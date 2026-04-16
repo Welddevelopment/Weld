@@ -7508,10 +7508,11 @@ async function rbxFetch(url) {
       });
     } catch (e) { console.warn('[RBX] Place gameicons failed:', e.message); }
 
-    // Attempt 2: universe-based fallback
-    if (!Object.keys(pMap).length) {
-      await resolveUniverses(placeIds);
-      const universeIds = [...new Set(placeIds.map(function (p) { return placeToUniverse[p]; }).filter(Boolean))];
+    // Attempt 2: universe-based fallback for any IDs that Attempt 1 missed
+    const missingIds = placeIds.filter(function (p) { return !pMap[p]; });
+    if (missingIds.length) {
+      await resolveUniverses(missingIds);
+      const universeIds = [...new Set(missingIds.map(function (p) { return placeToUniverse[p]; }).filter(Boolean))];
       if (universeIds.length) {
         try {
           const json = await rbxFetch(
@@ -7523,13 +7524,14 @@ async function rbxFetch(url) {
             const url = d.thumbnails && d.thumbnails[0] && d.thumbnails[0].imageUrl;
             if (url) uMap[String(d.universeId)] = url;
           });
-          placeIds.forEach(function (pid) {
+          missingIds.forEach(function (pid) {
             const uid = placeToUniverse[pid];
             if (uid && uMap[uid]) pMap[pid] = uMap[uid];
           });
         } catch (_) {}
 
-        if (!Object.keys(pMap).length) {
+        const stillMissing = missingIds.filter(function (p) { return !pMap[p]; });
+        if (stillMissing.length) {
           try {
             const json = await rbxFetch(
               'https://thumbnails.roblox.com/v1/games/icons?universeIds=' +
@@ -7539,7 +7541,7 @@ async function rbxFetch(url) {
             (json.data || []).forEach(function (d) {
               if (d.imageUrl) uMap[String(d.targetId)] = d.imageUrl;
             });
-            placeIds.forEach(function (pid) {
+            stillMissing.forEach(function (pid) {
               const uid = placeToUniverse[pid];
               if (uid && uMap[uid]) pMap[pid] = uMap[uid];
             });
