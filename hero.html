@@ -6481,7 +6481,7 @@ document.querySelectorAll('.why-grid, .for-grid').forEach(el => revealObserver.o
     return [0, 1, 2].map((offset) => {
       const stats = statTriplet(idx + offset + 1);
       const genre = ['adventure', 'battler', 'social', 'sim', 'racing'][offset % 5];
-      const game = ROBLOX_GAME_IDS[(idx + offset + 11) % ROBLOX_GAME_IDS.length];
+      const game = randomEl(ROBLOX_GAME_IDS);
       const desc = `${game.name} is a polished Roblox ${genre} title with daily events, badge progression, and an active live economy built for strong player retention.`;
       return {
         emoji: marks[(idx + offset) % marks.length],
@@ -6520,7 +6520,7 @@ document.querySelectorAll('.why-grid, .for-grid').forEach(el => revealObserver.o
     };
 
     return tags.slice(0, 3).map((tag, offset) => {
-      const game = ROBLOX_GAME_IDS[(idx + offset + 31) % ROBLOX_GAME_IDS.length];
+      const game = randomEl(ROBLOX_GAME_IDS);
       const sp = skillPortfolio[tag];
       const titleIdx = (idx + offset) % 3;
       return {
