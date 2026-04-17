@@ -1,0 +1,12 @@
+.claude/
+.codex-push-temp/
+.codex-tools/
+.vscode/
+codex-tools/
+Claude/
+temporary screenshots/
+node_modules/
+*.deleting
+test_write.txt
+AGENTS.md
+claude.md
