@@ -49,6 +49,8 @@ nav{
 }
 .nav-inner{max-width:1400px;margin:0 auto;padding:0 24px;height:100%;display:flex;align-items:center;justify-content:space-between;}
 .nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;font-family:var(--f-display);font-style:italic;font-size:24px;color:var(--text);}
+.nav-logo-img{width:28px;height:28px;object-fit:contain;flex-shrink:0;}
+.logo-dot{color:var(--coral);}
 .star-css{width:28px;height:28px;background:linear-gradient(135deg,var(--coral),var(--orange));clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);flex-shrink:0;box-shadow:0 0 18px rgba(234,90,53,.28);}
 .back-link{font-size:13px;color:var(--text-soft);text-decoration:none;font-weight:600;letter-spacing:.04em;text-transform:uppercase;transition:color 0.2s ease;}
 .back-link:hover{color:var(--text);}
@@ -157,7 +159,7 @@ nav{
 </style>
 </head>
 <body>
-<nav><div class="nav-inner"><a href="Hero.html" class="nav-logo"><div class="star-css"></div>weld.</a><a href="Hero.html" class="back-link">← Back to home</a></div></nav>
+<nav><div class="nav-inner"><a href="Hero.html" class="nav-logo" aria-label="weld. home"><img src="Assets/weld-logo-official.svg" alt="" class="nav-logo-img" width="28" height="28"/>weld<span class="logo-dot">.</span></a><a href="Hero.html" class="back-link">← Back to home</a></div></nav>
 
 <div class="signup-page">
 <div class="signup-card">
