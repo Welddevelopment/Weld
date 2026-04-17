@@ -1,0 +1,128 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.wrap{padding:1rem 0;font-family:var(--font-sans)}
+.toggle-row{display:flex;gap:8px;margin-bottom:1.5rem}
+.tog{flex:1;padding:10px;border-radius:8px;border:0.5px solid var(--color-border-secondary);cursor:pointer;font-size:13px;font-weight:500;text-align:center;transition:all 0.2s;background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.tog.active-dev{background:#E03A1E;color:#FAD4C8;border-color:#E03A1E}
+.tog.active-stu{background:#1A0A04;color:#FAD4C8;border-color:#1A0A04}
+.label{font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-text-tertiary);margin:1.25rem 0 0.6rem}
+.label:first-child{margin-top:0}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.sw{border-radius:8px;padding:12px 14px;min-width:110px;flex:1}
+.sw-name{font-size:10px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:3px;opacity:0.75}
+.sw-hex{font-size:12px;font-weight:500}
+.sw-use{font-size:10px;margin-top:5px;opacity:0.65;line-height:1.4}
+.preview{border-radius:10px;overflow:hidden;border:0.5px solid var(--color-border-tertiary);margin-top:0.5rem}
+.prev-row{padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:0.5px solid transparent}
+.prev-name{font-size:11px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase}
+.prev-sub{font-size:10px;margin-top:2px;opacity:0.6;line-height:1.3}
+.pill{font-size:10px;font-weight:500;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.tag{font-size:10px;font-weight:500;padding:3px 7px;border-radius:5px;white-space:nowrap}
+.panel{display:none}
+.panel.active{display:block}
+.note{margin-top:1rem;padding:12px 14px;border-radius:8px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.note strong{color:var(--color-text-primary);font-weight:500}
+.divider{height:0.5px;background:var(--color-border-tertiary);margin:1.25rem 0}
+</style>
+<div class="wrap">
+
+<div class="toggle-row">
+  <div class="tog active-dev" id="btn-dev" onclick="show('dev')">Developer mode</div>
+  <div class="tog" id="btn-stu" onclick="show('stu')">Studio mode</div>
+</div>
+
+<div class="panel active" id="panel-dev">
+  <div class="label">Hero & primary sections</div>
+  <div class="swatches">
+    <div class="sw" style="background:#E03A1E">
+      <div class="sw-name" style="color:#FAD4C8">Weld red</div>
+      <div class="sw-hex" style="color:#FAD4C8">#E03A1E</div>
+      <div class="sw-use" style="color:#FAD4C8">Hero, FAQ bg</div>
+    </div>
+    <div class="sw" style="background:#FAD4C8">
+      <div class="sw-name" style="color:#7A1C07">Spark pink</div>
+      <div class="sw-hex" style="color:#7A1C07">#FAD4C8</div>
+      <div class="sw-use" style="color:#7A1C07">Proof section</div>
+    </div>
+    <div class="sw" style="background:#1A0A04">
+      <div class="sw-name" style="color:#FAD4C8">Deep ember</div>
+      <div class="sw-hex" style="color:#FAD4C8">#1A0A04</div>
+      <div class="sw-use" style="color:#FAD4C8">Problem / footer</div>
+    </div>
+    <div class="sw" style="background:#FFF5F0;border:0.5px solid #F0C4B0">
+      <div class="sw-name" style="color:#7A1C07">Cream</div>
+      <div class="sw-hex" style="color:#7A1C07">#FFF5F0</div>
+      <div class="sw-use" style="color:#7A1C07">How it works</div>
+    </div>
+  </div>
+
+  <div class="label" style="margin-top:1rem">Page section rhythm</div>
+  <div class="preview">
+    <div class="prev-row" style="background:#FFF5F0;border-color:#F0C4B0"><div><div class="prev-name" style="color:#1A0A04">Nav</div><div class="prev-sub" style="color:#1A0A04">Cream — neutral entry</div></div><span class="pill" style="background:#E03A1E;color:#FAD4C8">Get access</span></div>
+    <div class="prev-row" style="background:#E03A1E;border-color:#C02F10"><div><div class="prev-name" style="color:#FAD4C8">Hero</div><div class="prev-sub" style="color:#FAD4C8">Red — bold, energetic</div></div><span class="tag" style="background:#FAD4C8;color:#7A1C07">Swipe. Spark. Ship.</span></div>
+    <div class="prev-row" style="background:#FFF5F0;border-color:#F0C4B0"><div><div class="prev-name" style="color:#1A0A04">How it works</div><div class="prev-sub" style="color:#1A0A04">Cream — breathable steps</div></div><span class="tag" style="background:#FAD4C8;color:#7A1C07">Step 1 →</span></div>
+    <div class="prev-row" style="background:#1A0A04;border-color:#2E1208"><div><div class="prev-name" style="color:#FAD4C8">Problem</div><div class="prev-sub" style="color:#FAD4C8">Dark — Discord chaos</div></div><span class="tag" style="background:#E03A1E;color:#FAD4C8">Discord</span></div>
+    <div class="prev-row" style="background:#FAD4C8;border-color:#F0C4B0"><div><div class="prev-name" style="color:#7A1C07">Proof</div><div class="prev-sub" style="color:#7A1C07">Pink — warm, trust-building</div></div><span class="tag" style="background:#E03A1E;color:#FAD4C8">Verified</span></div>
+    <div class="prev-row" style="background:#E03A1E;border-color:#C02F10"><div><div class="prev-name" style="color:#FAD4C8">FAQ + final CTA</div><div class="prev-sub" style="color:#FAD4C8">Red — closes with energy</div></div><span class="pill" style="background:#FAD4C8;color:#7A1C07">Join waitlist</span></div>
+    <div class="prev-row" style="background:#1A0A04"><div><div class="prev-name" style="color:#FAD4C8">Footer</div><div class="prev-sub" style="color:#FAD4C8">Dark — authoritative close</div></div><span class="tag" style="background:#E03A1E;color:#FAD4C8">weld.</span></div>
+  </div>
+</div>
+
+<div class="panel" id="panel-stu">
+  <div class="label">Hero & primary sections — studio shift</div>
+  <div class="swatches">
+    <div class="sw" style="background:#1A0A04">
+      <div class="sw-name" style="color:#FAD4C8">Deep ember</div>
+      <div class="sw-hex" style="color:#FAD4C8">#1A0A04</div>
+      <div class="sw-use" style="color:#FAD4C8">Hero — studio authority</div>
+    </div>
+    <div class="sw" style="background:#E03A1E">
+      <div class="sw-name" style="color:#FAD4C8">Weld red</div>
+      <div class="sw-hex" style="color:#FAD4C8">#E03A1E</div>
+      <div class="sw-use" style="color:#FAD4C8">Proof, FAQ bg</div>
+    </div>
+    <div class="sw" style="background:#FAD4C8">
+      <div class="sw-name" style="color:#7A1C07">Spark pink</div>
+      <div class="sw-hex" style="color:#7A1C07">#FAD4C8</div>
+      <div class="sw-use" style="color:#7A1C07">How it works</div>
+    </div>
+    <div class="sw" style="background:#FFF5F0;border:0.5px solid #F0C4B0">
+      <div class="sw-name" style="color:#7A1C07">Cream</div>
+      <div class="sw-hex" style="color:#7A1C07">#FFF5F0</div>
+      <div class="sw-use" style="color:#7A1C07">Who it's for</div>
+    </div>
+  </div>
+
+  <div class="label" style="margin-top:1rem">Page section rhythm — studios</div>
+  <div class="preview">
+    <div class="prev-row" style="background:#FFF5F0;border-color:#F0C4B0"><div><div class="prev-name" style="color:#1A0A04">Nav</div><div class="prev-sub" style="color:#1A0A04">Cream — same neutral entry</div></div><span class="pill" style="background:#1A0A04;color:#FAD4C8">Hire talent</span></div>
+    <div class="prev-row" style="background:#1A0A04;border-color:#2E1208"><div><div class="prev-name" style="color:#FAD4C8">Hero</div><div class="prev-sub" style="color:#FAD4C8">Dark — serious, premium feel</div></div><span class="tag" style="background:#E03A1E;color:#FAD4C8">Swipe. Spark. Ship.</span></div>
+    <div class="prev-row" style="background:#FAD4C8;border-color:#F0C4B0"><div><div class="prev-name" style="color:#7A1C07">How it works</div><div class="prev-sub" style="color:#7A1C07">Pink — warm, approachable</div></div><span class="tag" style="background:#1A0A04;color:#FAD4C8">Step 1 →</span></div>
+    <div class="prev-row" style="background:#FFF5F0;border-color:#F0C4B0"><div><div class="prev-name" style="color:#1A0A04">Problem</div><div class="prev-sub" style="color:#1A0A04">Cream — studios wasting time</div></div><span class="tag" style="background:#1A0A04;color:#FAD4C8">Discord</span></div>
+    <div class="prev-row" style="background:#E03A1E;border-color:#C02F10"><div><div class="prev-name" style="color:#FAD4C8">Proof</div><div class="prev-sub" style="color:#FAD4C8">Red — strong, decisive</div></div><span class="tag" style="background:#FAD4C8;color:#7A1C07">Verified</span></div>
+    <div class="prev-row" style="background:#1A0A04;border-color:#2E1208"><div><div class="prev-name" style="color:#FAD4C8">FAQ + final CTA</div><div class="prev-sub" style="color:#FAD4C8">Dark — matches hero, bookends</div></div><span class="pill" style="background:#E03A1E;color:#FAD4C8">Start hiring</span></div>
+    <div class="prev-row" style="background:#1A0A04"><div><div class="prev-name" style="color:#FAD4C8">Footer</div><div class="prev-sub" style="color:#FAD4C8">Dark — continuous close</div></div><span class="tag" style="background:#E03A1E;color:#FAD4C8">weld.</span></div>
+  </div>
+
+  <div class="note" style="margin-top:1rem">
+    <strong>Why dark for studios?</strong> Studios are buyers — they're evaluating, comparing, deciding. The dark ember hero signals authority and seriousness vs the energetic red of the developer side. Same brand, different personality. The red still appears prominently in the proof section where studios see verified talent — that's where the energy lands for them.
+  </div>
+</div>
+
+<div class="divider"></div>
+<div class="note">
+  <strong>Same 4 colours, different rhythm.</strong> Toggling modes doesn't change the palette — it resequences which background leads. Developer = red-first (energetic, creative). Studio = dark-first (authoritative, decisive). The nav and footer anchor points stay consistent so the page never feels completely alien on toggle.
+  <br><br>
+  <button onclick="sendPrompt('Now build a side-by-side hero mockup showing the developer red version vs the studio dark version with the toggle UI')" style="margin-top:8px;font-size:12px;font-weight:500;background:var(--color-background-primary);color:var(--color-text-primary);border:0.5px solid var(--color-border-secondary);padding:6px 12px;border-radius:20px;cursor:pointer">Build hero comparison mockup ↗</button>
+</div>
+
+</div>
+<script>
+function show(mode){
+  document.getElementById('panel-dev').classList.toggle('active', mode==='dev');
+  document.getElementById('panel-stu').classList.toggle('active', mode==='stu');
+  document.getElementById('btn-dev').className='tog'+(mode==='dev'?' active-dev':'');
+  document.getElementById('btn-stu').className='tog'+(mode==='stu'?' active-stu':'');
+}
+</script>
