@@ -7486,7 +7486,7 @@ document.querySelectorAll('.why-grid, .for-grid').forEach(el => revealObserver.o
 
 async function rbxFetch(url) {
   const path = url.replace('https://thumbnails.roblox.com/', '');
-  const proxyUrl = '/.netlify/functions/roblox-proxy?path=' + encodeURIComponent(path);
+  const proxyUrl = '/api/roblox-proxy?path=' + encodeURIComponent(path);
   
   const r = await fetchWithTimeout(proxyUrl, 12000);
   if (!r.ok) throw new Error('HTTP ' + r.status);
