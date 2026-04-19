@@ -3714,6 +3714,10 @@ body[data-audience="studio"] .mode-toggle-pill{
   color:#FFF5F0;
   text-shadow:0 16px 42px rgba(0,0,0,.3);
 }
+.se-headline .se-line{
+  display:block;
+  white-space:nowrap;
+}
 .split-half.se-dev .se-headline{
   max-width:16ch;
 }
@@ -4456,7 +4460,7 @@ body[data-audience="studio"] .value-strip-inner{
        onclick="chooseSplitEntry('developer')"
        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();chooseSplitEntry('developer')}">
     <span class="se-label">For talent</span>
-    <h2 class="se-headline">I'm a developer<br>looking for work</h2>
+    <h2 class="se-headline"><span class="se-line">I'm a developer</span><span class="se-line">looking for work</span></h2>
     <span class="se-cta">Find studios →</span>
   </div>
   <div class="se-divider" aria-hidden="true"></div>
