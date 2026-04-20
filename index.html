@@ -1,4 +1,4 @@
-﻿﻿﻿﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -3517,6 +3517,12 @@ body.modal-open > :not(#modal) {
   --scene-line:rgba(255,247,241,.12);
   --scene-shadow:0 38px 120px rgba(0,0,0,.48);
   --scene-shadow-soft:0 24px 64px rgba(0,0,0,.36);
+  --ember-title-gradient:
+    linear-gradient(180deg,#FFD79D 0%,#F7B46A 20%,#EF9447 44%,#E47633 72%,#D65E28 100%);
+  --ember-button-gradient:
+    linear-gradient(135deg,#FF7B56 0%,#E03A1E 48%,#B9260D 100%);
+  --ember-button-gradient-hover:
+    linear-gradient(135deg,#FFAB81 0%,#FF845F 22%,#E54523 60%,#BE2A10 100%);
 }
 
 body{
@@ -3541,14 +3547,12 @@ nav.scrolled{
 .demo-join-btn,
 .hero-browser-btn,
 .modal-action.like{
-  background:
-    linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,0) 32%),
-    linear-gradient(135deg,#FF7B56 0%,#E03A1E 48%,#B9260D 100%);
+  background:var(--ember-button-gradient);
   color:#FFF7F1;
-  border:1px solid rgba(255,244,239,.16);
+  border:1px solid rgba(247,196,121,.18);
   box-shadow:
-    0 0 0 1px rgba(255,255,255,.05) inset,
-    0 16px 34px rgba(224,58,30,.28),
+    0 0 0 1px rgba(255,214,148,.08) inset,
+    0 16px 34px rgba(217,91,39,.24),
     0 28px 70px rgba(0,0,0,.3);
 }
 .nav-cta:hover,
@@ -3559,9 +3563,10 @@ nav.scrolled{
 .hero-browser-btn:hover,
 .modal-action.like:hover{
   transform:translateY(-2px) scale(1.01);
+  background:var(--ember-button-gradient-hover);
   box-shadow:
-    0 0 0 1px rgba(255,255,255,.08) inset,
-    0 18px 38px rgba(224,58,30,.34),
+    0 0 0 1px rgba(255,222,166,.12) inset,
+    0 18px 38px rgba(217,91,39,.3),
     0 34px 82px rgba(0,0,0,.34);
   filter:saturate(1.05);
 }
@@ -3592,12 +3597,10 @@ nav.scrolled{
   pointer-events:none;
 }
 .mode-toggle-pill{
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0) 42%),
-    linear-gradient(135deg,#FF7B56 0%,#E03A1E 52%,#BA2B12 100%);
+  background:var(--ember-button-gradient);
   box-shadow:
-    0 12px 24px rgba(224,58,30,.3),
-    0 0 0 1px rgba(255,255,255,.08) inset;
+    0 12px 24px rgba(217,91,39,.26),
+    0 0 0 1px rgba(255,222,166,.12) inset;
 }
 body[data-audience="studio"] .mode-toggle-pill{
   background:
@@ -3697,8 +3700,16 @@ body[data-audience="studio"] .mode-toggle-pill{
   display:block;
   white-space:nowrap;
 }
+.se-headline .se-line-accent{
+  background:var(--ember-title-gradient);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  color:transparent;
+  text-shadow:none;
+}
 .split-half.se-dev .se-headline{
-  max-width:10ch;
+  max-width:12ch;
 }
 .split-half.se-studio .se-headline{
   color:#F3F6FF;
@@ -3708,14 +3719,14 @@ body[data-audience="studio"] .mode-toggle-pill{
   z-index:1;
   padding:15px 26px;
   letter-spacing:.12em;
-  background:rgba(255,255,255,.05);
+  background:rgba(255,255,255,.1);
   backdrop-filter:blur(14px);
   -webkit-backdrop-filter:blur(14px);
   pointer-events:none;
 }
 .split-half.se-dev .se-cta{
-  border-color:rgba(255,245,240,.4);
-  box-shadow:0 18px 34px rgba(122,28,7,.18);
+  border-color:rgba(255,245,240,.56);
+  box-shadow:0 18px 34px rgba(122,28,7,.24);
 }
 .split-half.se-studio .se-cta{
   background:
@@ -3727,6 +3738,20 @@ body[data-audience="studio"] .mode-toggle-pill{
 .se-divider{
   background:
     linear-gradient(180deg,transparent,rgba(255,245,240,.18),transparent);
+}
+
+.hl-line2,
+.s-headline em,
+.cta-headline em{
+  background:var(--ember-title-gradient);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  color:transparent;
+  text-shadow:none;
+}
+.cta-headline em{
+  font-style:normal;
 }
 
 .hero{
@@ -3887,12 +3912,10 @@ body[data-audience="studio"] .hero-panel-status{
   text-transform:uppercase;
 }
 body[data-audience="studio"] .hero-preview-btn{
-  background:
-    linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,0) 32%),
-    linear-gradient(135deg,#6D97F5 0%,#314D97 52%,#16203B 100%);
+  background:var(--ember-button-gradient);
   box-shadow:
-    0 0 0 1px rgba(255,255,255,.05) inset,
-    0 16px 34px rgba(109,151,245,.24),
+    0 0 0 1px rgba(255,222,166,.12) inset,
+    0 16px 34px rgba(217,91,39,.24),
     0 28px 70px rgba(0,0,0,.32);
   animation:previewPulseStudio 2.6s ease-in-out infinite;
 }
@@ -4151,23 +4174,169 @@ body[data-audience="studio"] .fc-bio-box{
 .how-step-item{
   border-bottom-color:rgba(255,247,241,.08);
 }
+.how-step-item:not(.active){
+  opacity:.78;
+}
 .step-num-wrap{
   background:linear-gradient(180deg,rgba(255,247,241,.08),rgba(255,247,241,.02));
   border:1px solid rgba(255,247,241,.08);
   box-shadow:0 12px 22px rgba(0,0,0,.16);
 }
+.step-content{
+  max-width:70ch;
+}
+.step-title{
+  font-size:clamp(22px,2.2vw,30px);
+  margin-bottom:12px;
+  color:rgba(255,247,241,.86);
+}
+.step-accent{
+  background:var(--ember-title-gradient);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  -webkit-text-fill-color:transparent;
+}
+.step-body{
+  font-size:15px;
+  line-height:1.82;
+  color:rgba(255,247,241,.8);
+}
+.for-grid{
+  grid-template-columns:minmax(0,1fr);
+}
+.for-card{
+  min-height:380px;
+  display:flex;
+  flex-direction:column;
+}
+.for-card-eyebrow{
+  margin-bottom:22px;
+  font-size:12px;
+}
+.for-card-title{
+  font-size:clamp(34px,4vw,52px);
+  line-height:1.02;
+  margin-bottom:26px;
+}
+.for-features{
+  margin-top:auto;
+}
+.for-feature{
+  font-size:15px;
+  line-height:1.78;
+  color:rgba(255,247,241,.84);
+}
+.why-card-title{
+  font-size:clamp(24px,2.3vw,30px);
+  line-height:1.24;
+}
+.why-card-body{
+  font-size:15px;
+  line-height:1.82;
+  color:rgba(255,247,241,.8);
+}
 .proof-grid{
   gap:22px;
+}
+.proof-card{
+  padding:36px 34px;
+}
+.proof-card-label{
+  margin-bottom:20px;
+  font-size:11px;
+  letter-spacing:.18em;
+}
+.proof-card-title{
+  font-size:clamp(24px,2.4vw,30px);
+  line-height:1.28;
+  margin-bottom:18px;
+  color:#FFF5F0;
+}
+.proof-card-body{
+  font-size:15px;
+  line-height:1.82;
+  color:rgba(255,247,241,.82);
 }
 .proof-card.discord-card{
   background:
     linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.015)),
     linear-gradient(180deg,#2E313B 0%,#1B1D23 100%);
 }
+.proof-card.discord-card .proof-card-label{
+  color:rgba(255,236,228,.86);
+  font-size:12px;
+  letter-spacing:.22em;
+  text-shadow:0 1px 0 rgba(0,0,0,.48),0 0 18px rgba(224,58,30,.18);
+}
 .proof-card.weld-card{
   background:
     linear-gradient(180deg,rgba(255,247,241,.08),rgba(255,247,241,.02)),
     linear-gradient(180deg,#25130C 0%,#120A06 100%);
+}
+.discord-msg{
+  padding:14px 16px;
+  gap:12px;
+}
+.discord-avatar{
+  width:34px;
+  height:34px;
+  font-size:12px;
+}
+.discord-name{
+  font-size:12px;
+  margin-bottom:4px;
+  color:#FFF5F0;
+}
+.discord-content{
+  font-size:13px;
+  line-height:1.65;
+  color:rgba(255,255,255,.76);
+}
+.weld-profile-mock{
+  margin-top:24px;
+  padding:24px;
+  background:rgba(255,255,255,.04);
+  border-color:rgba(255,255,255,.08);
+}
+.weld-mock-avatar{
+  width:40px;
+  height:40px;
+  font-size:15px;
+}
+.weld-mock-name{
+  font-size:16px;
+}
+.weld-mock-role{
+  font-size:11px;
+  letter-spacing:.08em;
+}
+.weld-mock-stat{
+  font-size:11px;
+  padding:4px 12px;
+}
+.weld-mock-games{
+  gap:12px;
+  margin-top:16px;
+  padding-top:16px;
+}
+.weld-mock-game{
+  padding:12px;
+}
+.weld-mock-game-visits{
+  font-size:18px;
+}
+.weld-mock-game-label{
+  font-size:10px;
+}
+.proof-row > div{
+  padding:18px 22px;
+  font-size:15px;
+  line-height:1.6;
+  color:rgba(255,250,247,.86);
+}
+.proof-row-head > div{
+  font-size:10px;
 }
 .faq-item{
   border-bottom-color:rgba(255,247,241,.1);
@@ -4301,6 +4470,238 @@ body[data-audience="studio"] .value-strip-inner{
     linear-gradient(180deg,rgba(255,247,241,.06),rgba(255,247,241,.015)),
     linear-gradient(180deg,rgba(13,18,30,.92),rgba(8,10,16,.98));
 }
+.for-inner,
+.proof-inner{
+  overflow:hidden;
+  isolation:isolate;
+  box-shadow:
+    0 42px 100px rgba(0,0,0,.34),
+    0 18px 36px rgba(0,0,0,.18),
+    inset 0 1px 0 rgba(255,255,255,.04),
+    inset 0 -1px 0 rgba(0,0,0,.3);
+}
+.for-inner::before,
+.proof-inner::before{
+  content:'';
+  position:absolute;
+  inset:1px;
+  border-radius:inherit;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.05),transparent 22%,transparent 76%,rgba(0,0,0,.18)),
+    radial-gradient(circle at 18% 12%,rgba(255,247,241,.08),transparent 28%);
+  pointer-events:none;
+  z-index:0;
+}
+.for-inner::after,
+.proof-inner::after{
+  content:'';
+  position:absolute;
+  left:10%;
+  right:10%;
+  bottom:-56px;
+  height:132px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(224,58,30,.18) 0%,rgba(224,58,30,.08) 36%,transparent 76%);
+  filter:blur(26px);
+  opacity:.6;
+  pointer-events:none;
+  z-index:0;
+}
+.for-inner > *,
+.proof-inner > *{
+  position:relative;
+  z-index:1;
+}
+body[data-audience="studio"] .for-inner::after,
+body[data-audience="studio"] .proof-inner::after{
+  background:radial-gradient(circle,rgba(98,146,255,.18) 0%,rgba(234,106,58,.1) 38%,transparent 78%);
+}
+.nav-cta{
+  position:relative;
+  border-color:rgba(255,245,240,.2);
+  box-shadow:
+    0 20px 36px rgba(122,28,7,.24),
+    0 10px 22px rgba(0,0,0,.18),
+    inset 0 1px 0 rgba(255,255,255,.24),
+    inset 0 -3px 0 rgba(122,28,7,.24);
+}
+.nav-cta::before{
+  content:'';
+  position:absolute;
+  inset:1px 1px auto 1px;
+  height:54%;
+  border-radius:inherit;
+  background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,.08) 58%,transparent);
+  opacity:.45;
+  pointer-events:none;
+}
+.nav-cta:hover{
+  box-shadow:
+    0 24px 42px rgba(122,28,7,.28),
+    0 14px 28px rgba(0,0,0,.22),
+    inset 0 1px 0 rgba(255,255,255,.28),
+    inset 0 -3px 0 rgba(122,28,7,.28);
+}
+.hero-fan-wrap .hero-brief-card{
+  padding:20px 20px 18px;
+  justify-content:flex-start;
+  gap:0;
+}
+.hero-fan-wrap .hero-brief-card::before{
+  inset:8px;
+  border-radius:20px;
+}
+.hero-fan-wrap .hero-brief-card .fc-top{
+  align-items:center;
+  gap:12px;
+  margin-bottom:14px;
+}
+.hero-fan-wrap .hero-brief-card .fc-avatar{
+  width:54px;
+  height:54px;
+  border-radius:18px;
+}
+.hero-fan-wrap .hero-brief-card .fc-info{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.hero-fan-wrap .hero-brief-card .fc-name{
+  font-size:25px;
+  margin-bottom:0;
+}
+.hero-fan-wrap .hero-brief-card .fc-badge{
+  width:max-content;
+  background:rgba(255,247,241,.06);
+}
+.hero-brief-fit{
+  font-size:12px;
+  line-height:1.45;
+  color:rgba(255,247,241,.7);
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.hero-brief-focus{
+  margin-bottom:14px;
+  padding:12px 14px 13px;
+  border-radius:18px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015)),
+    linear-gradient(180deg,rgba(255,247,241,.05),rgba(255,247,241,.015));
+  border:1px solid rgba(255,247,241,.08);
+  transform:translateZ(20px);
+}
+.hero-brief-kicker{
+  font-family:var(--f-mono);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:rgba(255,247,241,.52);
+  margin-bottom:10px;
+}
+.hero-brief-pill-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.hero-brief-pill{
+  display:inline-flex;
+  align-items:center;
+  min-height:28px;
+  padding:6px 11px;
+  border-radius:999px;
+  border:1px solid rgba(255,247,241,.12);
+  background:rgba(255,247,241,.05);
+  color:#FFF5F0;
+  font-size:11px;
+  font-weight:600;
+  line-height:1;
+}
+.hero-brief-summary{
+  margin-bottom:14px;
+  font-size:13px;
+  line-height:1.72;
+  color:rgba(255,247,241,.8);
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  transform:translateZ(18px);
+}
+.hero-brief-facts{
+  margin-top:auto;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  transform:translateZ(24px);
+}
+.hero-brief-fact{
+  min-width:0;
+  padding:10px 10px 11px;
+  border-radius:16px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01)),
+    rgba(11,8,7,.34);
+  border:1px solid rgba(255,247,241,.08);
+}
+.hero-brief-fact-label{
+  display:block;
+  margin-bottom:6px;
+  font-family:var(--f-mono);
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:rgba(255,247,241,.44);
+}
+.hero-brief-fact-value{
+  display:block;
+  color:#FFF5F0;
+  font-size:12px;
+  font-weight:600;
+  line-height:1.35;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.hero-brief-card--studio .hero-brief-focus,
+.hero-brief-card--studio .hero-brief-fact{
+  border-color:rgba(250,212,200,.1);
+}
+.hero-brief-card--developer{
+  background:
+    linear-gradient(180deg,rgba(14,18,29,.97) 0%,rgba(8,10,17,.98) 100%);
+}
+.hero-brief-card--developer::after{
+  background:linear-gradient(135deg,rgba(255,245,240,.16),transparent 24%,transparent 78%,rgba(109,151,245,.22));
+}
+.hero-brief-card--developer .fc-avatar{
+  box-shadow:0 12px 24px rgba(109,151,245,.18);
+}
+.hero-brief-card--developer .hero-brief-focus{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015)),
+    linear-gradient(180deg,rgba(109,151,245,.12),rgba(10,15,27,.08));
+}
+.hero-brief-card--developer .hero-brief-pill{
+  background:rgba(255,247,241,.04);
+  border-color:rgba(186,206,255,.16);
+}
+.hero-brief-card--developer .hero-brief-fact{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01)),
+    rgba(9,14,24,.4);
+  border-color:rgba(186,206,255,.12);
+}
+
+@media (max-width: 820px){
+  .hero-brief-facts{
+    grid-template-columns:1fr;
+  }
+}
 
 @media (max-width: 1100px){
   .hero-inner{
@@ -4422,7 +4823,7 @@ body[data-audience="studio"] .value-strip-inner{
        onclick="chooseSplitEntry('developer')"
        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();chooseSplitEntry('developer')}">
     <span class="se-label">For talent</span>
-    <h2 class="se-headline"><span class="se-line">I'm a developer</span><span class="se-line">looking for work</span></h2>
+    <h2 class="se-headline"><span class="se-line">I'm a developer</span><span class="se-line se-line-accent">looking for work</span></h2>
     <span class="se-cta">Find studios →</span>
   </div>
   <div class="se-divider" aria-hidden="true"></div>
@@ -4430,7 +4831,7 @@ body[data-audience="studio"] .value-strip-inner{
        onclick="chooseSplitEntry('studio')"
        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();chooseSplitEntry('studio')}">
     <span class="se-label">For teams</span>
-    <h2 class="se-headline">I'm a studio<br>looking to hire</h2>
+    <h2 class="se-headline"><span class="se-line">I'm a studio</span><span class="se-line se-line-accent">looking to hire</span></h2>
     <span class="se-cta">Find developers →</span>
   </div>
 </div>
@@ -4663,7 +5064,7 @@ body[data-audience="studio"] .value-strip-inner{
           <div class="step-connector"></div>
           <div class="step-content">
             <div class="step-title show-dev-only">'weld.' your profile.</div>
-            <div class="step-title show-studio-only">'weld.' your profile.</div>
+          <div class="step-title show-studio-only"><span class="step-accent">'weld.'</span> your profile.</div>
             <p class="step-body show-dev-only">Input your role, rates, availability and link your accounts, that's all. We will 'weld.' everything together so that your future clients can see proof of just how valuable you are, so you can spark a match, not a cold dead-end.</p>
             <p class="step-body show-studio-only">Input your role, rates, availability and link your accounts, that's all. We will 'weld.' everything together so that your next developers can see proof of just how valuable of a client you are, so you can spark a match, and start shipping.</p>
           </div>
@@ -4673,7 +5074,7 @@ body[data-audience="studio"] .value-strip-inner{
           <div class="step-connector"></div>
           <div class="step-content">
             <div class="step-title show-dev-only">Spark with clients you want.</div>
-            <div class="step-title show-studio-only">Spark with devs you want.</div>
+          <div class="step-title show-studio-only"><span class="step-accent">Spark</span> with devs you want.</div>
             <p class="step-body show-dev-only">Instead of chasing every potential job, you get clients that fit your needs accessibly — all it takes is a swipe.</p>
             <p class="step-body show-studio-only">Instead of chasing every potential developer, you get high quality developers that fit your needs accessibly — all it takes is a swipe.</p>
           </div>
@@ -4683,7 +5084,7 @@ body[data-audience="studio"] .value-strip-inner{
           <div class="step-connector"></div>
           <div class="step-content">
             <div class="step-title show-dev-only">Swipe. Spark. Ship.</div>
-            <div class="step-title show-studio-only">Swipe. Spark. Ship.</div>
+          <div class="step-title show-studio-only"><span class="step-accent">Swipe. Spark. Ship.</span></div>
             <p class="step-body show-dev-only">Swipe until you match, a spark forms. Then start delivering and helping studios ship what they need. Less spam, less back-and-forth, just start.</p>
             <p class="step-body show-studio-only">Swipe until you match, then a spark forms. Then start chatting and start shipping what you need. Less spam, less back-and-forth, just start.</p>
           </div>
@@ -5183,6 +5584,75 @@ function renderDevCard(d) {
   const badge = d.experience === "5+ years" ? "Pro" : "Verified";
   return `
     <div class="fc"><div class="fc-top"><div class="fc-avatar"><img data-rbx-user="${d.robloxUserId}" src="${RBX_PLACEHOLDER}" alt="${d.name}"></div><div class="fc-info"><div class="fc-name">${d.name}</div><div class="fc-badge">${badge}</div></div></div><div class="fc-tagline">${d.tagline}</div><div class="fc-bio-box"><div class="fc-bio">${d.bio}</div></div><div class="fc-tags">${tagsHTML}</div><div class="fc-divider"></div><div class="fc-meta"><div class="fc-dot"></div>${d.status}</div><div class="fc-stats"><div>Rate: <span>${d.rate}</span></div><div>Exp: <span>${d.expDisplay}</span></div></div></div>
+  `;
+}
+
+function truncateHeroBrief(text, maxLength = 118) {
+  const source = String(text || "").replace(/\s+/g, " ").trim();
+  if (!source) return "";
+  if (source.length <= maxLength) return source;
+  return `${source.slice(0, maxLength).replace(/[,\s.;:!?-]+$/g, "")}...`;
+}
+
+function heroRoleFit(item, type) {
+  const tags = Array.isArray(item.tags) ? item.tags.slice(0, 3) : [];
+  if (tags.length) {
+    return type === "studio"
+      ? `Hiring for ${tags.join(", ")}`
+      : `Strong in ${tags.join(", ")}`;
+  }
+  if (item.tagline) return truncateHeroBrief(item.tagline, 78);
+  return truncateHeroBrief(item.bio, 78);
+}
+
+function heroSummary(item) {
+  return truncateHeroBrief(item.bio || item.tagline, 132);
+}
+
+function heroFactTriplet(item, type) {
+  if (type === "studio") {
+    return [
+      { label: "Status", value: item.status || "Hiring Now" },
+      { label: "Budget", value: item.budget || "TBD" },
+      { label: "Team", value: item.team || "Small team" }
+    ];
+  }
+  return [
+    { label: "Status", value: item.status || "Available" },
+    { label: "Rate", value: item.rate || "Flexible" },
+    { label: "Experience", value: item.expDisplay || item.experience || "Experienced" }
+  ];
+}
+
+function renderHeroBriefCard(item, type) {
+  const tags = Array.isArray(item.tags) ? item.tags.slice(0, 3) : [];
+  const badge = type === "studio" ? "Studio" : (item.experience === "5+ years" ? "Pro" : "Verified");
+  const focusLabel = type === "studio" ? "Hiring focus" : "Primary skills";
+  const fit = heroRoleFit(item, type);
+  const summary = heroSummary(item);
+  const pills = tags.length
+    ? tags.map((tag) => `<span class="hero-brief-pill">${tag}</span>`).join("")
+    : `<span class="hero-brief-pill">${type === "studio" ? "Open brief" : "Available now"}</span>`;
+  const facts = heroFactTriplet(item, type)
+    .map((fact) => `<div class="hero-brief-fact"><span class="hero-brief-fact-label">${fact.label}</span><span class="hero-brief-fact-value">${fact.value}</span></div>`)
+    .join("");
+  return `
+    <div class="fc hero-brief-card hero-brief-card--${type}">
+      <div class="fc-top">
+        <div class="fc-avatar"><img data-rbx-user="${item.robloxUserId}" src="${RBX_PLACEHOLDER}" alt="${item.name}"></div>
+        <div class="fc-info">
+          <div class="fc-name">${item.name}</div>
+          <div class="fc-badge">${badge}</div>
+          <div class="hero-brief-fit">${fit}</div>
+        </div>
+      </div>
+      <div class="hero-brief-focus">
+        <div class="hero-brief-kicker">${focusLabel}</div>
+        <div class="hero-brief-pill-row">${pills}</div>
+      </div>
+      <div class="hero-brief-summary">${summary}</div>
+      <div class="hero-brief-facts">${facts}</div>
+    </div>
   `;
 }
 
@@ -6406,6 +6876,15 @@ document.querySelectorAll('.why-grid, .for-grid').forEach(el => revealObserver.o
   if (previewParams.get('preview') === 'hero') {
     applyMode(previewParams.get('audience') === 'studio' ? 'studio' : 'developer');
     if (splitEl) splitEl.classList.add('se-hidden');
+    var sectionId = previewParams.get('section');
+    if (sectionId) {
+      window.requestAnimationFrame(function() {
+        window.requestAnimationFrame(function() {
+          var target = document.getElementById(sectionId);
+          if (target) target.scrollIntoView({ block: 'start' });
+        });
+      });
+    }
     return;
   }
   window.chooseSplitEntry = function(mode) {
@@ -6755,8 +7234,7 @@ document.querySelectorAll('.why-grid, .for-grid').forEach(el => revealObserver.o
 
     const type = getPreviewType(aud);
     const items = type === 'studio' ? window.MockData.studios : window.MockData.developers;
-    const renderer = type === 'studio' ? window.MockData.renderStudioCard : window.MockData.renderDevCard;
-    fan.innerHTML = items.slice(0, 8).map(renderer).join('');
+    fan.innerHTML = items.slice(0, 8).map((item) => renderHeroBriefCard(item, type)).join('');
   }
 
   function cWrap(i) {
