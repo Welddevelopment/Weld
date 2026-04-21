@@ -479,25 +479,25 @@ nav.scrolled{
 }
 .hl-line2 {
   font-style:italic;
-  background:linear-gradient(135deg,#FAD4C8 0%,#E03A1E 80%,#FFF5F0 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;
   padding-bottom:12px;
   animation:heroTitleReveal .7s .28s var(--e-expo) forwards;
 }
 .hl-line1,.hl-line2{
-  transition:transform .25s var(--e-out),opacity .25s var(--e-out),filter .25s var(--e-out);
+  transition:transform .25s var(--e-out),opacity .25s var(--e-out);
+}
+.hl-line2-svg{
+  display:block;
+  height:auto;
+  overflow:visible;
 }
 .hero-line-exit{
   opacity:0!important;
   transform:translateY(-12px)!important;
-  filter:blur(8px)!important;
   transition-duration:.1s!important;
 }
 .hero-line-enter{
   opacity:1!important;
   transform:translateY(0)!important;
-  filter:blur(0)!important;
   transition-duration:.25s!important;
 }
 
@@ -3518,7 +3518,7 @@ body.modal-open > :not(#modal) {
   --scene-shadow:0 38px 120px rgba(0,0,0,.48);
   --scene-shadow-soft:0 24px 64px rgba(0,0,0,.36);
   --ember-title-gradient:
-    linear-gradient(180deg,#FFD79D 0%,#F7B46A 20%,#EF9447 44%,#E47633 72%,#D65E28 100%);
+    linear-gradient(135deg,#F3C476 0%,#EDA14C 34%,#E47732 68%,#D65A28 100%);
   --ember-button-gradient:
     linear-gradient(135deg,#FF7B56 0%,#E03A1E 48%,#B9260D 100%);
   --ember-button-gradient-hover:
@@ -3690,23 +3690,30 @@ body[data-audience="studio"] .mode-toggle-pill{
 .se-headline{
   position:relative;
   z-index:1;
+  display:flex;
+  flex-direction:column;
+  gap:.02em;
   max-width:11ch;
   font-size:clamp(34px,4.8vw,72px);
-  line-height:.92;
+  line-height:1.1;
+  padding-block:.14em;
+  overflow:visible;
   color:#FFF5F0;
   text-shadow:0 14px 40px rgba(0,0,0,.22);
 }
 .se-headline .se-line{
   display:block;
   white-space:nowrap;
+  overflow:visible;
+  line-height:1.04;
 }
 .se-headline .se-line-accent{
-  background:var(--ember-title-gradient);
-  -webkit-background-clip:text;
-  background-clip:text;
-  -webkit-text-fill-color:transparent;
-  color:transparent;
-  text-shadow:none;
+  background:none;
+  -webkit-background-clip:border-box;
+  background-clip:border-box;
+  -webkit-text-fill-color:currentColor;
+  color:#FFF5F0;
+  text-shadow:inherit;
 }
 .split-half.se-dev .se-headline{
   max-width:12ch;
@@ -3740,7 +3747,6 @@ body[data-audience="studio"] .mode-toggle-pill{
     linear-gradient(180deg,transparent,rgba(255,245,240,.18),transparent);
 }
 
-.hl-line2,
 .s-headline em,
 .cta-headline em{
   background:var(--ember-title-gradient);
@@ -3750,6 +3756,7 @@ body[data-audience="studio"] .mode-toggle-pill{
   color:transparent;
   text-shadow:none;
 }
+.hero .hl-line2{display:block;}
 .cta-headline em{
   font-style:normal;
 }
@@ -5063,7 +5070,7 @@ body[data-audience="studio"] .proof-inner::after{
           <div class="step-num-wrap">1</div>
           <div class="step-connector"></div>
           <div class="step-content">
-            <div class="step-title show-dev-only">'weld.' your profile.</div>
+          <div class="step-title show-dev-only"><span class="step-accent">'weld.'</span> your profile.</div>
           <div class="step-title show-studio-only"><span class="step-accent">'weld.'</span> your profile.</div>
             <p class="step-body show-dev-only">Input your role, rates, availability and link your accounts, that's all. We will 'weld.' everything together so that your future clients can see proof of just how valuable you are, so you can spark a match, not a cold dead-end.</p>
             <p class="step-body show-studio-only">Input your role, rates, availability and link your accounts, that's all. We will 'weld.' everything together so that your next developers can see proof of just how valuable of a client you are, so you can spark a match, and start shipping.</p>
@@ -5073,7 +5080,7 @@ body[data-audience="studio"] .proof-inner::after{
           <div class="step-num-wrap">2</div>
           <div class="step-connector"></div>
           <div class="step-content">
-            <div class="step-title show-dev-only">Spark with clients you want.</div>
+          <div class="step-title show-dev-only"><span class="step-accent">Spark</span> with clients you want.</div>
           <div class="step-title show-studio-only"><span class="step-accent">Spark</span> with devs you want.</div>
             <p class="step-body show-dev-only">Instead of chasing every potential job, you get clients that fit your needs accessibly — all it takes is a swipe.</p>
             <p class="step-body show-studio-only">Instead of chasing every potential developer, you get high quality developers that fit your needs accessibly — all it takes is a swipe.</p>
@@ -5083,7 +5090,7 @@ body[data-audience="studio"] .proof-inner::after{
           <div class="step-num-wrap">3</div>
           <div class="step-connector"></div>
           <div class="step-content">
-            <div class="step-title show-dev-only">Swipe. Spark. Ship.</div>
+          <div class="step-title show-dev-only"><span class="step-accent">Swipe. Spark. Ship.</span></div>
           <div class="step-title show-studio-only"><span class="step-accent">Swipe. Spark. Ship.</span></div>
             <p class="step-body show-dev-only">Swipe until you match, a spark forms. Then start delivering and helping studios ship what they need. Less spam, less back-and-forth, just start.</p>
             <p class="step-body show-studio-only">Swipe until you match, then a spark forms. Then start chatting and start shipping what you need. Less spam, less back-and-forth, just start.</p>
@@ -5751,17 +5758,16 @@ function initHeroEntrance() {
   // Line 2: animate as a whole block â€” gradient-clip breaks if text is inside inline-block spans
   const line2 = headline.querySelector('.hl-line2');
   if (line2) {
+    applyGradientToLine2(line2);
     line2.style.animationName = 'none'; // cancel CSS keyframe
     line2.style.opacity = '0';
     line2.style.transform = 'translateY(28px)';
-    line2.style.filter = 'blur(5px)';
     // Trigger after line1 words finish
     const delay = 380 + wordIdx * 65;
     setTimeout(() => {
-      line2.style.transition = `opacity .65s var(--e-expo), transform .65s var(--e-expo), filter .65s var(--e-expo)`;
+      line2.style.transition = `opacity .65s var(--e-expo), transform .65s var(--e-expo)`;
       line2.style.opacity = '1';
       line2.style.transform = 'none';
-      line2.style.filter = 'none';
     }, delay);
   }
 }
@@ -5769,10 +5775,38 @@ initHeroEntrance();
 
 function applyGradientToLine2(line2) {
   if (!line2) return;
-  line2.style.background = 'linear-gradient(135deg,#FAD4C8 0%,#E03A1E 60%)';
-  line2.style.webkitBackgroundClip = 'text';
-  line2.style.webkitTextFillColor = 'transparent';
-  line2.style.backgroundClip = 'text';
+  const text = (line2.dataset.lineText || line2.textContent || '').trim();
+  if (!text) return;
+  line2.dataset.lineText = text;
+
+  const styles = getComputedStyle(line2);
+  const fontSize = parseFloat(styles.fontSize) || 96;
+  const fontFamily = styles.fontFamily || 'Instrument Serif, Georgia, serif';
+  const fontWeight = styles.fontWeight || '400';
+  const letterSpacing = parseFloat(styles.letterSpacing) || 0;
+  const fontSpec = `italic ${fontWeight} ${fontSize}px ${fontFamily}`;
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  ctx.font = fontSpec;
+  const metrics = ctx.measureText(text);
+  const width = Math.ceil(metrics.width + Math.max(0, text.length - 1) * letterSpacing + fontSize * 0.08);
+  const ascent = Math.ceil(metrics.actualBoundingBoxAscent || fontSize * 0.76);
+  const descent = Math.ceil(metrics.actualBoundingBoxDescent || fontSize * 0.22);
+  const height = Math.max(1, ascent + descent + Math.ceil(fontSize * 0.06));
+  const gradientId = `hero-line2-gradient-${Math.random().toString(36).slice(2, 10)}`;
+
+  line2.innerHTML =
+    `<svg class="hl-line2-svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" aria-hidden="true" focusable="false">` +
+      `<defs><linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="0%">` +
+        `<stop offset="0%" stop-color="#F3C476"></stop>` +
+        `<stop offset="34%" stop-color="#EDA14C"></stop>` +
+        `<stop offset="68%" stop-color="#E47732"></stop>` +
+        `<stop offset="100%" stop-color="#D65A28"></stop>` +
+      `</linearGradient></defs>` +
+      `<text x="0" y="${ascent}" fill="url(#${gradientId})" font-family="${fontFamily.replace(/"/g, '&quot;')}" font-size="${fontSize}" font-style="italic" font-weight="${fontWeight}" letter-spacing="${letterSpacing}">${text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</text>` +
+    `</svg>`;
 }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -5794,7 +5828,7 @@ const audienceCopy = {
   },
   studio:{
     line1:'weld. with devs.',
-    line2:'no more discord.',
+    line2:'No more discord.',
     sub:"weld. links you with developers through verified Roblox profiles — rates, availability, and shipped games all in one place, so you can focus on shipping.",
     cta:'Weld with your devs',
     navCta:'Weld with your devs',
@@ -5917,7 +5951,11 @@ function setAudience(aud) {
 
 
 window.addEventListener('load', () => positionPill(currentAudience));
-window.addEventListener('resize', () => positionPill(currentAudience));
+window.addEventListener('resize', () => {
+  positionPill(currentAudience);
+  const line2 = document.getElementById('hl-line2');
+  if (line2) applyGradientToLine2(line2);
+});
 
 const allowPointerMotion = window.matchMedia('(min-width: 1025px)').matches &&
   !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
