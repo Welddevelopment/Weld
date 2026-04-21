@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:weldroblox.com)",
+      "Read(//c/Users/joelj/Downloads/**)"
+    ]
+  }
+}
