@@ -489,6 +489,8 @@ nav.scrolled{
   display:block;
   height:auto;
   overflow:visible;
+  margin-inline:auto;
+  max-width:100%;
 }
 .hero-line-exit{
   opacity:0!important;
@@ -4751,8 +4753,29 @@ body[data-audience="studio"] .proof-inner::after{
     inset:14px 10px 12px;
     border-radius:28px;
   }
+  .hero-text{
+    width:100%;
+    align-items:center;
+    text-align:center;
+  }
   .hero-headline{
-    font-size:clamp(58px,18vw,96px);
+    max-width:8.4ch;
+    width:min(100%, 8.4ch);
+    align-self:center;
+    margin-inline:auto;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+  }
+  .hl-line1,
+  .hl-line2{
+    font-size:clamp(54px,15vw,76px);
+    line-height:.9;
+  }
+  .hero-sub,
+  .hero-trust{
+    text-align:center;
   }
   .email-row,
   .cta-email-row{
@@ -5697,6 +5720,27 @@ function toggleFaq(el) {
   item.classList.toggle('open');
 }
 
+function shouldUseSplitHeroWords() {
+  return window.innerWidth > 820;
+}
+
+function prepareHeroLine1(line1) {
+  if (!line1) return 0;
+  const raw = (line1.dataset.lineText || line1.textContent || '').trim();
+  line1.dataset.lineText = raw;
+  if (!raw) return 0;
+  if (!shouldUseSplitHeroWords()) {
+    line1.textContent = raw;
+    return raw.split(/\s+/).length;
+  }
+  let wordIdx = 0;
+  const words = raw.split(/\s+/);
+  line1.innerHTML = words.map(w =>
+    `<span class="hw" style="--i:${wordIdx++}">${w}</span>`
+  ).join(' ');
+  return wordIdx;
+}
+
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    TELEPORT TRANSITIONS (Cinematic Anchor Navigation)
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
@@ -5749,10 +5793,7 @@ function initHeroEntrance() {
   // Line 1: word-split with stagger
   const line1 = headline.querySelector('.hl-line1');
   if (line1) {
-    const words = line1.textContent.trim().split(/\s+/);
-    line1.innerHTML = words.map(w =>
-      `<span class="hw" style="--i:${wordIdx++}">${w}</span>`
-    ).join(' ');
+    wordIdx = prepareHeroLine1(line1);
   }
 
   // Line 2: animate as a whole block â€” gradient-clip breaks if text is inside inline-block spans
@@ -5953,7 +5994,9 @@ function setAudience(aud) {
 window.addEventListener('load', () => positionPill(currentAudience));
 window.addEventListener('resize', () => {
   positionPill(currentAudience);
+  const line1 = document.getElementById('hl-line1');
   const line2 = document.getElementById('hl-line2');
+  if (line1) prepareHeroLine1(line1);
   if (line2) applyGradientToLine2(line2);
 });
 
