@@ -9,6 +9,7 @@ interface Props {
   dragOpacity?: number
   onPass?: () => void
   onLike?: () => void
+  onViewProfile?: () => void
 }
 
 export default function ProfileCard({
@@ -17,6 +18,7 @@ export default function ProfileCard({
   dragOpacity = 0,
   onPass,
   onLike,
+  onViewProfile,
 }: Props) {
   const available = isAvailableNow(profile.availability)
 
@@ -189,9 +191,20 @@ export default function ProfileCard({
           ))}
         </div>
 
+        {/* View profile button */}
+        <button
+          onMouseDown={e => e.stopPropagation()}
+          onClick={e => { e.stopPropagation(); onViewProfile?.() }}
+          className="w-full text-center py-2 mb-3 transition-opacity hover:opacity-80 active:opacity-60"
+          style={{ fontFamily: 'var(--font-geist-mono)', color: 'rgba(255,247,241,.35)', fontSize: 11, letterSpacing: '0.06em' }}
+        >
+          view full profile →
+        </button>
+
         {/* Action buttons */}
         <div className="flex justify-center gap-8">
           <button
+            onMouseDown={e => e.stopPropagation()}
             onClick={e => { e.stopPropagation(); onPass?.() }}
             className="w-12 h-12 rounded-full flex items-center justify-center text-xl transition-transform active:scale-90"
             style={{ border: '2px solid #E84624', color: '#E84624' }}
@@ -200,6 +213,7 @@ export default function ProfileCard({
             ✕
           </button>
           <button
+            onMouseDown={e => e.stopPropagation()}
             onClick={e => { e.stopPropagation(); onLike?.() }}
             className="w-12 h-12 rounded-full flex items-center justify-center text-xl transition-transform active:scale-90"
             style={{ border: '2px solid #3DC77A', color: '#3DC77A' }}

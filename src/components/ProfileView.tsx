@@ -6,6 +6,8 @@ import { getInitials, isAvailableNow } from '@/lib/utils'
 interface Props {
   profile: Profile
   onBack: () => void
+  onPass?: () => void
+  onLike?: () => void
 }
 
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
@@ -17,7 +19,7 @@ function Section({ label, children }: { label: string; children: React.ReactNode
   )
 }
 
-export default function ProfileView({ profile, onBack }: Props) {
+export default function ProfileView({ profile, onBack, onPass, onLike }: Props) {
   const available = isAvailableNow(profile.availability)
 
   return (
@@ -25,13 +27,17 @@ export default function ProfileView({ profile, onBack }: Props) {
       className="h-screen overflow-y-auto flex flex-col items-center py-6 px-4"
       style={{ background: '#0E0C09' }}
     >
+      {/* Fixed close button */}
+      <button
+        onClick={onBack}
+        className="fixed top-4 right-4 z-50 w-9 h-9 rounded-full flex items-center justify-center transition-opacity hover:opacity-80 active:scale-95"
+        style={{ background: 'rgba(255,250,247,.08)', border: '1px solid rgba(255,250,247,.12)', color: 'rgba(255,247,241,.6)' }}
+        aria-label="Close"
+      >
+        ✕
+      </button>
+
       <div className="w-full max-w-sm">
-        <button
-          onClick={onBack}
-          className="text-sm text-gray-500 mb-4 flex items-center gap-1 hover:text-gray-300 transition-colors"
-        >
-          ← Back to swiping
-        </button>
 
         {/* Header card */}
         <div className="rounded-3xl overflow-hidden" style={{ background: '#1E1B16', border: '1px solid rgba(255,250,247,.08)' }}>
@@ -121,13 +127,17 @@ export default function ProfileView({ profile, onBack }: Props) {
 
         <div className="flex gap-3 mt-4 mb-8">
           <button
-            onClick={onBack}
-            className="flex-1 py-3 rounded-xl text-gray-400 text-sm font-medium active:scale-95 transition-transform"
-            style={{ border: '1px solid rgba(255,255,255,0.12)' }}
+            onClick={onPass ?? onBack}
+            className="flex-1 py-3 rounded-xl text-sm font-medium active:scale-95 transition-transform"
+            style={{ border: '1px solid rgba(255,250,247,.12)', color: 'rgba(255,247,241,.5)' }}
           >
             Pass
           </button>
-          <button className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-semibold active:scale-95 transition-transform">
+          <button
+            onClick={onLike ?? onBack}
+            className="flex-1 py-3 rounded-xl text-sm font-semibold active:scale-95 transition-transform"
+            style={{ background: '#3DC77A', color: '#0E0C09' }}
+          >
             ♥ Spark
           </button>
         </div>

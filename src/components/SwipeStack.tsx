@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, forwardRef, useImperativeHandle } from 'react'
 import ProfileCard from './ProfileCard'
 import { Profile } from '@/lib/types'
 
@@ -13,7 +13,14 @@ interface Props {
   onCardClick: (profile: Profile) => void
 }
 
-export default function SwipeStack({ profiles, onLike, onPass, onCardClick }: Props) {
+export interface SwipeStackHandle {
+  swipe: (dir: 'left' | 'right') => void
+}
+
+const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
+  { profiles, onLike, onPass, onCardClick },
+  ref
+) {
   const [index, setIndex] = useState(0)
   const [flyDir, setFlyDir] = useState<'left' | 'right' | null>(null)
   const [dragOffset, setDragOffset] = useState(0)
@@ -23,20 +30,24 @@ export default function SwipeStack({ profiles, onLike, onPass, onCardClick }: Pr
   const startX = useRef(0)
   const didDrag = useRef(false)
   const swipeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const flyDirRef = useRef<'left' | 'right' | null>(null)
 
   const current = profiles[index]
   const next = profiles[index + 1]
   const remaining = profiles.length - index
 
   const triggerSwipe = (dir: 'left' | 'right') => {
+    if (flyDirRef.current) return
     if (swipeTimeout.current) clearTimeout(swipeTimeout.current)
 
     const profile = profiles[index]
+    flyDirRef.current = dir
     setDragOffset(0)
     setFlyDir(dir)
 
     swipeTimeout.current = setTimeout(() => {
       swipeTimeout.current = null
+      flyDirRef.current = null
       setIndex(i => i + 1)
       setFlyDir(null)
       if (dir === 'right') {
@@ -48,8 +59,10 @@ export default function SwipeStack({ profiles, onLike, onPass, onCardClick }: Pr
     }, 220)
   }
 
+  useImperativeHandle(ref, () => ({ swipe: triggerSwipe }))
+
   const onDragStart = (clientX: number) => {
-    if (flyDir) return
+    if (flyDirRef.current) return
     isDragging.current = true
     didDrag.current = false
     startX.current = clientX
@@ -93,10 +106,9 @@ export default function SwipeStack({ profiles, onLike, onPass, onCardClick }: Pr
     )
   }
 
-  const rotation = dragOffset * 0.07
   const dragProgress = Math.min(Math.abs(dragOffset) / SWIPE_THRESHOLD, 1)
-  const backScale = 0.95 + dragProgress * 0.05
-  const backTranslateY = 14 - dragProgress * 14
+  const rotation = dragOffset * 0.07
+
   const dragOverlay: 'like' | 'nope' | null =
     dragOffset > 10 ? 'like' : dragOffset < -10 ? 'nope' : null
 
@@ -121,8 +133,15 @@ export default function SwipeStack({ profiles, onLike, onPass, onCardClick }: Pr
       >
         {next && (
           <div
-            className="absolute top-0 left-0 pointer-events-none transition-transform duration-150"
-            style={{ transform: `scale(${backScale}) translateY(${backTranslateY}px)` }}
+            className="absolute top-0 left-0 pointer-events-none"
+            style={{
+              width: 340,
+              height: 520,
+              overflow: 'hidden',
+              transform: `scale(${flyDir ? 1 : 0.94})`,
+              transformOrigin: 'top center',
+              transition: flyDir ? 'transform 220ms ease-out' : 'none',
+            }}
           >
             <ProfileCard profile={next} />
           </div>
@@ -130,7 +149,7 @@ export default function SwipeStack({ profiles, onLike, onPass, onCardClick }: Pr
 
         <div
           className={`absolute top-0 left-0 cursor-grab active:cursor-grabbing
-            ${flyDir ? 'transition-all duration-200' : ''}
+            ${flyDir ? 'transition-[transform,opacity] duration-200' : ''}
             ${flyDir === 'left' ? '-translate-x-[200px] -rotate-[12deg] opacity-0' : ''}
             ${flyDir === 'right' ? 'translate-x-[200px] rotate-[12deg] opacity-0' : ''}
           `}
@@ -146,6 +165,7 @@ export default function SwipeStack({ profiles, onLike, onPass, onCardClick }: Pr
             dragOpacity={dragProgress}
             onPass={() => triggerSwipe('left')}
             onLike={() => triggerSwipe('right')}
+            onViewProfile={() => onCardClick(current)}
           />
         </div>
       </div>
@@ -153,4 +173,6 @@ export default function SwipeStack({ profiles, onLike, onPass, onCardClick }: Pr
       <p className="text-[11px] text-gray-600">tap card to view full profile</p>
     </div>
   )
-}
+})
+
+export default SwipeStack

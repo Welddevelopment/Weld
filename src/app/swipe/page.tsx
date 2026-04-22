@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import SwipeStack from '@/components/SwipeStack'
+import { useState, useRef } from 'react'
+import SwipeStack, { SwipeStackHandle } from '@/components/SwipeStack'
 import MatchModal from '@/components/MatchModal'
 import ProfileView from '@/components/ProfileView'
 import { Profile } from '@/lib/types'
@@ -333,9 +333,10 @@ export default function SwipePage() {
   const [view, setView] = useState<'swipe' | 'profile'>('swipe')
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null)
   const [matchProfile, setMatchProfile] = useState<Profile | null>(null)
+  const swipeRef = useRef<SwipeStackHandle>(null)
 
   const handleLike = (profile: Profile) => {
-    if (Math.random() < 0.3) setMatchProfile(profile)
+    if (Math.random() < 0.15) setMatchProfile(profile)
   }
 
   const handleCardClick = (profile: Profile) => {
@@ -344,12 +345,27 @@ export default function SwipePage() {
   }
 
   if (view === 'profile' && selectedProfile) {
-    return <ProfileView profile={selectedProfile} onBack={() => setView('swipe')} />
+    return (
+      <ProfileView
+        profile={selectedProfile}
+        onBack={() => setView('swipe')}
+        onPass={() => {
+          setView('swipe')
+          setTimeout(() => swipeRef.current?.swipe('left'), 0)
+        }}
+        onLike={() => {
+          handleLike(selectedProfile)
+          setView('swipe')
+          setTimeout(() => swipeRef.current?.swipe('right'), 0)
+        }}
+      />
+    )
   }
 
   return (
     <div className="h-screen flex flex-col items-center justify-center select-none" style={{ background: '#0E0C09' }}>
       <SwipeStack
+        ref={swipeRef}
         profiles={profiles}
         onLike={handleLike}
         onCardClick={handleCardClick}
