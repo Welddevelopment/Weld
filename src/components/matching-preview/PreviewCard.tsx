@@ -2,106 +2,86 @@
 
 import { PreviewProfile } from './preview-types'
 
-interface Props {
-  profile: PreviewProfile
-  compact?: boolean
+function truncate(text: string, max = 132) {
+  const s = String(text || '').replace(/\s+/g, ' ').trim()
+  if (s.length <= max) return s
+  return s.slice(0, max).replace(/[,\s.;:!?-]+$/, '') + '…'
 }
 
-function getInitials(name: string) {
-  return name.replace(/[^a-zA-Z ]/g, '').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || name.slice(0, 2).toUpperCase()
+function roleFit(profile: PreviewProfile) {
+  const tags = profile.tags.slice(0, 3)
+  if (!tags.length) return truncate(profile.bio, 78)
+  return profile.type === 'studio'
+    ? `Hiring for ${tags.join(', ')}`
+    : `Strong in ${tags.join(', ')}`
 }
 
-export default function PreviewCard({ profile, compact }: Props) {
-  const isStudio = profile.type === 'studio'
+function factTriplet(profile: PreviewProfile) {
+  if (profile.type === 'studio') {
+    const budget = profile.meta.match(/Budget:\s*([^-]+)/)?.[1]?.trim() ?? 'TBD'
+    const status = profile.meta.split(' - ')[0] ?? 'Hiring Now'
+    const team   = profile.role.match(/(\d+)\s*members/)?.[1] ?? 'Team'
+    return [{ label: 'Status', value: status }, { label: 'Budget', value: budget }, { label: 'Team', value: team }]
+  }
+  const status = profile.meta.split(' - ')[0] ?? 'Available'
+  const rate   = profile.meta.match(/Rate:\s*([^-]+)/)?.[1]?.trim() ?? 'Flexible'
+  const exp    = profile.role.match(/(\d+yr)/)?.[1] ?? 'Exp'
+  return [{ label: 'Status', value: status }, { label: 'Rate', value: rate }, { label: 'Exp', value: exp }]
+}
+
+function AvatarImg({ userId, name, bg }: { userId: number; name: string; bg: string }) {
+  const initials = name.slice(0, 2).toUpperCase()
+  return (
+    <div className="fc-avatar" style={{ background: bg }}>
+      <div className="fc-avatar-initials">{initials}</div>
+      <img
+        src={`https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=150&height=150&format=png`}
+        alt={name}
+        onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+      />
+    </div>
+  )
+}
+
+export default function PreviewCard({ profile }: { profile: PreviewProfile }) {
+  const isDev      = profile.type === 'dev'
+  const typeClass  = isDev ? 'hero-brief-card--developer' : 'hero-brief-card--studio'
+  const focusLabel = isDev ? 'Primary skills' : 'Hiring focus'
+  const pills      = profile.tags.slice(0, 3)
+  const facts      = factTriplet(profile)
 
   return (
-    <div
-      className="flex flex-col w-full h-full rounded-[18px] overflow-hidden select-none"
-      style={{
-        background: 'linear-gradient(180deg, #1E1B16 0%, #16130E 100%)',
-        border: '1px solid rgba(255,250,247,.10)',
-        color: '#FFF7F1',
-      }}
-    >
-      {/* Header gradient */}
-      <div
-        className="relative flex items-center justify-center flex-shrink-0"
-        style={{ height: compact ? 72 : 90, background: profile.headerGradient }}
-      >
-        <div
-          className="absolute -bottom-5 left-1/2 -translate-x-1/2 flex items-center justify-center rounded-full font-bold text-white z-10"
-          style={{
-            width: compact ? 40 : 48,
-            height: compact ? 40 : 48,
-            fontSize: compact ? 14 : 17,
-            background: 'rgba(255,255,255,0.18)',
-            border: '3px solid #16130E',
-            backdropFilter: 'blur(4px)',
-          }}
-        >
-          {getInitials(profile.name)}
+    <div className={`fc hero-brief-card ${typeClass}`}>
+      <div className="fc-top">
+        <AvatarImg userId={profile.robloxUserId} name={profile.name} bg={profile.bg} />
+        <div className="fc-info">
+          <div className="fc-name">{profile.name}</div>
+          <div className="fc-badge">{profile.badge}</div>
+          <div className="hero-brief-fit">{roleFit(profile)}</div>
         </div>
       </div>
 
-      {/* Body */}
-      <div className="flex flex-col flex-1 px-4 pt-7 pb-3 gap-2 min-h-0">
-        {/* Badge + name */}
-        <div className="text-center">
-          <span
-            className="inline-block text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full mb-1"
-            style={{ background: 'rgba(255,190,116,.12)', color: '#FFBE74' }}
-          >
-            {profile.badge}
-          </span>
-          <p
-            className="text-[#FFF7F1] leading-tight italic"
-            style={{
-              fontFamily: 'var(--font-instrument-serif)',
-              fontSize: compact ? 16 : 20,
-            }}
-          >
-            {profile.name}
-          </p>
-          <p className="text-gray-500 text-[10px] mt-0.5">{profile.roleLine}</p>
-        </div>
-
-        {/* Tagline */}
-        <p className="text-[10px] italic text-gray-400 text-center line-clamp-2 leading-relaxed px-1">
-          "{profile.tagline}"
-        </p>
-
-        {/* Tags */}
-        <div className="flex flex-wrap gap-1 justify-center">
-          {profile.tags.slice(0, compact ? 3 : 4).map(tag => (
-            <span
-              key={tag}
-              className="text-[9px] font-semibold px-2 py-0.5 rounded-full"
-              style={{ background: 'rgba(232,70,36,.12)', color: '#E84624' }}
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        {/* Divider */}
-        <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, rgba(255,250,247,.08), transparent)' }} />
-
-        {/* Status + stats */}
-        <div className="flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#3DC77A' }} />
-          <span className="text-[10px] text-gray-400 truncate">{profile.status}</span>
-        </div>
-
-        {!compact && (
-          <div className="grid grid-cols-3 gap-1 mt-0.5">
-            {profile.stats.map(({ label, value }) => (
-              <div key={label} className="text-center">
-                <p className="text-white font-bold text-[11px]">{value}</p>
-                <p className="text-gray-600 text-[9px]">{label}</p>
-              </div>
-            ))}
+      <div className="hero-brief-focus-wrap">
+        <div className="hero-brief-focus">
+          <div className="hero-brief-kicker">{focusLabel}</div>
+          <div className="hero-brief-pill-row">
+            {pills.length
+              ? pills.map(p => <span key={p} className="hero-brief-pill">{p}</span>)
+              : <span className="hero-brief-pill">{isDev ? 'Available now' : 'Open brief'}</span>
+            }
           </div>
-        )}
+        </div>
+      </div>
+
+      <div className="hero-brief-summary">{truncate(profile.bio, 132)}</div>
+
+      <div className="hero-brief-facts">
+        {facts.map(f => (
+          <div key={f.label} className="hero-brief-fact">
+            <span className="hero-brief-fact-label">{f.label}</span>
+            <span className="hero-brief-fact-value">{f.value}</span>
+          </div>
+        ))}
       </div>
     </div>
   )

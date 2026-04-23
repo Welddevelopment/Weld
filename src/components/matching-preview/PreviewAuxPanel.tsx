@@ -2,267 +2,221 @@
 
 import { PreviewProfile } from './preview-types'
 
-const PANEL_BG = '#FDF8F4'
-const PANEL_TEXT = '#1A1614'
-const LABEL_COLOR = '#9B8278'
-const BORDER = 'rgba(0,0,0,0.07)'
-
-const BADGE_COLORS: Record<string, { bg: string; color: string }> = {
-  SC:  { bg: '#E8F4FD', color: '#2563EB' },
-  BLD: { bg: '#FEF3E2', color: '#D97706' },
-  FX:  { bg: '#FDE8E8', color: '#DC2626' },
-  UI:  { bg: '#F3E8FF', color: '#7C3AED' },
-  HUD: { bg: '#E8F5E9', color: '#16A34A' },
-  SHP: { bg: '#FFF3E0', color: '#EA580C' },
-  AC:  { bg: '#FCE7F3', color: '#BE185D' },
-  DS:  { bg: '#E0F2FE', color: '#0284C7' },
-  SYS: { bg: '#F0FDF4', color: '#15803D' },
-  WLD: { bg: '#F0FDF4', color: '#16A34A' },
-  CTY: { bg: '#EFF6FF', color: '#1D4ED8' },
-  DNG: { bg: '#FDF4FF', color: '#9333EA' },
-  FPS: { bg: '#FEF2F2', color: '#DC2626' },
-  RPG: { bg: '#FFF7ED', color: '#C2410C' },
-  ACT: { bg: '#FDF4FF', color: '#7C3AED' },
-  PZL: { bg: '#EFF6FF', color: '#2563EB' },
-  ADV: { bg: '#F0FDF4', color: '#15803D' },
-  RP:  { bg: '#FEF9EC', color: '#B45309' },
-  SCH: { bg: '#F0F9FF', color: '#0369A1' },
-  SIM: { bg: '#F7F7F7', color: '#374151' },
-}
-
-function getBadgeStyle(badge: string) {
-  return BADGE_COLORS[badge] ?? { bg: '#F3F4F6', color: '#6B7280' }
-}
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function AvatarImg({ userId, name }: { userId: number; name: string }) {
+  const initials = name.slice(0, 2).toUpperCase()
   return (
-    <p className="text-[10px] font-bold tracking-widest uppercase mb-2" style={{ color: LABEL_COLOR }}>
-      {children}
-    </p>
-  )
-}
-
-interface LeftProps { profile: PreviewProfile }
-interface RightProps { profile: PreviewProfile }
-
-export function LeftAuxPanel({ profile }: LeftProps) {
-  const isDev = profile.type === 'dev'
-  const panelLabel = isDev ? 'Developer Snapshot' : 'Studio Snapshot'
-  const expertiseLabel = isDev ? 'Skill Expertise' : 'Now Hiring'
-  const metricsLabel = isDev ? 'Developer Metrics' : 'Studio Metrics'
-
-  return (
-    <div
-      className="flex flex-col gap-5 h-full overflow-y-auto"
-      style={{ background: PANEL_BG, color: PANEL_TEXT, padding: '20px 22px' }}
-    >
-      {/* Panel label */}
-      <div>
-        <span
-          className="text-[9px] font-bold tracking-widest uppercase px-2 py-1 rounded"
-          style={{ background: 'rgba(232,70,36,.10)', color: '#E84624' }}
-        >
-          {panelLabel}
-        </span>
-      </div>
-
-      <div>
-        <h3 className="text-lg font-bold mb-0.5" style={{ color: PANEL_TEXT }}>
-          Skills and expertise
-        </h3>
-        <p className="text-xs leading-relaxed" style={{ color: LABEL_COLOR }}>
-          A quick read on this {isDev ? "developer's" : "studio's"} strengths and how they work.
-        </p>
-      </div>
-
-      {/* Profile link */}
-      {profile.robloxUrl && (
-        <div>
-          <SectionLabel>Roblox Profile</SectionLabel>
-          <div
-            className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl"
-            style={{ border: `1px solid ${BORDER}`, background: 'white' }}
-          >
-            <div
-              className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
-              style={{ background: profile.headerGradient }}
-            >
-              {profile.name[0]}
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold truncate" style={{ color: PANEL_TEXT }}>{profile.name}</p>
-              <p className="text-[11px] truncate" style={{ color: '#E84624' }}>{profile.robloxUrl}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Skill expertise / hiring needs */}
-      {isDev ? (
-        profile.skillExpertise && profile.skillExpertise.length > 0 && (
-          <div>
-            <SectionLabel>{expertiseLabel}</SectionLabel>
-            <div className="flex flex-col gap-3">
-              {profile.skillExpertise.map(skill => (
-                <div key={skill.name}>
-                  <span
-                    className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full mb-1.5"
-                    style={{ background: 'rgba(232,70,36,.10)', color: '#E84624' }}
-                  >
-                    {skill.name.toUpperCase()}
-                  </span>
-                  <p className="text-xs leading-relaxed" style={{ color: '#5C4A44' }}>{skill.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )
-      ) : (
-        profile.hiringNeeds && profile.hiringNeeds.length > 0 && (
-          <div>
-            <SectionLabel>{expertiseLabel}</SectionLabel>
-            <div className="flex flex-col gap-3">
-              {profile.hiringNeeds.map(need => (
-                <div key={need.role}>
-                  <span
-                    className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full mb-1.5"
-                    style={{ background: 'rgba(232,70,36,.10)', color: '#E84624' }}
-                  >
-                    {need.role.toUpperCase()}
-                  </span>
-                  <p className="text-xs leading-relaxed" style={{ color: '#5C4A44' }}>{need.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )
-      )}
-
-      {/* Metrics pills */}
-      <div>
-        <SectionLabel>{metricsLabel}</SectionLabel>
-        <div className="flex flex-wrap gap-1.5">
-          {profile.tags.map(tag => (
-            <span
-              key={tag}
-              className="text-[11px] font-medium px-2.5 py-1 rounded-full"
-              style={{ border: `1px solid ${BORDER}`, background: 'white', color: PANEL_TEXT }}
-            >
-              {tag}
-            </span>
-          ))}
-          <span
-            className="text-[11px] font-medium px-2.5 py-1 rounded-full"
-            style={{ border: `1px solid ${BORDER}`, background: 'white', color: PANEL_TEXT }}
-          >
-            {profile.status}
-          </span>
-        </div>
-      </div>
-
-      {/* Portfolio links */}
-      {profile.portfolioLinks && profile.portfolioLinks.length > 0 && (
-        <div>
-          <SectionLabel>Portfolio Links</SectionLabel>
-          <div className="flex flex-col gap-2">
-            {profile.portfolioLinks.map(link => (
-              <div
-                key={link.label}
-                className="px-3 py-2.5 rounded-xl"
-                style={{ border: `1px solid ${BORDER}`, background: 'white' }}
-              >
-                <p className="text-sm font-semibold mb-0.5" style={{ color: PANEL_TEXT }}>{link.label}</p>
-                <p className="text-[11px]" style={{ color: '#E84624' }}>{link.url}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+    <div className="aux-profile-icon">
+      <div className="aux-profile-icon-initials">{initials}</div>
+      <img
+        src={`https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=150&height=150&format=png`}
+        alt={name}
+        onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+      />
     </div>
   )
 }
 
-export function RightAuxPanel({ profile }: RightProps) {
-  const isDev = profile.type === 'dev'
-  const panelLabel = isDev ? 'Best Work' : 'Top Games'
-  const subtitle = isDev
-    ? 'Three sample commissions stay visible while you browse the profile.'
-    : 'Top games from this studio with live player numbers.'
-
+function WorkThumb({ title }: { title: string }) {
+  const initial = title[0]?.toUpperCase() ?? '?'
   return (
-    <div
-      className="flex flex-col gap-5 h-full overflow-y-auto"
-      style={{ background: PANEL_BG, color: PANEL_TEXT, padding: '20px 22px' }}
-    >
-      {/* Panel label */}
-      <div>
-        <span
-          className="text-[9px] font-bold tracking-widest uppercase px-2 py-1 rounded"
-          style={{ background: 'rgba(232,70,36,.10)', color: '#E84624' }}
-        >
-          {panelLabel}
-        </span>
-      </div>
+    <div className="aux-work-thumb">
+      <div className="aux-work-thumb-placeholder">{initial}</div>
+    </div>
+  )
+}
 
-      <div>
-        <h3 className="text-lg font-bold mb-0.5" style={{ color: PANEL_TEXT }}>
-          Past projects at a glance
-        </h3>
-        <p className="text-xs leading-relaxed" style={{ color: LABEL_COLOR }}>{subtitle}</p>
-      </div>
+export function LeftAuxPanel({ profile }: { profile: PreviewProfile }) {
+  const isDev = profile.type === 'dev'
+  const profileHandle = `www.roblox.com/users/${profile.robloxUserId}/profile`
 
-      {/* Project cards */}
-      {profile.bestWork && profile.bestWork.length > 0 ? (
-        <div className="flex flex-col gap-3">
-          {profile.bestWork.map(work => {
-            const badgeStyle = getBadgeStyle(work.badge)
-            return (
-              <div
-                key={work.title}
-                className="rounded-xl overflow-hidden"
-                style={{ border: `1px solid ${BORDER}`, background: 'white' }}
-              >
-                <div className="flex gap-3 p-3">
-                  {/* Thumbnail */}
-                  <div
-                    className="w-20 h-20 rounded-lg flex items-center justify-center text-3xl flex-shrink-0"
-                    style={{ background: profile.headerGradient }}
-                  >
-                    {work.emoji}
+  if (isDev) {
+    const slug = profile.name.toLowerCase().replace(/[^a-z0-9]+/g, '')
+    const links = profile.portfolio?.links ?? [
+      { name: 'Roblox Profile', url: `roblox.com/users/${profile.robloxUserId}/profile` },
+      { name: 'GitHub', url: `github.com/${slug}` },
+      { name: 'Portfolio Site', url: `${slug}.dev` },
+    ]
+    return (
+      <div className="aux-panel-inner">
+        <div className="aux-panel-top">
+          <span className="aux-panel-eyebrow">Developer Snapshot</span>
+          <div className="aux-panel-title">Skills and expertise</div>
+          <div className="aux-panel-sub">A quick read on this developer&apos;s strengths and how they work.</div>
+        </div>
+        <div className="aux-panel-body">
+          <div className="aux-profile-card">
+            <AvatarImg userId={profile.robloxUserId} name={profile.name} />
+            <div className="aux-profile-copy">
+              <div className="aux-profile-label">Roblox profile</div>
+              <div className="aux-profile-title">{profile.name}</div>
+              <a className="aux-profile-link" href={`https://${profileHandle}`} target="_blank" rel="noreferrer">{profileHandle}</a>
+            </div>
+          </div>
+
+          {profile.skills && profile.skills.length > 0 && (
+            <div className="aux-section">
+              <div className="aux-section-label">Skill expertise</div>
+              <div className="aux-skills-list">
+                {profile.skills.map(skill => (
+                  <div key={skill.name} className="aux-skill-row">
+                    <div className="aux-skill-label">{skill.name}</div>
+                    <div className="aux-skill-desc">{skill.description}</div>
                   </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-1 mb-1">
-                      <p className="text-sm font-bold leading-tight" style={{ color: PANEL_TEXT }}>{work.title}</p>
-                      <span
-                        className="text-[9px] font-bold px-1.5 py-0.5 rounded flex-shrink-0"
-                        style={{ background: badgeStyle.bg, color: badgeStyle.color }}
-                      >
-                        {work.badge}
-                      </span>
-                    </div>
-                    <p className="text-[11px] leading-relaxed mb-2" style={{ color: '#6B5E58' }}>{work.description}</p>
-                    <div className="flex flex-wrap gap-1">
-                      {work.meta.map(({ label, value }) => (
-                        <span
-                          key={label}
-                          className="text-[10px] px-2 py-0.5 rounded-full"
-                          style={{ background: '#FFF0EC', color: '#C04A28', border: '1px solid rgba(232,70,36,.15)' }}
-                        >
-                          {label}: {value}
-                        </span>
-                      ))}
-                    </div>
+          <div className="aux-section">
+            <div className="aux-section-label">Developer metrics</div>
+            <div className="aux-work-meta">
+              <span className="aux-work-pill">{profile.meta}</span>
+              {profile.tags.slice(0, 3).map(tag => (
+                <span key={tag} className="aux-work-pill">{tag}</span>
+              ))}
+            </div>
+          </div>
+
+          <div className="aux-section">
+            <div className="aux-section-label">Portfolio links</div>
+            <div className="aux-links">
+              {links.map(link => (
+                <a key={link.name} href={`https://${link.url}`} target="_blank" rel="noreferrer" className="aux-link">
+                  <span className="aux-link-name">{link.name}</span>
+                  <span className="aux-link-url">{link.url}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Studio left panel
+  const slug = profile.name.toLowerCase().replace(/[^a-z0-9]+/g, '')
+  const studioLinks = [
+    { name: 'Studio site',   url: `${slug}.studio` },
+    { name: 'Roblox group',  url: `roblox.com/groups/${8820000 + slug.length * 13}` },
+    { name: 'Contact',       url: `hello@${slug}.studio` },
+  ]
+  return (
+    <div className="aux-panel-inner">
+      <div className="aux-panel-top">
+        <span className="aux-panel-eyebrow">Studio Snapshot</span>
+        <div className="aux-panel-title">Unique live-op profile</div>
+        <div className="aux-panel-sub">A concise studio pulse with a real Roblox profile and key team signals.</div>
+      </div>
+      <div className="aux-panel-body">
+        <div className="aux-profile-card">
+          <AvatarImg userId={profile.robloxUserId} name={profile.name} />
+          <div className="aux-profile-copy">
+            <div className="aux-profile-label">Roblox profile</div>
+            <div className="aux-profile-title">{profile.name}</div>
+            <a className="aux-profile-link" href={`https://${profileHandle}`} target="_blank" rel="noreferrer">{profileHandle}</a>
+          </div>
+        </div>
+
+        <div className="aux-section">
+          <div className="aux-section-label">Studio differentiator</div>
+          <div className="aux-panel-note">Shipping polished social games with live events, built-in monetization, and a player-first retention strategy.</div>
+        </div>
+
+        <div className="aux-section">
+          <div className="aux-section-label">Studio metrics</div>
+          <div className="aux-work-meta">
+            <span className="aux-work-pill">{profile.meta}</span>
+            {profile.tags.slice(0, 3).map(tag => (
+              <span key={tag} className="aux-work-pill">{tag}</span>
+            ))}
+          </div>
+          <div className="aux-panel-note">This team is structured for live title maintenance and rapid shipping cycles, not just one-off prototypes.</div>
+        </div>
+
+        <div className="aux-section">
+          <div className="aux-section-label">Studio links</div>
+          <div className="aux-links">
+            {studioLinks.map(link => (
+              <a key={link.name} href={`https://${link.url}`} target="_blank" rel="noreferrer" className="aux-link">
+                <span className="aux-link-name">{link.name}</span>
+                <span className="aux-link-url">{link.url}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function RightAuxPanel({ profile }: { profile: PreviewProfile }) {
+  const isDev = profile.type === 'dev'
+
+  if (isDev) {
+    const items = (profile.bestWork ?? []).slice(0, 3)
+    return (
+      <div className="aux-panel-inner">
+        <div className="aux-panel-top">
+          <span className="aux-panel-eyebrow">Best Work</span>
+          <div className="aux-panel-title">Past projects at a glance</div>
+          <div className="aux-panel-sub">Three sample commissions stay visible while you browse the profile.</div>
+        </div>
+        <div className="aux-panel-body">
+          <div className="aux-work-list">
+            {items.map(item => (
+              <div key={item.title} className="aux-work-item">
+                <WorkThumb title={item.title} />
+                <div className="aux-work-copy">
+                  <div className="aux-work-head">
+                    <div className="aux-work-title">{item.title}</div>
+                    <span className="aux-work-badge">{item.emoji}</span>
+                  </div>
+                  <div className="aux-work-desc">{item.desc}</div>
+                  <div className="aux-work-meta">
+                    <span className="aux-work-pill">Tools: {item.tools}</span>
+                    <span className="aux-work-pill">Time: {item.time}</span>
+                    <span className="aux-work-pill">Paid: ${item.amount}</span>
                   </div>
                 </div>
               </div>
-            )
-          })}
+            ))}
+          </div>
         </div>
-      ) : (
-        <p className="text-xs" style={{ color: LABEL_COLOR }}>No portfolio items yet.</p>
-      )}
+      </div>
+    )
+  }
+
+  // Studio right panel
+  const items = (profile.topGames ?? []).slice(0, 3)
+  return (
+    <div className="aux-panel-inner">
+      <div className="aux-panel-top">
+        <span className="aux-panel-eyebrow">Top games</span>
+        <div className="aux-panel-title">Live titles worth browsing</div>
+        <div className="aux-panel-sub">Realistic Roblox game mocks that feel like actual published experiences.</div>
+      </div>
+      <div className="aux-panel-body">
+        <div className="aux-work-list">
+          {items.map(item => (
+            <div key={item.title} className="aux-work-item">
+              <WorkThumb title={item.title} />
+              <div className="aux-work-copy">
+                <div className="aux-work-head">
+                  <div className="aux-work-title">{item.title}</div>
+                  <span className="aux-work-badge">{item.emoji}</span>
+                </div>
+                <div className="aux-work-desc">{item.desc}</div>
+                <div className="aux-work-meta">
+                  <span className="aux-work-pill">Plays: {item.plays}</span>
+                  <span className="aux-work-pill">Top CCU: {item.topCcu}</span>
+                  <span className="aux-work-pill">Current CCU: {item.currentCcu}</span>
+                </div>
+                <div className="aux-work-note">A live Roblox release built around social loops, rewards, and recurring events that drive retention.</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

@@ -1,30 +1,41 @@
 export type PreviewProfileType = 'dev' | 'studio'
 
+export type DevWork = {
+  emoji: string
+  title: string
+  desc: string
+  tools: string
+  time: string
+  amount: string
+}
+
+export type TopGame = {
+  emoji: string
+  title: string
+  desc: string
+  plays: string
+  topCcu: string
+  currentCcu: string
+}
+
 export type PreviewProfile = {
   id: string
   type: PreviewProfileType
-  name: string
+  robloxUserId: number
+  bg: string
   badge: string
-  tagline: string
+  name: string
+  role: string
   bio: string
   tags: string[]
-  status: string
-  roleLine: string
-  headerGradient: string
-  stats: Array<{ label: string; value: string }>
-  skillExpertise?: Array<{ name: string; description: string }>
-  socials?: Array<{ label: string; url: string }>
-  portfolioLinks?: Array<{ label: string; url: string }>
-  robloxUrl?: string
-  bestWork?: Array<{
-    emoji: string
-    badge: string
-    title: string
-    description: string
-    meta: Array<{ label: string; value: string }>
-  }>
-  hiringNeeds?: Array<{
-    role: string
-    description: string
-  }>
+  meta: string
+  // Dev-only
+  skills?: Array<{ name: string; description: string }>
+  portfolio?: { links: Array<{ name: string; url: string }> }
+  bestWork?: DevWork[]
+  socials?: Array<{ icon: string; label: string; url: string }>
+  // Studio-only
+  details?: string
+  skillsNeeded?: Array<{ name: string; description: string }>
+  topGames?: TopGame[]
 }
