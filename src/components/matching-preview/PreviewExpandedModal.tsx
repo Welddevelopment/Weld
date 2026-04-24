@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { PreviewProfile } from './preview-types'
 import { LeftAuxPanel, RightAuxPanel } from './PreviewAuxPanel'
+
+const MATCH_CHANCE = 0.15
 
 interface Props {
   profiles: PreviewProfile[]
@@ -15,13 +17,11 @@ interface Props {
 function AvatarImg({ userId, name, bg }: { userId: number; name: string; bg: string }) {
   const initials = name.slice(0, 2).toUpperCase()
   return (
-    <div
-      className="mp-modal-hero"
-      style={{ background: bg }}
-    >
+    <div className="mp-modal-hero" style={{ background: bg }}>
       <div style={{ position: 'relative', width: 'clamp(60px,8vh,96px)', height: 'clamp(60px,8vh,96px)' }}>
         <div style={{
-          position: 'absolute', inset: 0, borderRadius: '50%', background: 'rgba(255,255,255,0.2)',
+          position: 'absolute', inset: 0, borderRadius: '50%',
+          background: 'rgba(255,255,255,0.18)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontWeight: 700, fontSize: 24, color: 'rgba(255,255,255,.9)',
           border: '3px solid rgba(255,255,255,0.55)',
@@ -32,7 +32,7 @@ function AvatarImg({ userId, name, bg }: { userId: number; name: string; bg: str
           className="mp-modal-avatar"
           src={`https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=150&height=150&format=png`}
           alt={name}
-          style={{ position: 'absolute', inset: 0 }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
           onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
         />
       </div>
@@ -71,7 +71,6 @@ function CenterCard({
           <div className="mp-modal-description">{profile.details}</div>
         )}
 
-        {/* Skills section */}
         {!isDev && profile.skillsNeeded && profile.skillsNeeded.length > 0 && (
           <>
             <div className="mp-modal-section-title">Skills needed</div>
@@ -110,7 +109,6 @@ function CenterCard({
           {profile.meta}
         </div>
 
-        {/* Dev extras */}
         {isDev && profile.portfolio && (
           <>
             <div className="mp-modal-divider" />
@@ -164,7 +162,11 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
   const [currentId, setCurrentId] = useState(initialId)
   const [glowClass, setGlowClass] = useState('')
   const [showMatch, setShowMatch] = useState(false)
-  const MATCH_CHANCE = 0.15
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
+
+  useEffect(() => {
+    return () => { timersRef.current.forEach(clearTimeout) }
+  }, [])
 
   useEffect(() => {
     setCurrentId(initialId)
@@ -172,58 +174,57 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
     setShowMatch(false)
   }, [initialId])
 
-  const profile = profiles.find(p => p.id === currentId) ?? profiles[0]
+  const profile = profiles.find(p => p.id === currentId)
+  if (!profile) return null
 
-  const advance = useCallback((excludeId: string) => {
+  const advance = (excludeId: string) => {
     const remaining = profiles.filter(p => p.id !== excludeId)
     if (remaining.length === 0) { onClose(); return }
-    const idx = profiles.findIndex(p => p.id === excludeId)
-    const next = remaining[idx % remaining.length]
+    const curIdx = profiles.findIndex(p => p.id === excludeId)
+    const next = remaining[curIdx % remaining.length]
     setCurrentId(next.id)
     setGlowClass('')
     setShowMatch(false)
-  }, [profiles, onClose])
+  }
 
-  const handlePass = useCallback(() => {
+  const handlePass = () => {
     if (glowClass) return
     setGlowClass('mp-pass-glow')
-    setTimeout(() => {
+    const t = setTimeout(() => {
       onPassed(currentId)
       advance(currentId)
     }, 700)
-  }, [glowClass, currentId, onPassed, advance])
+    timersRef.current.push(t)
+  }
 
-  const handleLike = useCallback(() => {
+  const handleLike = () => {
     if (glowClass) return
     setGlowClass('mp-like-glow')
-    const isMatch = Math.random() < MATCH_CHANCE
-    if (isMatch) {
-      setTimeout(() => setShowMatch(true), 400)
+    if (Math.random() < MATCH_CHANCE) {
+      const t = setTimeout(() => setShowMatch(true), 400)
+      timersRef.current.push(t)
     } else {
-      setTimeout(() => {
+      const t = setTimeout(() => {
         onLiked(currentId)
         advance(currentId)
       }, 700)
+      timersRef.current.push(t)
     }
-  }, [glowClass, currentId, onLiked, advance])
+  }
 
-  const handleKeepMatching = useCallback(() => {
+  const handleKeepMatching = () => {
     onLiked(currentId)
     advance(currentId)
-  }, [currentId, onLiked, advance])
-
-  if (!profile) return null
+  }
 
   return (
     <div className="mp-modal-overlay" onClick={onClose}>
       <button className="mp-modal-close-screen" onClick={e => { e.stopPropagation(); onClose() }}>✕</button>
       <div className="mp-modal-row" onClick={e => e.stopPropagation()}>
-        {/* Left aux panel */}
         <div className="mp-carousel-card pos-left" style={{ overflow: 'hidden' }}>
           <LeftAuxPanel profile={profile} />
         </div>
 
-        {/* Center card */}
         <CenterCard
           profile={profile}
           glowClass={glowClass}
@@ -233,7 +234,6 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
           onKeepMatching={handleKeepMatching}
         />
 
-        {/* Right aux panel */}
         <div className="mp-carousel-card pos-right" style={{ overflow: 'hidden' }}>
           <RightAuxPanel profile={profile} />
         </div>

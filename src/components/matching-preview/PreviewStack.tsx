@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { PreviewProfile } from './preview-types'
 import PreviewCard from './PreviewCard'
 
@@ -12,6 +12,10 @@ interface Props {
 export default function PreviewStack({ profiles, onOpen }: Props) {
   const [shuffling, setShuffling] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => { if (timerRef.current) clearTimeout(timerRef.current) }
+  }, [])
 
   const displayed = profiles.slice(0, 8)
 

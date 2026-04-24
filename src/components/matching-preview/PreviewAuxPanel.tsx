@@ -96,9 +96,9 @@ export function LeftAuxPanel({ profile }: { profile: PreviewProfile }) {
   // Studio left panel
   const slug = profile.name.toLowerCase().replace(/[^a-z0-9]+/g, '')
   const studioLinks = [
-    { name: 'Studio site',   url: `${slug}.studio` },
-    { name: 'Roblox group',  url: `roblox.com/groups/${8820000 + slug.length * 13}` },
-    { name: 'Contact',       url: `hello@${slug}.studio` },
+    { name: 'Studio site',   url: `https://${slug}.studio`,                                  display: `${slug}.studio` },
+    { name: 'Roblox group',  url: `https://roblox.com/groups/${8820000 + slug.length * 13}`, display: `roblox.com/groups/${8820000 + slug.length * 13}` },
+    { name: 'Contact',       url: `mailto:hello@${slug}.studio`,                             display: `hello@${slug}.studio` },
   ]
   return (
     <div className="aux-panel-inner">
@@ -137,9 +137,9 @@ export function LeftAuxPanel({ profile }: { profile: PreviewProfile }) {
           <div className="aux-section-label">Studio links</div>
           <div className="aux-links">
             {studioLinks.map(link => (
-              <a key={link.name} href={`https://${link.url}`} target="_blank" rel="noreferrer" className="aux-link">
+              <a key={link.name} href={link.url} target="_blank" rel="noreferrer" className="aux-link">
                 <span className="aux-link-name">{link.name}</span>
-                <span className="aux-link-url">{link.url}</span>
+                <span className="aux-link-url">{link.display}</span>
               </a>
             ))}
           </div>
