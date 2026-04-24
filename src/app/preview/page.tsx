@@ -6,7 +6,7 @@ export default function PreviewPage() {
       className="min-h-screen flex flex-col items-center justify-center py-16 px-4"
       style={{ background: '#0E0C09' }}
     >
-      <div className="text-center mb-10">
+      <div className="text-center mb-8">
         <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-orange-500 mb-3">Matching Preview</p>
         <h1
           className="text-4xl italic text-[#FFF7F1] leading-tight"
@@ -15,7 +15,7 @@ export default function PreviewPage() {
           Find your perfect match
         </h1>
         <p className="text-gray-500 text-sm mt-2 max-w-xs mx-auto">
-          Browse developers and studios looking to collaborate on Roblox.
+          Select your role to browse the right profiles, then launch the full matching preview.
         </p>
       </div>
 

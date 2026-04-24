@@ -50,39 +50,40 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
     }
   }
 
+  const switchAudience = (type: PreviewProfileType) => {
+    setAudience(type)
+    setPassed(new Set())
+    setLiked(new Set())
+    setOpenProfileId(null)
+  }
+
   return (
     <div className="flex flex-col items-center gap-6">
-      {/* Audience toggle */}
-      <div
-        className="flex rounded-full p-0.5 text-xs font-semibold"
-        style={{ background: 'rgba(255,250,247,.06)', border: '1px solid rgba(255,250,247,.1)' }}
-      >
-        {(['dev', 'studio'] as const).map(type => (
-          <button
-            key={type}
-            onClick={() => {
-              setAudience(type)
-              setPassed(new Set())
-              setLiked(new Set())
-              setOpenProfileId(null)
-            }}
-            className="px-4 py-1.5 rounded-full transition-all capitalize"
-            style={{
-              background: audience === type ? 'rgba(232,70,36,.18)' : 'transparent',
-              color: audience === type ? '#E84624' : 'rgba(255,247,241,.5)',
-              border: audience === type ? '1px solid rgba(232,70,36,.3)' : '1px solid transparent',
-            }}
-          >
-            {type === 'dev' ? 'I am a developer' : 'I am a studio'}
-          </button>
-        ))}
+      {/* Audience toggle — matches original nav mode-toggle */}
+      <div className="mp-audience-toggle">
+        <div
+          className="mp-audience-pill"
+          style={{ transform: audience === 'studio' ? 'translateX(100%)' : 'translateX(0)' }}
+        />
+        <button
+          className={`mp-audience-btn${audience === 'dev' ? ' active' : ''}`}
+          onClick={() => switchAudience('dev')}
+        >
+          I&apos;m a developer
+        </button>
+        <button
+          className={`mp-audience-btn${audience === 'studio' ? ' active' : ''}`}
+          onClick={() => switchAudience('studio')}
+        >
+          I&apos;m a studio
+        </button>
       </div>
 
       {availableProfiles.length > 0 ? (
         <PreviewStack profiles={availableProfiles} onOpen={handleOpen} />
       ) : (
         <div className="text-center py-8">
-          <p className="text-white font-semibold mb-1">You've seen everyone</p>
+          <p className="text-white font-semibold mb-1">You&apos;ve seen everyone</p>
           <p className="text-gray-600 text-sm mb-4">Reset to browse again</p>
           <button
             onClick={() => { setPassed(new Set()); setLiked(new Set()) }}

@@ -137,11 +137,47 @@ body {
 .hero-brief-fact-value { display:block; color:#FFF5F0; font-size:12px; font-weight:600; line-height:1.35; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .hero-brief-focus-wrap { padding:0 16px; margin-bottom:0; }
 
-/* Dev (blue tint) card variant */
+/* Studio card variant — subtle coral border on focus/fact */
+.hero-brief-card--studio .hero-brief-focus,
+.hero-brief-card--studio .hero-brief-fact { border-color:rgba(250,212,200,.1); }
+
+/* Developer card variant — blue tint */
 .hero-brief-card--developer { background:linear-gradient(180deg,rgba(14,18,29,.97) 0%,rgba(8,10,17,.98) 100%) !important; border-color:rgba(109,151,245,.2) !important; }
+.hero-brief-card--developer::after { content:''; position:absolute; inset:0; pointer-events:none; border-radius:inherit; background:linear-gradient(135deg,rgba(255,245,240,.16),transparent 24%,transparent 78%,rgba(109,151,245,.22)); z-index:0; }
+.hero-brief-card--developer .fc-avatar { box-shadow:0 12px 24px rgba(109,151,245,.18); }
 .hero-brief-card--developer .hero-brief-focus { background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015)),linear-gradient(180deg,rgba(109,151,245,.12),rgba(10,15,27,.08)); }
 .hero-brief-card--developer .hero-brief-pill { background:rgba(255,247,241,.04); border-color:rgba(186,206,255,.16); }
 .hero-brief-card--developer .hero-brief-fact { background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01)),rgba(9,14,24,.4); border-color:rgba(186,206,255,.12); }
+
+/* ── Audience toggle (pre-preview selector) ── */
+.mp-audience-toggle {
+  position:relative; display:flex; gap:0;
+  background:linear-gradient(135deg,rgba(255,245,240,.06),rgba(255,245,240,.04));
+  border:1px solid rgba(255,245,240,.12);
+  border-radius:100px; padding:6px;
+  box-shadow:0 14px 48px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,245,240,.06);
+}
+.mp-audience-pill {
+  position:absolute; top:6px; bottom:6px; left:6px;
+  width:calc(50% - 6px);
+  background:linear-gradient(135deg,#EA5A35 0%,#FF7A4D 100%);
+  border-radius:100px;
+  box-shadow:0 14px 30px rgba(234,90,53,.24);
+  transition:transform .45s cubic-bezier(0.34,1.56,0.64,1),width .35s ease;
+  pointer-events:none; z-index:0;
+}
+.mp-audience-btn {
+  position:relative; z-index:1;
+  background:transparent; border:none; cursor:pointer;
+  font-family:var(--font-space-grotesk,sans-serif); font-size:14px; font-weight:600;
+  letter-spacing:.02em;
+  color:rgba(255,245,240,.6);
+  padding:12px 28px; border-radius:100px;
+  transition:color .25s ease;
+  white-space:nowrap;
+}
+.mp-audience-btn.active { color:#FFF5F0; text-shadow:0 0 14px rgba(255,255,255,.22); }
+.mp-audience-btn:hover:not(.active) { color:#FFF5F0; }
 
 /* ── Preview button ── */
 .hero-preview-actions { display:flex; justify-content:center; margin-top:16px; }
