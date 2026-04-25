@@ -1,0 +1,17 @@
+.claude/
+.codex-push-temp/
+.codex-tools/
+.vscode/
+codex-tools/
+Claude/
+temporary screenshots/
+.codex-logs/
+.next/
+*.log
+*.err
+tsconfig.tsbuildinfo
+node_modules/
+*.deleting
+test_write.txt
+AGENTS.md
+claude.md
