@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { ProfileDraft, createDraft, draftToProfile } from './profile-types'
 import ProfilePreviewScreen from './ProfilePreviewScreen'
 import TypeStep from './steps/TypeStep'
@@ -23,12 +24,51 @@ function loadDraft(): ProfileDraft {
   return createDraft()
 }
 
-const DEV_STEPS  = ['Identity', 'Role', 'Bio', 'Skills', 'Work', 'Portfolio', 'Review']
+const DEV_STEPS    = ['Identity', 'Role', 'Bio', 'Skills', 'Work', 'Portfolio', 'Review']
 const STUDIO_STEPS = ['Identity', 'Role', 'Bio', 'Skills', 'Games', 'Review']
 
-type Phase = 'form' | 'preview'
+type Phase = 'form' | 'preview' | 'published'
+
+function PublishedOverlay({ onViewProfile, onStartMatching }: { onViewProfile: () => void; onStartMatching: () => void }) {
+  return (
+    <div className="pb-pub-overlay">
+      <div className="pb-pub-card">
+        <div className="pb-pub-pulse">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </div>
+
+        <h2 className="pb-pub-heading">Profile is live</h2>
+        <p className="pb-pub-sub">You&apos;re now visible in the matching pool.</p>
+
+        <div className="pb-pub-actions">
+          <button type="button" className="pb-pub-btn" onClick={onViewProfile}>
+            <div className="pb-pub-icon pb-pub-icon--ghost">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </div>
+            <span className="pb-pub-btn-label">View finished profile</span>
+          </button>
+
+          <button type="button" className="pb-pub-btn" onClick={onStartMatching}>
+            <div className="pb-pub-icon pb-pub-icon--green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+            <span className="pb-pub-btn-label">Start matching</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function ProfileBuilder() {
+  const router = useRouter()
   const [draft, setDraft] = useState<ProfileDraft>(createDraft)
   const [step, setStep] = useState(0)
   const [phase, setPhase] = useState<Phase>('form')
@@ -72,20 +112,33 @@ export default function ProfileBuilder() {
 
   const continueFromPreview = () => {
     if (step >= totalContentSteps - 1) {
-      handlePublish()
+      setPhase('published')
       return
     }
     setStep(s => s + 1)
     setPhase('form')
   }
 
-  const handlePublish = () => {
-    alert('Profile saved! (In a real app this would submit to the backend.)')
-  }
-
   const profile = draftToProfile(draft, 'preview')
 
   if (!hydrated) return null
+
+  if (phase === 'published') {
+    return (
+      <>
+        <ProfilePreviewScreen
+          profile={profile}
+          onContinue={continueFromPreview}
+          onBack={() => setPhase('form')}
+          isLast
+        />
+        <PublishedOverlay
+          onViewProfile={() => setPhase('preview')}
+          onStartMatching={() => router.push('/preview')}
+        />
+      </>
+    )
+  }
 
   if (!typeChosen) {
     return (

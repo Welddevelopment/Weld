@@ -1353,5 +1353,121 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 .pb-btn--publish:hover { opacity: 0.9; }
 
-/* Right panel — card preview */
+/* Published overlay */
+.pb-pub-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: linear-gradient(180deg, rgba(8,22,14,0.97) 0%, rgba(4,13,8,0.98) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pb-pub-in 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes pb-pub-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.pb-pub-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 24px;
+}
+
+.pb-pub-pulse {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3DC77A, #1a6640);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32px;
+  animation: mp-overlay-in 0.45s cubic-bezier(0.34,1.56,0.64,1) both,
+             mp-chat-pulse 2.2s 0.65s ease-in-out infinite;
+  box-shadow: 0 4px 32px rgba(61,199,122,0.45);
+}
+
+.pb-pub-pulse svg {
+  width: 38px;
+  height: 38px;
+}
+
+.pb-pub-heading {
+  font-family: var(--font-space-grotesk, sans-serif);
+  font-size: 38px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #fff;
+  margin: 0 0 10px;
+  animation: mp-overlay-in 0.45s 0.08s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+.pb-pub-sub {
+  font-size: 15px;
+  color: rgba(255,255,255,0.5);
+  margin: 0 0 48px;
+  animation: mp-overlay-in 0.45s 0.15s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+.pb-pub-actions {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 40px;
+  animation: mp-overlay-in 0.45s 0.22s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+.pb-pub-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.pb-pub-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.pb-pub-icon svg { width: 26px; height: 26px; }
+
+.pb-pub-icon--ghost {
+  border: 2px solid rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.75);
+}
+.pb-pub-btn:hover .pb-pub-icon--ghost {
+  border-color: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.07);
+}
+
+.pb-pub-icon--green {
+  background: linear-gradient(135deg, #3DC77A, #1a6640);
+  box-shadow: 0 4px 22px rgba(61,199,122,0.4);
+  animation: mp-chat-pulse 2.2s 0.9s ease-in-out infinite;
+}
+.pb-pub-btn:hover .pb-pub-icon--green {
+  transform: scale(1.1);
+  box-shadow: 0 6px 28px rgba(61,199,122,0.55);
+}
+
+.pb-pub-btn-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.3px;
+}
 
