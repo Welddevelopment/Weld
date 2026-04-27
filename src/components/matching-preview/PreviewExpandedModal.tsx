@@ -35,6 +35,8 @@ interface Props {
   onLiked: (id: string) => void
 }
 
+interface PassToastData { name: string; isDev: boolean }
+
 function AvatarImg({ userId, name, bg }: { userId: number; name: string; bg: string }) {
   const initials = name.slice(0, 2).toUpperCase()
   return (
@@ -64,25 +66,18 @@ function CenterCard({
   profile,
   glowClass,
   showMatch,
-  showPass,
   onPass,
   onLike,
   onKeepMatching,
-  onPassContinue,
-  onPassSkip,
 }: {
   profile: PreviewProfile
   glowClass: string
   showMatch: boolean
-  showPass: boolean
   onPass: () => void
   onLike: () => void
   onKeepMatching: () => void
-  onPassContinue: () => void
-  onPassSkip: () => void
 }) {
   const isDev = profile.type === 'dev'
-  const passReasons = isDev ? DEV_PASS_REASONS : STUDIO_PASS_REASONS
 
   return (
     <div className={`mp-carousel-card pos-center ${glowClass}`} style={{ position: 'relative' }}>
@@ -174,7 +169,6 @@ function CenterCard({
         </div>
       </div>
 
-      {/* Like / match overlay */}
       {showMatch && (
         <div className="mp-match-overlay">
           <div className="mp-match-overlay-text">💚 You swiped right!</div>
@@ -185,20 +179,46 @@ function CenterCard({
           <button className="mp-match-keep-btn" onClick={onKeepMatching}>Keep matching →</button>
         </div>
       )}
+    </div>
+  )
+}
 
-      {/* Pass overlay */}
-      {showPass && (
-        <div className="mp-pass-overlay">
-          <div className="mp-pass-overlay-icon">👋</div>
-          <div className="mp-pass-overlay-text">You passed on {profile.name}</div>
-          <div className="mp-pass-overlay-sub">Help us improve — why wasn&apos;t it a fit?</div>
+function PassToast({ data, onDismiss }: { data: PassToastData; onDismiss: () => void }) {
+  const [expanded, setExpanded] = useState(false)
+  const reasons = data.isDev ? DEV_PASS_REASONS : STUDIO_PASS_REASONS
+
+  return (
+    <div
+      className={`mp-pass-toast${expanded ? ' mp-pass-toast--open' : ''}`}
+      onClick={e => { e.stopPropagation(); if (!expanded) setExpanded(true) }}
+    >
+      <div className="mp-pass-toast-row">
+        <span className="mp-pass-toast-icon">👋</span>
+        <div className="mp-pass-toast-content">
+          <span className="mp-pass-toast-text">Passed on {data.name}</span>
+          {!expanded && <span className="mp-pass-toast-hint">Tap to leave feedback</span>}
+        </div>
+        <button
+          className="mp-pass-toast-close"
+          onClick={e => { e.stopPropagation(); onDismiss() }}
+        >✕</button>
+      </div>
+
+      {expanded && (
+        <div className="mp-pass-toast-body" onClick={e => e.stopPropagation()}>
           <select className="mp-pass-reason-select" defaultValue="">
             <option value="" disabled>Select a reason…</option>
-            {passReasons.map(r => <option key={r} value={r}>{r}</option>)}
+            {reasons.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
-          <button className="mp-pass-continue-btn" onClick={onPassContinue}>Continue matching →</button>
-          <button className="mp-pass-skip-btn" onClick={onPassSkip}>Skip feedback</button>
+          <div className="mp-pass-toast-btns">
+            <button className="mp-pass-toast-submit" onClick={onDismiss}>Submit</button>
+            <button className="mp-pass-toast-skip" onClick={onDismiss}>Skip</button>
+          </div>
         </div>
+      )}
+
+      {!expanded && (
+        <div className="mp-pass-toast-timer" onAnimationEnd={onDismiss} />
       )}
     </div>
   )
@@ -208,7 +228,7 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
   const [currentId, setCurrentId] = useState(initialId)
   const [glowClass, setGlowClass] = useState('')
   const [showMatch, setShowMatch] = useState(false)
-  const [showPass, setShowPass] = useState(false)
+  const [passToast, setPassToast] = useState<PassToastData | null>(null)
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
 
   useEffect(() => {
@@ -219,7 +239,6 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
     setCurrentId(initialId)
     setGlowClass('')
     setShowMatch(false)
-    setShowPass(false)
   }, [initialId])
 
   const profile = profiles.find(p => p.id === currentId)
@@ -233,16 +252,14 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
     setCurrentId(next.id)
     setGlowClass('')
     setShowMatch(false)
-    setShowPass(false)
   }
 
   const handlePass = () => {
     if (glowClass) return
-    setGlowClass('mp-pass-glow')
-    const t = setTimeout(() => {
-      setShowPass(true)
-    }, 1750)
-    timersRef.current.push(t)
+    const { name, type } = profile
+    onPassed(currentId)
+    advance(currentId)
+    setPassToast({ name, isDev: type === 'dev' })
   }
 
   const handleLike = () => {
@@ -257,19 +274,14 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
     advance(currentId)
   }
 
-  const handlePassContinue = () => {
-    onPassed(currentId)
-    advance(currentId)
-  }
-
-  const handlePassSkip = () => {
-    onPassed(currentId)
-    advance(currentId)
-  }
-
   return (
     <div className="mp-modal-overlay" onClick={onClose}>
       <button className="mp-modal-close-screen" onClick={e => { e.stopPropagation(); onClose() }}>✕</button>
+
+      {passToast && (
+        <PassToast data={passToast} onDismiss={() => setPassToast(null)} />
+      )}
+
       <div className="mp-modal-row" onClick={e => e.stopPropagation()}>
         <div className="mp-carousel-card pos-left" style={{ overflow: 'hidden' }}>
           <LeftAuxPanel profile={profile} />
@@ -279,12 +291,9 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
           profile={profile}
           glowClass={glowClass}
           showMatch={showMatch}
-          showPass={showPass}
           onPass={handlePass}
           onLike={handleLike}
           onKeepMatching={handleKeepMatching}
-          onPassContinue={handlePassContinue}
-          onPassSkip={handlePassSkip}
         />
 
         <div className="mp-carousel-card pos-right" style={{ overflow: 'hidden' }}>
