@@ -13,7 +13,8 @@
       "PowerShell(Get-Command playwright)",
       "Bash(npm install *)",
       "Read(//tmp/pw/node_modules/**)",
-      "Read(//c/tmp/pw/node_modules/**)"
+      "Read(//c/tmp/pw/node_modules/**)",
+      "Bash(python3 -c ' *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\joelj\\OneDrive\\Documents\\weld-app\\src\\components"
