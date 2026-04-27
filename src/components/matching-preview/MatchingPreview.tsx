@@ -11,11 +11,25 @@ const EXPERIENCE_OPTIONS = ['<1', '1-2', '3-4', '5+']
 const TEAM_SIZE_OPTIONS = ['1-2', '3-4', '5-9', '10-19', '20+']
 const DEV_PLAY_OPTIONS = ['<50M', '50-74M', '75-99M', '100M+']
 const STUDIO_PLAY_OPTIONS = ['<30M', '30-49M', '50M+']
+const STUDIO_TOP_CCU_OPTIONS = ['<40K', '40-59K', '60K+']
+const STUDIO_CURRENT_CCU_OPTIONS = ['<10K', '10-19K', '20K+']
+const STUDIO_STATUS_OPTIONS = ['Hiring Now', 'Open to Offers']
+const BUDGET_OPTIONS = ['USD', 'Robux', 'Mixed', 'Fixed']
+const RATE_OPTIONS = ['USD', 'Robux', 'Fixed', 'Hourly']
+const CREATOR_LEVEL_OPTIONS = ['Verified', 'Pro Developer']
+const DEV_VALUE_OPTIONS = ['<$5K', '$5K-$9.9K', '$10K+']
 
 type PreviewFilterState = {
   skillFilters: Set<string>
   rangeFilter: string | null
   playFilter: string | null
+  topCcuFilter: string | null
+  currentCcuFilter: string | null
+  statusFilter: string | null
+  budgetFilter: string | null
+  rateFilter: string | null
+  badgeFilter: string | null
+  valueFilter: string | null
 }
 
 interface Props {
@@ -23,7 +37,18 @@ interface Props {
 }
 
 function createFilterState(): PreviewFilterState {
-  return { skillFilters: new Set(), rangeFilter: null, playFilter: null }
+  return {
+    skillFilters: new Set(),
+    rangeFilter: null,
+    playFilter: null,
+    topCcuFilter: null,
+    currentCcuFilter: null,
+    statusFilter: null,
+    budgetFilter: null,
+    rateFilter: null,
+    badgeFilter: null,
+    valueFilter: null,
+  }
 }
 
 function extractExperienceYears(profile: PreviewProfile) {
@@ -46,11 +71,43 @@ function parsePlayMillions(value: string) {
   return amount
 }
 
+function parseCompactCount(value: string) {
+  const match = value.match(/([\d.]+)\s*([KMB])?/i)
+  if (!match) return 0
+  const amount = Number(match[1])
+  if (Number.isNaN(amount)) return 0
+  const unit = match[2]?.toUpperCase()
+  if (unit === 'K') return amount * 1000
+  if (unit === 'M') return amount * 1000000
+  if (unit === 'B') return amount * 1000000000
+  return amount
+}
+
+function totalStudioCcu(profile: PreviewProfile, kind: 'top' | 'current') {
+  if (profile.type !== 'studio') return 0
+  return profile.topGames?.reduce((total, game) => {
+    return total + parseCompactCount(kind === 'top' ? game.topCcu : game.currentCcu)
+  }, 0) ?? 0
+}
+
 function totalProfilePlays(profile: PreviewProfile) {
   if (profile.type === 'dev') {
     return profile.bestWork?.reduce((total, item) => total + parsePlayMillions(item.plays), 0) ?? 0
   }
   return profile.topGames?.reduce((total, item) => total + parsePlayMillions(item.plays), 0) ?? 0
+}
+
+function totalDevProjectValue(profile: PreviewProfile) {
+  if (profile.type !== 'dev') return 0
+  return profile.bestWork?.reduce((total, item) => total + Number(item.amount), 0) ?? 0
+}
+
+function extractMetaValue(profile: PreviewProfile, label: 'Budget' | 'Rate') {
+  return profile.meta.match(new RegExp(`${label}:\\s*([^-]+)`))?.[1]?.trim() ?? null
+}
+
+function extractStatus(profile: PreviewProfile) {
+  return profile.meta.split(' - ')[0] ?? null
 }
 
 function inExperienceRange(years: number, range: string | null) {
@@ -85,6 +142,30 @@ function inPlayRange(totalMillions: number, range: string | null) {
   return false
 }
 
+function inStudioTopCcuRange(totalCcu: number, range: string | null) {
+  if (!range) return true
+  if (range === '<40K') return totalCcu < 40000
+  if (range === '40-59K') return totalCcu >= 40000 && totalCcu < 60000
+  if (range === '60K+') return totalCcu >= 60000
+  return false
+}
+
+function inStudioCurrentCcuRange(totalCcu: number, range: string | null) {
+  if (!range) return true
+  if (range === '<10K') return totalCcu < 10000
+  if (range === '10-19K') return totalCcu >= 10000 && totalCcu < 20000
+  if (range === '20K+') return totalCcu >= 20000
+  return false
+}
+
+function inDevValueRange(totalValue: number, range: string | null) {
+  if (!range) return true
+  if (range === '<$5K') return totalValue < 5000
+  if (range === '$5K-$9.9K') return totalValue >= 5000 && totalValue < 10000
+  if (range === '$10K+') return totalValue >= 10000
+  return false
+}
+
 export default function MatchingPreview({ audience: initialAudience = 'dev' }: Props) {
   const [audience, setAudience] = useState<PreviewProfileType>(initialAudience)
   const [passed, setPassed] = useState<Set<string>>(new Set())
@@ -103,6 +184,13 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
   const activeSkillFilters = activeFilters.skillFilters
   const activeRangeFilter = activeFilters.rangeFilter
   const activePlayFilter = activeFilters.playFilter
+  const activeTopCcuFilter = activeFilters.topCcuFilter
+  const activeCurrentCcuFilter = activeFilters.currentCcuFilter
+  const activeStatusFilter = activeFilters.statusFilter
+  const activeBudgetFilter = activeFilters.budgetFilter
+  const activeRateFilter = activeFilters.rateFilter
+  const activeBadgeFilter = activeFilters.badgeFilter
+  const activeValueFilter = activeFilters.valueFilter
 
   // Filter options derived from the full dataset (not just available) so pills don't vanish as you swipe
   const skillFilterOptions = useMemo(() => {
@@ -118,7 +206,17 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
   }, [allProfiles])
   const rangeFilterOptions = filterType === 'skills' ? EXPERIENCE_OPTIONS : TEAM_SIZE_OPTIONS
   const playFilterOptions = filterType === 'skills' ? DEV_PLAY_OPTIONS : STUDIO_PLAY_OPTIONS
-  const activeFilterCount = activeSkillFilters.size + (activeRangeFilter ? 1 : 0) + (activePlayFilter ? 1 : 0)
+  const activeFilterCount = [
+    activeRangeFilter,
+    activePlayFilter,
+    activeTopCcuFilter,
+    activeCurrentCcuFilter,
+    activeStatusFilter,
+    activeBudgetFilter,
+    activeRateFilter,
+    activeBadgeFilter,
+    activeValueFilter,
+  ].filter(Boolean).length + activeSkillFilters.size
 
   // Filter first, then remove profiles already passed or liked in this cycle.
   const filteredProfiles = useMemo(() => {
@@ -133,9 +231,38 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
         ? inExperienceRange(extractExperienceYears(p), activeRangeFilter)
         : inTeamSizeRange(extractTeamSize(p), activeRangeFilter)
       const matchesPlays = inPlayRange(totalProfilePlays(p), activePlayFilter)
-      return matchesSkill && matchesRange && matchesPlays
+      const matchesStudioStatus = p.type !== 'studio' || !activeStatusFilter || extractStatus(p) === activeStatusFilter
+      const matchesBudget = p.type !== 'studio' || !activeBudgetFilter || extractMetaValue(p, 'Budget') === activeBudgetFilter
+      const matchesTopCcu = p.type !== 'studio' || inStudioTopCcuRange(totalStudioCcu(p, 'top'), activeTopCcuFilter)
+      const matchesCurrentCcu = p.type !== 'studio' || inStudioCurrentCcuRange(totalStudioCcu(p, 'current'), activeCurrentCcuFilter)
+      const matchesRate = p.type !== 'dev' || !activeRateFilter || extractMetaValue(p, 'Rate') === activeRateFilter
+      const matchesBadge = p.type !== 'dev' || !activeBadgeFilter || p.badge === activeBadgeFilter
+      const matchesValue = p.type !== 'dev' || inDevValueRange(totalDevProjectValue(p), activeValueFilter)
+      return matchesSkill
+        && matchesRange
+        && matchesPlays
+        && matchesStudioStatus
+        && matchesBudget
+        && matchesTopCcu
+        && matchesCurrentCcu
+        && matchesRate
+        && matchesBadge
+        && matchesValue
     })
-  }, [allProfiles, activeFilterCount, activeSkillFilters, activeRangeFilter, activePlayFilter])
+  }, [
+    allProfiles,
+    activeFilterCount,
+    activeSkillFilters,
+    activeRangeFilter,
+    activePlayFilter,
+    activeTopCcuFilter,
+    activeCurrentCcuFilter,
+    activeStatusFilter,
+    activeBudgetFilter,
+    activeRateFilter,
+    activeBadgeFilter,
+    activeValueFilter,
+  ])
 
   const displayProfiles = useMemo(
     () => filteredProfiles.filter(p => !passed.has(p.id) && !liked.has(p.id)),
@@ -209,6 +336,17 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
     setOpenProfileId(null)
   }
 
+  const toggleSingleFilter = (
+    key: keyof Omit<PreviewFilterState, 'skillFilters'>,
+    value: string
+  ) => {
+    updateActiveFilters(current => ({
+      ...current,
+      [key]: current[key] === value ? null : value,
+    }))
+    setOpenProfileId(null)
+  }
+
   const clearFilters = () => {
     updateActiveFilters(() => createFilterState())
     setOpenProfileId(null)
@@ -226,6 +364,11 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
 
   const clearPlayFilter = () => {
     updateActiveFilters(current => ({ ...current, playFilter: null }))
+    setOpenProfileId(null)
+  }
+
+  const clearSingleFilter = (key: keyof Omit<PreviewFilterState, 'skillFilters'>) => {
+    updateActiveFilters(current => ({ ...current, [key]: null }))
     setOpenProfileId(null)
   }
 
@@ -256,6 +399,60 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
 
   const noMatchesFromFilter = activeFilterCount > 0 && filteredProfiles.length === 0
   const ranOutOfCards = filteredProfiles.length > 0 && displayProfiles.length === 0
+  const extraFilterSections = filterType === 'skills'
+    ? [
+      {
+        label: 'Rate type',
+        options: RATE_OPTIONS,
+        active: activeRateFilter,
+        onToggle: (value: string) => toggleSingleFilter('rateFilter', value),
+        onClear: () => clearSingleFilter('rateFilter'),
+      },
+      {
+        label: 'Creator level',
+        options: CREATOR_LEVEL_OPTIONS,
+        active: activeBadgeFilter,
+        onToggle: (value: string) => toggleSingleFilter('badgeFilter', value),
+        onClear: () => clearSingleFilter('badgeFilter'),
+      },
+      {
+        label: 'Highlighted project value',
+        options: DEV_VALUE_OPTIONS,
+        active: activeValueFilter,
+        onToggle: (value: string) => toggleSingleFilter('valueFilter', value),
+        onClear: () => clearSingleFilter('valueFilter'),
+      },
+    ]
+    : [
+      {
+        label: 'Studio status',
+        options: STUDIO_STATUS_OPTIONS,
+        active: activeStatusFilter,
+        onToggle: (value: string) => toggleSingleFilter('statusFilter', value),
+        onClear: () => clearSingleFilter('statusFilter'),
+      },
+      {
+        label: 'Budget type',
+        options: BUDGET_OPTIONS,
+        active: activeBudgetFilter,
+        onToggle: (value: string) => toggleSingleFilter('budgetFilter', value),
+        onClear: () => clearSingleFilter('budgetFilter'),
+      },
+      {
+        label: 'Top CCU',
+        options: STUDIO_TOP_CCU_OPTIONS,
+        active: activeTopCcuFilter,
+        onToggle: (value: string) => toggleSingleFilter('topCcuFilter', value),
+        onClear: () => clearSingleFilter('topCcuFilter'),
+      },
+      {
+        label: 'Current CCU',
+        options: STUDIO_CURRENT_CCU_OPTIONS,
+        active: activeCurrentCcuFilter,
+        onToggle: (value: string) => toggleSingleFilter('currentCcuFilter', value),
+        onClear: () => clearSingleFilter('currentCcuFilter'),
+      },
+    ]
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -343,6 +540,7 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
           skillOptions={skillFilterOptions}
           rangeOptions={rangeFilterOptions}
           playOptions={playFilterOptions}
+          extraSections={extraFilterSections}
           activeSkills={activeSkillFilters}
           activeRange={activeRangeFilter}
           activePlay={activePlayFilter}

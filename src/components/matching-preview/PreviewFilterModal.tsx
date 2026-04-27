@@ -1,10 +1,19 @@
 'use client'
 
+type FilterSection = {
+  label: string
+  options: string[]
+  active: string | null
+  onToggle: (opt: string) => void
+  onClear: () => void
+}
+
 interface Props {
   filterType: 'skills' | 'hiring'
   skillOptions: string[]
   rangeOptions: string[]
   playOptions: string[]
+  extraSections: FilterSection[]
   activeSkills: Set<string>
   activeRange: string | null
   activePlay: string | null
@@ -25,6 +34,7 @@ export default function PreviewFilterModal({
   skillOptions,
   rangeOptions,
   playOptions,
+  extraSections,
   activeSkills,
   activeRange,
   activePlay,
@@ -40,7 +50,10 @@ export default function PreviewFilterModal({
   onClose,
 }: Props) {
   const isSkills = filterType === 'skills'
-  const totalActive = activeSkills.size + (activeRange ? 1 : 0) + (activePlay ? 1 : 0)
+  const totalActive = activeSkills.size
+    + (activeRange ? 1 : 0)
+    + (activePlay ? 1 : 0)
+    + extraSections.filter(section => section.active).length
 
   return (
     <div className="pf-overlay">
@@ -133,6 +146,32 @@ export default function PreviewFilterModal({
             ))}
           </div>
         </div>
+
+        {extraSections.map(section => (
+          <div className="pf-section" key={section.label}>
+            <div className="pf-row-head">
+              <span className="pf-row-label">{section.label}</span>
+              {section.active && (
+                <button className="pf-clear-btn" type="button" onClick={section.onClear}>
+                  Clear
+                </button>
+              )}
+            </div>
+            <div className="pf-pills">
+              {section.options.map(opt => (
+                <button
+                  key={opt}
+                  type="button"
+                  className={`pf-pill${section.active === opt ? ' pf-pill--on' : ''}`}
+                  aria-pressed={section.active === opt}
+                  onClick={() => section.onToggle(opt)}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
 
         <div className="pf-footer">
           {totalActive === 0
