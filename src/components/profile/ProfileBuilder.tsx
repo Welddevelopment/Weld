@@ -11,7 +11,6 @@ import BioStep from './steps/BioStep'
 import SkillsStep from './steps/SkillsStep'
 import WorkStep from './steps/WorkStep'
 import PortfolioStep from './steps/PortfolioStep'
-import ReviewStep from './steps/ReviewStep'
 
 const DRAFT_KEY = 'weld_profile_draft'
 
@@ -24,8 +23,8 @@ function loadDraft(): ProfileDraft {
   return createDraft()
 }
 
-const DEV_STEPS    = ['Identity', 'Role', 'Bio', 'Skills', 'Work', 'Portfolio', 'Review']
-const STUDIO_STEPS = ['Identity', 'Role', 'Bio', 'Skills', 'Games', 'Review']
+const DEV_STEPS    = ['Identity', 'Role', 'Bio', 'Skills', 'Work', 'Portfolio']
+const STUDIO_STEPS = ['Identity', 'Role', 'Bio', 'Skills', 'Games']
 
 type Phase = 'form' | 'preview' | 'published'
 
@@ -174,8 +173,7 @@ export default function ProfileBuilder() {
       case 2: return <BioStep {...stepProps} />
       case 3: return <SkillsStep {...stepProps} />
       case 4: return isDev ? <WorkStep {...stepProps} /> : <WorkStep {...stepProps} studioMode />
-      case 5: return isDev ? <PortfolioStep {...stepProps} /> : <ReviewStep {...stepProps} />
-      case 6: return <ReviewStep {...stepProps} />
+      case 5: return <PortfolioStep {...stepProps} />
       default: return null
     }
   }
