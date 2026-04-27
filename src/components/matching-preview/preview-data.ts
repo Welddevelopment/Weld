@@ -114,7 +114,7 @@ function studioGames(studioIdx: number, gameOffset: number) {
   })
 }
 
-export const PREVIEW_STUDIOS: PreviewProfile[] = [
+const BASE_PREVIEW_STUDIOS: PreviewProfile[] = [
   {
     id: 'studio1', type: 'studio', robloxUserId: RBX[5], bg: BG[0], badge: 'Studio',
     name: 'NovaStar Studios', role: 'Roblox Game Studio - 12 members',
@@ -453,7 +453,7 @@ export const PREVIEW_STUDIOS: PreviewProfile[] = [
   },
 ]
 
-export const PREVIEW_DEVS: PreviewProfile[] = [
+const BASE_PREVIEW_DEVS: PreviewProfile[] = [
   {
     id: 'dev1', type: 'dev', robloxUserId: RBX[8], bg: BG[0], badge: 'Pro Developer',
     name: 'DevDave', role: 'Developer - 4yr experience',
@@ -755,3 +755,115 @@ export const PREVIEW_DEVS: PreviewProfile[] = [
     socials: [{ icon: 'RBX', label: 'Roblox', url: '#' }, { icon: 'DIS', label: 'Discord', url: '#' }, { icon: 'X', label: 'Twitter', url: '#' }],
   },
 ]
+
+const TARGET_PROFILE_COUNT = 100
+
+const TEAM_SIZES = [1, 2, 3, 4, 5, 7, 9, 10, 14, 19, 20, 24, 32]
+const DEV_EXPERIENCE_YEARS = [0, 1, 2, 3, 4, 5, 6, 8]
+const STUDIO_STATUSES = ['Hiring Now', 'Open to Offers']
+const BUDGET_TYPES = ['USD', 'Robux', 'Mixed', 'Fixed']
+const RATE_TYPES = ['USD', 'Robux', 'Fixed', 'Hourly']
+const CREATOR_BADGES = ['Verified', 'Pro Developer']
+
+const STUDIO_PLAY_BUCKETS = [
+  [6, 8, 10],
+  [12, 15, 20],
+  [18, 23, 29],
+]
+const STUDIO_TOP_CCU_BUCKETS = [
+  [9, 11, 14],
+  [15, 19, 22],
+  [21, 24, 28],
+]
+const STUDIO_CURRENT_CCU_BUCKETS = [
+  [1.6, 2.7, 4.4],
+  [4.2, 6.1, 7.5],
+  [7.4, 8.6, 9.7],
+]
+const DEV_PLAY_BUCKETS = [
+  [8, 12, 16],
+  [18, 22, 28],
+  [25, 30, 35],
+  [42, 36, 30],
+]
+const DEV_VALUE_BUCKETS = [
+  [900, 1200, 1500],
+  [900, 2200, 1500],
+  [1800, 1700, 1600],
+  [2400, 2600, 2700],
+  [5200, 1300, 1500],
+  [3400, 3500, 3600],
+  [5200, 6400, 7800],
+]
+
+function variantName(name: string, index: number, baseCount: number) {
+  const round = Math.floor(index / baseCount)
+  return round === 0 ? name : `${name} ${round + 1}`
+}
+
+function formatExperienceRole(years: number) {
+  if (years === 0) return 'Developer - <1yr experience'
+  if (years === 1) return 'Developer - 1yr experience'
+  return `Developer - ${years}yr experience`
+}
+
+function createStudioVariant(seed: PreviewProfile, index: number): PreviewProfile {
+  const plays = STUDIO_PLAY_BUCKETS[index % STUDIO_PLAY_BUCKETS.length]
+  const topCcu = STUDIO_TOP_CCU_BUCKETS[Math.floor(index / STUDIO_PLAY_BUCKETS.length) % STUDIO_TOP_CCU_BUCKETS.length]
+  const currentCcu = STUDIO_CURRENT_CCU_BUCKETS[Math.floor(index / (STUDIO_PLAY_BUCKETS.length * STUDIO_TOP_CCU_BUCKETS.length)) % STUDIO_CURRENT_CCU_BUCKETS.length]
+  const games = studioGames(index + 40, index % GAMES.length).map((game, offset) => ({
+    ...game,
+    plays: `${plays[offset]}M`,
+    topCcu: `${topCcu[offset]}K`,
+    currentCcu: `${currentCcu[offset]}K`,
+  }))
+  const teamSize = TEAM_SIZES[index % TEAM_SIZES.length]
+  const status = STUDIO_STATUSES[Math.floor(index / TEAM_SIZES.length) % STUDIO_STATUSES.length]
+  const budget = BUDGET_TYPES[Math.floor(index / (TEAM_SIZES.length * STUDIO_STATUSES.length)) % BUDGET_TYPES.length]
+
+  return {
+    ...seed,
+    id: index < BASE_PREVIEW_STUDIOS.length ? seed.id : `${seed.id}-mock-${index + 1}`,
+    name: variantName(seed.name, index, BASE_PREVIEW_STUDIOS.length),
+    role: `Roblox Game Studio - ${teamSize} members`,
+    meta: `${status} - Budget: ${budget} - Remote`,
+    robloxUserId: RBX[index % RBX.length],
+    bg: BG[index % BG.length],
+    topGames: games,
+  }
+}
+
+function createDevVariant(seed: PreviewProfile, index: number): PreviewProfile {
+  const sourceTags = seed.tags.length > 0 ? seed.tags : ['Scripting', 'Game Design', 'UI Design']
+  const plays = DEV_PLAY_BUCKETS[Math.floor(index / DEV_VALUE_BUCKETS.length) % DEV_PLAY_BUCKETS.length]
+  const values = DEV_VALUE_BUCKETS[index % DEV_VALUE_BUCKETS.length]
+  const bestWork = devWork(sourceTags, index + 50).map((item, offset) => ({
+    ...item,
+    amount: `${values[offset]}`,
+    plays: `${plays[offset]}M`,
+  }))
+  const years = DEV_EXPERIENCE_YEARS[index % DEV_EXPERIENCE_YEARS.length]
+  const rate = RATE_TYPES[Math.floor(index / DEV_EXPERIENCE_YEARS.length) % RATE_TYPES.length]
+
+  return {
+    ...seed,
+    id: index < BASE_PREVIEW_DEVS.length ? seed.id : `${seed.id}-mock-${index + 1}`,
+    name: variantName(seed.name, index, BASE_PREVIEW_DEVS.length),
+    role: formatExperienceRole(years),
+    meta: `Available Now - Rate: ${rate}`,
+    badge: CREATOR_BADGES[Math.floor(index / (DEV_EXPERIENCE_YEARS.length * RATE_TYPES.length)) % CREATOR_BADGES.length],
+    robloxUserId: RBX[index % RBX.length],
+    bg: BG[index % BG.length],
+    bestWork,
+  }
+}
+
+export const PREVIEW_STUDIOS: PreviewProfile[] = Array.from(
+  { length: TARGET_PROFILE_COUNT },
+  (_, index) => createStudioVariant(BASE_PREVIEW_STUDIOS[index % BASE_PREVIEW_STUDIOS.length], index)
+)
+
+export const PREVIEW_DEVS: PreviewProfile[] = Array.from(
+  { length: TARGET_PROFILE_COUNT },
+  (_, index) => createDevVariant(BASE_PREVIEW_DEVS[index % BASE_PREVIEW_DEVS.length], index)
+)

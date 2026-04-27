@@ -18,6 +18,7 @@ const BUDGET_OPTIONS = ['USD', 'Robux', 'Mixed', 'Fixed']
 const RATE_OPTIONS = ['USD', 'Robux', 'Fixed', 'Hourly']
 const CREATOR_LEVEL_OPTIONS = ['Verified', 'Pro Developer']
 const DEV_VALUE_OPTIONS = ['<$5K', '$5K-$9.9K', '$10K+']
+const DEV_MAX_VALUE_OPTIONS = ['<$2K', '$2K-$4.9K', '$5K+']
 
 type PreviewFilterState = {
   skillFilters: Set<string>
@@ -30,6 +31,7 @@ type PreviewFilterState = {
   rateFilter: string | null
   badgeFilter: string | null
   valueFilter: string | null
+  maxValueFilter: string | null
 }
 
 interface Props {
@@ -48,6 +50,7 @@ function createFilterState(): PreviewFilterState {
     rateFilter: null,
     badgeFilter: null,
     valueFilter: null,
+    maxValueFilter: null,
   }
 }
 
@@ -100,6 +103,11 @@ function totalProfilePlays(profile: PreviewProfile) {
 function totalDevProjectValue(profile: PreviewProfile) {
   if (profile.type !== 'dev') return 0
   return profile.bestWork?.reduce((total, item) => total + Number(item.amount), 0) ?? 0
+}
+
+function maxDevProjectValue(profile: PreviewProfile) {
+  if (profile.type !== 'dev') return 0
+  return profile.bestWork?.reduce((max, item) => Math.max(max, Number(item.amount)), 0) ?? 0
 }
 
 function extractMetaValue(profile: PreviewProfile, label: 'Budget' | 'Rate') {
@@ -166,6 +174,14 @@ function inDevValueRange(totalValue: number, range: string | null) {
   return false
 }
 
+function inDevMaxValueRange(maxValue: number, range: string | null) {
+  if (!range) return true
+  if (range === '<$2K') return maxValue < 2000
+  if (range === '$2K-$4.9K') return maxValue >= 2000 && maxValue < 5000
+  if (range === '$5K+') return maxValue >= 5000
+  return false
+}
+
 export default function MatchingPreview({ audience: initialAudience = 'dev' }: Props) {
   const [audience, setAudience] = useState<PreviewProfileType>(initialAudience)
   const [passed, setPassed] = useState<Set<string>>(new Set())
@@ -191,6 +207,7 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
   const activeRateFilter = activeFilters.rateFilter
   const activeBadgeFilter = activeFilters.badgeFilter
   const activeValueFilter = activeFilters.valueFilter
+  const activeMaxValueFilter = activeFilters.maxValueFilter
 
   // Filter options derived from the full dataset (not just available) so pills don't vanish as you swipe
   const skillFilterOptions = useMemo(() => {
@@ -216,6 +233,7 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
     activeRateFilter,
     activeBadgeFilter,
     activeValueFilter,
+    activeMaxValueFilter,
   ].filter(Boolean).length + activeSkillFilters.size
 
   // Filter first, then remove profiles already passed or liked in this cycle.
@@ -238,6 +256,7 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
       const matchesRate = p.type !== 'dev' || !activeRateFilter || extractMetaValue(p, 'Rate') === activeRateFilter
       const matchesBadge = p.type !== 'dev' || !activeBadgeFilter || p.badge === activeBadgeFilter
       const matchesValue = p.type !== 'dev' || inDevValueRange(totalDevProjectValue(p), activeValueFilter)
+      const matchesMaxValue = p.type !== 'dev' || inDevMaxValueRange(maxDevProjectValue(p), activeMaxValueFilter)
       return matchesSkill
         && matchesRange
         && matchesPlays
@@ -248,6 +267,7 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
         && matchesRate
         && matchesBadge
         && matchesValue
+        && matchesMaxValue
     })
   }, [
     allProfiles,
@@ -262,6 +282,7 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
     activeRateFilter,
     activeBadgeFilter,
     activeValueFilter,
+    activeMaxValueFilter,
   ])
 
   const displayProfiles = useMemo(
@@ -416,11 +437,18 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
         onClear: () => clearSingleFilter('badgeFilter'),
       },
       {
-        label: 'Highlighted project value',
+        label: 'Total highlighted projects value',
         options: DEV_VALUE_OPTIONS,
         active: activeValueFilter,
         onToggle: (value: string) => toggleSingleFilter('valueFilter', value),
         onClear: () => clearSingleFilter('valueFilter'),
+      },
+      {
+        label: 'Most valuable project',
+        options: DEV_MAX_VALUE_OPTIONS,
+        active: activeMaxValueFilter,
+        onToggle: (value: string) => toggleSingleFilter('maxValueFilter', value),
+        onClear: () => clearSingleFilter('maxValueFilter'),
       },
     ]
     : [
