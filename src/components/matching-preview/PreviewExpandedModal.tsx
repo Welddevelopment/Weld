@@ -66,6 +66,7 @@ function CenterCard({
   profile,
   glowClass,
   showMatch,
+  isMatch,
   onPass,
   onLike,
   onKeepMatching,
@@ -73,6 +74,7 @@ function CenterCard({
   profile: PreviewProfile
   glowClass: string
   showMatch: boolean
+  isMatch: boolean
   onPass: () => void
   onLike: () => void
   onKeepMatching: () => void
@@ -169,7 +171,7 @@ function CenterCard({
         </div>
       </div>
 
-      {showMatch && (
+      {showMatch && !isMatch && (
         <div className="mp-match-overlay">
           <div className="mp-match-overlay-text">💚 You swiped right!</div>
           <div className="mp-match-overlay-sub">We&apos;ll let you know when it&apos;s a match.</div>
@@ -177,6 +179,27 @@ function CenterCard({
             <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           </div>
           <button className="mp-match-keep-btn" onClick={onKeepMatching}>Keep matching →</button>
+        </div>
+      )}
+
+      {showMatch && isMatch && (
+        <div className="mp-match-overlay mp-its-a-match">
+          <div className="mp-iam-heading">🎉 It&apos;s a Match!</div>
+          <div className="mp-iam-sub">You and {profile.name} both liked each other</div>
+          <div className="mp-iam-actions">
+            <button className="mp-iam-reach-btn" onClick={onKeepMatching}>
+              <div className="mp-iam-reach-icon">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <span className="mp-iam-btn-label">Reach out</span>
+            </button>
+            <button className="mp-iam-scroll-btn" onClick={onKeepMatching}>
+              <div className="mp-iam-scroll-circle">
+                <svg viewBox="0 0 24 24" className="mp-iam-scroll-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <span className="mp-iam-btn-label">Keep matching</span>
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -228,6 +251,7 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
   const [currentId, setCurrentId] = useState(initialId)
   const [glowClass, setGlowClass] = useState('')
   const [showMatch, setShowMatch] = useState(false)
+  const [isMatch, setIsMatch] = useState(false)
   const [passToast, setPassToast] = useState<PassToastData | null>(null)
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
 
@@ -239,6 +263,7 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
     setCurrentId(initialId)
     setGlowClass('')
     setShowMatch(false)
+    setIsMatch(false)
   }, [initialId])
 
   const profile = profiles.find(p => p.id === currentId)
@@ -252,6 +277,7 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
     setCurrentId(next.id)
     setGlowClass('')
     setShowMatch(false)
+    setIsMatch(false)
   }
 
   const handlePass = () => {
@@ -265,6 +291,7 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
   const handleLike = () => {
     if (glowClass) return
     setGlowClass('mp-like-glow')
+    setIsMatch(Math.random() < 0.15)
     const t = setTimeout(() => setShowMatch(true), 460)
     timersRef.current.push(t)
   }
@@ -291,6 +318,7 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
           profile={profile}
           glowClass={glowClass}
           showMatch={showMatch}
+          isMatch={isMatch}
           onPass={handlePass}
           onLike={handleLike}
           onKeepMatching={handleKeepMatching}
