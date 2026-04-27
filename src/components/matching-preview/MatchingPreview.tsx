@@ -7,8 +7,38 @@ import PreviewStack from './PreviewStack'
 import PreviewExpandedModal from './PreviewExpandedModal'
 import PreviewFilterModal from './PreviewFilterModal'
 
+const EXPERIENCE_OPTIONS = ['<1', '1-2', '3-4', '5+']
+const TEAM_SIZE_OPTIONS = ['1-2', '3-4', '5-9', '10-19', '20+']
+
 interface Props {
   audience?: PreviewProfileType
+}
+
+function extractExperienceYears(profile: PreviewProfile) {
+  return Number(profile.role.match(/(\d+)\s*yr/i)?.[1] ?? NaN)
+}
+
+function extractTeamSize(profile: PreviewProfile) {
+  return Number(profile.role.match(/(\d+)\s*members/i)?.[1] ?? NaN)
+}
+
+function inExperienceRange(years: number, range: string | null) {
+  if (!range || Number.isNaN(years)) return !range
+  if (range === '<1') return years < 1
+  if (range === '1-2') return years >= 1 && years <= 2
+  if (range === '3-4') return years >= 3 && years <= 4
+  if (range === '5+') return years >= 5
+  return false
+}
+
+function inTeamSizeRange(size: number, range: string | null) {
+  if (!range || Number.isNaN(size)) return !range
+  if (range === '1-2') return size >= 1 && size <= 2
+  if (range === '3-4') return size >= 3 && size <= 4
+  if (range === '5-9') return size >= 5 && size <= 9
+  if (range === '10-19') return size >= 10 && size <= 19
+  if (range === '20+') return size >= 20
+  return false
 }
 
 export default function MatchingPreview({ audience: initialAudience = 'dev' }: Props) {
@@ -16,7 +46,8 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
   const [passed, setPassed] = useState<Set<string>>(new Set())
   const [liked, setLiked] = useState<Set<string>>(new Set())
   const [openProfileId, setOpenProfileId] = useState<string | null>(null)
-  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set())
+  const [activeSkillFilter, setActiveSkillFilter] = useState<string | null>(null)
+  const [activeRangeFilter, setActiveRangeFilter] = useState<string | null>(null)
   const [showFilters, setShowFilters] = useState(false)
 
   // When browsing as a dev you see studios; as a studio you see devs
@@ -29,7 +60,7 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
   )
 
   // Filter options derived from the full dataset (not just available) so pills don't vanish as you swipe
-  const filterOptions = useMemo(() => {
+  const skillFilterOptions = useMemo(() => {
     const opts = new Set<string>()
     allProfiles.forEach(p => {
       if (p.type === 'dev') {
@@ -40,15 +71,24 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
     })
     return Array.from(opts).sort()
   }, [allProfiles])
+  const rangeFilterOptions = filterType === 'skills' ? EXPERIENCE_OPTIONS : TEAM_SIZE_OPTIONS
+  const activeFilterCount = (activeSkillFilter ? 1 : 0) + (activeRangeFilter ? 1 : 0)
 
   // Profiles visible in the stack — available AND passing active filters
   const displayProfiles = useMemo(() => {
-    if (activeFilters.size === 0) return availableProfiles
+    if (activeFilterCount === 0) return availableProfiles
     return availableProfiles.filter(p => {
-      if (p.type === 'dev') return p.skills?.some(s => activeFilters.has(s.name)) ?? false
-      return p.skillsNeeded?.some(s => activeFilters.has(s.name)) ?? false
+      const matchesSkill = activeSkillFilter
+        ? p.type === 'dev'
+          ? p.skills?.some(s => s.name === activeSkillFilter) ?? false
+          : p.skillsNeeded?.some(s => s.name === activeSkillFilter) ?? false
+        : true
+      const matchesRange = p.type === 'dev'
+        ? inExperienceRange(extractExperienceYears(p), activeRangeFilter)
+        : inTeamSizeRange(extractTeamSize(p), activeRangeFilter)
+      return matchesSkill && matchesRange
     })
-  }, [availableProfiles, activeFilters])
+  }, [availableProfiles, activeFilterCount, activeSkillFilter, activeRangeFilter])
 
   const handleOpen = (id: string) => setOpenProfileId(id)
   const handleClose = () => setOpenProfileId(null)
@@ -77,18 +117,29 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
     }
   }
 
-  const toggleFilter = (skill: string) => {
-    setActiveFilters(prev => {
-      const next = new Set(prev)
-      if (next.has(skill)) next.delete(skill)
-      else next.add(skill)
-      return next
-    })
+  const toggleSkillFilter = (skill: string) => {
+    setActiveSkillFilter(prev => prev === skill ? null : skill)
+    setOpenProfileId(null)
+  }
+
+  const toggleRangeFilter = (range: string) => {
+    setActiveRangeFilter(prev => prev === range ? null : range)
     setOpenProfileId(null)
   }
 
   const clearFilters = () => {
-    setActiveFilters(new Set())
+    setActiveSkillFilter(null)
+    setActiveRangeFilter(null)
+    setOpenProfileId(null)
+  }
+
+  const clearSkillFilter = () => {
+    setActiveSkillFilter(null)
+    setOpenProfileId(null)
+  }
+
+  const clearRangeFilter = () => {
+    setActiveRangeFilter(null)
     setOpenProfileId(null)
   }
 
@@ -97,7 +148,8 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
     setPassed(new Set())
     setLiked(new Set())
     setOpenProfileId(null)
-    setActiveFilters(new Set())
+    setActiveSkillFilter(null)
+    setActiveRangeFilter(null)
     setShowFilters(false)
   }
 
@@ -127,7 +179,7 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
 
       {/* Filter button */}
       <button
-        className={`mp-filter-btn${activeFilters.size > 0 ? ' mp-filter-btn--active' : ''}`}
+        className={`mp-filter-btn${activeFilterCount > 0 ? ' mp-filter-btn--active' : ''}`}
         onClick={() => setShowFilters(true)}
       >
         <svg className="mp-filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -136,8 +188,8 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
           <line x1="11" y1="18" x2="13" y2="18" />
         </svg>
         Filters
-        {activeFilters.size > 0 && (
-          <span className="mp-filter-badge">{activeFilters.size}</span>
+        {activeFilterCount > 0 && (
+          <span className="mp-filter-badge">{activeFilterCount}</span>
         )}
       </button>
 
@@ -183,10 +235,15 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
       {showFilters && (
         <PreviewFilterModal
           filterType={filterType}
-          options={filterOptions}
-          active={activeFilters}
-          onToggle={toggleFilter}
-          onClear={clearFilters}
+          skillOptions={skillFilterOptions}
+          rangeOptions={rangeFilterOptions}
+          activeSkill={activeSkillFilter}
+          activeRange={activeRangeFilter}
+          onToggleSkill={toggleSkillFilter}
+          onToggleRange={toggleRangeFilter}
+          onClearSkill={clearSkillFilter}
+          onClearRange={clearRangeFilter}
+          onClearAll={clearFilters}
           onClose={() => setShowFilters(false)}
         />
       )}

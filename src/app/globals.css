@@ -189,6 +189,8 @@
 .pf-title { font-family:var(--font-space-grotesk,sans-serif); font-size:22px; font-weight:700; color:#FFF7F1; letter-spacing:-0.3px; margin-bottom:4px; }
 .pf-subtitle { font-size:13px; color:rgba(255,247,241,0.42); line-height:1.5; }
 .pf-body { margin-bottom:20px; }
+.pf-section { margin-bottom:22px; }
+.pf-section + .pf-section { padding-top:2px; }
 .pf-row-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
 .pf-row-label { font-size:11px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,247,241,0.38); }
 .pf-clear-btn { background:none; border:none; color:rgba(232,70,36,0.7); font-family:var(--font-geist-sans,sans-serif); font-size:12px; font-weight:600; cursor:pointer; padding:0; transition:color .15s; }
@@ -199,6 +201,7 @@
 .pf-pill--on { background:rgba(232,70,36,0.14); border-color:rgba(232,70,36,0.5); color:#E84624; font-weight:600; }
 .pf-pill--on:hover { background:rgba(232,70,36,0.22); border-color:#E84624; }
 .pf-footer { border-top:1px solid rgba(255,247,241,0.07); padding-top:16px; text-align:center; }
+.pf-footer-row { display:flex; align-items:center; justify-content:space-between; gap:16px; }
 .pf-hint { font-size:12px; color:rgba(255,247,241,0.3); }
 .pf-hint--active { color:rgba(232,70,36,0.7); font-weight:600; }
 @keyframes pf-in { from { opacity:0; transform:scale(0.95) translateY(8px); } to { opacity:1; transform:scale(1) translateY(0); } }
