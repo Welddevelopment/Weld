@@ -175,6 +175,7 @@ export function RightAuxPanel({ profile }: { profile: PreviewProfile }) {
                   <div className="aux-work-meta">
                     <span className="aux-work-pill">Tools: {item.tools}</span>
                     <span className="aux-work-pill">Time: {item.time}</span>
+                    <span className="aux-work-pill">Plays: {item.plays}</span>
                     <span className="aux-work-pill">Paid: ${item.amount}</span>
                   </div>
                 </div>

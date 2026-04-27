@@ -9,10 +9,13 @@ import PreviewFilterModal from './PreviewFilterModal'
 
 const EXPERIENCE_OPTIONS = ['<1', '1-2', '3-4', '5+']
 const TEAM_SIZE_OPTIONS = ['1-2', '3-4', '5-9', '10-19', '20+']
+const DEV_PLAY_OPTIONS = ['<50M', '50-74M', '75-99M', '100M+']
+const STUDIO_PLAY_OPTIONS = ['<30M', '30-49M', '50M+']
 
 type PreviewFilterState = {
   skillFilters: Set<string>
   rangeFilter: string | null
+  playFilter: string | null
 }
 
 interface Props {
@@ -20,7 +23,7 @@ interface Props {
 }
 
 function createFilterState(): PreviewFilterState {
-  return { skillFilters: new Set(), rangeFilter: null }
+  return { skillFilters: new Set(), rangeFilter: null, playFilter: null }
 }
 
 function extractExperienceYears(profile: PreviewProfile) {
@@ -30,6 +33,24 @@ function extractExperienceYears(profile: PreviewProfile) {
 
 function extractTeamSize(profile: PreviewProfile) {
   return Number(profile.role.match(/(\d+)\s*members/i)?.[1] ?? NaN)
+}
+
+function parsePlayMillions(value: string) {
+  const match = value.match(/([\d.]+)\s*([KMB])?/i)
+  if (!match) return 0
+  const amount = Number(match[1])
+  if (Number.isNaN(amount)) return 0
+  const unit = match[2]?.toUpperCase()
+  if (unit === 'K') return amount / 1000
+  if (unit === 'B') return amount * 1000
+  return amount
+}
+
+function totalProfilePlays(profile: PreviewProfile) {
+  if (profile.type === 'dev') {
+    return profile.bestWork?.reduce((total, item) => total + parsePlayMillions(item.plays), 0) ?? 0
+  }
+  return profile.topGames?.reduce((total, item) => total + parsePlayMillions(item.plays), 0) ?? 0
 }
 
 function inExperienceRange(years: number, range: string | null) {
@@ -51,6 +72,19 @@ function inTeamSizeRange(size: number, range: string | null) {
   return false
 }
 
+function inPlayRange(totalMillions: number, range: string | null) {
+  if (!range) return true
+  if (range === '<50M') return totalMillions < 50
+  if (range === '50-99M') return totalMillions >= 50 && totalMillions < 100
+  if (range === '50-74M') return totalMillions >= 50 && totalMillions < 75
+  if (range === '75-99M') return totalMillions >= 75 && totalMillions < 100
+  if (range === '100M+') return totalMillions >= 100
+  if (range === '<30M') return totalMillions < 30
+  if (range === '30-49M') return totalMillions >= 30 && totalMillions < 50
+  if (range === '50M+') return totalMillions >= 50
+  return false
+}
+
 export default function MatchingPreview({ audience: initialAudience = 'dev' }: Props) {
   const [audience, setAudience] = useState<PreviewProfileType>(initialAudience)
   const [passed, setPassed] = useState<Set<string>>(new Set())
@@ -68,6 +102,7 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
   const activeFilters = filtersByAudience[audience]
   const activeSkillFilters = activeFilters.skillFilters
   const activeRangeFilter = activeFilters.rangeFilter
+  const activePlayFilter = activeFilters.playFilter
 
   // Filter options derived from the full dataset (not just available) so pills don't vanish as you swipe
   const skillFilterOptions = useMemo(() => {
@@ -82,7 +117,8 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
     return Array.from(opts).sort()
   }, [allProfiles])
   const rangeFilterOptions = filterType === 'skills' ? EXPERIENCE_OPTIONS : TEAM_SIZE_OPTIONS
-  const activeFilterCount = activeSkillFilters.size + (activeRangeFilter ? 1 : 0)
+  const playFilterOptions = filterType === 'skills' ? DEV_PLAY_OPTIONS : STUDIO_PLAY_OPTIONS
+  const activeFilterCount = activeSkillFilters.size + (activeRangeFilter ? 1 : 0) + (activePlayFilter ? 1 : 0)
 
   // Filter first, then remove profiles already passed or liked in this cycle.
   const filteredProfiles = useMemo(() => {
@@ -96,9 +132,10 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
       const matchesRange = p.type === 'dev'
         ? inExperienceRange(extractExperienceYears(p), activeRangeFilter)
         : inTeamSizeRange(extractTeamSize(p), activeRangeFilter)
-      return matchesSkill && matchesRange
+      const matchesPlays = inPlayRange(totalProfilePlays(p), activePlayFilter)
+      return matchesSkill && matchesRange && matchesPlays
     })
-  }, [allProfiles, activeFilterCount, activeSkillFilters, activeRangeFilter])
+  }, [allProfiles, activeFilterCount, activeSkillFilters, activeRangeFilter, activePlayFilter])
 
   const displayProfiles = useMemo(
     () => filteredProfiles.filter(p => !passed.has(p.id) && !liked.has(p.id)),
@@ -164,6 +201,14 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
     setOpenProfileId(null)
   }
 
+  const togglePlayFilter = (range: string) => {
+    updateActiveFilters(current => ({
+      ...current,
+      playFilter: current.playFilter === range ? null : range,
+    }))
+    setOpenProfileId(null)
+  }
+
   const clearFilters = () => {
     updateActiveFilters(() => createFilterState())
     setOpenProfileId(null)
@@ -176,6 +221,11 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
 
   const clearRangeFilter = () => {
     updateActiveFilters(current => ({ ...current, rangeFilter: null }))
+    setOpenProfileId(null)
+  }
+
+  const clearPlayFilter = () => {
+    updateActiveFilters(current => ({ ...current, playFilter: null }))
     setOpenProfileId(null)
   }
 
@@ -292,12 +342,16 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
           filterType={filterType}
           skillOptions={skillFilterOptions}
           rangeOptions={rangeFilterOptions}
+          playOptions={playFilterOptions}
           activeSkills={activeSkillFilters}
           activeRange={activeRangeFilter}
+          activePlay={activePlayFilter}
           onToggleSkill={toggleSkillFilter}
           onToggleRange={toggleRangeFilter}
+          onTogglePlay={togglePlayFilter}
           onClearSkill={clearSkillFilter}
           onClearRange={clearRangeFilter}
+          onClearPlay={clearPlayFilter}
           onClearAll={clearFilters}
           onStartMatching={startMatching}
           canStartMatching={displayProfiles.length > 0}

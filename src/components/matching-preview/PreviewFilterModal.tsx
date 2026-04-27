@@ -4,12 +4,16 @@ interface Props {
   filterType: 'skills' | 'hiring'
   skillOptions: string[]
   rangeOptions: string[]
+  playOptions: string[]
   activeSkills: Set<string>
   activeRange: string | null
+  activePlay: string | null
   onToggleSkill: (opt: string) => void
   onToggleRange: (opt: string) => void
+  onTogglePlay: (opt: string) => void
   onClearSkill: () => void
   onClearRange: () => void
+  onClearPlay: () => void
   onClearAll: () => void
   onStartMatching: () => void
   canStartMatching: boolean
@@ -20,19 +24,23 @@ export default function PreviewFilterModal({
   filterType,
   skillOptions,
   rangeOptions,
+  playOptions,
   activeSkills,
   activeRange,
+  activePlay,
   onToggleSkill,
   onToggleRange,
+  onTogglePlay,
   onClearSkill,
   onClearRange,
+  onClearPlay,
   onClearAll,
   onStartMatching,
   canStartMatching,
   onClose,
 }: Props) {
   const isSkills = filterType === 'skills'
-  const totalActive = activeSkills.size + (activeRange ? 1 : 0)
+  const totalActive = activeSkills.size + (activeRange ? 1 : 0) + (activePlay ? 1 : 0)
 
   return (
     <div className="pf-overlay">
@@ -95,6 +103,30 @@ export default function PreviewFilterModal({
                 className={`pf-pill${activeRange === opt ? ' pf-pill--on' : ''}`}
                 aria-pressed={activeRange === opt}
                 onClick={() => onToggleRange(opt)}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="pf-section">
+          <div className="pf-row-head">
+            <span className="pf-row-label">{isSkills ? 'Plays contributed to' : 'Total plays'}</span>
+            {activePlay && (
+              <button className="pf-clear-btn" type="button" onClick={onClearPlay}>
+                Clear
+              </button>
+            )}
+          </div>
+          <div className="pf-pills">
+            {playOptions.map(opt => (
+              <button
+                key={opt}
+                type="button"
+                className={`pf-pill${activePlay === opt ? ' pf-pill--on' : ''}`}
+                aria-pressed={activePlay === opt}
+                onClick={() => onTogglePlay(opt)}
               >
                 {opt}
               </button>

@@ -93,6 +93,7 @@ function devWork(tags: string[], idx: number) {
       tools: sp ? sp.tools      : `${tag}, Roblox Studio`,
       time:  `${2 + ((idx + offset) % 5)} weeks`,
       amount: `${700 + (idx + offset) * 250}`,
+      plays: `${4 + ((idx * 13 + offset * 9) % 42)}M`,
     }
   })
 }

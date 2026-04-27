@@ -7,6 +7,7 @@ export type DevWork = {
   tools: string
   time: string
   amount: string
+  plays: string
 }
 
 export type TopGame = {
