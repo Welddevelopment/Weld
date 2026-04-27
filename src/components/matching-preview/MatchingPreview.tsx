@@ -10,11 +10,21 @@ import PreviewFilterModal from './PreviewFilterModal'
 const EXPERIENCE_OPTIONS = ['<1', '1-2', '3-4', '5+']
 const TEAM_SIZE_OPTIONS = ['1-2', '3-4', '5-9', '10-19', '20+']
 
+type PreviewFilterState = {
+  skillFilters: Set<string>
+  rangeFilter: string | null
+}
+
 interface Props {
   audience?: PreviewProfileType
 }
 
+function createFilterState(): PreviewFilterState {
+  return { skillFilters: new Set(), rangeFilter: null }
+}
+
 function extractExperienceYears(profile: PreviewProfile) {
+  if (/<\s*1\s*yr/i.test(profile.role)) return 0
   return Number(profile.role.match(/(\d+)\s*yr/i)?.[1] ?? NaN)
 }
 
@@ -46,13 +56,18 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
   const [passed, setPassed] = useState<Set<string>>(new Set())
   const [liked, setLiked] = useState<Set<string>>(new Set())
   const [openProfileId, setOpenProfileId] = useState<string | null>(null)
-  const [activeSkillFilter, setActiveSkillFilter] = useState<string | null>(null)
-  const [activeRangeFilter, setActiveRangeFilter] = useState<string | null>(null)
+  const [filtersByAudience, setFiltersByAudience] = useState<Record<PreviewProfileType, PreviewFilterState>>({
+    dev: createFilterState(),
+    studio: createFilterState(),
+  })
   const [showFilters, setShowFilters] = useState(false)
 
   // When browsing as a dev you see studios; as a studio you see devs
   const allProfiles: PreviewProfile[] = audience === 'dev' ? PREVIEW_STUDIOS : PREVIEW_DEVS
   const filterType: 'skills' | 'hiring' = audience === 'studio' ? 'skills' : 'hiring'
+  const activeFilters = filtersByAudience[audience]
+  const activeSkillFilters = activeFilters.skillFilters
+  const activeRangeFilter = activeFilters.rangeFilter
 
   const availableProfiles = useMemo(
     () => allProfiles.filter(p => !passed.has(p.id) && !liked.has(p.id)),
@@ -72,23 +87,23 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
     return Array.from(opts).sort()
   }, [allProfiles])
   const rangeFilterOptions = filterType === 'skills' ? EXPERIENCE_OPTIONS : TEAM_SIZE_OPTIONS
-  const activeFilterCount = (activeSkillFilter ? 1 : 0) + (activeRangeFilter ? 1 : 0)
+  const activeFilterCount = activeSkillFilters.size + (activeRangeFilter ? 1 : 0)
 
   // Profiles visible in the stack — available AND passing active filters
   const displayProfiles = useMemo(() => {
     if (activeFilterCount === 0) return availableProfiles
     return availableProfiles.filter(p => {
-      const matchesSkill = activeSkillFilter
+      const matchesSkill = activeSkillFilters.size > 0
         ? p.type === 'dev'
-          ? p.skills?.some(s => s.name === activeSkillFilter) ?? false
-          : p.skillsNeeded?.some(s => s.name === activeSkillFilter) ?? false
+          ? p.skills?.some(s => activeSkillFilters.has(s.name)) ?? false
+          : p.skillsNeeded?.some(s => activeSkillFilters.has(s.name)) ?? false
         : true
       const matchesRange = p.type === 'dev'
         ? inExperienceRange(extractExperienceYears(p), activeRangeFilter)
         : inTeamSizeRange(extractTeamSize(p), activeRangeFilter)
       return matchesSkill && matchesRange
     })
-  }, [availableProfiles, activeFilterCount, activeSkillFilter, activeRangeFilter])
+  }, [availableProfiles, activeFilterCount, activeSkillFilters, activeRangeFilter])
 
   const handleOpen = (id: string) => setOpenProfileId(id)
   const handleClose = () => setOpenProfileId(null)
@@ -117,30 +132,59 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
     }
   }
 
+  const updateActiveFilters = (updater: (current: PreviewFilterState) => PreviewFilterState) => {
+    setFiltersByAudience(prev => ({
+      ...prev,
+      [audience]: updater(prev[audience]),
+    }))
+  }
+
   const toggleSkillFilter = (skill: string) => {
-    setActiveSkillFilter(prev => prev === skill ? null : skill)
+    updateActiveFilters(current => {
+      const nextSkills = new Set(current.skillFilters)
+      if (filterType === 'skills') {
+        if (nextSkills.has(skill)) nextSkills.delete(skill)
+        else nextSkills.add(skill)
+      } else if (nextSkills.has(skill)) {
+        nextSkills.clear()
+      } else {
+        nextSkills.clear()
+        nextSkills.add(skill)
+      }
+      return { ...current, skillFilters: nextSkills }
+    })
     setOpenProfileId(null)
   }
 
   const toggleRangeFilter = (range: string) => {
-    setActiveRangeFilter(prev => prev === range ? null : range)
+    updateActiveFilters(current => ({
+      ...current,
+      rangeFilter: current.rangeFilter === range ? null : range,
+    }))
     setOpenProfileId(null)
   }
 
   const clearFilters = () => {
-    setActiveSkillFilter(null)
-    setActiveRangeFilter(null)
+    updateActiveFilters(() => createFilterState())
     setOpenProfileId(null)
   }
 
   const clearSkillFilter = () => {
-    setActiveSkillFilter(null)
+    updateActiveFilters(current => ({ ...current, skillFilters: new Set() }))
     setOpenProfileId(null)
   }
 
   const clearRangeFilter = () => {
-    setActiveRangeFilter(null)
+    updateActiveFilters(current => ({ ...current, rangeFilter: null }))
     setOpenProfileId(null)
+  }
+
+  const startMatching = () => {
+    const visibleProfiles = displayProfiles.slice(0, 8)
+    const targetProfile = visibleProfiles[visibleProfiles.length - 1]
+    if (!targetProfile) return
+    setShowFilters(false)
+    setOpenProfileId(targetProfile.id)
   }
 
   const switchAudience = (type: PreviewProfileType) => {
@@ -148,8 +192,6 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
     setPassed(new Set())
     setLiked(new Set())
     setOpenProfileId(null)
-    setActiveSkillFilter(null)
-    setActiveRangeFilter(null)
     setShowFilters(false)
   }
 
@@ -237,13 +279,15 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
           filterType={filterType}
           skillOptions={skillFilterOptions}
           rangeOptions={rangeFilterOptions}
-          activeSkill={activeSkillFilter}
+          activeSkills={activeSkillFilters}
           activeRange={activeRangeFilter}
           onToggleSkill={toggleSkillFilter}
           onToggleRange={toggleRangeFilter}
           onClearSkill={clearSkillFilter}
           onClearRange={clearRangeFilter}
           onClearAll={clearFilters}
+          onStartMatching={startMatching}
+          canStartMatching={displayProfiles.length > 0}
           onClose={() => setShowFilters(false)}
         />
       )}

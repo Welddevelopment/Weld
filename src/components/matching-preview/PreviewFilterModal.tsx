@@ -4,13 +4,15 @@ interface Props {
   filterType: 'skills' | 'hiring'
   skillOptions: string[]
   rangeOptions: string[]
-  activeSkill: string | null
+  activeSkills: Set<string>
   activeRange: string | null
   onToggleSkill: (opt: string) => void
   onToggleRange: (opt: string) => void
   onClearSkill: () => void
   onClearRange: () => void
   onClearAll: () => void
+  onStartMatching: () => void
+  canStartMatching: boolean
   onClose: () => void
 }
 
@@ -18,20 +20,22 @@ export default function PreviewFilterModal({
   filterType,
   skillOptions,
   rangeOptions,
-  activeSkill,
+  activeSkills,
   activeRange,
   onToggleSkill,
   onToggleRange,
   onClearSkill,
   onClearRange,
   onClearAll,
+  onStartMatching,
+  canStartMatching,
   onClose,
 }: Props) {
   const isSkills = filterType === 'skills'
-  const totalActive = (activeSkill ? 1 : 0) + (activeRange ? 1 : 0)
+  const totalActive = activeSkills.size + (activeRange ? 1 : 0)
 
   return (
-    <div className="pf-overlay">
+    <div className="pf-overlay" onClick={onClose}>
       <div className="pf-card" onClick={e => e.stopPropagation()}>
         <button className="pf-close-btn" type="button" onClick={onClose} aria-label="Close filters">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -53,7 +57,7 @@ export default function PreviewFilterModal({
         <div className="pf-section">
           <div className="pf-row-head">
             <span className="pf-row-label">{isSkills ? 'Primary skills' : 'Hiring focus'}</span>
-            {activeSkill && (
+            {activeSkills.size > 0 && (
               <button className="pf-clear-btn" type="button" onClick={onClearSkill}>
                 Clear
               </button>
@@ -64,8 +68,8 @@ export default function PreviewFilterModal({
               <button
                 key={opt}
                 type="button"
-                className={`pf-pill${activeSkill === opt ? ' pf-pill--on' : ''}`}
-                aria-pressed={activeSkill === opt}
+                className={`pf-pill${activeSkills.has(opt) ? ' pf-pill--on' : ''}`}
+                aria-pressed={activeSkills.has(opt)}
                 onClick={() => onToggleSkill(opt)}
               >
                 {opt}
@@ -106,6 +110,14 @@ export default function PreviewFilterModal({
                 <span className="pf-hint pf-hint--active">
                   {totalActive} filter{totalActive > 1 ? 's' : ''} active
                 </span>
+                <button
+                  className="pf-start-btn"
+                  type="button"
+                  onClick={onStartMatching}
+                  disabled={!canStartMatching}
+                >
+                  start matching
+                </button>
                 <button className="pf-clear-btn" type="button" onClick={onClearAll}>Clear all</button>
               </div>
             )
