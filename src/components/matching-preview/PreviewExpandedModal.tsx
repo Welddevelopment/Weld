@@ -1,10 +1,31 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { PreviewProfile } from './preview-types'
 import { LeftAuxPanel, RightAuxPanel } from './PreviewAuxPanel'
 
-const MATCH_CHANCE = 0.15
+const DEV_PASS_REASONS = [
+  'Not enough experience',
+  "Skills don't match what I need",
+  "Portfolio doesn't meet my standard",
+  "Don't like the aesthetic of past work",
+  'Rate is too high for my budget',
+  "Availability doesn't match my timeline",
+  'Specialisation is too niche for my project',
+  'Just browsing, not ready to commit',
+]
+
+const STUDIO_PASS_REASONS = [
+  'Team is too small for my needs',
+  'Team is too large, looking for smaller studios',
+  "Their games aren't in my genre",
+  "Budget type doesn't work for me",
+  "Game quality doesn't meet my standard",
+  'Player numbers are too low',
+  "Not hiring for my skillset",
+  'Not enough track record or shipped games',
+  'Just browsing, not ready to commit',
+]
 
 interface Props {
   profiles: PreviewProfile[]
@@ -29,7 +50,6 @@ function AvatarImg({ userId, name, bg }: { userId: number; name: string; bg: str
           {initials}
         </div>
         <img
-          className="mp-modal-avatar"
           src={`https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=150&height=150&format=png`}
           alt={name}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
@@ -44,18 +64,25 @@ function CenterCard({
   profile,
   glowClass,
   showMatch,
+  showPass,
   onPass,
   onLike,
   onKeepMatching,
+  onPassContinue,
+  onPassSkip,
 }: {
   profile: PreviewProfile
   glowClass: string
   showMatch: boolean
+  showPass: boolean
   onPass: () => void
   onLike: () => void
   onKeepMatching: () => void
+  onPassContinue: () => void
+  onPassSkip: () => void
 }) {
   const isDev = profile.type === 'dev'
+  const passReasons = isDev ? DEV_PASS_REASONS : STUDIO_PASS_REASONS
 
   return (
     <div className={`mp-carousel-card pos-center ${glowClass}`} style={{ position: 'relative' }}>
@@ -147,11 +174,30 @@ function CenterCard({
         </div>
       </div>
 
+      {/* Like / match overlay */}
       {showMatch && (
         <div className="mp-match-overlay">
-          <div className="mp-match-overlay-text">Liked</div>
-          <div className="mp-match-overlay-sub">We will let you know when it is a match.</div>
-          <button className="mp-match-keep-btn" onClick={onKeepMatching}>Keep matching</button>
+          <div className="mp-match-overlay-text">💚 You swiped right!</div>
+          <div className="mp-match-overlay-sub">We&apos;ll let you know when it&apos;s a match.</div>
+          <div className="mp-match-chat-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <button className="mp-match-keep-btn" onClick={onKeepMatching}>Keep matching →</button>
+        </div>
+      )}
+
+      {/* Pass overlay */}
+      {showPass && (
+        <div className="mp-pass-overlay">
+          <div className="mp-pass-overlay-icon">👋</div>
+          <div className="mp-pass-overlay-text">You passed on {profile.name}</div>
+          <div className="mp-pass-overlay-sub">Help us improve — why wasn&apos;t it a fit?</div>
+          <select className="mp-pass-reason-select" defaultValue="">
+            <option value="" disabled>Select a reason…</option>
+            {passReasons.map(r => <option key={r} value={r}>{r}</option>)}
+          </select>
+          <button className="mp-pass-continue-btn" onClick={onPassContinue}>Continue matching →</button>
+          <button className="mp-pass-skip-btn" onClick={onPassSkip}>Skip feedback</button>
         </div>
       )}
     </div>
@@ -162,6 +208,7 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
   const [currentId, setCurrentId] = useState(initialId)
   const [glowClass, setGlowClass] = useState('')
   const [showMatch, setShowMatch] = useState(false)
+  const [showPass, setShowPass] = useState(false)
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
 
   useEffect(() => {
@@ -172,6 +219,7 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
     setCurrentId(initialId)
     setGlowClass('')
     setShowMatch(false)
+    setShowPass(false)
   }, [initialId])
 
   const profile = profiles.find(p => p.id === currentId)
@@ -185,35 +233,37 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
     setCurrentId(next.id)
     setGlowClass('')
     setShowMatch(false)
+    setShowPass(false)
   }
 
   const handlePass = () => {
     if (glowClass) return
     setGlowClass('mp-pass-glow')
     const t = setTimeout(() => {
-      onPassed(currentId)
-      advance(currentId)
-    }, 700)
+      setShowPass(true)
+    }, 1750)
     timersRef.current.push(t)
   }
 
   const handleLike = () => {
     if (glowClass) return
     setGlowClass('mp-like-glow')
-    if (Math.random() < MATCH_CHANCE) {
-      const t = setTimeout(() => setShowMatch(true), 400)
-      timersRef.current.push(t)
-    } else {
-      const t = setTimeout(() => {
-        onLiked(currentId)
-        advance(currentId)
-      }, 700)
-      timersRef.current.push(t)
-    }
+    const t = setTimeout(() => setShowMatch(true), 460)
+    timersRef.current.push(t)
   }
 
   const handleKeepMatching = () => {
     onLiked(currentId)
+    advance(currentId)
+  }
+
+  const handlePassContinue = () => {
+    onPassed(currentId)
+    advance(currentId)
+  }
+
+  const handlePassSkip = () => {
+    onPassed(currentId)
     advance(currentId)
   }
 
@@ -229,9 +279,12 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
           profile={profile}
           glowClass={glowClass}
           showMatch={showMatch}
+          showPass={showPass}
           onPass={handlePass}
           onLike={handleLike}
           onKeepMatching={handleKeepMatching}
+          onPassContinue={handlePassContinue}
+          onPassSkip={handlePassSkip}
         />
 
         <div className="mp-carousel-card pos-right" style={{ overflow: 'hidden' }}>
