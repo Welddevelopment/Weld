@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { ProfileDraft, createDraft, draftToProfile } from './profile-types'
 import ProfilePreviewScreen from './ProfilePreviewScreen'
@@ -118,7 +118,7 @@ export default function ProfileBuilder() {
     setPhase('form')
   }
 
-  const profile = draftToProfile(draft, 'preview')
+  const profile = useMemo(() => draftToProfile(draft, 'preview'), [draft])
 
   if (!hydrated) return null
 

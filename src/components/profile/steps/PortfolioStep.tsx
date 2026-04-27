@@ -32,7 +32,7 @@ export default function PortfolioStep({ draft, update, onNext, onBack }: Props) 
 
   return (
     <div className="pb-step-content">
-      <div className="pb-step-eyebrow">Step 7</div>
+      <div className="pb-step-eyebrow">Step 6</div>
       <h1 className="pb-step-title">Portfolio & socials</h1>
       <p className="pb-step-sub">Add links to work you want studios to see, and any social channels. All optional.</p>
 

@@ -2,6 +2,7 @@
 
 import { PreviewProfile } from '../matching-preview/preview-types'
 import { LeftAuxPanel, RightAuxPanel } from '../matching-preview/PreviewAuxPanel'
+import { getInitials } from '@/lib/utils'
 
 interface Props {
   profile: PreviewProfile
@@ -11,7 +12,7 @@ interface Props {
 }
 
 function AvatarImg({ userId, name, bg }: { userId: number; name: string; bg: string }) {
-  const initials = name ? name.slice(0, 2).toUpperCase() : '?'
+  const initials = name ? getInitials(name) : '?'
   return (
     <div className="mp-modal-hero" style={{ background: bg }}>
       <div style={{ position: 'relative', width: 'clamp(60px,8vh,96px)', height: 'clamp(60px,8vh,96px)' }}>

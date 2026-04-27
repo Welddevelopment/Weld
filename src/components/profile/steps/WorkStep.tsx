@@ -109,7 +109,7 @@ export default function WorkStep({ draft, update, onNext, onBack, studioMode = f
 
     return (
       <div className="pb-step-content">
-        <div className="pb-step-eyebrow">Step 6</div>
+        <div className="pb-step-eyebrow">Step 5</div>
         <h1 className="pb-step-title">Your top games</h1>
         <p className="pb-step-sub">Add up to 3 games that show off your studio. These are visible on your profile.</p>
 

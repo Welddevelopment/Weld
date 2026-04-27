@@ -884,37 +884,39 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   overflow-y: auto;
 }
 
-/* Preview overlay extras */
-.pb-preview-overlay {
+/* Preview overlay extras — overrides mp-modal-overlay */
+.mp-modal-overlay.pb-preview-overlay {
   flex-direction: column;
-  padding: clamp(12px,2vh,24px) clamp(12px,2vw,24px);
+  padding: clamp(52px,7vh,72px) clamp(12px,2vw,24px) clamp(76px,10vh,100px);
   gap: clamp(8px,1.5vh,16px);
+  overflow: visible;
+  align-items: stretch;
+  justify-content: stretch;
 }
 
 .pb-preview-back {
-  position: fixed;
+  position: absolute;
   top: 20px;
   left: 20px;
-  z-index: 20;
+  z-index: 10;
   padding: 8px 16px;
   border-radius: 8px;
   border: 1.5px solid rgba(255,255,255,0.15);
-  background: rgba(10,10,10,0.8);
+  background: rgba(10,10,10,0.6);
   color: rgba(255,255,255,0.7);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  backdrop-filter: blur(8px);
   transition: border-color 0.15s, color 0.15s;
 }
 .pb-preview-back:hover { border-color: rgba(255,255,255,0.35); color: #fff; }
 
 .pb-preview-label-pill {
-  position: fixed;
+  position: absolute;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 20;
+  z-index: 10;
   padding: 6px 14px;
   border-radius: 99px;
   background: rgba(232,70,36,0.15);
@@ -928,11 +930,11 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 
 .pb-preview-cta {
-  position: fixed;
+  position: absolute;
   bottom: 28px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 20;
+  z-index: 10;
 }
 
 .pb-preview-continue-btn {
@@ -1357,7 +1359,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .pb-pub-overlay {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 300;
   background: linear-gradient(180deg, rgba(8,22,14,0.97) 0%, rgba(4,13,8,0.98) 100%);
   display: flex;
   align-items: center;

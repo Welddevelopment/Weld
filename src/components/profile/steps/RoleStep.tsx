@@ -37,7 +37,7 @@ export default function RoleStep({ draft, update, onNext, onBack }: Props) {
 
   return (
     <div className="pb-step-content">
-      <div className="pb-step-eyebrow">Step 3</div>
+      <div className="pb-step-eyebrow">Step 2</div>
       <h1 className="pb-step-title">{isDev ? 'Your experience & rate' : 'Your team & status'}</h1>
       <p className="pb-step-sub">
         {isDev

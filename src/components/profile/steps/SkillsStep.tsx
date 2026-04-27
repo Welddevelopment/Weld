@@ -55,7 +55,7 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
 
   return (
     <div className="pb-step-content">
-      <div className="pb-step-eyebrow">Step 5</div>
+      <div className="pb-step-eyebrow">Step 4</div>
       <h1 className="pb-step-title">{isDev ? 'Your skills' : 'What you\'re hiring for'}</h1>
       <p className="pb-step-sub">
         {isDev
