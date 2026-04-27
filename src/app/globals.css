@@ -170,6 +170,39 @@
 .mp-audience-btn.active { color:#FFF5F0; text-shadow:0 0 14px rgba(255,255,255,.22); }
 .mp-audience-btn:hover:not(.active) { color:#FFF5F0; }
 
+/* ── Filter button ── */
+.mp-filter-btn { display:inline-flex; align-items:center; gap:7px; background:rgba(255,245,240,0.05); border:1px solid rgba(255,245,240,0.12); border-radius:100px; padding:8px 18px; font-family:var(--font-geist-sans,sans-serif); font-size:13px; font-weight:600; color:rgba(255,245,240,0.55); cursor:pointer; transition:color .2s,border-color .2s,background .2s; letter-spacing:0.01em; }
+.mp-filter-btn:hover { color:#FFF5F0; border-color:rgba(255,245,240,0.25); background:rgba(255,245,240,0.08); }
+.mp-filter-btn--active { color:#E84624; border-color:rgba(232,70,36,0.45); background:rgba(232,70,36,0.07); }
+.mp-filter-btn--active:hover { background:rgba(232,70,36,0.12); border-color:rgba(232,70,36,0.65); }
+.mp-filter-icon { width:14px; height:14px; flex-shrink:0; }
+.mp-filter-badge { min-width:18px; height:18px; padding:0 5px; border-radius:100px; background:#E84624; color:#fff; font-size:10px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; margin-left:2px; }
+
+/* ── Filter modal ── */
+.pf-overlay { position:fixed; inset:0; z-index:200; backdrop-filter:blur(10px) saturate(1.2); -webkit-backdrop-filter:blur(10px) saturate(1.2); background:rgba(6,5,4,0.65); display:flex; align-items:center; justify-content:center; padding:20px; }
+.pf-card { position:relative; background:#1A1815; border:1px solid rgba(255,245,240,0.1); border-radius:20px; width:100%; max-width:500px; padding:32px; box-shadow:0 24px 64px rgba(0,0,0,0.55); animation:pf-in .3s cubic-bezier(0.34,1.36,0.64,1) both; }
+.pf-close-btn { position:absolute; top:16px; right:16px; width:34px; height:34px; border-radius:50%; border:1.5px solid rgba(232,70,36,0.45); background:rgba(232,70,36,0.08); color:#E84624; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s,border-color .15s; flex-shrink:0; }
+.pf-close-btn svg { width:14px; height:14px; }
+.pf-close-btn:hover { background:rgba(232,70,36,0.18); border-color:#E84624; }
+.pf-header { margin-bottom:24px; padding-right:40px; }
+.pf-eyebrow { font-size:10px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#E84624; margin-bottom:6px; }
+.pf-title { font-family:var(--font-space-grotesk,sans-serif); font-size:22px; font-weight:700; color:#FFF7F1; letter-spacing:-0.3px; margin-bottom:4px; }
+.pf-subtitle { font-size:13px; color:rgba(255,247,241,0.42); line-height:1.5; }
+.pf-body { margin-bottom:20px; }
+.pf-row-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.pf-row-label { font-size:11px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,247,241,0.38); }
+.pf-clear-btn { background:none; border:none; color:rgba(232,70,36,0.7); font-family:var(--font-geist-sans,sans-serif); font-size:12px; font-weight:600; cursor:pointer; padding:0; transition:color .15s; }
+.pf-clear-btn:hover { color:#E84624; }
+.pf-pills { display:flex; flex-wrap:wrap; gap:8px; }
+.pf-pill { background:rgba(255,247,241,0.05); border:1px solid rgba(255,247,241,0.1); border-radius:100px; padding:7px 15px; font-family:var(--font-geist-sans,sans-serif); font-size:13px; font-weight:500; color:rgba(255,247,241,0.55); cursor:pointer; transition:all .15s; }
+.pf-pill:hover { background:rgba(255,247,241,0.1); color:#FFF7F1; border-color:rgba(255,247,241,0.25); }
+.pf-pill--on { background:rgba(232,70,36,0.14); border-color:rgba(232,70,36,0.5); color:#E84624; font-weight:600; }
+.pf-pill--on:hover { background:rgba(232,70,36,0.22); border-color:#E84624; }
+.pf-footer { border-top:1px solid rgba(255,247,241,0.07); padding-top:16px; text-align:center; }
+.pf-hint { font-size:12px; color:rgba(255,247,241,0.3); }
+.pf-hint--active { color:rgba(232,70,36,0.7); font-weight:600; }
+@keyframes pf-in { from { opacity:0; transform:scale(0.95) translateY(8px); } to { opacity:1; transform:scale(1) translateY(0); } }
+
 /* ── Preview button ── */
 .hero-preview-actions { display:flex; justify-content:center; margin-top:16px; }
 .hero-preview-btn {
