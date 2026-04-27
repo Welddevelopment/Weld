@@ -69,11 +69,6 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
   const activeSkillFilters = activeFilters.skillFilters
   const activeRangeFilter = activeFilters.rangeFilter
 
-  const availableProfiles = useMemo(
-    () => allProfiles.filter(p => !passed.has(p.id) && !liked.has(p.id)),
-    [allProfiles, passed, liked]
-  )
-
   // Filter options derived from the full dataset (not just available) so pills don't vanish as you swipe
   const skillFilterOptions = useMemo(() => {
     const opts = new Set<string>()
@@ -89,10 +84,10 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
   const rangeFilterOptions = filterType === 'skills' ? EXPERIENCE_OPTIONS : TEAM_SIZE_OPTIONS
   const activeFilterCount = activeSkillFilters.size + (activeRangeFilter ? 1 : 0)
 
-  // Profiles visible in the stack — available AND passing active filters
-  const displayProfiles = useMemo(() => {
-    if (activeFilterCount === 0) return availableProfiles
-    return availableProfiles.filter(p => {
+  // Filter first, then remove profiles already passed or liked in this cycle.
+  const filteredProfiles = useMemo(() => {
+    if (activeFilterCount === 0) return allProfiles
+    return allProfiles.filter(p => {
       const matchesSkill = activeSkillFilters.size > 0
         ? p.type === 'dev'
           ? p.skills?.some(s => activeSkillFilters.has(s.name)) ?? false
@@ -103,7 +98,12 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
         : inTeamSizeRange(extractTeamSize(p), activeRangeFilter)
       return matchesSkill && matchesRange
     })
-  }, [availableProfiles, activeFilterCount, activeSkillFilters, activeRangeFilter])
+  }, [allProfiles, activeFilterCount, activeSkillFilters, activeRangeFilter])
+
+  const displayProfiles = useMemo(
+    () => filteredProfiles.filter(p => !passed.has(p.id) && !liked.has(p.id)),
+    [filteredProfiles, passed, liked]
+  )
 
   const handleOpen = (id: string) => setOpenProfileId(id)
   const handleClose = () => setOpenProfileId(null)
@@ -187,6 +187,15 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
     setOpenProfileId(targetProfile.id)
   }
 
+  const viewProfilesAgain = () => {
+    const visibleProfiles = filteredProfiles.slice(0, 8)
+    const targetProfile = visibleProfiles[visibleProfiles.length - 1]
+    if (!targetProfile) return
+    setPassed(new Set())
+    setLiked(new Set())
+    setOpenProfileId(targetProfile.id)
+  }
+
   const switchAudience = (type: PreviewProfileType) => {
     setAudience(type)
     setPassed(new Set())
@@ -195,7 +204,8 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
     setShowFilters(false)
   }
 
-  const noMatchesFromFilter = availableProfiles.length > 0 && displayProfiles.length === 0
+  const noMatchesFromFilter = activeFilterCount > 0 && filteredProfiles.length === 0
+  const ranOutOfCards = filteredProfiles.length > 0 && displayProfiles.length === 0
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -248,19 +258,22 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
             Clear filters
           </button>
         </div>
-      ) : availableProfiles.length > 0 ? (
+      ) : displayProfiles.length > 0 ? (
         <PreviewStack profiles={displayProfiles} onOpen={handleOpen} />
-      ) : (
+      ) : ranOutOfCards ? (
         <div className="text-center py-8">
-          <p className="text-white font-semibold mb-1">You&apos;ve seen everyone</p>
-          <p className="text-gray-600 text-sm mb-4">Reset to browse again</p>
+          <p className="text-white font-semibold mb-4">cycle through cards again</p>
           <button
-            onClick={() => { setPassed(new Set()); setLiked(new Set()) }}
+            onClick={viewProfilesAgain}
             className="px-4 py-2 rounded-full text-sm font-semibold transition-all hover:opacity-80"
             style={{ border: '1px solid rgba(232,70,36,.4)', color: '#E84624' }}
           >
-            Reset
+            view profiles again
           </button>
+        </div>
+      ) : (
+        <div className="text-center py-8">
+          <p className="text-white font-semibold mb-1">No profiles available</p>
         </div>
       )}
 

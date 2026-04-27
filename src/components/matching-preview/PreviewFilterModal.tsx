@@ -35,7 +35,7 @@ export default function PreviewFilterModal({
   const totalActive = activeSkills.size + (activeRange ? 1 : 0)
 
   return (
-    <div className="pf-overlay" onClick={onClose}>
+    <div className="pf-overlay">
       <div className="pf-card" onClick={e => e.stopPropagation()}>
         <button className="pf-close-btn" type="button" onClick={onClose} aria-label="Close filters">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
