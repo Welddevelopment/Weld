@@ -1,6 +1,6 @@
 import { PreviewProfile } from './preview-types'
 
-const BG = [
+export const BG = [
   'linear-gradient(135deg,#E84624,#FF8A5C)',
   'linear-gradient(135deg,#FFF5F0,#FF8A5C)',
   'linear-gradient(135deg,#FFB5A7,#E84624)',
@@ -35,7 +35,7 @@ const RBX = [
 
 const STUDIO_DETAILS = 'We are an established studio focused on creating highly immersive, monetizable games. Our next phase is about building polished, feature-rich systems with strong UX and beautiful motion work across the whole experience.'
 
-const DEV_SKILL_DESCS: Record<string, string> = {
+export const DEV_SKILL_DESCS: Record<string, string> = {
   'Scripting':    'Multi-year experience building game systems in Luau — DataStores, remote events, server-client architecture, and combat frameworks. Writes readable, documented code that is built to be maintained long-term.',
   'UI Design':    'Designs reactive UI from Figma wireframes to finished Roblox builds. Smooth tweening, mobile-responsive layouts, and UX flows that eliminate friction at every screen.',
   'VFX':          'Creates visual effects that make players stop and stare — explosions, elemental spells, portal warps, and environmental ambiance. Every effect is optimised for performance at scale.',
