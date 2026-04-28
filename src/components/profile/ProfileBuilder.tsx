@@ -107,10 +107,25 @@ function ProfileAccountStatus({
   )
 }
 
-function PublishedOverlay({ onViewProfile, onStartMatching }: { onViewProfile: () => void; onStartMatching: () => void }) {
+function PublishedOverlay({ onViewProfile, onStartMatching, onDismiss }: { onViewProfile: () => void; onStartMatching: () => void; onDismiss: () => void }) {
   return (
     <div className="pb-pub-overlay">
-      <div className="pb-pub-card">
+      <div className="pb-pub-card" style={{ position: 'relative' }}>
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label="Close"
+          style={{
+            position: 'absolute', top: -14, right: -14,
+            width: 32, height: 32, borderRadius: '50%',
+            background: '#E84624', border: 'none', color: '#fff',
+            fontSize: 15, fontWeight: 700, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
+          }}
+        >
+          ✕
+        </button>
         <div className="pb-pub-pulse">
           <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="20 6 9 17 4 12" />
@@ -270,10 +285,7 @@ export default function ProfileBuilder({ onPublished }: { onPublished?: (profile
       if (accessToken) {
         setSaveState('saving')
         saveAccountProfile(accessToken, draft, profile)
-          .then(() => {
-            setSaveState('saved')
-            onPublished?.(profile)
-          })
+          .then(() => setSaveState('saved'))
           .catch(() => setSaveState('error'))
       }
       return
@@ -296,6 +308,7 @@ export default function ProfileBuilder({ onPublished }: { onPublished?: (profile
         <PublishedOverlay
           onViewProfile={() => setPhase('preview')}
           onStartMatching={() => router.push('/preview')}
+          onDismiss={() => onPublished?.(profile)}
         />
       </>
     )

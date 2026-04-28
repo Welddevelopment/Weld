@@ -85,16 +85,30 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
 
       {selected.length > 0 && (
         <div className="pb-skill-selected">
-          <div className="pb-skill-selected-label">Selected order (drag to reorder):</div>
+          <div className="pb-skill-selected-label">Selected — click a description to edit it:</div>
           {selected.map((s, i) => (
-            <div key={s.name} className="pb-skill-selected-row">
-              <span className="pb-skill-selected-num">{i + 1}</span>
-              <span className="pb-skill-selected-name">{s.name}</span>
-              <button
-                type="button"
-                className="pb-skill-remove"
-                onClick={() => update({ selectedSkills: selected.filter(x => x.name !== s.name) })}
-              >✕</button>
+            <div key={s.name} style={{ marginBottom: 6, background: 'rgba(255,255,255,0.04)', borderRadius: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px 6px' }}>
+                <span className="pb-skill-selected-num">{i + 1}</span>
+                <span className="pb-skill-selected-name">{s.name}</span>
+                <button
+                  type="button"
+                  className="pb-skill-remove"
+                  onClick={() => update({ selectedSkills: selected.filter(x => x.name !== s.name) })}
+                >✕</button>
+              </div>
+              <div style={{ padding: '0 12px 10px' }}>
+                <textarea
+                  className="pb-textarea"
+                  value={s.description}
+                  rows={2}
+                  style={{ marginBottom: 0, resize: 'vertical', fontSize: 13 }}
+                  onChange={e => {
+                    const desc = e.target.value
+                    update({ selectedSkills: selected.map(x => x.name === s.name ? { ...x, description: desc } : x) })
+                  }}
+                />
+              </div>
             </div>
           ))}
         </div>
