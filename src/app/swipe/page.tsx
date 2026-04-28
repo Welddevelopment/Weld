@@ -1,9 +1,12 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import SwipeStack, { SwipeStackHandle } from '@/components/SwipeStack'
+import { useRef, useState } from 'react'
+
+import AppNav from '@/components/AppNav'
 import MatchModal from '@/components/MatchModal'
 import ProfileView from '@/components/ProfileView'
+import RequireAuth from '@/components/RequireAuth'
+import SwipeStack, { SwipeStackHandle } from '@/components/SwipeStack'
 import { Profile } from '@/lib/types'
 
 const profiles: Profile[] = [
@@ -344,32 +347,35 @@ export default function SwipePage() {
     setView('profile')
   }
 
-  if (view === 'profile' && selectedProfile) {
-    return (
-      <ProfileView
-        profile={selectedProfile}
-        onBack={() => setView('swipe')}
-        onPass={() => {
-          setView('swipe')
-          setTimeout(() => swipeRef.current?.swipe('left'), 0)
-        }}
-        onLike={() => {
-          handleLike(selectedProfile)
-          setView('swipe')
-          setTimeout(() => swipeRef.current?.swipe('right'), 0)
-        }}
-      />
-    )
-  }
-
   return (
-    <div className="h-screen flex flex-col items-center justify-center select-none" style={{ background: '#0E0C09' }}>
-      <SwipeStack
-        ref={swipeRef}
-        profiles={profiles}
-        onLike={handleLike}
-        onCardClick={handleCardClick}
-      />
+    <div className="flex min-h-screen flex-col select-none" style={{ background: '#0E0C09' }}>
+      <AppNav />
+      <RequireAuth>
+        {view === 'profile' && selectedProfile ? (
+          <ProfileView
+            profile={selectedProfile}
+            onBack={() => setView('swipe')}
+            onPass={() => {
+              setView('swipe')
+              setTimeout(() => swipeRef.current?.swipe('left'), 0)
+            }}
+            onLike={() => {
+              handleLike(selectedProfile)
+              setView('swipe')
+              setTimeout(() => swipeRef.current?.swipe('right'), 0)
+            }}
+          />
+        ) : (
+          <div className="flex flex-1 items-center justify-center" style={{ minHeight: 'calc(100vh - 73px)' }}>
+            <SwipeStack
+              ref={swipeRef}
+              profiles={profiles}
+              onLike={handleLike}
+              onCardClick={handleCardClick}
+            />
+          </div>
+        )}
+      </RequireAuth>
       {matchProfile && (
         <MatchModal profile={matchProfile} onClose={() => setMatchProfile(null)} />
       )}
