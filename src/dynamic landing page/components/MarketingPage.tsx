@@ -1167,13 +1167,13 @@ export default function MarketingPage({
                   <AudienceToggle mode={mode} onChange={handleModeChange} disabled={isPending} />
                 </div>
 
-                <a
-                  href="#hero-capture"
+                <Link
+                  href="/signup"
                   className={`magnetic-button header-command-button inline-flex min-h-[44px] items-center justify-center self-start rounded-full border px-4 text-center font-mono text-[9px] uppercase tracking-[0.13em] whitespace-nowrap sm:min-h-[46px] sm:px-5 sm:text-[10px] md:justify-self-end ${headerButtonClass} command-button`}
                   data-magnetic="true"
                 >
-                  {getPrimaryCta(mode)}
-                </a>
+                  SIGN UP →
+                </Link>
               </div>
             </div>
 

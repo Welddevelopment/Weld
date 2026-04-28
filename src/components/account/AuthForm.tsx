@@ -105,7 +105,7 @@ export default function AuthForm({ mode }: Props) {
         if (signUpError) throw signUpError
 
         if (data.session) {
-          router.push('/profile')
+          router.push('/home')
           router.refresh()
           return
         }
