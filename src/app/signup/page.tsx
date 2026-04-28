@@ -1,1 +1,5 @@
-export { default } from "@/dynamic landing page/routes/LegacySignupPage";
+import AuthForm from '@/components/account/AuthForm'
+
+export default function SignupPage() {
+  return <AuthForm mode="signup" />
+}
