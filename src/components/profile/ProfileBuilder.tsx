@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { Session } from '@supabase/supabase-js'
 import { ProfileDraft, createDraft, draftToProfile } from './profile-types'
+import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 import ProfilePreviewScreen from './ProfilePreviewScreen'
 import TypeStep from './steps/TypeStep'
 import IdentityStep from './steps/IdentityStep'
@@ -144,7 +145,7 @@ function PublishedOverlay({ onViewProfile, onStartMatching }: { onViewProfile: (
   )
 }
 
-export default function ProfileBuilder() {
+export default function ProfileBuilder({ onPublished }: { onPublished?: (profile: PreviewProfile) => void } = {}) {
   const router = useRouter()
   const [draft, setDraft] = useState<ProfileDraft>(createDraft)
   const [step, setStep] = useState(0)
@@ -269,7 +270,10 @@ export default function ProfileBuilder() {
       if (accessToken) {
         setSaveState('saving')
         saveAccountProfile(accessToken, draft, profile)
-          .then(() => setSaveState('saved'))
+          .then(() => {
+            setSaveState('saved')
+            onPublished?.(profile)
+          })
           .catch(() => setSaveState('error'))
       }
       return
