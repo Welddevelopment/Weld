@@ -121,7 +121,7 @@ export default function AuthForm({ mode }: Props) {
 
       if (signInError) throw signInError
 
-      router.push('/profile')
+      router.push('/home')
       router.refresh()
     } catch (authError) {
       setError(authError instanceof Error ? authError.message : 'Authentication failed.')
