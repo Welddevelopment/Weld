@@ -6,6 +6,9 @@ import { getInitials } from '@/lib/utils'
 
 interface Props {
   profile: PreviewProfile
+  onBioChange?: (bio: string) => void
+  onSkillDescChange?: (name: string, desc: string) => void
+  onDetailsChange?: (details: string) => void
   onContinue: () => void
   onBack: () => void
   isLast: boolean
@@ -38,8 +41,75 @@ function AvatarImg({ userId, name, bg }: { userId: number; name: string; bg: str
   )
 }
 
-export default function ProfilePreviewScreen({ profile, onContinue, onBack, isLast }: Props) {
+function InlineEdit({
+  value,
+  onChange,
+  placeholder = 'Click to edit…',
+  darkBg = false,
+}: {
+  value: string
+  onChange: (v: string) => void
+  placeholder?: string
+  darkBg?: boolean
+}) {
+  const focusBorder = 'rgba(232,70,36,0.55)'
+  const focusBg = darkBg ? 'rgba(232,70,36,0.08)' : 'rgba(232,70,36,0.06)'
+
+  function autoResize(el: HTMLTextAreaElement) {
+    el.style.height = 'auto'
+    el.style.height = `${el.scrollHeight}px`
+  }
+
+  return (
+    <textarea
+      value={value}
+      onChange={e => { onChange(e.target.value); autoResize(e.target) }}
+      onFocus={e => {
+        e.target.style.borderColor = focusBorder
+        e.target.style.background = focusBg
+        autoResize(e.target)
+      }}
+      onBlur={e => {
+        e.target.style.borderColor = 'transparent'
+        e.target.style.background = 'transparent'
+      }}
+      placeholder={placeholder}
+      rows={1}
+      style={{
+        display: 'block',
+        width: '100%',
+        background: 'transparent',
+        border: '1.5px dashed transparent',
+        borderRadius: 6,
+        outline: 'none',
+        resize: 'none',
+        overflow: 'hidden',
+        cursor: 'text',
+        fontFamily: 'inherit',
+        fontSize: 'inherit',
+        lineHeight: 'inherit',
+        color: 'inherit',
+        letterSpacing: 'inherit',
+        padding: '3px 6px',
+        margin: '-3px -6px',
+        boxSizing: 'border-box',
+        transition: 'border-color 0.15s, background 0.15s',
+      }}
+    />
+  )
+}
+
+export default function ProfilePreviewScreen({
+  profile,
+  onBioChange,
+  onSkillDescChange,
+  onDetailsChange,
+  onContinue,
+  onBack,
+  isLast,
+}: Props) {
   const isDev = profile.type === 'dev'
+  const editable = !!(onBioChange || onSkillDescChange || onDetailsChange)
 
   return (
     <div className="mp-modal-overlay pb-preview-overlay">
@@ -48,7 +118,7 @@ export default function ProfilePreviewScreen({ profile, onContinue, onBack, isLa
       </button>
 
       <div className="pb-preview-label-pill">
-        Profile preview
+        {editable ? 'Profile preview — click text to edit' : 'Profile preview'}
       </div>
 
       <div className="mp-modal-row" onClick={e => e.stopPropagation()}>
@@ -62,12 +132,30 @@ export default function ProfilePreviewScreen({ profile, onContinue, onBack, isLa
             {profile.badge && <div className="mp-modal-badge">{profile.badge}</div>}
             <div className="mp-modal-name">{profile.name || <span style={{ opacity: 0.3 }}>Your Name</span>}</div>
             <div className="mp-modal-role">{profile.role}</div>
-            {profile.bio && <div className="mp-modal-bio">{profile.bio}</div>}
 
-            {!isDev && profile.details && (
-              <div className="mp-modal-description">{profile.details}</div>
+            {/* Bio — inline editable */}
+            {(profile.bio || onBioChange) && (
+              <div className="mp-modal-bio" style={{ padding: 0 }}>
+                {onBioChange ? (
+                  <InlineEdit value={profile.bio} onChange={onBioChange} placeholder="Write your bio…" darkBg />
+                ) : (
+                  profile.bio
+                )}
+              </div>
             )}
 
+            {/* Studio: project description — inline editable */}
+            {!isDev && (profile.details || onDetailsChange) && (
+              <div className="mp-modal-description" style={{ padding: onDetailsChange ? '16px' : undefined }}>
+                {onDetailsChange ? (
+                  <InlineEdit value={profile.details ?? ''} onChange={onDetailsChange} placeholder="Describe your project…" />
+                ) : (
+                  profile.details
+                )}
+              </div>
+            )}
+
+            {/* Studio: skills needed — descriptions inline editable */}
             {!isDev && profile.skillsNeeded && profile.skillsNeeded.length > 0 && (
               <>
                 <div className="mp-modal-section-title">Skills needed</div>
@@ -75,13 +163,22 @@ export default function ProfilePreviewScreen({ profile, onContinue, onBack, isLa
                   {profile.skillsNeeded.map(s => (
                     <div key={s.name} className="mp-profile-skill">
                       <div className="mp-skill-label">{s.name}</div>
-                      <div className="mp-skill-desc">{s.description}</div>
+                      {onSkillDescChange ? (
+                        <InlineEdit
+                          value={s.description}
+                          onChange={desc => onSkillDescChange(s.name, desc)}
+                          placeholder="Describe what you need…"
+                        />
+                      ) : (
+                        <div className="mp-skill-desc">{s.description}</div>
+                      )}
                     </div>
                   ))}
                 </div>
               </>
             )}
 
+            {/* Dev: skills — descriptions inline editable */}
             {isDev && profile.skills && profile.skills.length > 0 && (
               <>
                 <div className="mp-modal-section-title">Skills</div>
@@ -89,7 +186,15 @@ export default function ProfilePreviewScreen({ profile, onContinue, onBack, isLa
                   {profile.skills.map(s => (
                     <div key={s.name} className="mp-profile-skill">
                       <div className="mp-skill-label">{s.name}</div>
-                      <div className="mp-skill-desc">{s.description}</div>
+                      {onSkillDescChange ? (
+                        <InlineEdit
+                          value={s.description}
+                          onChange={desc => onSkillDescChange(s.name, desc)}
+                          placeholder="Describe this skill…"
+                        />
+                      ) : (
+                        <div className="mp-skill-desc">{s.description}</div>
+                      )}
                     </div>
                   ))}
                 </div>

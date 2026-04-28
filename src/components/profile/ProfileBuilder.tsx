@@ -335,6 +335,15 @@ export default function ProfileBuilder({ onPublished }: { onPublished?: (profile
         onContinue={continueFromPreview}
         onBack={() => setPhase('form')}
         isLast={step >= totalContentSteps - 1}
+        onBioChange={bio => update({ bio })}
+        onSkillDescChange={(name, desc) =>
+          update({
+            selectedSkills: draft.selectedSkills.map(s =>
+              s.name === name ? { ...s, description: desc } : s
+            ),
+          })
+        }
+        onDetailsChange={details => update({ details })}
       />
     )
   }
