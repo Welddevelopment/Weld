@@ -33,9 +33,11 @@ interface Props {
   onClose: () => void
   onPassed: (id: string) => void
   onLiked: (id: string) => void
-  onLikeResult?: (id: string) => boolean | void | Promise<boolean | void>
+  onLikeResult?: (id: string) => LikeFeedback | void | Promise<LikeFeedback | void>
   autoLike?: boolean
 }
+
+export type LikeFeedback = 'liked' | 'matched' | 'already_liked' | 'already_matched'
 
 interface PassToastData { name: string; isDev: boolean }
 
@@ -69,6 +71,7 @@ function CenterCard({
   glowClass,
   showMatch,
   isMatch,
+  likeFeedback,
   onPass,
   onLike,
   onKeepMatching,
@@ -77,11 +80,14 @@ function CenterCard({
   glowClass: string
   showMatch: boolean
   isMatch: boolean
+  likeFeedback: LikeFeedback
   onPass: () => void
   onLike: () => void
   onKeepMatching: () => void
 }) {
   const isDev = profile.type === 'dev'
+  const alreadyLiked = likeFeedback === 'already_liked'
+  const alreadyMatched = likeFeedback === 'already_matched'
 
   return (
     <div className={`mp-carousel-card pos-center ${glowClass}`} style={{ position: 'relative' }}>
@@ -173,7 +179,33 @@ function CenterCard({
         </div>
       </div>
 
-      {showMatch && !isMatch && (
+      {showMatch && alreadyLiked && (
+        <div className="mp-match-overlay">
+          <div className="mp-match-overlay-text">Already liked</div>
+          <div className="mp-match-overlay-sub">You already saved {profile.name}. They will stay on your home page.</div>
+          <div className="mp-match-chat-icon">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+          <button className="mp-match-keep-btn" onClick={onKeepMatching}>Keep matching</button>
+        </div>
+      )}
+
+      {showMatch && alreadyMatched && (
+        <div className="mp-match-overlay mp-its-a-match">
+          <div className="mp-iam-heading">Already matched</div>
+          <div className="mp-iam-sub">You and {profile.name} have already liked each other</div>
+          <div className="mp-iam-actions">
+            <button className="mp-iam-scroll-btn" onClick={onKeepMatching}>
+              <div className="mp-iam-scroll-circle">
+                <svg viewBox="0 0 24 24" className="mp-iam-scroll-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <span className="mp-iam-btn-label">Keep matching</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showMatch && !isMatch && !alreadyLiked && !alreadyMatched && (
         <div className="mp-match-overlay">
           <div className="mp-match-overlay-text">💚 You swiped right!</div>
           <div className="mp-match-overlay-sub">We&apos;ll let you know when it&apos;s a match.</div>
@@ -184,7 +216,7 @@ function CenterCard({
         </div>
       )}
 
-      {showMatch && isMatch && (
+      {showMatch && isMatch && !alreadyMatched && (
         <div className="mp-match-overlay mp-its-a-match">
           <div className="mp-iam-heading">🎉 It&apos;s a Match!</div>
           <div className="mp-iam-sub">You and {profile.name} both liked each other</div>
@@ -254,6 +286,7 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
   const [glowClass, setGlowClass] = useState('')
   const [showMatch, setShowMatch] = useState(false)
   const [isMatch, setIsMatch] = useState(false)
+  const [likeFeedback, setLikeFeedback] = useState<LikeFeedback>('liked')
   const [isLiking, setIsLiking] = useState(false)
   const [passToast, setPassToast] = useState<PassToastData | null>(null)
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
@@ -264,9 +297,10 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
     return () => { timersRef.current.forEach(clearTimeout) }
   }, [])
 
-  const revealLikeResult = useCallback((matched: boolean) => {
+  const revealLikeResult = useCallback((feedback: LikeFeedback) => {
     setGlowClass('mp-like-glow')
-    setIsMatch(matched)
+    setLikeFeedback(feedback)
+    setIsMatch(feedback === 'matched')
     const t = setTimeout(() => setShowMatch(true), 460)
     timersRef.current.push(t)
   }, [])
@@ -274,10 +308,10 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
   const commitLike = useCallback(async (id: string) => {
     setIsLiking(true)
     try {
-      const matched = await onLikeResult?.(id)
-      revealLikeResult(Boolean(matched))
+      const feedback = await onLikeResult?.(id)
+      revealLikeResult(feedback ?? 'liked')
     } catch {
-      revealLikeResult(false)
+      revealLikeResult('liked')
     } finally {
       setIsLiking(false)
     }
@@ -298,6 +332,7 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
     setGlowClass('')
     setShowMatch(false)
     setIsMatch(false)
+    setLikeFeedback('liked')
     setIsLiking(false)
   }, [initialId])
 
@@ -313,6 +348,7 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
     setGlowClass('')
     setShowMatch(false)
     setIsMatch(false)
+    setLikeFeedback('liked')
     setIsLiking(false)
   }
 
@@ -362,6 +398,7 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
           glowClass={glowClass}
           showMatch={showMatch}
           isMatch={isMatch}
+          likeFeedback={likeFeedback}
           onPass={handlePass}
           onLike={handleLike}
           onKeepMatching={handleKeepMatching}

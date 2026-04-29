@@ -4,12 +4,13 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 
 import AppNav from '@/components/AppNav'
-import PreviewExpandedModal from '@/components/matching-preview/PreviewExpandedModal'
+import PreviewExpandedModal, { type LikeFeedback } from '@/components/matching-preview/PreviewExpandedModal'
 import SwipeStack, { SwipeProfile, SwipeStackHandle } from '@/components/SwipeStack'
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/browser'
 
 type PageMode = 'loading' | 'unauthed' | 'ready'
-type SwipeApiResponse = { ok?: boolean; match?: boolean; message?: string }
+type SwipeApiResponse = { ok?: boolean; match?: boolean; message?: string; status?: LikeFeedback | 'passed' }
+type ExistingLikeNotice = { profile: SwipeProfile; kind: 'already_liked' | 'already_matched' }
 
 function MutualMatchScreen({
   profile,
@@ -48,6 +49,48 @@ function MutualMatchScreen({
   )
 }
 
+function ExistingLikeScreen({
+  notice,
+  onKeepMatching,
+}: {
+  notice: ExistingLikeNotice
+  onKeepMatching: () => void
+}) {
+  const alreadyMatched = notice.kind === 'already_matched'
+  return (
+    <div className="mp-modal-overlay" onClick={onKeepMatching}>
+      <div
+        className="mp-carousel-card pos-center"
+        style={{ position: 'relative', overflow: 'hidden', width: 340, height: 520 }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className={`mp-match-overlay${alreadyMatched ? ' mp-its-a-match' : ''}`}>
+          <div className={alreadyMatched ? 'mp-iam-heading' : 'mp-match-overlay-text'}>
+            {alreadyMatched ? 'Already matched' : 'Already liked'}
+          </div>
+          <div className={alreadyMatched ? 'mp-iam-sub' : 'mp-match-overlay-sub'}>
+            {alreadyMatched
+              ? `You and ${notice.profile.name} have already liked each other.`
+              : `You already liked ${notice.profile.name}. They are saved on your home page.`}
+          </div>
+          <button className={alreadyMatched ? 'mp-iam-scroll-btn' : 'mp-match-keep-btn'} onClick={onKeepMatching}>
+            {alreadyMatched ? (
+              <>
+                <div className="mp-iam-scroll-circle">
+                  <svg viewBox="0 0 24 24" className="mp-iam-scroll-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+                <span className="mp-iam-btn-label">Keep matching</span>
+              </>
+            ) : (
+              'Keep matching'
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function SwipePage() {
   const [mode, setMode] = useState<PageMode>('loading')
   const [token, setToken] = useState<string | null>(null)
@@ -55,6 +98,7 @@ export default function SwipePage() {
   const [loadingProfiles, setLoadingProfiles] = useState(false)
   const [modalProfile, setModalProfile] = useState<SwipeProfile | null>(null)
   const [matchedProfile, setMatchedProfile] = useState<SwipeProfile | null>(null)
+  const [existingLikeNotice, setExistingLikeNotice] = useState<ExistingLikeNotice | null>(null)
   const [autoLikeModal, setAutoLikeModal] = useState(false)
   const [swipeError, setSwipeError] = useState<string | null>(null)
   const swipeRef = useRef<SwipeStackHandle>(null)
@@ -91,7 +135,7 @@ export default function SwipePage() {
   const recordSwipe = async (userId: string, direction: 'like' | 'pass') => {
     if (!token) {
       setSwipeError('No active login session. Please log in again.')
-      return false
+      return null
     }
 
     try {
@@ -103,13 +147,13 @@ export default function SwipePage() {
       const json = (await res.json().catch(() => null)) as SwipeApiResponse | null
       if (!res.ok || !json?.ok) {
         setSwipeError(json?.message ?? `Swipe request failed with status ${res.status}.`)
-        return false
+        return null
       }
       setSwipeError(null)
-      return Boolean(res.ok && json?.ok && json.match)
+      return json.status === 'passed' ? null : json.status ?? (json.match ? 'matched' : 'liked')
     } catch {
       setSwipeError('Swipe request failed before reaching the server.')
-      return false
+      return null
     }
   }
 
@@ -163,8 +207,11 @@ export default function SwipePage() {
               ref={swipeRef}
               profiles={profiles}
               onLike={p => {
-                void recordSwipe(p.userId, 'like').then(matched => {
-                  if (matched) setMatchedProfile(p)
+                void recordSwipe(p.userId, 'like').then(feedback => {
+                  if (feedback === 'matched') setMatchedProfile(p)
+                  if (feedback === 'already_liked' || feedback === 'already_matched') {
+                    setExistingLikeNotice({ profile: p, kind: feedback })
+                  }
                 })
               }}
               onPass={p => { void recordSwipe(p.userId, 'pass') }}
@@ -192,9 +239,9 @@ export default function SwipePage() {
             setAutoLikeModal(false)
           }}
           onLikeResult={async () => {
-            const matched = await recordSwipe(modalProfile.userId, 'like')
+            const feedback = await recordSwipe(modalProfile.userId, 'like')
             setTimeout(() => swipeRef.current?.swipe('right', { notify: false }), 0)
-            return matched
+            return feedback ?? 'liked'
           }}
         />
       )}
@@ -203,6 +250,13 @@ export default function SwipePage() {
         <MutualMatchScreen
           profile={matchedProfile}
           onKeepMatching={() => setMatchedProfile(null)}
+        />
+      )}
+
+      {existingLikeNotice && (
+        <ExistingLikeScreen
+          notice={existingLikeNotice}
+          onKeepMatching={() => setExistingLikeNotice(null)}
         />
       )}
     </div>

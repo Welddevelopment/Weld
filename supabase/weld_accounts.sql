@@ -50,6 +50,12 @@ on public.user_profiles
 for select
 using (auth.uid() = user_id);
 
+drop policy if exists "Users can read published profiles" on public.user_profiles;
+create policy "Users can read published profiles"
+on public.user_profiles
+for select
+using (published_profile is not null);
+
 drop policy if exists "Users can create their own profile" on public.user_profiles;
 create policy "Users can create their own profile"
 on public.user_profiles
