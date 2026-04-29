@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { PreviewProfile } from './preview-types'
 import { LeftAuxPanel, RightAuxPanel } from './PreviewAuxPanel'
 
@@ -33,6 +33,7 @@ interface Props {
   onClose: () => void
   onPassed: (id: string) => void
   onLiked: (id: string) => void
+  onLikeResult?: (id: string) => boolean | void | Promise<boolean | void>
   autoLike?: boolean
 }
 
@@ -248,11 +249,12 @@ function PassToast({ data, onDismiss }: { data: PassToastData; onDismiss: () => 
   )
 }
 
-export default function PreviewExpandedModal({ profiles, initialId, onClose, onPassed, onLiked, autoLike }: Props) {
+export default function PreviewExpandedModal({ profiles, initialId, onClose, onPassed, onLiked, onLikeResult, autoLike }: Props) {
   const [currentId, setCurrentId] = useState(initialId)
   const [glowClass, setGlowClass] = useState('')
   const [showMatch, setShowMatch] = useState(false)
   const [isMatch, setIsMatch] = useState(false)
+  const [isLiking, setIsLiking] = useState(false)
   const [passToast, setPassToast] = useState<PassToastData | null>(null)
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
   const pendingPassRef = useRef<string | null>(null)
@@ -262,24 +264,41 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
     return () => { timersRef.current.forEach(clearTimeout) }
   }, [])
 
+  const revealLikeResult = useCallback((matched: boolean) => {
+    setGlowClass('mp-like-glow')
+    setIsMatch(matched)
+    const t = setTimeout(() => setShowMatch(true), 460)
+    timersRef.current.push(t)
+  }, [])
+
+  const commitLike = useCallback(async (id: string) => {
+    setIsLiking(true)
+    try {
+      const matched = await onLikeResult?.(id)
+      revealLikeResult(Boolean(matched))
+    } catch {
+      revealLikeResult(false)
+    } finally {
+      setIsLiking(false)
+    }
+  }, [onLikeResult, revealLikeResult])
+
   // Auto-trigger like when opened from the card ♥ button
   useEffect(() => {
     if (!autoLike || autoLikeInitializedRef.current) return
     autoLikeInitializedRef.current = true
     const t = setTimeout(() => {
-      setGlowClass('mp-like-glow')
-      setIsMatch(Math.random() < 0.15)
-      const t2 = setTimeout(() => setShowMatch(true), 460)
-      timersRef.current.push(t2)
+      void commitLike(initialId)
     }, 200)
     timersRef.current.push(t)
-  }, [autoLike])
+  }, [autoLike, initialId, commitLike])
 
   useEffect(() => {
     setCurrentId(initialId)
     setGlowClass('')
     setShowMatch(false)
     setIsMatch(false)
+    setIsLiking(false)
   }, [initialId])
 
   const profile = profiles.find(p => p.id === currentId)
@@ -294,21 +313,19 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
     setGlowClass('')
     setShowMatch(false)
     setIsMatch(false)
+    setIsLiking(false)
   }
 
   const handlePass = () => {
-    if (glowClass) return
+    if (glowClass || isLiking) return
     const { name, type } = profile
     pendingPassRef.current = currentId
     setPassToast({ name, isDev: type === 'dev' })
   }
 
   const handleLike = () => {
-    if (glowClass) return
-    setGlowClass('mp-like-glow')
-    setIsMatch(Math.random() < 0.15)
-    const t = setTimeout(() => setShowMatch(true), 460)
-    timersRef.current.push(t)
+    if (glowClass || isLiking) return
+    void commitLike(currentId)
   }
 
   const handleKeepMatching = () => {

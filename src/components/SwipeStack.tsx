@@ -18,7 +18,7 @@ interface Props {
 }
 
 export interface SwipeStackHandle {
-  swipe: (dir: 'left' | 'right') => void
+  swipe: (dir: 'left' | 'right', options?: { notify?: boolean }) => void
 }
 
 const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
@@ -42,7 +42,7 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
   const next = profiles[index + 1]
   const remaining = profiles.length - index
 
-  const triggerSwipe = (dir: 'left' | 'right') => {
+  const triggerSwipe = (dir: 'left' | 'right', notify = true) => {
     if (flyDirRef.current) return
     if (swipeTimeout.current) clearTimeout(swipeTimeout.current)
 
@@ -56,11 +56,13 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
       flyDirRef.current = null
       setIndex(i => i + 1)
       setFlyDir(null)
-      if (dir === 'right') {
-        setSparks(s => s + 1)
-        onLike(profile)
-      } else {
-        onPass?.(profile)
+      if (notify) {
+        if (dir === 'right') {
+          setSparks(s => s + 1)
+          onLike(profile)
+        } else {
+          onPass?.(profile)
+        }
       }
     }, 220)
   }
@@ -76,7 +78,9 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
     }, 600)
   }
 
-  useImperativeHandle(ref, () => ({ swipe: triggerSwipe }))
+  useImperativeHandle(ref, () => ({
+    swipe: (dir, options) => triggerSwipe(dir, options?.notify ?? true),
+  }))
 
   const onDragStart = (clientX: number) => {
     if (flyDirRef.current || likeFlash) return

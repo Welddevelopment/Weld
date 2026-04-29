@@ -9,6 +9,44 @@ import SwipeStack, { SwipeProfile, SwipeStackHandle } from '@/components/SwipeSt
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/browser'
 
 type PageMode = 'loading' | 'unauthed' | 'ready'
+type SwipeApiResponse = { ok?: boolean; match?: boolean }
+
+function MutualMatchScreen({
+  profile,
+  onKeepMatching,
+}: {
+  profile: SwipeProfile
+  onKeepMatching: () => void
+}) {
+  return (
+    <div className="mp-modal-overlay" onClick={onKeepMatching}>
+      <div
+        className="mp-carousel-card pos-center"
+        style={{ position: 'relative', overflow: 'hidden', width: 340, height: 520 }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="mp-match-overlay mp-its-a-match">
+          <div className="mp-iam-heading">🎉 It&apos;s a Match!</div>
+          <div className="mp-iam-sub">You and {profile.name} both liked each other</div>
+          <div className="mp-iam-actions">
+            <button className="mp-iam-reach-btn" onClick={onKeepMatching}>
+              <div className="mp-iam-reach-icon">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <span className="mp-iam-btn-label">Reach out</span>
+            </button>
+            <button className="mp-iam-scroll-btn" onClick={onKeepMatching}>
+              <div className="mp-iam-scroll-circle">
+                <svg viewBox="0 0 24 24" className="mp-iam-scroll-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <span className="mp-iam-btn-label">Keep matching</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function SwipePage() {
   const [mode, setMode] = useState<PageMode>('loading')
@@ -16,6 +54,7 @@ export default function SwipePage() {
   const [profiles, setProfiles] = useState<SwipeProfile[]>([])
   const [loadingProfiles, setLoadingProfiles] = useState(false)
   const [modalProfile, setModalProfile] = useState<SwipeProfile | null>(null)
+  const [matchedProfile, setMatchedProfile] = useState<SwipeProfile | null>(null)
   const [autoLikeModal, setAutoLikeModal] = useState(false)
   const swipeRef = useRef<SwipeStackHandle>(null)
 
@@ -48,13 +87,20 @@ export default function SwipePage() {
       .finally(() => setLoadingProfiles(false))
   }, [mode, token])
 
-  const recordSwipe = (userId: string, direction: 'like' | 'pass') => {
-    if (!token) return
-    fetch('/api/swipe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ swipedUserId: userId, direction }),
-    }).catch(() => {})
+  const recordSwipe = async (userId: string, direction: 'like' | 'pass') => {
+    if (!token) return false
+
+    try {
+      const res = await fetch('/api/swipe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ swipedUserId: userId, direction }),
+      })
+      const json = (await res.json().catch(() => null)) as SwipeApiResponse | null
+      return Boolean(res.ok && json?.ok && json.match)
+    } catch {
+      return false
+    }
   }
 
   return (
@@ -90,8 +136,12 @@ export default function SwipePage() {
             <SwipeStack
               ref={swipeRef}
               profiles={profiles}
-              onLike={p => recordSwipe(p.userId, 'like')}
-              onPass={p => recordSwipe(p.userId, 'pass')}
+              onLike={p => {
+                void recordSwipe(p.userId, 'like').then(matched => {
+                  if (matched) setMatchedProfile(p)
+                })
+              }}
+              onPass={p => { void recordSwipe(p.userId, 'pass') }}
               onCardClick={p => setModalProfile(p)}
               onCardLike={p => { setAutoLikeModal(true); setModalProfile(p) }}
             />
@@ -106,17 +156,27 @@ export default function SwipePage() {
           autoLike={autoLikeModal}
           onClose={() => { setModalProfile(null); setAutoLikeModal(false) }}
           onPassed={() => {
-            recordSwipe(modalProfile.userId, 'pass')
+            void recordSwipe(modalProfile.userId, 'pass')
             setModalProfile(null)
             setAutoLikeModal(false)
-            setTimeout(() => swipeRef.current?.swipe('left'), 0)
+            setTimeout(() => swipeRef.current?.swipe('left', { notify: false }), 0)
           }}
           onLiked={() => {
-            recordSwipe(modalProfile.userId, 'like')
             setModalProfile(null)
             setAutoLikeModal(false)
-            setTimeout(() => swipeRef.current?.swipe('right'), 0)
           }}
+          onLikeResult={async () => {
+            const matched = await recordSwipe(modalProfile.userId, 'like')
+            setTimeout(() => swipeRef.current?.swipe('right', { notify: false }), 0)
+            return matched
+          }}
+        />
+      )}
+
+      {matchedProfile && (
+        <MutualMatchScreen
+          profile={matchedProfile}
+          onKeepMatching={() => setMatchedProfile(null)}
         />
       )}
     </div>

@@ -22,15 +22,31 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, message: 'Missing swipedUserId or direction.' }, { status: 400 })
   }
 
-  const { error } = await auth.client.from('swipes').insert({
+  const { error } = await auth.client.from('swipes').upsert({
     swiper_id: auth.user.id,
     swiped_id: swipedUserId,
     direction,
-  })
+  }, { onConflict: 'swiper_id,swiped_id' })
 
-  if (error && error.code !== '23505') {
+  if (error) {
     return NextResponse.json({ ok: false, message: 'Could not record swipe.' }, { status: 500 })
   }
 
-  return NextResponse.json({ ok: true })
+  if (direction !== 'like') {
+    return NextResponse.json({ ok: true, match: false })
+  }
+
+  const { data: reciprocalSwipe, error: reciprocalError } = await auth.client
+    .from('swipes')
+    .select('swiper_id')
+    .eq('swiper_id', swipedUserId)
+    .eq('swiped_id', auth.user.id)
+    .eq('direction', 'like')
+    .maybeSingle()
+
+  if (reciprocalError) {
+    return NextResponse.json({ ok: false, message: 'Could not check for a match.' }, { status: 500 })
+  }
+
+  return NextResponse.json({ ok: true, match: Boolean(reciprocalSwipe) })
 }
