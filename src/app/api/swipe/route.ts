@@ -22,11 +22,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, message: 'Missing swipedUserId or direction.' }, { status: 400 })
   }
 
-  const { error } = await auth.client.from('swipes').upsert({
-    swiper_id: auth.user.id,
-    swiped_id: swipedUserId,
-    direction,
-  }, { onConflict: 'swiper_id,swiped_id' })
+  const swipeAction = direction === 'like' ? 'like' : 'pass'
+  const { data: existingSwipe, error: existingSwipeError } = await auth.client
+    .from('swipes')
+    .select('id')
+    .eq('swiper_id', auth.user.id)
+    .eq('target_id', swipedUserId)
+    .maybeSingle()
+
+  if (existingSwipeError) {
+    return NextResponse.json({ ok: false, message: 'Could not check existing swipe.' }, { status: 500 })
+  }
+
+  const writeQuery = existingSwipe
+    ? auth.client.from('swipes').update({ action: swipeAction }).eq('id', existingSwipe.id)
+    : auth.client.from('swipes').insert({
+        swiper_id: auth.user.id,
+        target_id: swipedUserId,
+        action: swipeAction,
+      })
+
+  const { error } = await writeQuery
 
   if (error) {
     return NextResponse.json({ ok: false, message: 'Could not record swipe.' }, { status: 500 })
@@ -40,8 +56,8 @@ export async function POST(request: NextRequest) {
     .from('swipes')
     .select('swiper_id')
     .eq('swiper_id', swipedUserId)
-    .eq('swiped_id', auth.user.id)
-    .eq('direction', 'like')
+    .eq('target_id', auth.user.id)
+    .eq('action', 'like')
     .maybeSingle()
 
   if (reciprocalError) {

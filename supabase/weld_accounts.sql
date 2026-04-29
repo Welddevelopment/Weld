@@ -9,14 +9,17 @@ create table if not exists public.user_profiles (
 );
 
 create table if not exists public.swipes (
+  id uuid primary key default gen_random_uuid(),
   swiper_id uuid not null references auth.users(id) on delete cascade,
-  swiped_id uuid not null references auth.users(id) on delete cascade,
-  direction text not null check (direction in ('like', 'pass')),
+  target_id uuid not null references auth.users(id) on delete cascade,
+  action text not null check (action in ('like', 'pass')),
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now()),
-  primary key (swiper_id, swiped_id),
-  check (swiper_id <> swiped_id)
+  check (swiper_id <> target_id)
 );
+
+create unique index if not exists swipes_swiper_target_key
+on public.swipes (swiper_id, target_id);
 
 alter table public.user_profiles enable row level security;
 alter table public.swipes enable row level security;
@@ -64,7 +67,7 @@ drop policy if exists "Users can read swipes they participate in" on public.swip
 create policy "Users can read swipes they participate in"
 on public.swipes
 for select
-using (auth.uid() = swiper_id or auth.uid() = swiped_id);
+using (auth.uid() = swiper_id or auth.uid() = target_id);
 
 drop policy if exists "Users can create their own swipes" on public.swipes;
 create policy "Users can create their own swipes"

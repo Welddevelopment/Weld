@@ -11,10 +11,10 @@ export async function GET(request: NextRequest) {
 
   const { data: swipes } = await auth.client
     .from('swipes')
-    .select('swiped_id')
+    .select('target_id')
     .eq('swiper_id', auth.user.id)
 
-  const swipedIds: string[] = (swipes ?? []).map((s: { swiped_id: string }) => s.swiped_id)
+  const swipedIds: string[] = (swipes ?? []).map((s: { target_id: string }) => s.target_id)
   const excludeIds = [auth.user.id, ...swipedIds]
 
   let query = auth.client
