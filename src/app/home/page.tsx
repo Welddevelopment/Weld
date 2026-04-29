@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import AppNav from '@/components/AppNav'
@@ -34,7 +35,7 @@ function formatSavedAt(value: string | null) {
   }).format(new Date(value))
 }
 
-function SavedProfileCard({ item, label, onClick }: { item: SavedProfileItem; label: string; onClick?: () => void }) {
+function SavedProfileCard({ item, label, onClick, onMessage }: { item: SavedProfileItem; label: string; onClick?: () => void; onMessage?: () => void }) {
   const { profile } = item
   const skillNames = profile.type === 'dev'
     ? (profile.skills ?? []).map(skill => skill.name)
@@ -71,11 +72,21 @@ function SavedProfileCard({ item, label, onClick }: { item: SavedProfileItem; la
         <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-white/35">
           {formatSavedAt(item.likedAt)}
         </span>
-        {item.matched && (
-          <span className="rounded-full border border-[#3DC77A]/30 bg-[#3DC77A]/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-[#85e3ad]">
-            matched
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {item.matched && (
+            <span className="rounded-full border border-[#3DC77A]/30 bg-[#3DC77A]/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-[#85e3ad]">
+              matched
+            </span>
+          )}
+          {onMessage && (
+            <button
+              onClick={e => { e.stopPropagation(); onMessage() }}
+              className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-white/55 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white/80"
+            >
+              Message
+            </button>
+          )}
+        </div>
       </div>
     </article>
   )
@@ -91,6 +102,7 @@ function EmptyState({ title, copy }: { title: string; copy: string }) {
 }
 
 export default function HomePage() {
+  const router = useRouter()
   const [mode, setMode] = useState<PageMode>('loading')
   const [token, setToken] = useState<string | null>(null)
   const [likes, setLikes] = useState<SavedProfileItem[]>([])
@@ -98,6 +110,19 @@ export default function HomePage() {
   const [inboundLikes, setInboundLikes] = useState<SavedProfileItem[]>([])
   const [modalProfile, setModalProfile] = useState<SwipeProfile | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  const openConversation = async (userId: string) => {
+    if (!token) return
+    try {
+      const res = await fetch('/api/messages/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ recipientId: userId }),
+      })
+      const json = await res.json().catch(() => null)
+      if (json?.ok) router.push(`/messages?c=${json.conversationId}`)
+    } catch { /* navigation fails silently */ }
+  }
 
   const recordSwipe = async (userId: string, direction: 'like' | 'pass'): Promise<LikeFeedback | null> => {
     if (!token) return null
@@ -203,7 +228,7 @@ export default function HomePage() {
               {matches.length > 0 ? (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {matches.map(item => (
-                    <SavedProfileCard key={item.profile.userId} item={item} label="Mutual like" onClick={() => setModalProfile(item.profile)} />
+                    <SavedProfileCard key={item.profile.userId} item={item} label="Mutual like" onClick={() => setModalProfile(item.profile)} onMessage={() => void openConversation(item.profile.userId)} />
                   ))}
                 </div>
               ) : (
@@ -219,7 +244,7 @@ export default function HomePage() {
               {likes.length > 0 ? (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {likes.map(item => (
-                    <SavedProfileCard key={item.profile.userId} item={item} label={item.matched ? 'Matched' : 'Liked'} onClick={() => setModalProfile(item.profile)} />
+                    <SavedProfileCard key={item.profile.userId} item={item} label={item.matched ? 'Matched' : 'Liked'} onClick={() => setModalProfile(item.profile)} onMessage={() => void openConversation(item.profile.userId)} />
                   ))}
                 </div>
               ) : (
@@ -235,7 +260,7 @@ export default function HomePage() {
               {inboundLikes.length > 0 ? (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {inboundLikes.map(item => (
-                    <SavedProfileCard key={item.profile.userId} item={item} label="Liked you" onClick={() => setModalProfile(item.profile)} />
+                    <SavedProfileCard key={item.profile.userId} item={item} label="Liked you" onClick={() => setModalProfile(item.profile)} onMessage={() => void openConversation(item.profile.userId)} />
                   ))}
                 </div>
               ) : (

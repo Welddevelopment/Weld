@@ -19,18 +19,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, message: 'Cannot message yourself.' }, { status: 400 })
   }
 
-  // Caller must have liked the recipient to initiate
-  const { data: like } = await auth.client
-    .from('swipes')
-    .select('id')
-    .eq('swiper_id', auth.user.id)
-    .eq('target_id', recipientId)
-    .eq('action', 'like')
-    .maybeSingle()
+  // Allow if either party has liked the other
+  const [{ data: callerLiked }, { data: recipientLiked }] = await Promise.all([
+    auth.client.from('swipes').select('id').eq('swiper_id', auth.user.id).eq('target_id', recipientId).eq('action', 'like').maybeSingle(),
+    auth.client.from('swipes').select('id').eq('swiper_id', recipientId).eq('target_id', auth.user.id).eq('action', 'like').maybeSingle(),
+  ])
 
-  if (!like) {
+  if (!callerLiked && !recipientLiked) {
     return NextResponse.json(
-      { ok: false, message: 'You must like someone before messaging them.' },
+      { ok: false, message: 'You can only message someone who has liked you or who you have liked.' },
       { status: 403 }
     )
   }

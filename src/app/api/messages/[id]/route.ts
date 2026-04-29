@@ -84,21 +84,29 @@ export async function POST(
   const isInitiator = conv.initiator_id === auth.user.id
   const otherId = isInitiator ? conv.recipient_id : conv.initiator_id
 
-  // Enforce 1-message limit: only applies to the initiator before a mutual match
+  // Enforce 1-message limit: only for initiators doing cold outreach
+  // (no limit if matched, or if the other person already liked the initiator)
   if (isInitiator) {
     const matched = await checkMatched(auth.client, auth.user.id, otherId)
     if (!matched) {
-      const { count } = await auth.client
-        .from('messages')
-        .select('id', { count: 'exact', head: true })
-        .eq('conversation_id', params.id)
-        .eq('sender_id', auth.user.id)
+      const { data: theyLikedMe } = await auth.client
+        .from('swipes').select('id')
+        .eq('swiper_id', otherId).eq('target_id', auth.user.id).eq('action', 'like')
+        .maybeSingle()
 
-      if ((count ?? 0) >= 1) {
-        return NextResponse.json(
-          { ok: false, limitReached: true, message: 'You can only send one message until they match with you.' },
-          { status: 403 }
-        )
+      if (!theyLikedMe) {
+        const { count } = await auth.client
+          .from('messages')
+          .select('id', { count: 'exact', head: true })
+          .eq('conversation_id', params.id)
+          .eq('sender_id', auth.user.id)
+
+        if ((count ?? 0) >= 1) {
+          return NextResponse.json(
+            { ok: false, limitReached: true, message: 'You can only send one message until they match with you.' },
+            { status: 403 }
+          )
+        }
       }
     }
   }
