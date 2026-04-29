@@ -9,7 +9,7 @@ import SwipeStack, { SwipeProfile, SwipeStackHandle } from '@/components/SwipeSt
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/browser'
 
 type PageMode = 'loading' | 'unauthed' | 'ready'
-type SwipeApiResponse = { ok?: boolean; match?: boolean }
+type SwipeApiResponse = { ok?: boolean; match?: boolean; message?: string }
 
 function MutualMatchScreen({
   profile,
@@ -56,6 +56,7 @@ export default function SwipePage() {
   const [modalProfile, setModalProfile] = useState<SwipeProfile | null>(null)
   const [matchedProfile, setMatchedProfile] = useState<SwipeProfile | null>(null)
   const [autoLikeModal, setAutoLikeModal] = useState(false)
+  const [swipeError, setSwipeError] = useState<string | null>(null)
   const swipeRef = useRef<SwipeStackHandle>(null)
 
   useEffect(() => {
@@ -88,7 +89,10 @@ export default function SwipePage() {
   }, [mode, token])
 
   const recordSwipe = async (userId: string, direction: 'like' | 'pass') => {
-    if (!token) return false
+    if (!token) {
+      setSwipeError('No active login session. Please log in again.')
+      return false
+    }
 
     try {
       const res = await fetch('/api/swipe', {
@@ -97,8 +101,14 @@ export default function SwipePage() {
         body: JSON.stringify({ swipedUserId: userId, direction }),
       })
       const json = (await res.json().catch(() => null)) as SwipeApiResponse | null
+      if (!res.ok || !json?.ok) {
+        setSwipeError(json?.message ?? `Swipe request failed with status ${res.status}.`)
+        return false
+      }
+      setSwipeError(null)
       return Boolean(res.ok && json?.ok && json.match)
     } catch {
+      setSwipeError('Swipe request failed before reaching the server.')
       return false
     }
   }
@@ -106,6 +116,22 @@ export default function SwipePage() {
   return (
     <div className="flex min-h-screen flex-col select-none" style={{ background: '#0E0C09' }}>
       <AppNav />
+
+      {swipeError && (
+        <div className="fixed left-1/2 top-24 z-[300] w-[min(92vw,560px)] -translate-x-1/2 rounded-xl border border-red-400/30 bg-red-950/95 px-4 py-3 text-sm text-red-50 shadow-2xl">
+          <div className="flex items-start justify-between gap-4">
+            <p>{swipeError}</p>
+            <button
+              type="button"
+              className="shrink-0 text-red-100/70 transition hover:text-red-50"
+              onClick={() => setSwipeError(null)}
+              aria-label="Dismiss swipe error"
+            >
+              x
+            </button>
+          </div>
+        </div>
+      )}
 
       {mode === 'loading' && (
         <div className="flex flex-1 items-center justify-center">

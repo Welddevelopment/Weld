@@ -31,7 +31,10 @@ export async function POST(request: NextRequest) {
     .maybeSingle()
 
   if (existingSwipeError) {
-    return NextResponse.json({ ok: false, message: 'Could not check existing swipe.' }, { status: 500 })
+    return NextResponse.json({
+      ok: false,
+      message: `Could not check existing swipe: ${existingSwipeError.message}`,
+    }, { status: 500 })
   }
 
   const writeQuery = existingSwipe
@@ -45,7 +48,10 @@ export async function POST(request: NextRequest) {
   const { error } = await writeQuery
 
   if (error) {
-    return NextResponse.json({ ok: false, message: 'Could not record swipe.' }, { status: 500 })
+    return NextResponse.json({
+      ok: false,
+      message: `Could not record swipe: ${error.message}`,
+    }, { status: 500 })
   }
 
   if (direction !== 'like') {
@@ -61,7 +67,10 @@ export async function POST(request: NextRequest) {
     .maybeSingle()
 
   if (reciprocalError) {
-    return NextResponse.json({ ok: false, message: 'Could not check for a match.' }, { status: 500 })
+    return NextResponse.json({
+      ok: false,
+      message: `Could not check for a match: ${reciprocalError.message}`,
+    }, { status: 500 })
   }
 
   return NextResponse.json({ ok: true, match: Boolean(reciprocalSwipe) })
