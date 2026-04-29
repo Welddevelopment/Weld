@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 
 import AppNav from '@/components/AppNav'
 import ChatPanel from '@/components/ChatPanel'
@@ -91,7 +91,7 @@ function ConversationRow({
   )
 }
 
-export default function MessagesPage() {
+function MessagesPageInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const activeId = searchParams.get('c')
@@ -218,5 +218,19 @@ export default function MessagesPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function MessagesPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen flex-col bg-[#0c0e0f]">
+        <div className="flex flex-1 items-center justify-center">
+          <p className="font-mono text-sm text-white/40">Loading…</p>
+        </div>
+      </div>
+    }>
+      <MessagesPageInner />
+    </Suspense>
   )
 }
