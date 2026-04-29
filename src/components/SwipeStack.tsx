@@ -1,16 +1,19 @@
 'use client'
 
 import { useState, useRef, forwardRef, useImperativeHandle } from 'react'
-import ProfileCard from './ProfileCard'
-import { Profile } from '@/lib/types'
+
+import type { PreviewProfile } from '@/components/matching-preview/preview-types'
+import SwipeCard from './SwipeCard'
+
+export type SwipeProfile = PreviewProfile & { userId: string }
 
 const SWIPE_THRESHOLD = 100
 
 interface Props {
-  profiles: Profile[]
-  onLike: (profile: Profile) => void
-  onPass?: (profile: Profile) => void
-  onCardClick: (profile: Profile) => void
+  profiles: SwipeProfile[]
+  onLike: (profile: SwipeProfile) => void
+  onPass?: (profile: SwipeProfile) => void
+  onCardClick: (profile: SwipeProfile) => void
 }
 
 export interface SwipeStackHandle {
@@ -95,7 +98,7 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
   if (!current) {
     return (
       <div className="text-center">
-        <p className="text-xl font-bold text-white">You've seen everyone</p>
+        <p className="text-xl font-bold text-white">You&apos;ve seen everyone</p>
         <p className="text-sm text-gray-500 mt-1">Check back soon for new talent</p>
         {sparks > 0 && (
           <p className="text-sm text-green-400 mt-3 font-medium">
@@ -108,7 +111,6 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
 
   const dragProgress = Math.min(Math.abs(dragOffset) / SWIPE_THRESHOLD, 1)
   const rotation = dragOffset * 0.07
-
   const dragOverlay: 'like' | 'nope' | null =
     dragOffset > 10 ? 'like' : dragOffset < -10 ? 'nope' : null
 
@@ -143,7 +145,7 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
               transition: flyDir ? 'transform 220ms ease-out' : 'none',
             }}
           >
-            <ProfileCard profile={next} />
+            <SwipeCard profile={next} />
           </div>
         )}
 
@@ -159,7 +161,7 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
           onTouchMove={e => { e.preventDefault(); onDragMove(e.touches[0].clientX) }}
           onTouchEnd={onDragEnd}
         >
-          <ProfileCard
+          <SwipeCard
             profile={current}
             dragOverlay={dragOverlay}
             dragOpacity={dragProgress}

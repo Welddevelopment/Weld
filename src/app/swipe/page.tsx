@@ -1,383 +1,118 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
 
 import AppNav from '@/components/AppNav'
-import MatchModal from '@/components/MatchModal'
-import ProfileView from '@/components/ProfileView'
-import RequireAuth from '@/components/RequireAuth'
-import SwipeStack, { SwipeStackHandle } from '@/components/SwipeStack'
-import { Profile } from '@/lib/types'
+import PreviewExpandedModal from '@/components/matching-preview/PreviewExpandedModal'
+import SwipeStack, { SwipeProfile, SwipeStackHandle } from '@/components/SwipeStack'
+import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/browser'
 
-const profiles: Profile[] = [
-  {
-    id: 1,
-    name: "xDev_Kira",
-    role: "Scripter / UI/UX / Systems",
-    experience: "7yr",
-    bio: "I build the systems that make players stay. Combat, progression, and UI that converts.",
-    skills: ["Luau", "UI Design", "OOP", "Game Systems"],
-    rate: "$42/hr",
-    availability: "Available now",
-    visits: "4.8M",
-    rating: "4.9",
-    matchScore: 94,
-    verified: true,
-    tier: "Pro Developer",
-    headerGradient: "linear-gradient(135deg, #E84624, #FF8A5C)",
-  },
-  {
-    id: 2,
-    name: "NovaBuild",
-    role: "Builder / Environment",
-    experience: "3yr",
-    bio: "Immersive maps and environments that players actually explore.",
-    skills: ["Building", "Lighting", "Terrain"],
-    rate: "$30/hr",
-    availability: "2 weeks",
-    visits: "2.1M",
-    rating: "4.5",
-    matchScore: 78,
-    verified: true,
-    tier: "Developer",
-    headerGradient: "linear-gradient(135deg, #3DC77A, #1A9B5E)",
-  },
-  {
-    id: 3,
-    name: "ScriptKing",
-    role: "Scripter / Backend / Combat",
-    experience: "5yr",
-    bio: "Specialist in game systems, combat, and physics. I profile before I ship.",
-    skills: ["Luau", "OOP", "Networking", "Anti-Cheat"],
-    rate: "$55/hr",
-    availability: "Available now",
-    visits: "9.2M",
-    rating: "4.8",
-    matchScore: 91,
-    verified: true,
-    tier: "Pro Developer",
-    headerGradient: "linear-gradient(135deg, #7C3AED, #4C1D95)",
-  },
-  {
-    id: 4,
-    name: "PixelForge",
-    role: "3D Modeler / Asset Artist",
-    experience: "4yr",
-    bio: "Low-poly assets optimized for performance. Fast turnaround, any style.",
-    skills: ["Blender", "Texturing", "UV Mapping", "LODs"],
-    rate: "$35/hr",
-    availability: "1 week",
-    visits: "1.4M",
-    rating: "4.6",
-    matchScore: 82,
-    verified: false,
-    tier: "Developer",
-    headerGradient: "linear-gradient(135deg, #3B82F6, #1D4ED8)",
-  },
-  {
-    id: 5,
-    name: "VoxelQueen",
-    role: "Builder / Terrain / Detailing",
-    experience: "6yr",
-    bio: "Every block placed with intention. Natural terrain that feels real.",
-    skills: ["Building", "Terrain", "Detailing", "Lighting"],
-    rate: "$45/hr",
-    availability: "Available now",
-    visits: "6.7M",
-    rating: "4.7",
-    matchScore: 88,
-    verified: true,
-    tier: "Pro Developer",
-    headerGradient: "linear-gradient(135deg, #F59E0B, #B45309)",
-  },
-  {
-    id: 6,
-    name: "DataDev",
-    role: "Backend / DataStore / APIs",
-    experience: "4yr",
-    bio: "DataStore wizard. Your player data won't corrupt on my watch.",
-    skills: ["DataStore", "Luau", "APIs", "Security"],
-    rate: "$60/hr",
-    availability: "3 weeks",
-    visits: "3.3M",
-    rating: "4.9",
-    matchScore: 86,
-    verified: true,
-    tier: "Developer",
-    headerGradient: "linear-gradient(135deg, #14B8A6, #0F766E)",
-  },
-  {
-    id: 7,
-    name: "AnimXR",
-    role: "Animator / VFX / Rigging",
-    experience: "2yr",
-    bio: "Smooth, snappy animations that feel alive. Moon Animator specialist.",
-    skills: ["Moon Animator", "Rigging", "VFX", "Particles"],
-    rate: "$25/hr",
-    availability: "Available now",
-    visits: "800K",
-    rating: "4.3",
-    matchScore: 71,
-    verified: false,
-    tier: "Rising Dev",
-    headerGradient: "linear-gradient(135deg, #EC4899, #9D174D)",
-  },
-  {
-    id: 8,
-    name: "LunarCraft",
-    role: "Game Designer / Systems / Monetization",
-    experience: "8yr",
-    bio: "Shipped 4 top-100 games. Retention and economy design are my obsession.",
-    skills: ["Game Design", "Systems", "Monetization", "Quests"],
-    rate: "$70/hr",
-    availability: "2 weeks",
-    visits: "18M",
-    rating: "5.0",
-    matchScore: 97,
-    verified: true,
-    tier: "Pro Developer",
-    headerGradient: "linear-gradient(135deg, #E84624, #FF8A5C)",
-  },
-  {
-    id: 9,
-    name: "SoundWave",
-    role: "Audio Designer / SFX / Music",
-    experience: "3yr",
-    bio: "SFX and adaptive music that make players feel things.",
-    skills: ["Audio", "Mixing", "Roblox SFX", "Composition"],
-    rate: "$30/hr",
-    availability: "Available now",
-    visits: "500K",
-    rating: "4.4",
-    matchScore: 74,
-    verified: false,
-    tier: "Developer",
-    headerGradient: "linear-gradient(135deg, #3DC77A, #1A9B5E)",
-  },
-  {
-    id: 10,
-    name: "GUIGuru",
-    role: "UI Designer / Tweening / Mobile",
-    experience: "5yr",
-    bio: "Interfaces so clean they look native. Mobile-first every time.",
-    skills: ["UI", "Tweening", "Responsive", "Figma"],
-    rate: "$45/hr",
-    availability: "1 week",
-    visits: "3.9M",
-    rating: "4.7",
-    matchScore: 89,
-    verified: true,
-    tier: "Pro Developer",
-    headerGradient: "linear-gradient(135deg, #7C3AED, #4C1D95)",
-  },
-  {
-    id: 11,
-    name: "CodeHawk",
-    role: "Scripter / Performance / Networking",
-    experience: "6yr",
-    bio: "Optimized Luau code. Sub-16ms frames or I rewrite it.",
-    skills: ["Luau", "Performance", "Networking", "Profiling"],
-    rate: "$65/hr",
-    availability: "Available now",
-    visits: "7.1M",
-    rating: "4.8",
-    matchScore: 92,
-    verified: true,
-    tier: "Pro Developer",
-    headerGradient: "linear-gradient(135deg, #3B82F6, #1D4ED8)",
-  },
-  {
-    id: 12,
-    name: "TerraMaker",
-    role: "Builder / Terrain / Environments",
-    experience: "4yr",
-    bio: "Natural terrain that players actually explore, not just run through.",
-    skills: ["Terrain", "Building", "Lighting", "Atmosphere"],
-    rate: "$38/hr",
-    availability: "Available now",
-    visits: "2.6M",
-    rating: "4.5",
-    matchScore: 80,
-    verified: true,
-    tier: "Developer",
-    headerGradient: "linear-gradient(135deg, #F59E0B, #B45309)",
-  },
-  {
-    id: 13,
-    name: "FXStudio",
-    role: "VFX Artist / Particles / Lighting",
-    experience: "3yr",
-    bio: "Particles, beams, and effects that make your game feel premium.",
-    skills: ["VFX", "Particles", "Lighting", "Post FX"],
-    rate: "$40/hr",
-    availability: "2 weeks",
-    visits: "1.2M",
-    rating: "4.6",
-    matchScore: 77,
-    verified: false,
-    tier: "Developer",
-    headerGradient: "linear-gradient(135deg, #14B8A6, #0F766E)",
-  },
-  {
-    id: 14,
-    name: "RoArchitect",
-    role: "Builder / Architecture / Interiors",
-    experience: "9yr",
-    bio: "Architectural realism inside Roblox constraints. I've seen it all.",
-    skills: ["Building", "Interiors", "Detailing", "Modular Design"],
-    rate: "$50/hr",
-    availability: "1 month",
-    visits: "11M",
-    rating: "4.9",
-    matchScore: 85,
-    verified: true,
-    tier: "Pro Developer",
-    headerGradient: "linear-gradient(135deg, #EC4899, #9D174D)",
-  },
-  {
-    id: 15,
-    name: "NetRunner",
-    role: "Backend / Networking / Anti-Cheat",
-    experience: "5yr",
-    bio: "RemoteEvents, server authority, anti-cheat. I live in the network layer.",
-    skills: ["Networking", "Anti-Cheat", "Luau", "Security"],
-    rate: "$70/hr",
-    availability: "Available now",
-    visits: "5.5M",
-    rating: "4.8",
-    matchScore: 90,
-    verified: true,
-    tier: "Pro Developer",
-    headerGradient: "linear-gradient(135deg, #E84624, #FF8A5C)",
-  },
-  {
-    id: 16,
-    name: "IconPro",
-    role: "Graphic Designer / Branding / Icons",
-    experience: "3yr",
-    bio: "Thumbnails and icons that actually get clicks. Data-driven design.",
-    skills: ["Photoshop", "Illustrator", "Branding", "A/B Testing"],
-    rate: "$20/hr",
-    availability: "Available now",
-    visits: "400K",
-    rating: "4.2",
-    matchScore: 68,
-    verified: false,
-    tier: "Rising Dev",
-    headerGradient: "linear-gradient(135deg, #3DC77A, #1A9B5E)",
-  },
-  {
-    id: 17,
-    name: "QuestForge",
-    role: "Game Designer / Quests / Economy",
-    experience: "4yr",
-    bio: "Quest systems and progression loops that retain players past day 30.",
-    skills: ["Game Design", "Quests", "Economy", "Retention"],
-    rate: "$50/hr",
-    availability: "1 week",
-    visits: "4.2M",
-    rating: "4.6",
-    matchScore: 83,
-    verified: true,
-    tier: "Developer",
-    headerGradient: "linear-gradient(135deg, #7C3AED, #4C1D95)",
-  },
-  {
-    id: 18,
-    name: "MeshMaster",
-    role: "3D Modeler / Blender / Optimization",
-    experience: "6yr",
-    bio: "Custom meshes for any art style. Sub-24hr turnaround on most assets.",
-    skills: ["Blender", "UV Mapping", "LODs", "Texturing"],
-    rate: "$45/hr",
-    availability: "Available now",
-    visits: "2.8M",
-    rating: "4.7",
-    matchScore: 81,
-    verified: true,
-    tier: "Developer",
-    headerGradient: "linear-gradient(135deg, #3B82F6, #1D4ED8)",
-  },
-  {
-    id: 19,
-    name: "UIRapid",
-    role: "UI Designer / Mobile / Figma",
-    experience: "2yr",
-    bio: "Junior but fast and hungry. Every UI I ship works on mobile day one.",
-    skills: ["UI", "Mobile", "Figma", "Tweening"],
-    rate: "$18/hr",
-    availability: "Available now",
-    visits: "250K",
-    rating: "4.1",
-    matchScore: 65,
-    verified: false,
-    tier: "Rising Dev",
-    headerGradient: "linear-gradient(135deg, #F59E0B, #B45309)",
-  },
-  {
-    id: 20,
-    name: "OmegaDev",
-    role: "Full-Stack / Scripter / Designer",
-    experience: "10yr",
-    bio: "I script, build, design, and ship. Sole dev on 3 games with 20M+ visits.",
-    skills: ["Luau", "Building", "UI", "Game Design"],
-    rate: "$90/hr",
-    availability: "2 weeks",
-    visits: "22M",
-    rating: "5.0",
-    matchScore: 98,
-    verified: true,
-    tier: "Pro Developer",
-    headerGradient: "linear-gradient(135deg, #14B8A6, #0F766E)",
-  }
-]
+type PageMode = 'loading' | 'unauthed' | 'ready'
 
 export default function SwipePage() {
-  const [view, setView] = useState<'swipe' | 'profile'>('swipe')
-  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null)
-  const [matchProfile, setMatchProfile] = useState<Profile | null>(null)
+  const [mode, setMode] = useState<PageMode>('loading')
+  const [token, setToken] = useState<string | null>(null)
+  const [profiles, setProfiles] = useState<SwipeProfile[]>([])
+  const [loadingProfiles, setLoadingProfiles] = useState(false)
+  const [modalProfile, setModalProfile] = useState<SwipeProfile | null>(null)
   const swipeRef = useRef<SwipeStackHandle>(null)
 
-  const handleLike = (profile: Profile) => {
-    if (Math.random() < 0.15) setMatchProfile(profile)
-  }
+  useEffect(() => {
+    if (!hasBrowserSupabaseConfig()) {
+      setMode('unauthed')
+      return
+    }
 
-  const handleCardClick = (profile: Profile) => {
-    setSelectedProfile(profile)
-    setView('profile')
+    getBrowserSupabase().auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        setMode('unauthed')
+        return
+      }
+      setToken(data.session.access_token)
+      setMode('ready')
+    })
+  }, [])
+
+  useEffect(() => {
+    if (mode !== 'ready' || !token) return
+    setLoadingProfiles(true)
+    fetch('/api/swipe/profiles', {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+    })
+      .then(res => res.json())
+      .then(json => { if (json.ok) setProfiles(json.profiles) })
+      .catch(() => {})
+      .finally(() => setLoadingProfiles(false))
+  }, [mode, token])
+
+  const recordSwipe = (userId: string, direction: 'like' | 'pass') => {
+    if (!token) return
+    fetch('/api/swipe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ swipedUserId: userId, direction }),
+    }).catch(() => {})
   }
 
   return (
     <div className="flex min-h-screen flex-col select-none" style={{ background: '#0E0C09' }}>
       <AppNav />
-      <RequireAuth>
-        {view === 'profile' && selectedProfile ? (
-          <ProfileView
-            profile={selectedProfile}
-            onBack={() => setView('swipe')}
-            onPass={() => {
-              setView('swipe')
-              setTimeout(() => swipeRef.current?.swipe('left'), 0)
-            }}
-            onLike={() => {
-              handleLike(selectedProfile)
-              setView('swipe')
-              setTimeout(() => swipeRef.current?.swipe('right'), 0)
-            }}
-          />
-        ) : (
-          <div className="flex flex-1 items-center justify-center" style={{ minHeight: 'calc(100vh - 73px)' }}>
+
+      {mode === 'loading' && (
+        <div className="flex flex-1 items-center justify-center">
+          <p className="font-mono text-sm text-white/40">Loading…</p>
+        </div>
+      )}
+
+      {mode === 'unauthed' && (
+        <div className="flex flex-1 flex-col items-center justify-center gap-5 py-32">
+          <p className="font-mono text-sm text-white/50">You need to be logged in to match.</p>
+          <Link
+            href="/login"
+            className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.13em] text-white/60 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white/90"
+          >
+            Log in →
+          </Link>
+        </div>
+      )}
+
+      {mode === 'ready' && (
+        <div
+          className="flex flex-1 items-center justify-center"
+          style={{ minHeight: 'calc(100vh - 73px)' }}
+        >
+          {loadingProfiles ? (
+            <p className="font-mono text-sm text-white/40">Loading profiles…</p>
+          ) : (
             <SwipeStack
               ref={swipeRef}
               profiles={profiles}
-              onLike={handleLike}
-              onCardClick={handleCardClick}
+              onLike={p => recordSwipe(p.userId, 'like')}
+              onPass={p => recordSwipe(p.userId, 'pass')}
+              onCardClick={p => setModalProfile(p)}
             />
-          </div>
-        )}
-      </RequireAuth>
-      {matchProfile && (
-        <MatchModal profile={matchProfile} onClose={() => setMatchProfile(null)} />
+          )}
+        </div>
+      )}
+
+      {modalProfile && (
+        <PreviewExpandedModal
+          profiles={[modalProfile]}
+          initialId={modalProfile.id}
+          onClose={() => setModalProfile(null)}
+          onPassed={() => {
+            recordSwipe(modalProfile.userId, 'pass')
+            setModalProfile(null)
+            setTimeout(() => swipeRef.current?.swipe('left'), 0)
+          }}
+          onLiked={() => {
+            recordSwipe(modalProfile.userId, 'like')
+            setModalProfile(null)
+            setTimeout(() => swipeRef.current?.swipe('right'), 0)
+          }}
+        />
       )}
     </div>
   )
