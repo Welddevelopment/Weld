@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import AppNav from '@/components/AppNav'
+import PreviewExpandedModal, { type LikeFeedback } from '@/components/matching-preview/PreviewExpandedModal'
 import type { SwipeProfile } from '@/components/SwipeStack'
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/browser'
 
@@ -33,14 +34,14 @@ function formatSavedAt(value: string | null) {
   }).format(new Date(value))
 }
 
-function SavedProfileCard({ item, label }: { item: SavedProfileItem; label: string }) {
+function SavedProfileCard({ item, label, onClick }: { item: SavedProfileItem; label: string; onClick?: () => void }) {
   const { profile } = item
   const skillNames = profile.type === 'dev'
     ? (profile.skills ?? []).map(skill => skill.name)
     : (profile.skillsNeeded ?? []).map(skill => skill.name)
 
   return (
-    <article className="rounded-[18px] border border-white/10 bg-white/[0.04] p-4 shadow-[0_18px_42px_rgba(0,0,0,0.18)]">
+    <article className="rounded-[18px] border border-white/10 bg-white/[0.04] p-4 shadow-[0_18px_42px_rgba(0,0,0,0.18)] cursor-pointer transition hover:border-white/20 hover:bg-white/[0.07]" onClick={onClick}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#FFBE74]">{label}</p>
@@ -91,10 +92,28 @@ function EmptyState({ title, copy }: { title: string; copy: string }) {
 
 export default function HomePage() {
   const [mode, setMode] = useState<PageMode>('loading')
+  const [token, setToken] = useState<string | null>(null)
   const [likes, setLikes] = useState<SavedProfileItem[]>([])
   const [matches, setMatches] = useState<SavedProfileItem[]>([])
   const [inboundLikes, setInboundLikes] = useState<SavedProfileItem[]>([])
+  const [modalProfile, setModalProfile] = useState<SwipeProfile | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  const recordSwipe = async (userId: string, direction: 'like' | 'pass'): Promise<LikeFeedback | null> => {
+    if (!token) return null
+    try {
+      const res = await fetch('/api/swipe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ swipedUserId: userId, direction }),
+      })
+      const json = await res.json().catch(() => null)
+      if (!res.ok || !json?.ok) return null
+      return json.status === 'passed' ? null : (json.status ?? (json.match ? 'matched' : 'liked'))
+    } catch {
+      return null
+    }
+  }
 
   useEffect(() => {
     if (!hasBrowserSupabaseConfig()) {
@@ -108,6 +127,7 @@ export default function HomePage() {
         return
       }
 
+      setToken(data.session.access_token)
       try {
         const res = await fetch('/api/home/matches', {
           headers: { Authorization: `Bearer ${data.session.access_token}` },
@@ -183,7 +203,7 @@ export default function HomePage() {
               {matches.length > 0 ? (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {matches.map(item => (
-                    <SavedProfileCard key={item.profile.userId} item={item} label="Mutual like" />
+                    <SavedProfileCard key={item.profile.userId} item={item} label="Mutual like" onClick={() => setModalProfile(item.profile)} />
                   ))}
                 </div>
               ) : (
@@ -199,7 +219,7 @@ export default function HomePage() {
               {likes.length > 0 ? (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {likes.map(item => (
-                    <SavedProfileCard key={item.profile.userId} item={item} label={item.matched ? 'Matched' : 'Liked'} />
+                    <SavedProfileCard key={item.profile.userId} item={item} label={item.matched ? 'Matched' : 'Liked'} onClick={() => setModalProfile(item.profile)} />
                   ))}
                 </div>
               ) : (
@@ -215,7 +235,7 @@ export default function HomePage() {
               {inboundLikes.length > 0 ? (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {inboundLikes.map(item => (
-                    <SavedProfileCard key={item.profile.userId} item={item} label="Liked you" />
+                    <SavedProfileCard key={item.profile.userId} item={item} label="Liked you" onClick={() => setModalProfile(item.profile)} />
                   ))}
                 </div>
               ) : (
@@ -225,6 +245,20 @@ export default function HomePage() {
           </>
         )}
       </main>
+
+      {modalProfile && (
+        <PreviewExpandedModal
+          profiles={[modalProfile]}
+          initialId={modalProfile.id}
+          onClose={() => setModalProfile(null)}
+          onPassed={() => setModalProfile(null)}
+          onLiked={() => setModalProfile(null)}
+          onLikeResult={async (id) => {
+            const feedback = await recordSwipe(id, 'like')
+            return feedback ?? 'liked'
+          }}
+        />
+      )}
     </div>
   )
 }

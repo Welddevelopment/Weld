@@ -8,6 +8,7 @@ import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/bro
 
 const NAV_LINKS = [
   { href: '/home', label: 'Home' },
+  { href: '/messages', label: 'Messages' },
   { href: '/account', label: 'Account' },
   { href: '/profile', label: 'Profile' },
   { href: '/swipe', label: 'Match' },

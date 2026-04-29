@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 
 import AppNav from '@/components/AppNav'
@@ -15,9 +16,11 @@ type ExistingLikeNotice = { profile: SwipeProfile; kind: 'already_liked' | 'alre
 function MutualMatchScreen({
   profile,
   onKeepMatching,
+  onReachOut,
 }: {
   profile: SwipeProfile
   onKeepMatching: () => void
+  onReachOut: () => void
 }) {
   return (
     <div className="mp-modal-overlay" onClick={onKeepMatching}>
@@ -30,11 +33,50 @@ function MutualMatchScreen({
           <div className="mp-iam-heading">🎉 It&apos;s a Match!</div>
           <div className="mp-iam-sub">You and {profile.name} both liked each other</div>
           <div className="mp-iam-actions">
-            <button className="mp-iam-reach-btn" onClick={onKeepMatching}>
+            <button className="mp-iam-reach-btn" onClick={onReachOut}>
               <div className="mp-iam-reach-icon">
                 <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               </div>
               <span className="mp-iam-btn-label">Reach out</span>
+            </button>
+            <button className="mp-iam-scroll-btn" onClick={onKeepMatching}>
+              <div className="mp-iam-scroll-circle">
+                <svg viewBox="0 0 24 24" className="mp-iam-scroll-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <span className="mp-iam-btn-label">Keep matching</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function LikeScreen({
+  profile,
+  onKeepMatching,
+  onMessageThem,
+}: {
+  profile: SwipeProfile
+  onKeepMatching: () => void
+  onMessageThem: () => void
+}) {
+  return (
+    <div className="mp-modal-overlay" onClick={onKeepMatching}>
+      <div
+        className="mp-carousel-card pos-center"
+        style={{ position: 'relative', overflow: 'hidden', width: 340, height: 520 }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="mp-match-overlay" style={{ background: 'linear-gradient(160deg,rgba(14,12,9,0.97),rgba(30,27,22,0.97))' }}>
+          <div className="mp-iam-heading" style={{ fontSize: '1.4rem' }}>👍 Liked!</div>
+          <div className="mp-iam-sub">You liked {profile.name}. Send them a message or keep matching.</div>
+          <div className="mp-iam-actions">
+            <button className="mp-iam-reach-btn" onClick={onMessageThem}>
+              <div className="mp-iam-reach-icon">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <span className="mp-iam-btn-label">Message them</span>
             </button>
             <button className="mp-iam-scroll-btn" onClick={onKeepMatching}>
               <div className="mp-iam-scroll-circle">
@@ -92,16 +134,31 @@ function ExistingLikeScreen({
 }
 
 export default function SwipePage() {
+  const router = useRouter()
   const [mode, setMode] = useState<PageMode>('loading')
   const [token, setToken] = useState<string | null>(null)
   const [profiles, setProfiles] = useState<SwipeProfile[]>([])
   const [loadingProfiles, setLoadingProfiles] = useState(false)
   const [modalProfile, setModalProfile] = useState<SwipeProfile | null>(null)
   const [matchedProfile, setMatchedProfile] = useState<SwipeProfile | null>(null)
+  const [likedProfile, setLikedProfile] = useState<SwipeProfile | null>(null)
   const [existingLikeNotice, setExistingLikeNotice] = useState<ExistingLikeNotice | null>(null)
   const [autoLikeModal, setAutoLikeModal] = useState(false)
   const [swipeError, setSwipeError] = useState<string | null>(null)
   const swipeRef = useRef<SwipeStackHandle>(null)
+
+  const openConversation = async (profile: SwipeProfile) => {
+    if (!token) return
+    try {
+      const res = await fetch('/api/messages/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ recipientId: profile.userId }),
+      })
+      const json = await res.json().catch(() => null)
+      if (json?.ok) router.push(`/messages?c=${json.conversationId}`)
+    } catch { /* navigation fails silently */ }
+  }
 
   useEffect(() => {
     if (!hasBrowserSupabaseConfig()) {
@@ -209,7 +266,8 @@ export default function SwipePage() {
               onLike={p => {
                 void recordSwipe(p.userId, 'like').then(feedback => {
                   if (feedback === 'matched') setMatchedProfile(p)
-                  if (feedback === 'already_liked' || feedback === 'already_matched') {
+                  else if (feedback === 'liked') setLikedProfile(p)
+                  else if (feedback === 'already_liked' || feedback === 'already_matched') {
                     setExistingLikeNotice({ profile: p, kind: feedback })
                   }
                 })
@@ -250,6 +308,15 @@ export default function SwipePage() {
         <MutualMatchScreen
           profile={matchedProfile}
           onKeepMatching={() => setMatchedProfile(null)}
+          onReachOut={() => { void openConversation(matchedProfile); setMatchedProfile(null) }}
+        />
+      )}
+
+      {likedProfile && (
+        <LikeScreen
+          profile={likedProfile}
+          onKeepMatching={() => setLikedProfile(null)}
+          onMessageThem={() => { void openConversation(likedProfile); setLikedProfile(null) }}
         />
       )}
 

@@ -18,7 +18,8 @@
       "Bash(git commit *)"
     ],
     "additionalDirectories": [
-      "C:\\Users\\joelj\\OneDrive\\Documents\\weld-app\\src\\components"
+      "C:\\Users\\joelj\\OneDrive\\Documents\\weld-app\\src\\components",
+      "c:\\Users\\joelj\\OneDrive\\Documents\\weld-app\\src\\app\\api\\messages"
     ]
   }
 }
