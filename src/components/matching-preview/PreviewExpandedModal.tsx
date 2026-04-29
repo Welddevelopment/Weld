@@ -33,6 +33,7 @@ interface Props {
   onClose: () => void
   onPassed: (id: string) => void
   onLiked: (id: string) => void
+  autoLike?: boolean
 }
 
 interface PassToastData { name: string; isDev: boolean }
@@ -247,17 +248,32 @@ function PassToast({ data, onDismiss }: { data: PassToastData; onDismiss: () => 
   )
 }
 
-export default function PreviewExpandedModal({ profiles, initialId, onClose, onPassed, onLiked }: Props) {
+export default function PreviewExpandedModal({ profiles, initialId, onClose, onPassed, onLiked, autoLike }: Props) {
   const [currentId, setCurrentId] = useState(initialId)
   const [glowClass, setGlowClass] = useState('')
   const [showMatch, setShowMatch] = useState(false)
   const [isMatch, setIsMatch] = useState(false)
   const [passToast, setPassToast] = useState<PassToastData | null>(null)
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
+  const pendingPassRef = useRef<string | null>(null)
+  const autoLikeInitializedRef = useRef(false)
 
   useEffect(() => {
     return () => { timersRef.current.forEach(clearTimeout) }
   }, [])
+
+  // Auto-trigger like when opened from the card ♥ button
+  useEffect(() => {
+    if (!autoLike || autoLikeInitializedRef.current) return
+    autoLikeInitializedRef.current = true
+    const t = setTimeout(() => {
+      setGlowClass('mp-like-glow')
+      setIsMatch(Math.random() < 0.15)
+      const t2 = setTimeout(() => setShowMatch(true), 460)
+      timersRef.current.push(t2)
+    }, 200)
+    timersRef.current.push(t)
+  }, [autoLike])
 
   useEffect(() => {
     setCurrentId(initialId)
@@ -283,8 +299,7 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
   const handlePass = () => {
     if (glowClass) return
     const { name, type } = profile
-    onPassed(currentId)
-    advance(currentId)
+    pendingPassRef.current = currentId
     setPassToast({ name, isDev: type === 'dev' })
   }
 
@@ -306,7 +321,18 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
       <button className="mp-modal-close-screen" onClick={e => { e.stopPropagation(); onClose() }}>✕</button>
 
       {passToast && (
-        <PassToast data={passToast} onDismiss={() => setPassToast(null)} />
+        <PassToast
+          data={passToast}
+          onDismiss={() => {
+            const pendingId = pendingPassRef.current
+            pendingPassRef.current = null
+            setPassToast(null)
+            if (pendingId !== null) {
+              onPassed(pendingId)
+              advance(pendingId)
+            }
+          }}
+        />
       )}
 
       <div className="mp-modal-row" onClick={e => e.stopPropagation()}>

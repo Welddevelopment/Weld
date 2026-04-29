@@ -14,7 +14,8 @@
       "Bash(npm install *)",
       "Read(//tmp/pw/node_modules/**)",
       "Read(//c/tmp/pw/node_modules/**)",
-      "Bash(python3 -c ' *)"
+      "Bash(python3 -c ' *)",
+      "Bash(git commit *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\joelj\\OneDrive\\Documents\\weld-app\\src\\components"

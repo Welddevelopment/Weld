@@ -14,6 +14,7 @@ interface Props {
   onLike: (profile: SwipeProfile) => void
   onPass?: (profile: SwipeProfile) => void
   onCardClick: (profile: SwipeProfile) => void
+  onCardLike?: (profile: SwipeProfile) => void
 }
 
 export interface SwipeStackHandle {
@@ -21,7 +22,7 @@ export interface SwipeStackHandle {
 }
 
 const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
-  { profiles, onLike, onPass, onCardClick },
+  { profiles, onLike, onPass, onCardClick, onCardLike },
   ref
 ) {
   const [index, setIndex] = useState(0)
@@ -189,7 +190,7 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
             dragOverlay={likeFlash ? 'like' : dragOverlay}
             dragOpacity={likeFlash ? 1 : dragProgress}
             onPass={() => triggerSwipe('left')}
-            onLike={handleCardLike}
+            onLike={onCardLike ? () => onCardLike(current) : handleCardLike}
             onViewProfile={() => onCardClick(current)}
           />
         </div>

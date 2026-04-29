@@ -16,6 +16,7 @@ export default function SwipePage() {
   const [profiles, setProfiles] = useState<SwipeProfile[]>([])
   const [loadingProfiles, setLoadingProfiles] = useState(false)
   const [modalProfile, setModalProfile] = useState<SwipeProfile | null>(null)
+  const [autoLikeModal, setAutoLikeModal] = useState(false)
   const swipeRef = useRef<SwipeStackHandle>(null)
 
   useEffect(() => {
@@ -92,6 +93,7 @@ export default function SwipePage() {
               onLike={p => recordSwipe(p.userId, 'like')}
               onPass={p => recordSwipe(p.userId, 'pass')}
               onCardClick={p => setModalProfile(p)}
+              onCardLike={p => { setAutoLikeModal(true); setModalProfile(p) }}
             />
           )}
         </div>
@@ -101,15 +103,18 @@ export default function SwipePage() {
         <PreviewExpandedModal
           profiles={[modalProfile]}
           initialId={modalProfile.id}
-          onClose={() => setModalProfile(null)}
+          autoLike={autoLikeModal}
+          onClose={() => { setModalProfile(null); setAutoLikeModal(false) }}
           onPassed={() => {
             recordSwipe(modalProfile.userId, 'pass')
             setModalProfile(null)
+            setAutoLikeModal(false)
             setTimeout(() => swipeRef.current?.swipe('left'), 0)
           }}
           onLiked={() => {
             recordSwipe(modalProfile.userId, 'like')
             setModalProfile(null)
+            setAutoLikeModal(false)
             setTimeout(() => swipeRef.current?.swipe('right'), 0)
           }}
         />
