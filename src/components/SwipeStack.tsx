@@ -28,12 +28,14 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
   const [flyDir, setFlyDir] = useState<'left' | 'right' | null>(null)
   const [dragOffset, setDragOffset] = useState(0)
   const [sparks, setSparks] = useState(0)
+  const [likeFlash, setLikeFlash] = useState(false)
 
   const isDragging = useRef(false)
   const startX = useRef(0)
   const didDrag = useRef(false)
   const swipeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const flyDirRef = useRef<'left' | 'right' | null>(null)
+  const likeFlashTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const current = profiles[index]
   const next = profiles[index + 1]
@@ -62,10 +64,21 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
     }, 220)
   }
 
+  // Card like button: flash the LIKE stamp briefly before swiping
+  const handleCardLike = () => {
+    if (flyDirRef.current || likeFlash) return
+    if (likeFlashTimeout.current) clearTimeout(likeFlashTimeout.current)
+    setLikeFlash(true)
+    likeFlashTimeout.current = setTimeout(() => {
+      setLikeFlash(false)
+      triggerSwipe('right')
+    }, 600)
+  }
+
   useImperativeHandle(ref, () => ({ swipe: triggerSwipe }))
 
   const onDragStart = (clientX: number) => {
-    if (flyDirRef.current) return
+    if (flyDirRef.current || likeFlash) return
     isDragging.current = true
     didDrag.current = false
     startX.current = clientX
@@ -82,7 +95,7 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
     if (!isDragging.current) return
     isDragging.current = false
     if (!didDrag.current) {
-      onCardClick(profiles[index])
+      // No drag movement — don't open modal on accidental taps
       setDragOffset(0)
       return
     }
@@ -97,14 +110,24 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
 
   if (!current) {
     return (
-      <div className="text-center">
-        <p className="text-xl font-bold text-white">You&apos;ve seen everyone</p>
-        <p className="text-sm text-gray-500 mt-1">Check back soon for new talent</p>
+      <div className="flex flex-col items-center gap-4 text-center">
+        <p
+          className="font-mono text-sm uppercase tracking-[0.16em]"
+          style={{ color: 'rgba(255,247,241,.4)' }}
+        >
+          viewed all profiles for now
+        </p>
         {sparks > 0 && (
-          <p className="text-sm text-green-400 mt-3 font-medium">
+          <p className="text-sm text-green-400 font-medium">
             ⚡ {sparks} spark{sparks > 1 ? 's' : ''} made
           </p>
         )}
+        <button
+          onClick={() => setIndex(0)}
+          className="mt-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.13em] text-white/60 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white/90"
+        >
+          View again
+        </button>
       </div>
     )
   }
@@ -163,10 +186,10 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
         >
           <SwipeCard
             profile={current}
-            dragOverlay={dragOverlay}
-            dragOpacity={dragProgress}
+            dragOverlay={likeFlash ? 'like' : dragOverlay}
+            dragOpacity={likeFlash ? 1 : dragProgress}
             onPass={() => triggerSwipe('left')}
-            onLike={() => triggerSwipe('right')}
+            onLike={handleCardLike}
             onViewProfile={() => onCardClick(current)}
           />
         </div>
