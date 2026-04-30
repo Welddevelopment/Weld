@@ -128,12 +128,14 @@ function ExistingLikeScreen({
       >
         <div className={`mp-match-overlay${alreadyMatched ? ' mp-its-a-match' : ''}`}>
           <div className={alreadyMatched ? 'mp-iam-heading' : 'mp-match-overlay-text'}>
-            {alreadyMatched ? 'Already matched' : 'Already liked'}
+            {alreadyMatched
+              ? `You have matched with ${notice.profile.name} already`
+              : `You have liked ${notice.profile.name} already`}
           </div>
           <div className={alreadyMatched ? 'mp-iam-sub' : 'mp-match-overlay-sub'}>
             {alreadyMatched
-              ? `You and ${notice.profile.name} have already liked each other.`
-              : `You already liked ${notice.profile.name}. They are saved on your home page.`}
+              ? 'You can keep matching or change your interaction by passing on this profile.'
+              : 'They are saved on your home page. You can still pass later if your mind changes.'}
           </div>
           <button className={alreadyMatched ? 'mp-iam-scroll-btn' : 'mp-match-keep-btn'} onClick={onKeepMatching}>
             {alreadyMatched ? (

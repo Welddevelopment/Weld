@@ -181,8 +181,8 @@ function CenterCard({
 
       {showMatch && alreadyLiked && (
         <div className="mp-match-overlay">
-          <div className="mp-match-overlay-text">Already liked</div>
-          <div className="mp-match-overlay-sub">You already saved {profile.name}. They will stay on your home page.</div>
+          <div className="mp-match-overlay-text">You have liked {profile.name} already</div>
+          <div className="mp-match-overlay-sub">They are saved on your home page. You can still pass later if your mind changes.</div>
           <div className="mp-match-chat-icon">
             <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
           </div>
@@ -192,8 +192,8 @@ function CenterCard({
 
       {showMatch && alreadyMatched && (
         <div className="mp-match-overlay mp-its-a-match">
-          <div className="mp-iam-heading">Already matched</div>
-          <div className="mp-iam-sub">You and {profile.name} have already liked each other</div>
+          <div className="mp-iam-heading">You have matched with {profile.name} already</div>
+          <div className="mp-iam-sub">You can keep matching or change your interaction by passing on this profile.</div>
           <div className="mp-iam-actions">
             <button className="mp-iam-scroll-btn" onClick={onKeepMatching}>
               <div className="mp-iam-scroll-circle">

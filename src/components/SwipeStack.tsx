@@ -43,6 +43,20 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
   const next = profiles[index + 1]
   const remaining = profiles.length - index
 
+  const viewAgain = () => {
+    if (swipeTimeout.current) clearTimeout(swipeTimeout.current)
+    if (likeFlashTimeout.current) clearTimeout(likeFlashTimeout.current)
+    swipeTimeout.current = null
+    likeFlashTimeout.current = null
+    flyDirRef.current = null
+    isDragging.current = false
+    didDrag.current = false
+    setDragOffset(0)
+    setFlyDir(null)
+    setLikeFlash(false)
+    setIndex(0)
+  }
+
   const triggerSwipe = (dir: 'left' | 'right', notify = true) => {
     if (disabled || flyDirRef.current) return
     if (swipeTimeout.current) clearTimeout(swipeTimeout.current)
@@ -129,7 +143,7 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
           </p>
         )}
         <button
-          onClick={() => setIndex(0)}
+          onClick={viewAgain}
           className="mt-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.13em] text-white/60 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white/90"
         >
           View again
