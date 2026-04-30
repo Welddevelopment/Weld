@@ -9,11 +9,25 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, message: auth.message }, { status: auth.status })
   }
 
-  const { data: swipes } = await auth.client
-    .from('swipes')
-    .select('target_id')
-    .eq('swiper_id', auth.user.id)
+  // Fetch own profile type and already-swiped IDs in parallel
+  const [{ data: ownRow }, { data: swipes }] = await Promise.all([
+    auth.client
+      .from('user_profiles')
+      .select('published_profile')
+      .eq('user_id', auth.user.id)
+      .maybeSingle(),
+    auth.client
+      .from('swipes')
+      .select('target_id')
+      .eq('swiper_id', auth.user.id),
+  ])
 
+  const ownType = (ownRow?.published_profile as PreviewProfile | null)?.type
+  if (!ownType) {
+    return NextResponse.json({ ok: true, profiles: [], noProfile: true })
+  }
+
+  const oppositeType = ownType === 'dev' ? 'studio' : 'dev'
   const swipedIds: string[] = (swipes ?? []).map((s: { target_id: string }) => s.target_id)
   const excludeIds = [auth.user.id, ...swipedIds]
 
@@ -21,6 +35,7 @@ export async function GET(request: NextRequest) {
     .from('user_profiles')
     .select('user_id, published_profile')
     .not('published_profile', 'is', null)
+    .eq('published_profile->>type', oppositeType)
 
   if (excludeIds.length > 0) {
     query = query.not('user_id', 'in', `(${excludeIds.join(',')})`)
@@ -40,5 +55,5 @@ export async function GET(request: NextRequest) {
       userId: row.user_id,
     }))
 
-  return NextResponse.json({ ok: true, profiles })
+  return NextResponse.json({ ok: true, profiles, noProfile: false, ownType })
 }

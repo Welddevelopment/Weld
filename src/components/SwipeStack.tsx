@@ -15,6 +15,7 @@ interface Props {
   onPass?: (profile: SwipeProfile) => void
   onCardClick: (profile: SwipeProfile) => void
   onCardLike?: (profile: SwipeProfile) => void
+  disabled?: boolean
 }
 
 export interface SwipeStackHandle {
@@ -22,7 +23,7 @@ export interface SwipeStackHandle {
 }
 
 const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
-  { profiles, onLike, onPass, onCardClick, onCardLike },
+  { profiles, onLike, onPass, onCardClick, onCardLike, disabled = false },
   ref
 ) {
   const [index, setIndex] = useState(0)
@@ -43,7 +44,7 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
   const remaining = profiles.length - index
 
   const triggerSwipe = (dir: 'left' | 'right', notify = true) => {
-    if (flyDirRef.current) return
+    if (disabled || flyDirRef.current) return
     if (swipeTimeout.current) clearTimeout(swipeTimeout.current)
 
     const profile = profiles[index]
@@ -83,7 +84,7 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
   }))
 
   const onDragStart = (clientX: number) => {
-    if (flyDirRef.current || likeFlash) return
+    if (disabled || flyDirRef.current || likeFlash) return
     isDragging.current = true
     didDrag.current = false
     startX.current = clientX
