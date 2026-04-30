@@ -101,6 +101,7 @@ function MessagesPageInner() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [conversations, setConversations] = useState<ConversationSummary[]>([])
   const [loadingConvs, setLoadingConvs] = useState(false)
+  const [convsError, setConvsError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!hasBrowserSupabaseConfig()) { setMode('unauthed'); return }
@@ -119,8 +120,11 @@ function MessagesPageInner() {
         cache: 'no-store',
       })
         .then(r => r.json())
-        .then(json => { if (json.ok) setConversations(json.conversations) })
-        .catch(() => {})
+        .then(json => {
+          if (json.ok) setConversations(json.conversations)
+          else setConvsError(json.message ?? 'Could not load conversations.')
+        })
+        .catch(() => setConvsError('Could not load conversations. Check your connection.'))
         .finally(() => setLoadingConvs(false))
     })
   }, [])
@@ -175,6 +179,8 @@ function MessagesPageInner() {
             <div className="flex-1 overflow-y-auto p-2">
               {loadingConvs ? (
                 <p className="py-10 text-center font-mono text-sm text-white/30">Loading…</p>
+              ) : convsError ? (
+                <p className="px-4 py-10 text-center font-mono text-xs text-red-400/70">{convsError}</p>
               ) : conversations.length === 0 ? (
                 <div className="px-4 py-10 text-center">
                   <p className="font-mono text-sm text-white/50">No conversations yet.</p>

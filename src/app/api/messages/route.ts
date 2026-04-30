@@ -53,7 +53,8 @@ export async function GET(request: NextRequest) {
       .from('messages')
       .select('conversation_id,content,sender_id,created_at')
       .in('conversation_id', conversationIds)
-      .order('created_at', { ascending: false }),
+      .order('created_at', { ascending: false })
+      .limit(conversationIds.length * 10),
     auth.client
       .from('swipes')
       .select('target_id')

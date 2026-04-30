@@ -56,21 +56,18 @@ export default function ChatPanel({
       .then(r => r.json())
       .then(json => {
         if (!json.ok) return
-        const msgs: Message[] = json.messages
-        setMessages(msgs)
-        if (isInitiator && !isMatched) {
-          const myCount = msgs.filter(m => m.sender_id === currentUserId).length
-          if (myCount >= 1) setLimitReached(true)
-        }
+        setMessages(json.messages)
+        setLimitReached(Boolean(json.limitActive))
       })
       .finally(() => setLoading(false))
-  }, [conversationId, token, isInitiator, isMatched, currentUserId])
+  }, [conversationId, token])
 
   // Realtime subscription
   useEffect(() => {
     const supabase = getBrowserSupabase()
+    // Use token in channel name so a new session always creates a fresh subscription
     const channel = supabase
-      .channel(`chat:${conversationId}`)
+      .channel(`chat:${conversationId}:${token.slice(-8)}`)
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` },
@@ -85,7 +82,7 @@ export default function ChatPanel({
       .subscribe()
 
     return () => { void supabase.removeChannel(channel) }
-  }, [conversationId])
+  }, [conversationId, token])
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -123,9 +120,12 @@ export default function ChatPanel({
         setMessages(prev => prev.filter(m => m.id !== tempId))
         setInput(content)
       } else if (json?.ok) {
-        // Replace temp with real message (realtime may also deliver it — dedup handles that)
-        setMessages(prev => prev.map(m => m.id === tempId ? (json.message as Message) : m))
-        if (isInitiator && !isMatched) setLimitReached(true)
+        const real = json.message as Message
+        // Remove temp + any realtime-delivered copy, then add canonical once
+        setMessages(prev => [
+          ...prev.filter(m => m.id !== tempId && m.id !== real.id),
+          real,
+        ])
       } else {
         setMessages(prev => prev.filter(m => m.id !== tempId))
         setInput(content)

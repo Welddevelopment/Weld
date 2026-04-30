@@ -60,6 +60,14 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (error || !newConv) {
+    // Race condition: another conversation was created concurrently — re-check both orderings
+    const [{ data: r1 }, { data: r2 }] = await Promise.all([
+      auth.client.from('conversations').select('id').eq('initiator_id', auth.user.id).eq('recipient_id', recipientId).maybeSingle(),
+      auth.client.from('conversations').select('id').eq('initiator_id', recipientId).eq('recipient_id', auth.user.id).maybeSingle(),
+    ])
+    const recovered = r1 ?? r2
+    if (recovered) return NextResponse.json({ ok: true, conversationId: recovered.id })
+
     return NextResponse.json(
       { ok: false, message: `Could not create conversation: ${error?.message ?? 'unknown error'}` },
       { status: 500 }

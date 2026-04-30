@@ -57,7 +57,27 @@ export async function GET(
     return NextResponse.json({ ok: false, message: msgError.message }, { status: 500 })
   }
 
-  return NextResponse.json({ ok: true, messages: messages ?? [] })
+  const msgs = messages ?? []
+  let limitActive = false
+
+  if (conv.initiator_id === auth.user.id) {
+    const otherId = conv.recipient_id
+    const [matched, { data: theyLikedMe }] = await Promise.all([
+      checkMatched(auth.client, auth.user.id, otherId),
+      auth.client
+        .from('swipes').select('id')
+        .eq('swiper_id', otherId).eq('target_id', auth.user.id).eq('action', 'like')
+        .maybeSingle(),
+    ])
+
+    if (!matched && !theyLikedMe) {
+      const myCount = msgs.filter(m => m.sender_id === auth.user.id).length
+      const theirCount = msgs.filter(m => m.sender_id === otherId).length
+      limitActive = myCount >= 1 && theirCount === 0
+    }
+  }
+
+  return NextResponse.json({ ok: true, messages: msgs, limitActive })
 }
 
 export async function POST(
@@ -87,26 +107,27 @@ export async function POST(
   // Enforce 1-message limit: only for initiators doing cold outreach
   // (no limit if matched, or if the other person already liked the initiator)
   if (isInitiator) {
-    const matched = await checkMatched(auth.client, auth.user.id, otherId)
-    if (!matched) {
-      const { data: theyLikedMe } = await auth.client
+    const [matched, { data: theyLikedMe }] = await Promise.all([
+      checkMatched(auth.client, auth.user.id, otherId),
+      auth.client
         .from('swipes').select('id')
         .eq('swiper_id', otherId).eq('target_id', auth.user.id).eq('action', 'like')
-        .maybeSingle()
+        .maybeSingle(),
+    ])
 
-      if (!theyLikedMe) {
-        const { count } = await auth.client
-          .from('messages')
-          .select('id', { count: 'exact', head: true })
-          .eq('conversation_id', params.id)
-          .eq('sender_id', auth.user.id)
+    if (!matched && !theyLikedMe) {
+      const [{ count: myCount }, { count: theirCount }] = await Promise.all([
+        auth.client.from('messages').select('id', { count: 'exact', head: true })
+          .eq('conversation_id', params.id).eq('sender_id', auth.user.id),
+        auth.client.from('messages').select('id', { count: 'exact', head: true })
+          .eq('conversation_id', params.id).eq('sender_id', otherId),
+      ])
 
-        if ((count ?? 0) >= 1) {
-          return NextResponse.json(
-            { ok: false, limitReached: true, message: 'You can only send one message until they match with you.' },
-            { status: 403 }
-          )
-        }
+      if ((theirCount ?? 0) === 0 && (myCount ?? 0) >= 1) {
+        return NextResponse.json(
+          { ok: false, limitReached: true, message: 'You can only send one message until they reply or match with you.' },
+          { status: 403 }
+        )
       }
     }
   }
