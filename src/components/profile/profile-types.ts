@@ -57,19 +57,17 @@ export function draftToProfile(draft: ProfileDraft, id: string): PreviewProfile 
   let tags: string[] = []
 
   if (isDev) {
-    const yr = draft.experienceYears ?? 1
-    role = `Developer - ${yr}yr experience`
-    const rate = draft.rateType
-      ? `${draft.rateAmount ? draft.rateAmount + ' ' : ''}${draft.rateType}`
-      : 'Rate negotiable'
-    meta = rate
+    const yr = draft.experienceYears ?? 0
+    role = yr === 0 ? 'Developer - <1yr experience' : `Developer - ${yr}yr experience`
+    const rate = draft.rateType ?? ''
+    meta = ['Available Now', rate ? `Rate: ${rate}` : '', 'Remote'].filter(Boolean).join(' - ')
     tags = draft.selectedSkills.slice(0, 3).map(s => s.name)
   } else {
-    const size = draft.teamSize ?? 1
+    const size = draft.teamSize ?? 0
     role = `Roblox Game Studio - ${size} members`
-    const status = draft.status ?? 'Open to Offers'
+    const status = draft.status ?? ''
     const budget = draft.budgetType ?? ''
-    meta = [status, budget].filter(Boolean).join(' · ')
+    meta = [status, budget ? `Budget: ${budget}` : '', 'Remote'].filter(Boolean).join(' - ')
     tags = draft.selectedSkills.slice(0, 3).map(s => s.name)
   }
 
@@ -78,7 +76,7 @@ export function draftToProfile(draft: ProfileDraft, id: string): PreviewProfile 
     type: draft.type,
     robloxUserId: draft.robloxUserId ?? 1,
     bg: draft.bg,
-    badge: draft.badge,
+    badge: isDev ? draft.badge : (draft.badge || 'Studio'),
     name: draft.name || 'Your Name',
     role,
     bio: draft.bio,

@@ -11,13 +11,14 @@ interface Props {
   onBack: () => void
 }
 
-const BADGES = ['⭐ Rising Star', '🔥 Hot Right Now', '💎 Premium Creator', '🚀 Fast Delivery', '🏆 Top Rated', '✅ Verified']
+const CREATOR_LEVELS = ['Verified', 'Pro Developer']
 
 export default function IdentityStep({ draft, update, onNext, onBack }: Props) {
   const [urlInput, setUrlInput] = useState(
     draft.robloxUserId ? `https://www.roblox.com/users/${draft.robloxUserId}/profile` : ''
   )
   const [urlError, setUrlError] = useState('')
+  const isDev = draft.type === 'dev'
 
   const parseUserId = (val: string): number | null => {
     const match = val.match(/\/users\/(\d+)/)
@@ -36,7 +37,7 @@ export default function IdentityStep({ draft, update, onNext, onBack }: Props) {
     }
   }
 
-  const canAdvance = !!draft.name.trim()
+  const canAdvance = Boolean(draft.name.trim()) && (!isDev || Boolean(draft.badge))
 
   return (
     <div className="pb-step-content">
@@ -57,7 +58,7 @@ export default function IdentityStep({ draft, update, onNext, onBack }: Props) {
       </div>
 
       <div className="pb-field">
-        <label className="pb-label">Roblox profile URL <span className="pb-hint-label">(optional — shows your avatar)</span></label>
+        <label className="pb-label">Roblox profile URL <span className="pb-hint-label">(optional - shows your avatar)</span></label>
         <input
           className={`pb-input${urlError ? ' pb-input--error' : ''}`}
           type="text"
@@ -85,21 +86,23 @@ export default function IdentityStep({ draft, update, onNext, onBack }: Props) {
         </div>
       </div>
 
-      <div className="pb-field">
-        <label className="pb-label">Badge <span className="pb-hint-label">(optional)</span></label>
-        <div className="pb-badge-options">
-          {BADGES.map(b => (
-            <button
-              key={b}
-              type="button"
-              className={`pb-badge-opt${draft.badge === b ? ' pb-badge-opt--active' : ''}`}
-              onClick={() => update({ badge: draft.badge === b ? '' : b })}
-            >
-              {b}
-            </button>
-          ))}
+      {isDev && (
+        <div className="pb-field">
+          <label className="pb-label">Creator level <span className="pb-required">*</span></label>
+          <div className="pb-badge-options">
+            {CREATOR_LEVELS.map(level => (
+              <button
+                key={level}
+                type="button"
+                className={`pb-badge-opt${draft.badge === level ? ' pb-badge-opt--active' : ''}`}
+                onClick={() => update({ badge: level })}
+              >
+                {level}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="pb-nav">
         <button className="pb-btn pb-btn--ghost" type="button" onClick={onBack}>Back</button>

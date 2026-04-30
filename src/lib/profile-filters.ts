@@ -190,7 +190,7 @@ function inDevMaxValueRange(value: number, range: string | null) {
   return false
 }
 
-export function applyFilters(profiles: PreviewProfile[], filters: FilterState): PreviewProfile[] {
+export function applyFilters<T extends PreviewProfile>(profiles: T[], filters: FilterState): T[] {
   if (countActiveFilters(filters) === 0) return profiles
   const { skillFilters, rangeFilter, playFilter, topCcuFilter, currentCcuFilter, statusFilter, budgetFilter, rateFilter, badgeFilter, valueFilter, maxValueFilter } = filters
 

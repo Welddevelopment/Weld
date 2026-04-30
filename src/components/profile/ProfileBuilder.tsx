@@ -263,7 +263,7 @@ export default function ProfileBuilder({ onPublished }: { onPublished?: (profile
   const profile = useMemo(() => draftToProfile(draft, 'preview'), [draft])
 
   const handleTypeSelect = (type: 'dev' | 'studio') => {
-    update({ type })
+    update({ type, badge: type === 'studio' ? 'Studio' : '' })
     setTypeChosen(true)
     setStep(0)
     setPhase('form')
