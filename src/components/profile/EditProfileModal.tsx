@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import type { DevWork, TopGame } from '@/components/matching-preview/preview-types'
 import { BG, DEV_SKILL_DESCS } from '@/components/matching-preview/preview-data'
-import { createDraft, draftToProfile, type ProfileDraft } from './profile-types'
+import { createDraft, draftToProfile, profileToDraft, type ProfileDraft } from './profile-types'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -904,12 +904,16 @@ function RightPanel({ draft, update }: { draft: ProfileDraft; update: (p: Partia
 
 interface Props {
   token: string
-  onSaved: (profile: PreviewProfile) => void
+  initialDraft?: ProfileDraft | null
+  initialProfile?: PreviewProfile | null
+  onSaved: (profile: PreviewProfile, draft: ProfileDraft) => void
   onClose: () => void
 }
 
-export default function EditProfileModal({ token, onSaved, onClose }: Props) {
-  const [draft, setDraft] = useState<ProfileDraft>(loadLocalDraft)
+export default function EditProfileModal({ token, initialDraft, initialProfile, onSaved, onClose }: Props) {
+  const [draft, setDraft] = useState<ProfileDraft>(() => (
+    initialDraft ?? (initialProfile ? profileToDraft(initialProfile) : loadLocalDraft())
+  ))
   const [saving, setSaving] = useState(false)
   const hasFetched = useRef(false)
 
@@ -920,9 +924,9 @@ export default function EditProfileModal({ token, onSaved, onClose }: Props) {
     return () => document.removeEventListener('keydown', handler)
   }, [onClose])
 
-  // If draft.name is empty, try loading from API
+  // Prefer the account draft, then fall back to the published profile.
   useEffect(() => {
-    if (hasFetched.current || draft.name) return
+    if (hasFetched.current) return
     hasFetched.current = true
     ;(async () => {
       try {
@@ -934,11 +938,13 @@ export default function EditProfileModal({ token, onSaved, onClose }: Props) {
           const json = await res.json()
           if (json.profile?.draft) {
             setDraft(prev => ({ ...prev, ...json.profile.draft }))
+          } else if (json.profile?.publishedProfile) {
+            setDraft(profileToDraft(json.profile.publishedProfile as PreviewProfile))
           }
         }
       } catch {}
     })()
-  }, [token, draft.name])
+  }, [token])
 
   function update(patch: Partial<ProfileDraft>) {
     setDraft(prev => ({ ...prev, ...patch }))
@@ -954,7 +960,7 @@ export default function EditProfileModal({ token, onSaved, onClose }: Props) {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ draft, publishedProfile: newProfile }),
       })
-      if (res.ok) onSaved(newProfile)
+      if (res.ok) onSaved(newProfile, draft)
     } catch {} finally {
       setSaving(false)
     }

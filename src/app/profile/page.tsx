@@ -5,8 +5,10 @@ import { useEffect, useState } from 'react'
 
 import AppNav from '@/components/AppNav'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
+import EditProfileModal from '@/components/profile/EditProfileModal'
 import ProfileBuilder from '@/components/profile/ProfileBuilder'
 import PublishedProfileView from '@/components/profile/PublishedProfileView'
+import type { ProfileDraft } from '@/components/profile/profile-types'
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/browser'
 
 const DRAFT_KEY = 'weld_profile_draft'
@@ -16,7 +18,9 @@ type PageMode = 'loading' | 'unauthed' | 'published' | 'editing'
 export default function ProfilePage() {
   const [mode, setMode] = useState<PageMode>('loading')
   const [publishedProfile, setPublishedProfile] = useState<PreviewProfile | null>(null)
+  const [profileDraft, setProfileDraft] = useState<ProfileDraft | null>(null)
   const [token, setToken] = useState<string | null>(null)
+  const [editModalOpen, setEditModalOpen] = useState(false)
   const [builderKey, setBuilderKey] = useState(0)
 
   useEffect(() => {
@@ -43,6 +47,9 @@ export default function ProfilePage() {
         })
         if (res.ok) {
           const json = await res.json()
+          if (json.profile?.draft) {
+            setProfileDraft(json.profile.draft as ProfileDraft)
+          }
           if (json.profile?.publishedProfile) {
             setPublishedProfile(json.profile.publishedProfile as PreviewProfile)
             setMode('published')
@@ -57,6 +64,14 @@ export default function ProfilePage() {
 
   function handlePublished(profile: PreviewProfile) {
     setPublishedProfile(profile)
+    setEditModalOpen(false)
+    setMode('published')
+  }
+
+  function handleEditSaved(profile: PreviewProfile, draft: ProfileDraft) {
+    setPublishedProfile(profile)
+    setProfileDraft(draft)
+    setEditModalOpen(false)
     setMode('published')
   }
 
@@ -75,6 +90,8 @@ export default function ProfilePage() {
     }
 
     setPublishedProfile(null)
+    setProfileDraft(null)
+    setEditModalOpen(false)
     setMode('editing')
     setBuilderKey(k => k + 1)
   }
@@ -100,8 +117,24 @@ export default function ProfilePage() {
       {mode === 'published' && publishedProfile && (
         <PublishedProfileView
           profile={publishedProfile}
-          onEdit={() => setMode('editing')}
+          onEdit={() => {
+            if (token) {
+              setEditModalOpen(true)
+            } else {
+              setMode('editing')
+            }
+          }}
           onDelete={handleDelete}
+        />
+      )}
+
+      {mode === 'published' && publishedProfile && token && editModalOpen && (
+        <EditProfileModal
+          token={token}
+          initialDraft={profileDraft}
+          initialProfile={publishedProfile}
+          onSaved={handleEditSaved}
+          onClose={() => setEditModalOpen(false)}
         />
       )}
 

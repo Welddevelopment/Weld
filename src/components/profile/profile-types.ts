@@ -49,6 +49,57 @@ export function createDraft(): ProfileDraft {
   }
 }
 
+function selectedSkillsFromProfile(profile: PreviewProfile) {
+  const skills = profile.type === 'dev' ? profile.skills : profile.skillsNeeded
+  if (skills && skills.length > 0) return skills
+  return profile.tags.map(name => ({ name, description: '' }))
+}
+
+function parseExperienceYears(profile: PreviewProfile) {
+  if (profile.role.includes('<1yr')) return 0
+  const match = profile.role.match(/(\d+)yr/)
+  return match ? Number(match[1]) : null
+}
+
+function parseTeamSize(profile: PreviewProfile) {
+  const match = profile.role.match(/(\d+)\s+members/)
+  return match ? Number(match[1]) : null
+}
+
+function metaValue(profile: PreviewProfile, label: string) {
+  return profile.meta
+    .split(' - ')
+    .find(part => part.startsWith(`${label}: `))
+    ?.replace(`${label}: `, '')
+    .trim() ?? null
+}
+
+export function profileToDraft(profile: PreviewProfile): ProfileDraft {
+  const draft = createDraft()
+  const isDev = profile.type === 'dev'
+
+  return {
+    ...draft,
+    type: profile.type,
+    robloxUserId: profile.robloxUserId,
+    bg: profile.bg,
+    badge: profile.badge,
+    name: profile.name,
+    bio: profile.bio,
+    experienceYears: isDev ? parseExperienceYears(profile) : null,
+    rateType: isDev ? metaValue(profile, 'Rate') : null,
+    teamSize: isDev ? null : parseTeamSize(profile),
+    status: isDev ? null : profile.meta.split(' - ')[0] || null,
+    budgetType: isDev ? null : metaValue(profile, 'Budget'),
+    details: profile.details ?? '',
+    selectedSkills: selectedSkillsFromProfile(profile),
+    portfolioLinks: profile.portfolio?.links ?? [],
+    socials: profile.socials ?? [],
+    bestWork: profile.bestWork ?? [],
+    topGames: profile.topGames ?? [],
+  }
+}
+
 export function draftToProfile(draft: ProfileDraft, id: string): PreviewProfile {
   const isDev = draft.type === 'dev'
 
