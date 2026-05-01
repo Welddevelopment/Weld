@@ -145,6 +145,29 @@ const S = {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
+const EDIT_PANEL_STYLE = {
+  padding: '20px 18px',
+  background: 'linear-gradient(180deg, rgba(24,18,15,0.98), rgba(10,8,7,0.98))',
+  borderColor: 'rgba(255,138,92,0.26)',
+  boxShadow: 'inset 0 0 0 1px rgba(255,245,240,0.04)',
+  color: '#FFF7F1',
+} as const
+
+const EDIT_PANEL_TOP_STYLE = {
+  margin: '-20px -18px 18px',
+  padding: '22px 22px 14px',
+  background: 'linear-gradient(135deg, rgba(232,70,36,0.16), rgba(255,138,92,0.07))',
+  borderBottom: '1px solid rgba(255,245,240,0.1)',
+} as const
+
+const EDIT_PANEL_TITLE_STYLE = {
+  color: '#FFF7F1',
+} as const
+
+const EDIT_PANEL_SUB_STYLE = {
+  color: 'rgba(255,247,241,0.68)',
+} as const
+
 function InlineEdit({
   value,
   onChange,
@@ -239,7 +262,7 @@ function LeftPanel({ draft, update }: { draft: ProfileDraft; update: (p: Partial
   const games = draft.topGames
 
   return (
-    <div className="aux-panel-inner" style={{ padding: '20px 18px' }}>
+    <div className="aux-panel-inner" style={EDIT_PANEL_STYLE}>
       <div style={S.field}>
         <span style={S.label}>Roblox Profile URL</span>
         <input
@@ -834,11 +857,11 @@ function RightPanel({ draft, update }: { draft: ProfileDraft; update: (p: Partia
   if (isDev) {
     const works = draft.bestWork
     return (
-      <div className="aux-panel-inner" style={{ padding: '20px 18px' }}>
-        <div className="aux-panel-top">
+      <div className="aux-panel-inner" style={EDIT_PANEL_STYLE}>
+        <div className="aux-panel-top" style={EDIT_PANEL_TOP_STYLE}>
           <span className="aux-panel-eyebrow">Best Work</span>
-          <div className="aux-panel-title">Your past projects</div>
-          <div className="aux-panel-sub">Add up to 3 projects to show studios what you can do.</div>
+          <div className="aux-panel-title" style={EDIT_PANEL_TITLE_STYLE}>Your past projects</div>
+          <div className="aux-panel-sub" style={EDIT_PANEL_SUB_STYLE}>Add up to 3 projects to show studios what you can do.</div>
         </div>
         <div className="aux-panel-body">
           {works.map((w, i) => (
@@ -868,11 +891,11 @@ function RightPanel({ draft, update }: { draft: ProfileDraft; update: (p: Partia
 
   const games = draft.topGames
   return (
-    <div className="aux-panel-inner" style={{ padding: '20px 18px' }}>
-      <div className="aux-panel-top">
+    <div className="aux-panel-inner" style={EDIT_PANEL_STYLE}>
+      <div className="aux-panel-top" style={EDIT_PANEL_TOP_STYLE}>
         <span className="aux-panel-eyebrow">Top Games</span>
-        <div className="aux-panel-title">Your published titles</div>
-        <div className="aux-panel-sub">Add up to 3 games with play and CCU stats.</div>
+        <div className="aux-panel-title" style={EDIT_PANEL_TITLE_STYLE}>Your published titles</div>
+        <div className="aux-panel-sub" style={EDIT_PANEL_SUB_STYLE}>Add up to 3 games with play and CCU stats.</div>
       </div>
       <div className="aux-panel-body">
         {games.map((g, i) => (
