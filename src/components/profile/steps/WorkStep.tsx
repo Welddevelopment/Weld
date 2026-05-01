@@ -1,22 +1,17 @@
 'use client'
 
 import { ProfileDraft } from '../profile-types'
-import { DevWork, TopGame } from '../../matching-preview/preview-types'
+import { DevWork } from '../../matching-preview/preview-types'
 
 interface Props {
   draft: ProfileDraft
   update: (patch: Partial<ProfileDraft>) => void
   onNext: () => void
   onBack: () => void
-  studioMode?: boolean
 }
 
 function emptyWork(): DevWork {
   return { emoji: 'Game', title: '', desc: '', tools: '', time: '', amount: '', plays: '' }
-}
-
-function emptyGame(): TopGame {
-  return { emoji: 'Game', title: '', desc: '', plays: '', topCcu: '', currentCcu: '' }
 }
 
 function filled(value: string) {
@@ -25,10 +20,6 @@ function filled(value: string) {
 
 function workReady(work: DevWork) {
   return filled(work.title) && filled(work.desc) && filled(work.amount) && filled(work.plays)
-}
-
-function gameReady(game: TopGame) {
-  return filled(game.title) && filled(game.desc) && filled(game.plays) && filled(game.topCcu) && filled(game.currentCcu)
 }
 
 const EMOJI_OPTIONS = ['Game', 'Combat', 'Build', 'Art', 'Tools', 'VFX', 'Audio', 'World', 'Launch']
@@ -80,69 +71,7 @@ function WorkEntry({
   )
 }
 
-function GameEntry({
-  game,
-  index,
-  onChange,
-  onRemove,
-}: {
-  game: TopGame
-  index: number
-  onChange: (g: TopGame) => void
-  onRemove: () => void
-}) {
-  return (
-    <div className="pb-work-entry">
-      <div className="pb-work-entry-header">
-        <span className="pb-work-entry-num">Game {index + 1}</span>
-        <button type="button" className="pb-work-remove" onClick={onRemove}>Remove</button>
-      </div>
-      <EmojiPicker value={game.emoji} onChange={e => onChange({ ...game, emoji: e })} />
-      <input className="pb-input" placeholder="Game title *" value={game.title} onChange={e => onChange({ ...game, title: e.target.value })} />
-      <textarea className="pb-textarea" placeholder="Short description *" rows={2} value={game.desc} onChange={e => onChange({ ...game, desc: e.target.value })} />
-      <div className="pb-work-row2">
-        <input className="pb-input" placeholder="Total plays * (e.g. 500M)" value={game.plays} onChange={e => onChange({ ...game, plays: e.target.value })} />
-        <input className="pb-input" placeholder="Peak CCU * (e.g. 12000)" value={game.topCcu} onChange={e => onChange({ ...game, topCcu: e.target.value })} />
-        <input className="pb-input" placeholder="Current CCU * (e.g. 3200)" value={game.currentCcu} onChange={e => onChange({ ...game, currentCcu: e.target.value })} />
-      </div>
-    </div>
-  )
-}
-
-export default function WorkStep({ draft, update, onNext, onBack, studioMode = false }: Props) {
-  if (studioMode) {
-    const games = draft.topGames
-    const ready = games.length > 0 && games.every(gameReady)
-    const addGame = () => update({ topGames: [...games, emptyGame()] })
-    const updateGame = (i: number, g: TopGame) => {
-      const next = [...games]; next[i] = g; update({ topGames: next })
-    }
-    const removeGame = (i: number) => update({ topGames: games.filter((_, idx) => idx !== i) })
-
-    return (
-      <div className="pb-step-content">
-        <div className="pb-step-eyebrow">Step 5</div>
-        <h1 className="pb-step-title">Your top games</h1>
-        <p className="pb-step-sub">Add at least 1 game with play and CCU stats so studio filters can find you.</p>
-
-        {games.map((g, i) => (
-          <GameEntry key={i} game={g} index={i} onChange={g2 => updateGame(i, g2)} onRemove={() => removeGame(i)} />
-        ))}
-
-        {games.length < 3 && (
-          <button type="button" className="pb-add-btn" onClick={addGame}>+ Add game</button>
-        )}
-
-        <div className="pb-nav">
-          <button className="pb-btn pb-btn--ghost" type="button" onClick={onBack}>Back</button>
-          <button className="pb-btn pb-btn--primary" type="button" onClick={onNext} disabled={!ready}>
-            Next
-          </button>
-        </div>
-      </div>
-    )
-  }
-
+export default function WorkStep({ draft, update, onNext, onBack }: Props) {
   const works = draft.bestWork
   const ready = works.length > 0 && works.every(workReady)
   const addWork = () => update({ bestWork: [...works, emptyWork()] })
@@ -153,9 +82,9 @@ export default function WorkStep({ draft, update, onNext, onBack, studioMode = f
 
   return (
     <div className="pb-step-content">
-      <div className="pb-step-eyebrow">Step 6</div>
+      <div className="pb-step-eyebrow">Step 5</div>
       <h1 className="pb-step-title">Your best work</h1>
-      <p className="pb-step-sub">Add at least 1 project with play and value stats so developer filters can find you.</p>
+      <p className="pb-step-sub">Add at least 1 project with play and value stats so studios can find you.</p>
 
       {works.map((w, i) => (
         <WorkEntry key={i} work={w} index={i} onChange={w2 => updateWork(i, w2)} onRemove={() => removeWork(i)} />

@@ -7,7 +7,6 @@ import type { Session } from '@supabase/supabase-js'
 import { ProfileDraft, createDraft, draftToProfile } from './profile-types'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 import ProfilePreviewScreen from './ProfilePreviewScreen'
-import TypeStep from './steps/TypeStep'
 import IdentityStep from './steps/IdentityStep'
 import RoleStep from './steps/RoleStep'
 import BioStep from './steps/BioStep'
@@ -69,8 +68,7 @@ async function saveAccountProfile(
   if (!response.ok) throw new Error('Could not save account profile.')
 }
 
-const DEV_STEPS    = ['Identity', 'Role', 'Bio', 'Skills', 'Work', 'Portfolio']
-const STUDIO_STEPS = ['Identity', 'Role', 'Bio', 'Skills', 'Games']
+const DEV_STEPS = ['Identity', 'Role', 'Bio', 'Skills', 'Work', 'Portfolio']
 
 type Phase = 'form' | 'preview' | 'published'
 type SaveState = 'local' | 'loading' | 'saving' | 'saved' | 'error'
@@ -225,7 +223,7 @@ export default function ProfileBuilder({ onPublished, onDelete }: { onPublished?
   const [step, setStep] = useState(0)
   const [phase, setPhase] = useState<Phase>('form')
   const [hydrated, setHydrated] = useState(false)
-  const [typeChosen, setTypeChosen] = useState(false)
+
   const [accountEmail, setAccountEmail] = useState<string | null>(null)
   const [accessToken, setAccessToken] = useState<string | null>(null)
   const [accountLoaded, setAccountLoaded] = useState(false)
@@ -234,7 +232,8 @@ export default function ProfileBuilder({ onPublished, onDelete }: { onPublished?
   const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
-    setDraft(loadDraft())
+    const d = loadDraft()
+    setDraft({ ...d, type: 'dev', badge: d.badge === 'Studio' ? '' : d.badge })
     setHydrated(true)
   }, [])
 
@@ -270,7 +269,7 @@ export default function ProfileBuilder({ onPublished, onDelete }: { onPublished?
       try {
         const remoteDraft = await loadAccountDraft(session.access_token)
         if (!alive) return
-        if (remoteDraft) setDraft(remoteDraft)
+        if (remoteDraft) setDraft({ ...remoteDraft, type: 'dev', badge: remoteDraft.badge === 'Studio' ? '' : remoteDraft.badge })
         setSaveState('saved')
       } catch {
         if (!alive) return
@@ -318,25 +317,13 @@ export default function ProfileBuilder({ onPublished, onDelete }: { onPublished?
     setDraft(prev => ({ ...prev, ...patch }))
   }, [])
 
-  const isDev = draft.type === 'dev'
-  const contentSteps = isDev ? DEV_STEPS : STUDIO_STEPS
+  const contentSteps = DEV_STEPS
   const totalContentSteps = contentSteps.length
   const profile = useMemo(() => draftToProfile(draft, 'preview'), [draft])
 
-  const handleTypeSelect = (type: 'dev' | 'studio') => {
-    update({ type, badge: type === 'studio' ? 'Studio' : '' })
-    setTypeChosen(true)
-    setStep(0)
-    setPhase('form')
-  }
-
   const goNext = () => setPhase('preview')
   const goBack = () => {
-    if (step === 0) {
-      setTypeChosen(false)
-    } else {
-      setStep(s => s - 1)
-    }
+    if (step > 0) setStep(s => s - 1)
     setPhase('form')
   }
 
@@ -380,29 +367,6 @@ export default function ProfileBuilder({ onPublished, onDelete }: { onPublished?
     )
   }
 
-  if (!typeChosen) {
-    return (
-      <div className="pb-form-shell">
-        <div className="pb-form-top">
-          <span className="pb-brand">weld</span>
-          <ProfileAccountStatus accountEmail={accountEmail} saveState={saveState} />
-          <button
-            type="button"
-            onClick={() => setShowDeleteWarning(true)}
-            style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(232,70,36,0.45)', padding: '4px 0' }}
-          >
-            Delete draft
-          </button>
-        </div>
-        <div className="pb-form-body">
-          <TypeStep draft={draft} onSelect={handleTypeSelect} />
-        </div>
-        {showDeleteWarning && (
-          <DeleteWarningModal isDeleting={isDeleting} onConfirm={handleConfirmDelete} onCancel={() => setShowDeleteWarning(false)} />
-        )}
-      </div>
-    )
-  }
 
   if (phase === 'preview') {
     return (
@@ -411,15 +375,6 @@ export default function ProfileBuilder({ onPublished, onDelete }: { onPublished?
         onContinue={continueFromPreview}
         onBack={() => setPhase('form')}
         isLast={step >= totalContentSteps - 1}
-        onBioChange={bio => update({ bio })}
-        onSkillDescChange={(name, desc) =>
-          update({
-            selectedSkills: draft.selectedSkills.map(s =>
-              s.name === name ? { ...s, description: desc } : s
-            ),
-          })
-        }
-        onDetailsChange={details => update({ details })}
       />
     )
   }
@@ -433,7 +388,7 @@ export default function ProfileBuilder({ onPublished, onDelete }: { onPublished?
       case 1: return <RoleStep {...stepProps} />
       case 2: return <BioStep {...stepProps} />
       case 3: return <SkillsStep {...stepProps} />
-      case 4: return isDev ? <WorkStep {...stepProps} /> : <WorkStep {...stepProps} studioMode />
+      case 4: return <WorkStep {...stepProps} />
       case 5: return <PortfolioStep {...stepProps} />
       default: return null
     }

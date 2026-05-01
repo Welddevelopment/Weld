@@ -173,11 +173,13 @@ function InlineEdit({
   onChange,
   placeholder = 'Click to edit…',
   darkBg = false,
+  lightCard = false,
 }: {
   value: string
   onChange: (v: string) => void
   placeholder?: string
   darkBg?: boolean
+  lightCard?: boolean
 }) {
   function autoResize(el: HTMLTextAreaElement) {
     el.style.height = 'auto'
@@ -189,7 +191,9 @@ function InlineEdit({
       onChange={e => { onChange(e.target.value); autoResize(e.target) }}
       onFocus={e => {
         e.target.style.borderColor = 'rgba(232,70,36,0.55)'
-        e.target.style.background = darkBg ? 'rgba(232,70,36,0.08)' : 'rgba(232,70,36,0.06)'
+        e.target.style.background = lightCard
+          ? 'rgba(232,70,36,0.06)'
+          : darkBg ? 'rgba(232,70,36,0.08)' : 'rgba(232,70,36,0.06)'
         autoResize(e.target)
       }}
       onBlur={e => {
@@ -203,7 +207,8 @@ function InlineEdit({
         border: '1.5px dashed transparent', borderRadius: 6, outline: 'none',
         resize: 'none', overflow: 'hidden', cursor: 'text',
         fontFamily: 'inherit', fontSize: 'inherit', lineHeight: 'inherit',
-        color: 'inherit', letterSpacing: 'inherit',
+        color: lightCard ? '#2D1F16' : 'inherit',
+        letterSpacing: 'inherit',
         padding: '3px 6px', margin: '-3px -6px', boxSizing: 'border-box',
         transition: 'border-color 0.15s, background 0.15s',
       }}

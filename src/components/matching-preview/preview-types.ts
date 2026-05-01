@@ -19,6 +19,20 @@ export type TopGame = {
   currentCcu: string
 }
 
+export type ProfileStats = {
+  experience: string
+  projects: string
+  scriptsBuilt: string
+  onTime: string
+}
+
+export type WorkSummary = {
+  totalProjects: string
+  linesOfCode: string
+  totalHours: string
+  commitment: string
+}
+
 export type PreviewProfile = {
   id: string
   type: PreviewProfileType
@@ -31,10 +45,12 @@ export type PreviewProfile = {
   tags: string[]
   meta: string
   // Dev-only
-  skills?: Array<{ name: string; description: string }>
+  skills?: Array<{ name: string; description: string; categories?: Array<{ icon: string; name: string; description: string }>; resources?: Array<{ label: string; url: string }> }>
   portfolio?: { links: Array<{ name: string; url: string }> }
   bestWork?: DevWork[]
   socials?: Array<{ icon: string; label: string; url: string }>
+  stats?: ProfileStats
+  workSummary?: WorkSummary
   // Studio-only
   details?: string
   skillsNeeded?: Array<{ name: string; description: string }>

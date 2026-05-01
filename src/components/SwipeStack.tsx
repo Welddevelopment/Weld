@@ -4,18 +4,22 @@ import { useState, useRef, forwardRef, useImperativeHandle } from 'react'
 import Link from 'next/link'
 
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
-import SwipeCard from './SwipeCard'
+import GamesPanel from '@/components/matching-preview/panels/GamesPanel'
+import WorkPanel from '@/components/matching-preview/panels/WorkPanel'
+import SkillPanel from '@/components/matching-preview/panels/SkillPanel'
+import SwipeCard, { type PanelKind } from './SwipeCard'
 
 export type SwipeProfile = PreviewProfile & { userId: string }
 
 const SWIPE_THRESHOLD = 100
+const CARD_WIDTH = 380
+const CARD_HEIGHT = 628 // 560 face + 68 action bar
 
 interface Props {
   profiles: SwipeProfile[]
   onLike: (profile: SwipeProfile) => void
   onPass?: (profile: SwipeProfile) => void
-  onCardClick: (profile: SwipeProfile) => void
-  onCardLike?: (profile: SwipeProfile) => void
+  onMessage?: (profile: SwipeProfile) => void
   disabled?: boolean
 }
 
@@ -23,8 +27,10 @@ export interface SwipeStackHandle {
   swipe: (dir: 'left' | 'right', options?: { notify?: boolean }) => void
 }
 
+type PanelState = { kind: 'none' } | { kind: 'games' } | { kind: 'work' } | { kind: 'skill'; name: string }
+
 const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
-  { profiles, onLike, onPass, onCardClick, onCardLike, disabled = false },
+  { profiles, onLike, onPass, onMessage, disabled = false },
   ref
 ) {
   const [index, setIndex] = useState(0)
@@ -32,6 +38,7 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
   const [dragOffset, setDragOffset] = useState(0)
   const [sparks, setSparks] = useState(0)
   const [likeFlash, setLikeFlash] = useState(false)
+  const [panel, setPanel] = useState<PanelState>({ kind: 'none' })
 
   const isDragging = useRef(false)
   const startX = useRef(0)
@@ -40,22 +47,25 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
   const flyDirRef = useRef<'left' | 'right' | null>(null)
   const likeFlashTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  const panelOpen = panel.kind !== 'none'
   const current = profiles[index]
   const next = profiles[index + 1]
   const remaining = profiles.length - index
 
-  const viewAgain = () => {
-    if (swipeTimeout.current) clearTimeout(swipeTimeout.current)
-    if (likeFlashTimeout.current) clearTimeout(likeFlashTimeout.current)
-    swipeTimeout.current = null
-    likeFlashTimeout.current = null
-    flyDirRef.current = null
-    isDragging.current = false
-    didDrag.current = false
-    setDragOffset(0)
-    setFlyDir(null)
-    setLikeFlash(false)
-    setIndex(0)
+  const closePanel = () => setPanel({ kind: 'none' })
+
+  const handleOpenPanel = (p: PanelKind) => {
+    if (typeof p === 'object' && 'skill' in p) {
+      setPanel(prev =>
+        prev.kind === 'skill' && prev.name === p.skill
+          ? { kind: 'none' }
+          : { kind: 'skill', name: p.skill }
+      )
+    } else if (p === 'games') {
+      setPanel(prev => prev.kind === 'games' ? { kind: 'none' } : { kind: 'games' })
+    } else {
+      setPanel(prev => prev.kind === 'work' ? { kind: 'none' } : { kind: 'work' })
+    }
   }
 
   const triggerSwipe = (dir: 'left' | 'right', notify = true) => {
@@ -66,6 +76,7 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
     flyDirRef.current = dir
     setDragOffset(0)
     setFlyDir(dir)
+    setPanel({ kind: 'none' })
 
     swipeTimeout.current = setTimeout(() => {
       swipeTimeout.current = null
@@ -73,17 +84,12 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
       setIndex(i => i + 1)
       setFlyDir(null)
       if (notify) {
-        if (dir === 'right') {
-          setSparks(s => s + 1)
-          onLike(profile)
-        } else {
-          onPass?.(profile)
-        }
+        if (dir === 'right') { setSparks(s => s + 1); onLike(profile) }
+        else onPass?.(profile)
       }
     }, 220)
   }
 
-  // Card like button: flash the LIKE stamp briefly before swiping
   const handleCardLike = () => {
     if (flyDirRef.current || likeFlash) return
     if (likeFlashTimeout.current) clearTimeout(likeFlashTimeout.current)
@@ -99,7 +105,7 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
   }))
 
   const onDragStart = (clientX: number) => {
-    if (disabled || flyDirRef.current || likeFlash) return
+    if (disabled || flyDirRef.current || likeFlash || panelOpen) return
     isDragging.current = true
     didDrag.current = false
     startX.current = clientX
@@ -115,18 +121,25 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
   const onDragEnd = () => {
     if (!isDragging.current) return
     isDragging.current = false
-    if (!didDrag.current) {
-      // No drag movement — don't open modal on accidental taps
-      setDragOffset(0)
-      return
-    }
-    if (dragOffset > SWIPE_THRESHOLD) {
-      triggerSwipe('right')
-    } else if (dragOffset < -SWIPE_THRESHOLD) {
-      triggerSwipe('left')
-    } else {
-      setDragOffset(0)
-    }
+    if (!didDrag.current) { setDragOffset(0); return }
+    if (dragOffset > SWIPE_THRESHOLD) triggerSwipe('right')
+    else if (dragOffset < -SWIPE_THRESHOLD) triggerSwipe('left')
+    else setDragOffset(0)
+  }
+
+  const viewAgain = () => {
+    if (swipeTimeout.current) clearTimeout(swipeTimeout.current)
+    if (likeFlashTimeout.current) clearTimeout(likeFlashTimeout.current)
+    swipeTimeout.current = null
+    likeFlashTimeout.current = null
+    flyDirRef.current = null
+    isDragging.current = false
+    didDrag.current = false
+    setDragOffset(0)
+    setFlyDir(null)
+    setLikeFlash(false)
+    setIndex(0)
+    setPanel({ kind: 'none' })
   }
 
   if (!current) {
@@ -171,6 +184,12 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
     ? undefined
     : { transform: `translateX(${dragOffset}px) rotate(${rotation}deg)` }
 
+  const activePanel: PanelKind | null =
+    panel.kind === 'games' ? 'games' :
+    panel.kind === 'work' ? 'work' :
+    panel.kind === 'skill' ? { skill: panel.name } :
+    null
+
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="flex items-center gap-3 text-xs text-gray-500">
@@ -179,53 +198,65 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
         <span className="text-green-400 font-medium">⚡ {sparks} spark{sparks !== 1 ? 's' : ''}</span>
       </div>
 
-      <div
-        className="relative"
-        style={{ width: 340, height: 520 }}
-        onMouseMove={e => { if (isDragging.current) onDragMove(e.clientX) }}
-        onMouseUp={onDragEnd}
-        onMouseLeave={onDragEnd}
-      >
-        {next && (
-          <div
-            className="absolute top-0 left-0 pointer-events-none"
-            style={{
-              width: 340,
-              height: 520,
-              overflow: 'hidden',
-              transform: `scale(${flyDir ? 1 : 0.94})`,
-              transformOrigin: 'top center',
-              transition: flyDir ? 'transform 220ms ease-out' : 'none',
-            }}
-          >
-            <SwipeCard profile={next} />
-          </div>
-        )}
-
+      <div className="npc-stack-row">
+        {/* Card drag container */}
         <div
-          className={`absolute top-0 left-0 cursor-grab active:cursor-grabbing
-            ${flyDir ? 'transition-[transform,opacity] duration-200' : ''}
-            ${flyDir === 'left' ? '-translate-x-[200px] -rotate-[12deg] opacity-0' : ''}
-            ${flyDir === 'right' ? 'translate-x-[200px] rotate-[12deg] opacity-0' : ''}
-          `}
-          style={frontStyle}
-          onMouseDown={e => { e.preventDefault(); onDragStart(e.clientX) }}
-          onTouchStart={e => onDragStart(e.touches[0].clientX)}
-          onTouchMove={e => { e.preventDefault(); onDragMove(e.touches[0].clientX) }}
-          onTouchEnd={onDragEnd}
+          className="relative"
+          style={{ width: CARD_WIDTH, height: CARD_HEIGHT }}
+          onMouseMove={e => { if (isDragging.current) onDragMove(e.clientX) }}
+          onMouseUp={onDragEnd}
+          onMouseLeave={onDragEnd}
         >
-          <SwipeCard
-            profile={current}
-            dragOverlay={likeFlash ? 'like' : dragOverlay}
-            dragOpacity={likeFlash ? 1 : dragProgress}
-            onPass={() => triggerSwipe('left')}
-            onLike={onCardLike ? () => onCardLike(current) : handleCardLike}
-            onViewProfile={() => onCardClick(current)}
-          />
-        </div>
-      </div>
+          {/* Back card */}
+          {next && (
+            <div
+              className="absolute top-0 left-0 pointer-events-none"
+              style={{
+                width: CARD_WIDTH,
+                height: CARD_HEIGHT,
+                overflow: 'hidden',
+                transform: `scale(${flyDir ? 1 : 0.94})`,
+                transformOrigin: 'top center',
+                transition: flyDir ? 'transform 220ms ease-out' : 'none',
+              }}
+            >
+              <SwipeCard profile={next} />
+            </div>
+          )}
 
-      <p className="text-[11px] text-gray-600">tap card to view full profile</p>
+          {/* Front card */}
+          <div
+            className={`absolute top-0 left-0 ${panelOpen ? '' : 'cursor-grab active:cursor-grabbing'}
+              ${flyDir ? 'transition-[transform,opacity] duration-200' : ''}
+              ${flyDir === 'left' ? '-translate-x-[200px] -rotate-[12deg] opacity-0' : ''}
+              ${flyDir === 'right' ? 'translate-x-[200px] rotate-[12deg] opacity-0' : ''}
+            `}
+            style={frontStyle}
+            onMouseDown={e => { if (!panelOpen) { e.preventDefault(); onDragStart(e.clientX) } }}
+            onTouchStart={e => { if (!panelOpen) onDragStart(e.touches[0].clientX) }}
+            onTouchMove={e => { e.preventDefault(); onDragMove(e.touches[0].clientX) }}
+            onTouchEnd={onDragEnd}
+          >
+            <SwipeCard
+              profile={current}
+              dragOverlay={likeFlash ? 'like' : dragOverlay}
+              dragOpacity={likeFlash ? 1 : dragProgress}
+              activePanel={activePanel}
+              onPass={() => triggerSwipe('left')}
+              onLike={handleCardLike}
+              onMessage={() => onMessage?.(current)}
+              onOpenPanel={handleOpenPanel}
+            />
+          </div>
+        </div>
+
+        {/* Side panel */}
+        {panel.kind === 'games' && <GamesPanel profile={current} onBack={closePanel} />}
+        {panel.kind === 'work'  && <WorkPanel  profile={current} onBack={closePanel} />}
+        {panel.kind === 'skill' && (
+          <SkillPanel profile={current} skillName={panel.name} onBack={closePanel} />
+        )}
+      </div>
     </div>
   )
 })

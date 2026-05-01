@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import AppNav from '@/components/AppNav'
-import PreviewExpandedModal, { type LikeFeedback } from '@/components/matching-preview/PreviewExpandedModal'
 import PreviewFilterModal from '@/components/matching-preview/PreviewFilterModal'
 import SwipeStack, { SwipeProfile, SwipeStackHandle } from '@/components/SwipeStack'
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/browser'
@@ -30,6 +29,7 @@ import {
 } from '@/lib/profile-filters'
 
 type PageMode = 'loading' | 'unauthed' | 'ready'
+type LikeFeedback = 'liked' | 'matched' | 'already_liked' | 'already_matched'
 type SwipeApiResponse = { ok?: boolean; match?: boolean; message?: string; status?: LikeFeedback | 'passed' }
 type ExistingLikeNotice = { profile: SwipeProfile; kind: 'already_liked' | 'already_matched' }
 
@@ -163,11 +163,9 @@ export default function SwipePage() {
   const [noProfile, setNoProfile] = useState(false)
   const [ownType, setOwnType] = useState<'dev' | 'studio' | null>(null)
   const [loadingProfiles, setLoadingProfiles] = useState(false)
-  const [modalProfile, setModalProfile] = useState<SwipeProfile | null>(null)
   const [matchedProfile, setMatchedProfile] = useState<SwipeProfile | null>(null)
   const [likedProfile, setLikedProfile] = useState<SwipeProfile | null>(null)
   const [existingLikeNotice, setExistingLikeNotice] = useState<ExistingLikeNotice | null>(null)
-  const [autoLikeModal, setAutoLikeModal] = useState(false)
   const [swipeError, setSwipeError] = useState<string | null>(null)
   const [filters, setFilters] = useState<FilterState>(createFilterState())
   const [showFilters, setShowFilters] = useState(false)
@@ -409,37 +407,12 @@ export default function SwipePage() {
                     })
                   }}
                   onPass={p => { void recordSwipe(p.userId, 'pass') }}
-                  onCardClick={p => setModalProfile(p)}
-                  onCardLike={p => { setAutoLikeModal(true); setModalProfile(p) }}
+                  onMessage={p => { void openConversation(p) }}
                 />
               )}
             </div>
           )}
         </div>
-      )}
-
-      {modalProfile && (
-        <PreviewExpandedModal
-          profiles={[modalProfile]}
-          initialId={modalProfile.id}
-          autoLike={autoLikeModal}
-          onClose={() => { setModalProfile(null); setAutoLikeModal(false) }}
-          onPassed={() => {
-            void recordSwipe(modalProfile.userId, 'pass')
-            setModalProfile(null)
-            setAutoLikeModal(false)
-            setTimeout(() => swipeRef.current?.swipe('left', { notify: false }), 0)
-          }}
-          onLiked={() => {
-            setModalProfile(null)
-            setAutoLikeModal(false)
-          }}
-          onLikeResult={async () => {
-            const feedback = await recordSwipe(modalProfile.userId, 'like')
-            setTimeout(() => swipeRef.current?.swipe('right', { notify: false }), 0)
-            return feedback ?? 'liked'
-          }}
-        />
       )}
 
       {matchedProfile && (
