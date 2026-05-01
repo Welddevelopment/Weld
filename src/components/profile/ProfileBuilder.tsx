@@ -147,10 +147,20 @@ function DeleteWarningModal({ isDeleting, onConfirm, onCancel }: { isDeleting: b
   )
 }
 
-export default function ProfileBuilder({ onPublished, onDelete }: { onPublished?: (profile: PreviewProfile) => void; onDelete?: () => Promise<void> } = {}) {
+export default function ProfileBuilder({
+  onPublished,
+  onDelete,
+  initialPhase = 'identity',
+  onCancel,
+}: {
+  onPublished?: (profile: PreviewProfile) => void
+  onDelete?: () => Promise<void>
+  initialPhase?: Phase
+  onCancel?: () => void
+} = {}) {
   const router = useRouter()
   const [draft, setDraft] = useState<ProfileDraft>(createDraft)
-  const [phase, setPhase] = useState<Phase>('identity')
+  const [phase, setPhase] = useState<Phase>(initialPhase)
   const [editorPanel, setEditorPanel] = useState<EditorPanel>(null)
   const [hydrated, setHydrated] = useState(false)
   const [accountEmail, setAccountEmail] = useState<string | null>(null)
@@ -292,7 +302,12 @@ export default function ProfileBuilder({ onPublished, onDelete }: { onPublished?
               update={update}
               activePanel={editorPanel}
               onOpenPanel={setEditorPanel}
-              onBack={() => { setEditorPanel(null); setPhase('rate') }}
+              onBack={() => {
+                setEditorPanel(null)
+                if (onCancel) onCancel()
+                else setPhase('rate')
+              }}
+              onBackLabel={onCancel ? '← Cancel' : '← Back'}
               onPublish={handlePublish}
             />
             {editorPanel === 'skills' && (

@@ -63,7 +63,7 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
       )
     } else if (p === 'games') {
       setPanel(prev => prev.kind === 'games' ? { kind: 'none' } : { kind: 'games' })
-    } else {
+    } else if (p === 'work') {
       setPanel(prev => prev.kind === 'work' ? { kind: 'none' } : { kind: 'work' })
     }
   }

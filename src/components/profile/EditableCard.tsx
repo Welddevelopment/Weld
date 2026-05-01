@@ -11,6 +11,7 @@ interface Props {
   activePanel: EditorPanel
   onOpenPanel: (p: EditorPanel) => void
   onBack: () => void
+  onBackLabel?: string
   onPublish: () => void
 }
 
@@ -21,7 +22,7 @@ function expLabel(years: number | null): string {
   return `${years}+ yrs`
 }
 
-export default function EditableCard({ draft, update, activePanel, onOpenPanel, onBack, onPublish }: Props) {
+export default function EditableCard({ draft, update, activePanel, onOpenPanel, onBack, onBackLabel = '← Back', onPublish }: Props) {
   const initials = getInitials(draft.name) || '?'
   const rateDisplay = draft.rateAmount
     ? `${draft.rateAmount} ${draft.rateType ?? ''}`.trim()
@@ -193,7 +194,7 @@ export default function EditableCard({ draft, update, activePanel, onOpenPanel, 
       {/* Editor action bar */}
       <div className="npc-editor-bar">
         <button type="button" className="npc-editor-back" onClick={onBack}>
-          ← Back
+          {onBackLabel}
         </button>
         <button type="button" className="npc-editor-publish" onClick={onPublish}>
           Publish Profile
