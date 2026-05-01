@@ -7,10 +7,10 @@ interface Props {
   onBack: () => void
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  Game:   '#a78bfa', Combat: '#f87171', Build:  '#34d399',
-  Art:    '#f472b6', Tools:  '#60a5fa', VFX:    '#fb923c',
-  Audio:  '#facc15', World:  '#4ade80', Launch: '#818cf8',
+const CATEGORY_COLOR: Record<string, string> = {
+  Game: '#818cf8', Combat: '#f87171', Build: '#34d399',
+  Art: '#f472b6', Tools: '#60a5fa', VFX: '#fb923c',
+  Audio: '#facc15', World: '#4ade80', Launch: '#a78bfa',
 }
 
 export default function GamesPanel({ profile, onBack }: Props) {
@@ -34,31 +34,33 @@ export default function GamesPanel({ profile, onBack }: Props) {
           <p style={{ color: '#aaa', fontSize: 13, textAlign: 'center', paddingTop: 40 }}>
             No games added yet.
           </p>
-        ) : (
-          games.map((game, i) => {
-            const color = CATEGORY_COLORS[game.emoji] ?? '#a78bfa'
-            return (
-              <div key={i} className="npc-game-item">
-                <div className="npc-game-thumb" style={{ background: `${color}22` }}>
-                  {game.imageUrl ? (
-                    <img src={game.imageUrl} alt={game.title} />
-                  ) : (
-                    <span className="npc-game-thumb-label" style={{ color }}>{game.emoji || 'Game'}</span>
-                  )}
-                </div>
+        ) : games.map((game, i) => {
+          const color = CATEGORY_COLOR[game.emoji] ?? '#818cf8'
+          return (
+            <div key={i} className="npc-game-item">
+              {/* 16:9 thumbnail — Roblox screenshots are 768×432 */}
+              <div className="npc-game-thumb" style={{ background: `${color}18` }}>
+                {game.imageUrl
+                  ? <img src={game.imageUrl} alt={game.title} />
+                  : <span className="npc-game-thumb-cat" style={{ color }}>{game.emoji || 'Game'}</span>
+                }
+              </div>
 
-                <div className="npc-game-copy">
-                  <div className="npc-game-title">{game.title || 'Untitled Game'}</div>
+              <div className="npc-game-copy">
+                <div className="npc-game-title">{game.title || 'Untitled'}</div>
 
-                  {game.gameUrl && (
-                    <a href={game.gameUrl} target="_blank" rel="noreferrer" className="npc-game-url">
-                      {game.gameUrl.replace(/^https?:\/\//, '')}
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 9, height: 9, marginLeft: 3, display: 'inline', verticalAlign: 'middle' }}>
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-                      </svg>
-                    </a>
-                  )}
+                {game.gameUrl && (
+                  <a href={game.gameUrl} target="_blank" rel="noreferrer" className="npc-game-url">
+                    {game.gameUrl.replace(/^https?:\/\/(www\.)?/, '')}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                      <polyline points="15 3 21 3 21 9"/>
+                      <line x1="10" y1="14" x2="21" y2="3"/>
+                    </svg>
+                  </a>
+                )}
 
+                {(game.plays || game.currentCcu || game.topCcu) && (
                   <div className="npc-game-stats">
                     {game.plays && (
                       <div className="npc-game-stat">
@@ -79,19 +81,23 @@ export default function GamesPanel({ profile, onBack }: Props) {
                       </div>
                     )}
                   </div>
+                )}
 
-                  <div className="npc-game-tags">
-                    {game.emoji && <span className="npc-game-tag" style={{ background: `${color}18`, color }}>{game.emoji}</span>}
-                  </div>
-
-                  {game.desc && (
-                    <p style={{ fontSize: 11, color: '#666', margin: '5px 0 0', lineHeight: 1.45 }}>{game.desc}</p>
+                <div className="npc-game-tags">
+                  {game.emoji && (
+                    <span className="npc-game-tag" style={{ background: `${color}18`, color }}>
+                      {game.emoji}
+                    </span>
                   )}
                 </div>
+
+                {game.desc && (
+                  <p className="npc-game-desc">{game.desc}</p>
+                )}
               </div>
-            )
-          })
-        )}
+            </div>
+          )
+        })}
       </div>
     </div>
   )

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { ProfileDraft } from '../profile-types'
 import { DevWork } from '@/components/matching-preview/preview-types'
 
@@ -13,15 +14,45 @@ function emptyWork(): DevWork {
   return { emoji: 'Game', title: '', desc: '', tools: '', time: '', amount: '', plays: '', imageUrl: '' }
 }
 
-const EMOJI_OPTIONS = ['Game', 'Combat', 'Build', 'Art', 'Tools', 'VFX', 'Audio', 'World', 'Launch']
+const CATEGORY_OPTIONS = ['Game', 'Combat', 'Build', 'Art', 'Tools', 'VFX', 'Audio', 'World', 'Launch']
 
 export default function WorkEditPanel({ draft, update, onClose }: Props) {
   const works = draft.bestWork
 
-  const add = () => update({ bestWork: [...works, emptyWork()] })
-  const remove = (i: number) => update({ bestWork: works.filter((_, idx) => idx !== i) })
+  const [openPicker, setOpenPicker] = useState<Set<number>>(
+    () => new Set(works.length === 0 ? [] : works.map((_, i) => i).filter(i => !works[i].title))
+  )
+
+  const add = () => {
+    const nextIdx = works.length
+    update({ bestWork: [...works, emptyWork()] })
+    setOpenPicker(prev => new Set([...prev, nextIdx]))
+  }
+
+  const remove = (i: number) => {
+    update({ bestWork: works.filter((_, idx) => idx !== i) })
+    setOpenPicker(prev => {
+      const next = new Set<number>()
+      prev.forEach(idx => { if (idx < i) next.add(idx); else if (idx > i) next.add(idx - 1) })
+      return next
+    })
+  }
+
   const change = (i: number, w: DevWork) => {
     const next = [...works]; next[i] = w; update({ bestWork: next })
+  }
+
+  const selectCategory = (i: number, w: DevWork, emoji: string) => {
+    change(i, { ...w, emoji })
+    setOpenPicker(prev => { const next = new Set(prev); next.delete(i); return next })
+  }
+
+  const togglePicker = (i: number) => {
+    setOpenPicker(prev => {
+      const next = new Set(prev)
+      if (next.has(i)) next.delete(i); else next.add(i)
+      return next
+    })
   }
 
   return (
@@ -33,33 +64,41 @@ export default function WorkEditPanel({ draft, update, onClose }: Props) {
           </svg>
           Close
         </button>
+        <h2 className="npc-panel-title">My Work</h2>
+        <p className="npc-panel-sub">Projects you&apos;ve built.</p>
       </div>
 
       <div className="npc-panel-body">
-        <div style={{ fontSize: 15, fontWeight: 700, color: '#111', fontFamily: 'var(--font-display)', fontStyle: 'italic', marginBottom: 16 }}>
-          Projects you&apos;ve built
-        </div>
-
         {works.map((w, i) => (
           <div key={i} className="pb-entry-card">
             <div className="pb-entry-card-header">
               <span className="pb-entry-card-label">Project {i + 1}</span>
+              <button
+                type="button"
+                className="pb-category-pill"
+                onClick={() => togglePicker(i)}
+                title="Change category"
+              >
+                {w.emoji || 'Category'}
+                <span className="pb-category-pill-dots">···</span>
+              </button>
               <button type="button" className="pb-entry-card-remove" onClick={() => remove(i)}>Remove</button>
             </div>
 
-            <div style={{ fontSize: 10, fontFamily: 'var(--font-geist-mono)', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)', marginBottom: 6 }}>
-              Category
-            </div>
-            <div className="pb-emoji-row">
-              {EMOJI_OPTIONS.map(e => (
-                <button key={e} type="button"
-                  className={`pb-emoji-btn${w.emoji === e ? ' pb-emoji-btn--on' : ''}`}
-                  onClick={() => change(i, { ...w, emoji: e })}
-                >
-                  {e}
-                </button>
-              ))}
-            </div>
+            {openPicker.has(i) && (
+              <div className="pb-emoji-row">
+                {CATEGORY_OPTIONS.map(e => (
+                  <button
+                    key={e}
+                    type="button"
+                    className={`pb-emoji-btn${w.emoji === e ? ' pb-emoji-btn--on' : ''}`}
+                    onClick={() => selectCategory(i, w, e)}
+                  >
+                    {e}
+                  </button>
+                ))}
+              </div>
+            )}
 
             <div className="pb-image-row">
               {w.imageUrl && (
@@ -74,6 +113,7 @@ export default function WorkEditPanel({ draft, update, onClose }: Props) {
                 onChange={e => change(i, { ...w, imageUrl: e.target.value })}
               />
             </div>
+
             <input
               className="pb-panel-input"
               placeholder="Project name (e.g. Combat System)"

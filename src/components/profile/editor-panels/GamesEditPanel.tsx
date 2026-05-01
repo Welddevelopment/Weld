@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { ProfileDraft } from '../profile-types'
 import { TopGame } from '@/components/matching-preview/preview-types'
 
@@ -13,15 +14,45 @@ function emptyGame(): TopGame {
   return { emoji: 'Game', title: '', desc: '', plays: '', topCcu: '', currentCcu: '', imageUrl: '', gameUrl: '' }
 }
 
-const EMOJI_OPTIONS = ['Game', 'Combat', 'Build', 'Art', 'Tools', 'VFX', 'Audio', 'World', 'Launch']
+const CATEGORY_OPTIONS = ['Game', 'Combat', 'Build', 'Art', 'Tools', 'VFX', 'Audio', 'World', 'Launch']
 
 export default function GamesEditPanel({ draft, update, onClose }: Props) {
   const games = draft.topGames
 
-  const add = () => update({ topGames: [...games, emptyGame()] })
-  const remove = (i: number) => update({ topGames: games.filter((_, idx) => idx !== i) })
+  const [openPicker, setOpenPicker] = useState<Set<number>>(
+    () => new Set(games.length === 0 ? [] : games.map((_, i) => i).filter(i => !games[i].title))
+  )
+
+  const add = () => {
+    const nextIdx = games.length
+    update({ topGames: [...games, emptyGame()] })
+    setOpenPicker(prev => new Set([...prev, nextIdx]))
+  }
+
+  const remove = (i: number) => {
+    update({ topGames: games.filter((_, idx) => idx !== i) })
+    setOpenPicker(prev => {
+      const next = new Set<number>()
+      prev.forEach(idx => { if (idx < i) next.add(idx); else if (idx > i) next.add(idx - 1) })
+      return next
+    })
+  }
+
   const change = (i: number, g: TopGame) => {
     const next = [...games]; next[i] = g; update({ topGames: next })
+  }
+
+  const selectCategory = (i: number, g: TopGame, emoji: string) => {
+    change(i, { ...g, emoji })
+    setOpenPicker(prev => { const next = new Set(prev); next.delete(i); return next })
+  }
+
+  const togglePicker = (i: number) => {
+    setOpenPicker(prev => {
+      const next = new Set(prev)
+      if (next.has(i)) next.delete(i); else next.add(i)
+      return next
+    })
   }
 
   return (
@@ -33,33 +64,41 @@ export default function GamesEditPanel({ draft, update, onClose }: Props) {
           </svg>
           Close
         </button>
+        <h2 className="npc-panel-title">My Games</h2>
+        <p className="npc-panel-sub">Games you&apos;ve worked on.</p>
       </div>
 
       <div className="npc-panel-body">
-        <div style={{ fontSize: 15, fontWeight: 700, color: '#111', fontFamily: 'var(--font-display)', fontStyle: 'italic', marginBottom: 16 }}>
-          Games you&apos;ve worked on
-        </div>
-
         {games.map((g, i) => (
           <div key={i} className="pb-entry-card">
             <div className="pb-entry-card-header">
               <span className="pb-entry-card-label">Game {i + 1}</span>
+              <button
+                type="button"
+                className="pb-category-pill"
+                onClick={() => togglePicker(i)}
+                title="Change category"
+              >
+                {g.emoji || 'Category'}
+                <span className="pb-category-pill-dots">···</span>
+              </button>
               <button type="button" className="pb-entry-card-remove" onClick={() => remove(i)}>Remove</button>
             </div>
 
-            <div style={{ fontSize: 10, fontFamily: 'var(--font-geist-mono)', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)', marginBottom: 6 }}>
-              Category
-            </div>
-            <div className="pb-emoji-row">
-              {EMOJI_OPTIONS.map(e => (
-                <button key={e} type="button"
-                  className={`pb-emoji-btn${g.emoji === e ? ' pb-emoji-btn--on' : ''}`}
-                  onClick={() => change(i, { ...g, emoji: e })}
-                >
-                  {e}
-                </button>
-              ))}
-            </div>
+            {openPicker.has(i) && (
+              <div className="pb-emoji-row">
+                {CATEGORY_OPTIONS.map(e => (
+                  <button
+                    key={e}
+                    type="button"
+                    className={`pb-emoji-btn${g.emoji === e ? ' pb-emoji-btn--on' : ''}`}
+                    onClick={() => selectCategory(i, g, e)}
+                  >
+                    {e}
+                  </button>
+                ))}
+              </div>
+            )}
 
             <div className="pb-image-row">
               {g.imageUrl && (
@@ -74,6 +113,7 @@ export default function GamesEditPanel({ draft, update, onClose }: Props) {
                 onChange={e => change(i, { ...g, imageUrl: e.target.value })}
               />
             </div>
+
             <input
               className="pb-panel-input"
               placeholder="Game name (e.g. Tower Defence Simulator)"
@@ -94,7 +134,7 @@ export default function GamesEditPanel({ draft, update, onClose }: Props) {
               onChange={e => change(i, { ...g, desc: e.target.value })}
             />
             <div className="pb-panel-row3">
-              <input className="pb-panel-input" placeholder="Total plays" value={g.plays} onChange={e => change(i, { ...g, plays: e.target.value })} />
+              <input className="pb-panel-input" placeholder="Total visits" value={g.plays} onChange={e => change(i, { ...g, plays: e.target.value })} />
               <input className="pb-panel-input" placeholder="Peak CCU" value={g.topCcu} onChange={e => change(i, { ...g, topCcu: e.target.value })} />
               <input className="pb-panel-input" placeholder="Current CCU" value={g.currentCcu} onChange={e => change(i, { ...g, currentCcu: e.target.value })} />
             </div>
