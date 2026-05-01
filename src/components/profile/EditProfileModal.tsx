@@ -968,6 +968,7 @@ export default function EditProfileModal({ token, initialDraft, initialProfile, 
 
   return (
     <div
+      className="profile-edit-modal"
       style={{
         position: 'fixed', inset: 0, zIndex: 300,
         background: 'radial-gradient(circle at 50% 16%,rgba(224,58,30,.22),transparent 30%),rgba(6,5,4,.92)',
