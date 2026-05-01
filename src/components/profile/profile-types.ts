@@ -110,8 +110,10 @@ export function draftToProfile(draft: ProfileDraft, id: string): PreviewProfile 
   if (isDev) {
     const yr = draft.experienceYears ?? 0
     role = yr === 0 ? 'Developer - <1yr experience' : `Developer - ${yr}yr experience`
-    const rate = draft.rateType ?? ''
-    meta = ['Available Now', rate ? `Rate: ${rate}` : '', 'Remote'].filter(Boolean).join(' - ')
+    const rateStr = draft.rateType
+      ? (draft.rateAmount ? `${draft.rateAmount} ${draft.rateType}` : draft.rateType)
+      : ''
+    meta = ['Available Now', rateStr ? `Rate: ${rateStr}` : '', 'Remote'].filter(Boolean).join(' - ')
     tags = draft.selectedSkills.slice(0, 3).map(s => s.name)
   } else {
     const size = draft.teamSize ?? 0
@@ -139,6 +141,7 @@ export function draftToProfile(draft: ProfileDraft, id: string): PreviewProfile 
     if (draft.selectedSkills.length > 0) profile.skills = draft.selectedSkills
     if (draft.portfolioLinks.length > 0) profile.portfolio = { links: draft.portfolioLinks }
     if (draft.bestWork.length > 0) profile.bestWork = draft.bestWork
+    if (draft.topGames.length > 0) profile.topGames = draft.topGames
     if (draft.socials.length > 0) profile.socials = draft.socials
   } else {
     if (draft.details) profile.details = draft.details

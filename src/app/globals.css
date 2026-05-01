@@ -2371,3 +2371,263 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   align-items: flex-start;
 }
 
+/* ── PROFILE EDITOR ──────────────────────────────────────────── */
+
+/* Editor body variant — allows wider row */
+.pb-form-body--editor {
+  align-items: flex-start;
+  padding-top: 32px;
+  overflow-x: auto;
+}
+
+/* Editable name field */
+.npc-editable-name {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  font-weight: 700;
+  color: #111;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid rgba(68,68,238,0.18);
+  outline: none;
+  width: 100%;
+  padding: 0 0 2px;
+  line-height: 1.2;
+}
+.npc-editable-name:focus { border-bottom-color: #4444EE; }
+.npc-editable-name::placeholder { color: rgba(0,0,0,0.22); }
+
+/* Editable bio textarea */
+.npc-editable-bio {
+  display: block;
+  width: 100%;
+  font-size: 13px;
+  color: rgba(0,0,0,0.65);
+  line-height: 1.55;
+  background: rgba(0,0,0,0.03);
+  border: 1.5px solid rgba(0,0,0,0.08);
+  border-radius: 8px;
+  padding: 10px 12px;
+  resize: vertical;
+  outline: none;
+  font-family: inherit;
+  margin-bottom: 14px;
+  box-sizing: border-box;
+}
+.npc-editable-bio:focus { border-color: #4444EE; background: rgba(68,68,238,0.03); }
+.npc-editable-bio::placeholder { color: rgba(0,0,0,0.28); }
+
+/* Skill chip editing variants */
+.npc-skill-chip--edit {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  background: rgba(68,68,238,0.08);
+  border: 1.5px solid rgba(68,68,238,0.2);
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: default;
+}
+.npc-skill-chip-name {
+  background: none;
+  border: none;
+  padding: 5px 8px 5px 10px;
+  font-size: 11px;
+  font-family: var(--font-geist-mono);
+  letter-spacing: 0.04em;
+  color: #4444EE;
+  cursor: pointer;
+  line-height: 1;
+}
+.npc-skill-chip-x {
+  background: none;
+  border: none;
+  border-left: 1px solid rgba(68,68,238,0.18);
+  padding: 5px 8px;
+  font-size: 9px;
+  color: rgba(68,68,238,0.45);
+  cursor: pointer;
+  line-height: 1;
+}
+.npc-skill-chip-x:hover { color: #E84624; background: rgba(232,70,36,0.07); }
+
+/* Add skill chip */
+.npc-skill-chip--add {
+  background: rgba(0,0,0,0.04) !important;
+  border: 1.5px dashed rgba(0,0,0,0.14) !important;
+  color: rgba(0,0,0,0.38) !important;
+  font-size: 11px !important;
+  font-family: var(--font-geist-mono) !important;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  padding: 5px 12px !important;
+  border-radius: 20px !important;
+}
+.npc-skill-chip--add:hover,
+.npc-skill-chip--add-active {
+  border-color: rgba(68,68,238,0.35) !important;
+  color: #4444EE !important;
+  background: rgba(68,68,238,0.06) !important;
+}
+
+/* Entry button active (panel open) */
+.npc-entry-btn--active {
+  border-color: rgba(68,68,238,0.35) !important;
+  background: rgba(68,68,238,0.05) !important;
+}
+.npc-entry-btn--active .npc-entry-icon,
+.npc-entry-btn--active .npc-entry-title { color: #4444EE !important; }
+
+/* Editor action bar (replaces swipe action bar) */
+.npc-editor-bar {
+  display: flex;
+  width: 380px;
+  border-top: 1.5px solid rgba(0,0,0,0.08);
+  border-radius: 0 0 20px 20px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.npc-editor-back {
+  flex: 1;
+  background: rgba(0,0,0,0.04);
+  border: none;
+  padding: 14px;
+  font-family: var(--font-geist-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,0.38);
+  cursor: pointer;
+  border-right: 1px solid rgba(0,0,0,0.08);
+}
+.npc-editor-back:hover { background: rgba(0,0,0,0.07); }
+.npc-editor-publish {
+  flex: 2;
+  background: #4444EE;
+  border: none;
+  padding: 14px;
+  font-family: var(--font-geist-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  cursor: pointer;
+}
+.npc-editor-publish:hover { background: #3333cc; }
+
+/* ── EDIT PANELS (skills / work / games) ────────────────────── */
+
+.pb-edit-skill-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.pb-edit-skill-btn {
+  padding: 5px 11px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(0,0,0,0.11);
+  background: transparent;
+  font-size: 11px;
+  font-family: var(--font-geist-mono);
+  color: rgba(0,0,0,0.5);
+  cursor: pointer;
+}
+.pb-edit-skill-btn:hover { border-color: #4444EE; color: #4444EE; }
+.pb-edit-skill-btn--on { background: rgba(68,68,238,0.09); border-color: #4444EE; color: #4444EE; }
+.pb-edit-skill-btn--disabled { opacity: 0.32; cursor: not-allowed; }
+
+.pb-entry-card {
+  background: rgba(0,0,0,0.025);
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.pb-entry-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.pb-entry-card-label {
+  font-family: var(--font-geist-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,0.38);
+}
+.pb-entry-card-remove {
+  background: none;
+  border: none;
+  color: rgba(232,70,36,0.5);
+  font-size: 10px;
+  font-family: var(--font-geist-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+.pb-entry-card-remove:hover { color: #E84624; }
+
+.pb-edit-add-btn {
+  width: 100%;
+  background: rgba(68,68,238,0.05);
+  border: 1.5px dashed rgba(68,68,238,0.22);
+  border-radius: 10px;
+  padding: 12px;
+  font-family: var(--font-geist-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4444EE;
+  cursor: pointer;
+  margin-top: 4px;
+}
+.pb-edit-add-btn:hover { background: rgba(68,68,238,0.09); }
+
+/* Inputs/textareas inside panels */
+.pb-panel-input {
+  display: block;
+  width: 100%;
+  background: #fff;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #111;
+  outline: none;
+  margin-bottom: 7px;
+  box-sizing: border-box;
+}
+.pb-panel-input:focus { border-color: #4444EE; }
+.pb-panel-input::placeholder { color: rgba(0,0,0,0.28); }
+
+.pb-panel-textarea {
+  display: block;
+  width: 100%;
+  background: #fff;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #111;
+  outline: none;
+  resize: vertical;
+  margin-bottom: 7px;
+  box-sizing: border-box;
+  line-height: 1.5;
+}
+.pb-panel-textarea:focus { border-color: #4444EE; }
+.pb-panel-textarea::placeholder { color: rgba(0,0,0,0.28); }
+
+.pb-panel-row3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+.pb-panel-row3 .pb-panel-input { margin-bottom: 0; font-size: 12px; }
+

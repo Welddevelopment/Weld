@@ -6,13 +6,12 @@ import { useRouter } from 'next/navigation'
 import type { Session } from '@supabase/supabase-js'
 import { ProfileDraft, createDraft, draftToProfile } from './profile-types'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
-import ProfilePreviewScreen from './ProfilePreviewScreen'
 import IdentityStep from './steps/IdentityStep'
 import RoleStep from './steps/RoleStep'
-import BioStep from './steps/BioStep'
-import SkillsStep from './steps/SkillsStep'
-import WorkStep from './steps/WorkStep'
-import PortfolioStep from './steps/PortfolioStep'
+import EditableCard, { EditorPanel } from './EditableCard'
+import SkillsEditPanel from './editor-panels/SkillsEditPanel'
+import WorkEditPanel from './editor-panels/WorkEditPanel'
+import GamesEditPanel from './editor-panels/GamesEditPanel'
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/browser'
 
 const DRAFT_KEY = 'weld_profile_draft'
@@ -33,18 +32,11 @@ function mergeDraft(value: unknown): ProfileDraft {
 
 async function loadAccountDraft(accessToken: string) {
   const response = await fetch('/api/account/profile', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+    headers: { Authorization: `Bearer ${accessToken}` },
     cache: 'no-store',
   })
-
   if (!response.ok) throw new Error('Could not load account profile.')
-
-  const result = (await response.json()) as {
-    profile?: { draft?: unknown } | null
-  }
-
+  const result = (await response.json()) as { profile?: { draft?: unknown } | null }
   return result.profile?.draft ? mergeDraft(result.profile.draft) : null
 }
 
@@ -55,47 +47,27 @@ async function saveAccountProfile(
 ) {
   const response = await fetch('/api/account/profile', {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify({
-      draft,
-      ...(publishedProfile ? { publishedProfile } : {}),
-    }),
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ draft, ...(publishedProfile ? { publishedProfile } : {}) }),
   })
-
   if (!response.ok) throw new Error('Could not save account profile.')
 }
 
-const DEV_STEPS = ['Identity', 'Role', 'Bio', 'Skills', 'Work', 'Portfolio']
-
-type Phase = 'form' | 'preview' | 'published'
+type Phase = 'identity' | 'rate' | 'editor' | 'published'
 type SaveState = 'local' | 'loading' | 'saving' | 'saved' | 'error'
 
-function saveStateLabel(saveState: SaveState) {
-  if (saveState === 'loading') return 'Loading account'
-  if (saveState === 'saving') return 'Saving'
-  if (saveState === 'saved') return 'Saved to account'
-  if (saveState === 'error') return 'Save issue'
+function saveStateLabel(s: SaveState) {
+  if (s === 'loading') return 'Loading account'
+  if (s === 'saving') return 'Saving'
+  if (s === 'saved') return 'Saved to account'
+  if (s === 'error') return 'Save issue'
   return 'Local draft'
 }
 
-function ProfileAccountStatus({
-  accountEmail,
-  saveState,
-}: {
-  accountEmail: string | null
-  saveState: SaveState
-}) {
+function ProfileAccountStatus({ accountEmail, saveState }: { accountEmail: string | null; saveState: SaveState }) {
   if (!accountEmail) {
-    return (
-      <Link href="/signup" className="pb-account-link">
-        Sign in to save
-      </Link>
-    )
+    return <Link href="/signup" className="pb-account-link">Sign in to save</Link>
   }
-
   return (
     <Link href="/account" className="pb-account-status">
       <span className={`pb-save-dot pb-save-dot--${saveState}`} />
@@ -105,7 +77,7 @@ function ProfileAccountStatus({
   )
 }
 
-function PublishedOverlay({ onViewProfile, onStartMatching, onDismiss }: { onViewProfile: () => void; onStartMatching: () => void; onDismiss: () => void }) {
+function PublishedOverlay({ onStartMatching, onDismiss }: { onStartMatching: () => void; onDismiss: () => void }) {
   return (
     <div className="pb-pub-overlay">
       <div className="pb-pub-card" style={{ position: 'relative' }}>
@@ -121,29 +93,15 @@ function PublishedOverlay({ onViewProfile, onStartMatching, onDismiss }: { onVie
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
           }}
-        >
-          ✕
-        </button>
+        >✕</button>
         <div className="pb-pub-pulse">
           <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="20 6 9 17 4 12" />
           </svg>
         </div>
-
         <h2 className="pb-pub-heading">Profile is live</h2>
         <p className="pb-pub-sub">You&apos;re live — studios and devs can now find you.</p>
-
         <div className="pb-pub-actions">
-          <button type="button" className="pb-pub-btn" onClick={onViewProfile}>
-            <div className="pb-pub-icon pb-pub-icon--ghost">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            </div>
-            <span className="pb-pub-btn-label">View finished profile</span>
-          </button>
-
           <button type="button" className="pb-pub-btn" onClick={onStartMatching}>
             <div className="pb-pub-icon pb-pub-icon--green">
               <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
@@ -158,15 +116,7 @@ function PublishedOverlay({ onViewProfile, onStartMatching, onDismiss }: { onVie
   )
 }
 
-function DeleteWarningModal({
-  isDeleting,
-  onConfirm,
-  onCancel,
-}: {
-  isDeleting: boolean
-  onConfirm: () => void
-  onCancel: () => void
-}) {
+function DeleteWarningModal({ isDeleting, onConfirm, onCancel }: { isDeleting: boolean; onConfirm: () => void; onCancel: () => void }) {
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 500,
@@ -182,33 +132,13 @@ function DeleteWarningModal({
           Delete your draft?
         </h2>
         <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.48)', lineHeight: 1.65, marginBottom: 28, marginTop: 0 }}>
-          Your draft will be permanently cleared and you&apos;ll start from scratch. If you&apos;ve already published a profile, it will be removed from the swipe pool. This cannot be undone.
+          Your draft will be permanently cleared. If you&apos;ve published a profile, it will be removed from the swipe pool. This cannot be undone.
         </p>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-          <button
-            onClick={onCancel}
-            disabled={isDeleting}
-            style={{
-              padding: '10px 22px', borderRadius: 999,
-              border: '1.5px solid rgba(255,255,255,0.14)',
-              background: 'transparent', color: 'rgba(255,255,255,0.65)',
-              fontFamily: 'var(--font-mono)', fontSize: 11,
-              letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer',
-            }}
-          >
+          <button onClick={onCancel} disabled={isDeleting} style={{ padding: '10px 22px', borderRadius: 999, border: '1.5px solid rgba(255,255,255,0.14)', background: 'transparent', color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
             Cancel
           </button>
-          <button
-            onClick={onConfirm}
-            disabled={isDeleting}
-            style={{
-              padding: '10px 22px', borderRadius: 999,
-              border: '1.5px solid #E84624',
-              background: 'rgba(232,70,36,0.12)', color: '#E84624',
-              fontFamily: 'var(--font-mono)', fontSize: 11,
-              letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer',
-            }}
-          >
+          <button onClick={onConfirm} disabled={isDeleting} style={{ padding: '10px 22px', borderRadius: 999, border: '1.5px solid #E84624', background: 'rgba(232,70,36,0.12)', color: '#E84624', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
             {isDeleting ? 'Deleting…' : 'Delete draft'}
           </button>
         </div>
@@ -220,10 +150,9 @@ function DeleteWarningModal({
 export default function ProfileBuilder({ onPublished, onDelete }: { onPublished?: (profile: PreviewProfile) => void; onDelete?: () => Promise<void> } = {}) {
   const router = useRouter()
   const [draft, setDraft] = useState<ProfileDraft>(createDraft)
-  const [step, setStep] = useState(0)
-  const [phase, setPhase] = useState<Phase>('form')
+  const [phase, setPhase] = useState<Phase>('identity')
+  const [editorPanel, setEditorPanel] = useState<EditorPanel>(null)
   const [hydrated, setHydrated] = useState(false)
-
   const [accountEmail, setAccountEmail] = useState<string | null>(null)
   const [accessToken, setAccessToken] = useState<string | null>(null)
   const [accountLoaded, setAccountLoaded] = useState(false)
@@ -239,33 +168,18 @@ export default function ProfileBuilder({ onPublished, onDelete }: { onPublished?
 
   useEffect(() => {
     if (!hydrated) return
-    if (!hasBrowserSupabaseConfig()) {
-      setAccountLoaded(true)
-      return
-    }
+    if (!hasBrowserSupabaseConfig()) { setAccountLoaded(true); return }
 
     const supabase = getBrowserSupabase()
     let alive = true
 
     async function applySession(session: Session | null, loadRemote: boolean) {
       if (!alive) return
-
       setAccountEmail(session?.user.email ?? null)
       setAccessToken(session?.access_token ?? null)
-
-      if (!session?.access_token) {
-        setSaveState('local')
-        setAccountLoaded(true)
-        return
-      }
-
-      if (!loadRemote) {
-        setAccountLoaded(true)
-        return
-      }
-
+      if (!session?.access_token) { setSaveState('local'); setAccountLoaded(true); return }
+      if (!loadRemote) { setAccountLoaded(true); return }
       setSaveState('loading')
-
       try {
         const remoteDraft = await loadAccountDraft(session.access_token)
         if (!alive) return
@@ -279,37 +193,26 @@ export default function ProfileBuilder({ onPublished, onDelete }: { onPublished?
       }
     }
 
-    supabase.auth.getSession().then(({ data }) => {
-      void applySession(data.session, true)
-    })
-
+    supabase.auth.getSession().then(({ data }) => { void applySession(data.session, true) })
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
       void applySession(session, event === 'SIGNED_IN')
     })
-
-    return () => {
-      alive = false
-      data.subscription.unsubscribe()
-    }
+    return () => { alive = false; data.subscription.unsubscribe() }
   }, [hydrated])
 
   useEffect(() => {
     if (!hydrated) return
-    try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
-    } catch {}
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)) } catch {}
   }, [draft, hydrated])
 
   useEffect(() => {
     if (!hydrated || !accountLoaded || !accessToken) return
-
     setSaveState('saving')
     const timeout = window.setTimeout(() => {
       saveAccountProfile(accessToken, draft)
         .then(() => setSaveState('saved'))
         .catch(() => setSaveState('error'))
     }, 500)
-
     return () => window.clearTimeout(timeout)
   }, [draft, hydrated, accountLoaded, accessToken])
 
@@ -317,14 +220,16 @@ export default function ProfileBuilder({ onPublished, onDelete }: { onPublished?
     setDraft(prev => ({ ...prev, ...patch }))
   }, [])
 
-  const contentSteps = DEV_STEPS
-  const totalContentSteps = contentSteps.length
   const profile = useMemo(() => draftToProfile(draft, 'preview'), [draft])
 
-  const goNext = () => setPhase('preview')
-  const goBack = () => {
-    if (step > 0) setStep(s => s - 1)
-    setPhase('form')
+  const handlePublish = () => {
+    setPhase('published')
+    if (accessToken) {
+      setSaveState('saving')
+      saveAccountProfile(accessToken, draft, profile)
+        .then(() => setSaveState('saved'))
+        .catch(() => setSaveState('error'))
+    }
   }
 
   const handleConfirmDelete = async () => {
@@ -332,92 +237,103 @@ export default function ProfileBuilder({ onPublished, onDelete }: { onPublished?
     await onDelete?.()
   }
 
-  const continueFromPreview = () => {
-    if (step >= totalContentSteps - 1) {
-      setPhase('published')
-      if (accessToken) {
-        setSaveState('saving')
-        saveAccountProfile(accessToken, draft, profile)
-          .then(() => setSaveState('saved'))
-          .catch(() => setSaveState('error'))
-      }
-      return
-    }
-    setStep(s => s + 1)
-    setPhase('form')
-  }
-
   if (!hydrated) return null
 
-  if (phase === 'published') {
+  // Published overlay sits on top of the editor
+  const publishedOverlay = phase === 'published' ? (
+    <PublishedOverlay
+      onStartMatching={() => router.push('/swipe')}
+      onDismiss={() => onPublished?.(profile)}
+    />
+  ) : null
+
+  // Header shown in all phases
+  const isQuickStep = phase === 'identity' || phase === 'rate'
+  const quickStepNum = phase === 'identity' ? 1 : 2
+
+  const header = (
+    <div className="pb-form-top">
+      <span className="pb-brand">weld</span>
+      <ProfileAccountStatus accountEmail={accountEmail} saveState={saveState} />
+      {isQuickStep && (
+        <>
+          <span className="pb-form-step-indicator">
+            {phase === 'identity' ? 'Identity' : 'Rate'} · {quickStepNum} of 2
+          </span>
+          <div className="pb-form-progress">
+            <div className="pb-form-progress-fill" style={{ width: `${quickStepNum * 50}%` }} />
+          </div>
+        </>
+      )}
+      {!isQuickStep && (
+        <span className="pb-form-step-indicator" style={{ marginLeft: 'auto' }}>
+          Edit your profile
+        </span>
+      )}
+      <button
+        type="button"
+        onClick={() => setShowDeleteWarning(true)}
+        style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(232,70,36,0.45)', padding: '4px 0', flexShrink: 0 }}
+      >
+        Delete draft
+      </button>
+    </div>
+  )
+
+  // Editor phase: card + side panel row
+  if (phase === 'editor' || phase === 'published') {
     return (
-      <>
-        <ProfilePreviewScreen
-          profile={profile}
-          onContinue={continueFromPreview}
-          onBack={() => setPhase('form')}
-          isLast
-        />
-        <PublishedOverlay
-          onViewProfile={() => setPhase('preview')}
-          onStartMatching={() => router.push('/preview')}
-          onDismiss={() => onPublished?.(profile)}
-        />
-      </>
+      <div className="pb-form-shell">
+        {header}
+        <div className="pb-form-body pb-form-body--editor">
+          <div className="npc-stack-row" style={{ alignItems: 'flex-start' }}>
+            <EditableCard
+              draft={draft}
+              update={update}
+              activePanel={editorPanel}
+              onOpenPanel={setEditorPanel}
+              onBack={() => { setEditorPanel(null); setPhase('rate') }}
+              onPublish={handlePublish}
+            />
+            {editorPanel === 'skills' && (
+              <SkillsEditPanel draft={draft} update={update} onClose={() => setEditorPanel(null)} />
+            )}
+            {editorPanel === 'work' && (
+              <WorkEditPanel draft={draft} update={update} onClose={() => setEditorPanel(null)} />
+            )}
+            {editorPanel === 'games' && (
+              <GamesEditPanel draft={draft} update={update} onClose={() => setEditorPanel(null)} />
+            )}
+          </div>
+        </div>
+        {publishedOverlay}
+        {showDeleteWarning && (
+          <DeleteWarningModal isDeleting={isDeleting} onConfirm={handleConfirmDelete} onCancel={() => setShowDeleteWarning(false)} />
+        )}
+      </div>
     )
   }
 
-
-  if (phase === 'preview') {
-    return (
-      <ProfilePreviewScreen
-        profile={profile}
-        onContinue={continueFromPreview}
-        onBack={() => setPhase('form')}
-        isLast={step >= totalContentSteps - 1}
-      />
-    )
-  }
-
-  const stepLabel = contentSteps[step]
-  const stepProps = { draft, update, onNext: goNext, onBack: goBack }
-
-  function renderStep() {
-    switch (step) {
-      case 0: return <IdentityStep {...stepProps} />
-      case 1: return <RoleStep {...stepProps} />
-      case 2: return <BioStep {...stepProps} />
-      case 3: return <SkillsStep {...stepProps} />
-      case 4: return <WorkStep {...stepProps} />
-      case 5: return <PortfolioStep {...stepProps} />
-      default: return null
-    }
-  }
+  // Quick setup steps
+  const stepProps = { draft, update, onBack: () => { if (phase === 'rate') setPhase('identity') }, onNext: () => {} }
 
   return (
     <div className="pb-form-shell">
-      <div className="pb-form-top">
-        <span className="pb-brand">weld</span>
-        <ProfileAccountStatus accountEmail={accountEmail} saveState={saveState} />
-        <span className="pb-form-step-indicator">
-          {stepLabel} · {step + 1} of {totalContentSteps}
-        </span>
-        <div className="pb-form-progress">
-          <div
-            className="pb-form-progress-fill"
-            style={{ width: `${((step + 1) / totalContentSteps) * 100}%` }}
-          />
-        </div>
-        <button
-          type="button"
-          onClick={() => setShowDeleteWarning(true)}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(232,70,36,0.45)', padding: '4px 0', flexShrink: 0 }}
-        >
-          Delete draft
-        </button>
-      </div>
+      {header}
       <div className="pb-form-body">
-        {renderStep()}
+        {phase === 'identity' && (
+          <IdentityStep
+            {...stepProps}
+            onNext={() => setPhase('rate')}
+          />
+        )}
+        {phase === 'rate' && (
+          <RoleStep
+            {...stepProps}
+            onBack={() => setPhase('identity')}
+            onNext={() => { setEditorPanel(null); setPhase('editor') }}
+          />
+        )}
       </div>
       {showDeleteWarning && (
         <DeleteWarningModal isDeleting={isDeleting} onConfirm={handleConfirmDelete} onCancel={() => setShowDeleteWarning(false)} />
