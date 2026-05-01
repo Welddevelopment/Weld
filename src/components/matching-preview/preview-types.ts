@@ -8,6 +8,7 @@ export type DevWork = {
   time: string
   amount: string
   plays: string
+  imageUrl?: string
 }
 
 export type TopGame = {
@@ -17,6 +18,8 @@ export type TopGame = {
   plays: string
   topCcu: string
   currentCcu: string
+  imageUrl?: string
+  gameUrl?: string
 }
 
 export type ProfileStats = {

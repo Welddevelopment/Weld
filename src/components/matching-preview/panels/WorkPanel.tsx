@@ -32,61 +32,69 @@ export default function WorkPanel({ profile, onBack }: Props) {
             No work items added yet.
           </p>
         ) : (
-          work.map((item, i) => (
-            <div key={i} className="npc-work-item">
-              <div
-                className="npc-work-icon"
-                style={{ background: `${ICON_COLORS[i % ICON_COLORS.length]}22`, color: ICON_COLORS[i % ICON_COLORS.length] }}
-              >
-                {item.emoji}
-              </div>
-              <div className="npc-work-copy">
-                <div className="npc-work-title">{item.title}</div>
-                {item.desc && <div className="npc-work-desc">{item.desc}</div>}
-                {item.tools && (
-                  <div className="npc-work-tags">
-                    {item.tools.split(',').map(t => (
-                      <span key={t} className="npc-work-tag">{t.trim()}</span>
-                    ))}
-                  </div>
-                )}
-                <div className="npc-work-stats">
-                  {item.time && (
-                    <div className="npc-work-stat">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                      </svg>
-                      <span className="npc-work-stat-val">{item.time}</span>
-                      <span className="npc-work-stat-lbl">Time</span>
-                    </div>
-                  )}
-                  {item.amount && (
-                    <div className="npc-work-stat">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                      </svg>
-                      <span className="npc-work-stat-val">${item.amount}</span>
-                      <span className="npc-work-stat-lbl">Paid</span>
-                    </div>
-                  )}
-                  {item.plays && (
-                    <div className="npc-work-stat">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                      </svg>
-                      <span className="npc-work-stat-val">{item.plays}</span>
-                      <span className="npc-work-stat-lbl">Plays</span>
-                    </div>
+          work.map((item, i) => {
+            const color = ICON_COLORS[i % ICON_COLORS.length]
+            return (
+              <div key={i} className="npc-work-item">
+                <div className="npc-work-icon" style={{ background: `${color}22`, color }}>
+                  {item.imageUrl ? (
+                    <img src={item.imageUrl} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 10 }} />
+                  ) : (
+                    <span style={{ fontSize: 11, fontWeight: 700, textAlign: 'center', lineHeight: 1.2 }}>{item.emoji || 'Code'}</span>
                   )}
                 </div>
+
+                <div className="npc-work-copy">
+                  <div className="npc-work-title">{item.title}</div>
+                  {item.desc && <div className="npc-work-desc">{item.desc}</div>}
+
+                  {item.tools && (
+                    <div className="npc-work-tags">
+                      {item.tools.split(',').map(t => (
+                        <span key={t} className="npc-work-tag">{t.trim()}</span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="npc-work-stats">
+                    {item.time && (
+                      <div className="npc-work-stat">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span className="npc-work-stat-val">{item.time}</span>
+                        <span className="npc-work-stat-lbl">Time</span>
+                      </div>
+                    )}
+                    {item.amount && (
+                      <div className="npc-work-stat">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                        <span className="npc-work-stat-val">{item.amount}</span>
+                        <span className="npc-work-stat-lbl">Paid</span>
+                      </div>
+                    )}
+                    {item.plays && (
+                      <div className="npc-work-stat">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        <span className="npc-work-stat-val">{item.plays}</span>
+                        <span className="npc-work-stat-lbl">Plays</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <button className="npc-work-arrow" aria-label="View details">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6"/>
+                  </svg>
+                </button>
               </div>
-              <button className="npc-work-arrow" aria-label="View details">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="9 18 15 12 9 6"/>
-                </svg>
-              </button>
-            </div>
-          ))
+            )
+          })
         )}
 
         {summary && (

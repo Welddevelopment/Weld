@@ -10,7 +10,7 @@ interface Props {
 }
 
 function emptyWork(): DevWork {
-  return { emoji: 'Game', title: '', desc: '', tools: '', time: '', amount: '', plays: '' }
+  return { emoji: 'Game', title: '', desc: '', tools: '', time: '', amount: '', plays: '', imageUrl: '' }
 }
 
 const EMOJI_OPTIONS = ['Game', 'Combat', 'Build', 'Art', 'Tools', 'VFX', 'Audio', 'World', 'Launch']
@@ -61,6 +61,19 @@ export default function WorkEditPanel({ draft, update, onClose }: Props) {
               ))}
             </div>
 
+            <div className="pb-image-row">
+              {w.imageUrl && (
+                <div className="pb-image-preview">
+                  <img src={w.imageUrl} alt="preview" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                </div>
+              )}
+              <input
+                className="pb-panel-input"
+                placeholder="Screenshot URL (paste image link)"
+                value={w.imageUrl ?? ''}
+                onChange={e => change(i, { ...w, imageUrl: e.target.value })}
+              />
+            </div>
             <input
               className="pb-panel-input"
               placeholder="Project name (e.g. Combat System)"

@@ -10,7 +10,7 @@ interface Props {
 }
 
 function emptyGame(): TopGame {
-  return { emoji: 'Game', title: '', desc: '', plays: '', topCcu: '', currentCcu: '' }
+  return { emoji: 'Game', title: '', desc: '', plays: '', topCcu: '', currentCcu: '', imageUrl: '', gameUrl: '' }
 }
 
 const EMOJI_OPTIONS = ['Game', 'Combat', 'Build', 'Art', 'Tools', 'VFX', 'Audio', 'World', 'Launch']
@@ -61,11 +61,30 @@ export default function GamesEditPanel({ draft, update, onClose }: Props) {
               ))}
             </div>
 
+            <div className="pb-image-row">
+              {g.imageUrl && (
+                <div className="pb-image-preview">
+                  <img src={g.imageUrl} alt="preview" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                </div>
+              )}
+              <input
+                className="pb-panel-input"
+                placeholder="Screenshot URL (paste image link)"
+                value={g.imageUrl ?? ''}
+                onChange={e => change(i, { ...g, imageUrl: e.target.value })}
+              />
+            </div>
             <input
               className="pb-panel-input"
               placeholder="Game name (e.g. Tower Defence Simulator)"
               value={g.title}
               onChange={e => change(i, { ...g, title: e.target.value })}
+            />
+            <input
+              className="pb-panel-input"
+              placeholder="Roblox game URL (roblox.com/games/...)"
+              value={g.gameUrl ?? ''}
+              onChange={e => change(i, { ...g, gameUrl: e.target.value })}
             />
             <textarea
               className="pb-panel-textarea"
