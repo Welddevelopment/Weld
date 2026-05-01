@@ -38,6 +38,29 @@ export async function GET(request: NextRequest) {
   })
 }
 
+export async function DELETE(request: NextRequest) {
+  const auth = await getSupabaseUserFromRequest(request)
+
+  if (!auth.ok) {
+    return NextResponse.json({ ok: false, message: auth.message }, { status: auth.status })
+  }
+
+  const { error } = await auth.client
+    .from('user_profiles')
+    .update({
+      published_profile: null,
+      profile_draft: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('user_id', auth.user.id)
+
+  if (error) {
+    return NextResponse.json({ ok: false, message: 'Could not delete your profile.' }, { status: 500 })
+  }
+
+  return NextResponse.json({ ok: true })
+}
+
 export async function PUT(request: NextRequest) {
   const auth = await getSupabaseUserFromRequest(request)
 

@@ -9,11 +9,15 @@ import ProfileBuilder from '@/components/profile/ProfileBuilder'
 import PublishedProfileView from '@/components/profile/PublishedProfileView'
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/browser'
 
+const DRAFT_KEY = 'weld_profile_draft'
+
 type PageMode = 'loading' | 'unauthed' | 'published' | 'editing'
 
 export default function ProfilePage() {
   const [mode, setMode] = useState<PageMode>('loading')
   const [publishedProfile, setPublishedProfile] = useState<PreviewProfile | null>(null)
+  const [token, setToken] = useState<string | null>(null)
+  const [builderKey, setBuilderKey] = useState(0)
 
   useEffect(() => {
     if (!hasBrowserSupabaseConfig()) {
@@ -29,6 +33,8 @@ export default function ProfilePage() {
         setMode('unauthed')
         return
       }
+
+      setToken(session.access_token)
 
       try {
         const res = await fetch('/api/account/profile', {
@@ -54,6 +60,25 @@ export default function ProfilePage() {
     setMode('published')
   }
 
+  async function handleDelete() {
+    try {
+      localStorage.removeItem(DRAFT_KEY)
+    } catch {}
+
+    if (token) {
+      try {
+        await fetch('/api/account/profile', {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
+        })
+      } catch {}
+    }
+
+    setPublishedProfile(null)
+    setMode('editing')
+    setBuilderKey(k => k + 1)
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-[#0a0a0a]">
       <AppNav />
@@ -76,11 +101,16 @@ export default function ProfilePage() {
         <PublishedProfileView
           profile={publishedProfile}
           onEdit={() => setMode('editing')}
+          onDelete={handleDelete}
         />
       )}
 
       {mode === 'editing' && (
-        <ProfileBuilder onPublished={handlePublished} />
+        <ProfileBuilder
+          key={builderKey}
+          onPublished={handlePublished}
+          onDelete={handleDelete}
+        />
       )}
     </div>
   )

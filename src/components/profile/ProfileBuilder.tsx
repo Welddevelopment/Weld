@@ -160,7 +160,66 @@ function PublishedOverlay({ onViewProfile, onStartMatching, onDismiss }: { onVie
   )
 }
 
-export default function ProfileBuilder({ onPublished }: { onPublished?: (profile: PreviewProfile) => void } = {}) {
+function DeleteWarningModal({
+  isDeleting,
+  onConfirm,
+  onCancel,
+}: {
+  isDeleting: boolean
+  onConfirm: () => void
+  onCancel: () => void
+}) {
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 500,
+      background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(6px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+    }}>
+      <div style={{
+        background: '#141211', border: '1px solid rgba(232,70,36,0.3)',
+        borderRadius: 20, padding: '36px 28px', maxWidth: 380, width: '100%', textAlign: 'center',
+      }}>
+        <div style={{ fontSize: 36, marginBottom: 16 }}>⚠️</div>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 26, color: '#FFF7F1', marginBottom: 12, marginTop: 0 }}>
+          Delete your draft?
+        </h2>
+        <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.48)', lineHeight: 1.65, marginBottom: 28, marginTop: 0 }}>
+          Your draft will be permanently cleared and you&apos;ll start from scratch. If you&apos;ve already published a profile, it will be removed from the swipe pool. This cannot be undone.
+        </p>
+        <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+          <button
+            onClick={onCancel}
+            disabled={isDeleting}
+            style={{
+              padding: '10px 22px', borderRadius: 999,
+              border: '1.5px solid rgba(255,255,255,0.14)',
+              background: 'transparent', color: 'rgba(255,255,255,0.65)',
+              fontFamily: 'var(--font-mono)', fontSize: 11,
+              letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer',
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isDeleting}
+            style={{
+              padding: '10px 22px', borderRadius: 999,
+              border: '1.5px solid #E84624',
+              background: 'rgba(232,70,36,0.12)', color: '#E84624',
+              fontFamily: 'var(--font-mono)', fontSize: 11,
+              letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer',
+            }}
+          >
+            {isDeleting ? 'Deleting…' : 'Delete draft'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function ProfileBuilder({ onPublished, onDelete }: { onPublished?: (profile: PreviewProfile) => void; onDelete?: () => Promise<void> } = {}) {
   const router = useRouter()
   const [draft, setDraft] = useState<ProfileDraft>(createDraft)
   const [step, setStep] = useState(0)
@@ -171,6 +230,8 @@ export default function ProfileBuilder({ onPublished }: { onPublished?: (profile
   const [accessToken, setAccessToken] = useState<string | null>(null)
   const [accountLoaded, setAccountLoaded] = useState(false)
   const [saveState, setSaveState] = useState<SaveState>('local')
+  const [showDeleteWarning, setShowDeleteWarning] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     setDraft(loadDraft())
@@ -279,6 +340,11 @@ export default function ProfileBuilder({ onPublished }: { onPublished?: (profile
     setPhase('form')
   }
 
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true)
+    await onDelete?.()
+  }
+
   const continueFromPreview = () => {
     if (step >= totalContentSteps - 1) {
       setPhase('published')
@@ -320,10 +386,20 @@ export default function ProfileBuilder({ onPublished }: { onPublished?: (profile
         <div className="pb-form-top">
           <span className="pb-brand">weld</span>
           <ProfileAccountStatus accountEmail={accountEmail} saveState={saveState} />
+          <button
+            type="button"
+            onClick={() => setShowDeleteWarning(true)}
+            style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(232,70,36,0.45)', padding: '4px 0' }}
+          >
+            Delete draft
+          </button>
         </div>
         <div className="pb-form-body">
           <TypeStep draft={draft} onSelect={handleTypeSelect} />
         </div>
+        {showDeleteWarning && (
+          <DeleteWarningModal isDeleting={isDeleting} onConfirm={handleConfirmDelete} onCancel={() => setShowDeleteWarning(false)} />
+        )}
       </div>
     )
   }
@@ -377,10 +453,20 @@ export default function ProfileBuilder({ onPublished }: { onPublished?: (profile
             style={{ width: `${((step + 1) / totalContentSteps) * 100}%` }}
           />
         </div>
+        <button
+          type="button"
+          onClick={() => setShowDeleteWarning(true)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(232,70,36,0.45)', padding: '4px 0', flexShrink: 0 }}
+        >
+          Delete draft
+        </button>
       </div>
       <div className="pb-form-body">
         {renderStep()}
       </div>
+      {showDeleteWarning && (
+        <DeleteWarningModal isDeleting={isDeleting} onConfirm={handleConfirmDelete} onCancel={() => setShowDeleteWarning(false)} />
+      )}
     </div>
   )
 }
