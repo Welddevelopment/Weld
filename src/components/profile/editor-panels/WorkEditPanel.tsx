@@ -47,6 +47,9 @@ export default function WorkEditPanel({ draft, update, onClose }: Props) {
               <button type="button" className="pb-entry-card-remove" onClick={() => remove(i)}>Remove</button>
             </div>
 
+            <div style={{ fontSize: 10, fontFamily: 'var(--font-geist-mono)', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)', marginBottom: 6 }}>
+              Category
+            </div>
             <div className="pb-emoji-row">
               {EMOJI_OPTIONS.map(e => (
                 <button key={e} type="button"
@@ -60,13 +63,13 @@ export default function WorkEditPanel({ draft, update, onClose }: Props) {
 
             <input
               className="pb-panel-input"
-              placeholder="Project title *"
+              placeholder="Project name (e.g. Combat System)"
               value={w.title}
               onChange={e => change(i, { ...w, title: e.target.value })}
             />
             <textarea
               className="pb-panel-textarea"
-              placeholder="Short description *"
+              placeholder="What did you build? What was your role?"
               rows={2}
               value={w.desc}
               onChange={e => change(i, { ...w, desc: e.target.value })}
@@ -78,9 +81,9 @@ export default function WorkEditPanel({ draft, update, onClose }: Props) {
               onChange={e => change(i, { ...w, tools: e.target.value })}
             />
             <div className="pb-panel-row3">
-              <input className="pb-panel-input" placeholder="Time (2wks)" value={w.time} onChange={e => change(i, { ...w, time: e.target.value })} />
-              <input className="pb-panel-input" placeholder="Value * (5000)" value={w.amount} onChange={e => change(i, { ...w, amount: e.target.value })} />
-              <input className="pb-panel-input" placeholder="Plays * (14M)" value={w.plays} onChange={e => change(i, { ...w, plays: e.target.value })} />
+              <input className="pb-panel-input" placeholder="Time taken" value={w.time} onChange={e => change(i, { ...w, time: e.target.value })} />
+              <input className="pb-panel-input" placeholder="Value paid" value={w.amount} onChange={e => change(i, { ...w, amount: e.target.value })} />
+              <input className="pb-panel-input" placeholder="Game plays" value={w.plays} onChange={e => change(i, { ...w, plays: e.target.value })} />
             </div>
           </div>
         ))}

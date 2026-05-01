@@ -27,8 +27,6 @@ export interface SwipeStackHandle {
   swipe: (dir: 'left' | 'right', options?: { notify?: boolean }) => void
 }
 
-type PanelState = { kind: 'none' } | { kind: 'games' } | { kind: 'work' } | { kind: 'skill'; name: string }
-
 const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
   { profiles, onLike, onPass, onMessage, disabled = false },
   ref
@@ -38,7 +36,8 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
   const [dragOffset, setDragOffset] = useState(0)
   const [sparks, setSparks] = useState(0)
   const [likeFlash, setLikeFlash] = useState(false)
-  const [panel, setPanel] = useState<PanelState>({ kind: 'none' })
+  const [leftPanel, setLeftPanel] = useState<null | 'games'>(null)
+  const [rightPanel, setRightPanel] = useState<null | 'work' | { skill: string }>(null)
 
   const isDragging = useRef(false)
   const startX = useRef(0)
@@ -47,24 +46,22 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
   const flyDirRef = useRef<'left' | 'right' | null>(null)
   const likeFlashTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const panelOpen = panel.kind !== 'none'
+  const panelOpen = leftPanel !== null || rightPanel !== null
   const current = profiles[index]
   const next = profiles[index + 1]
   const remaining = profiles.length - index
 
-  const closePanel = () => setPanel({ kind: 'none' })
-
   const handleOpenPanel = (p: PanelKind) => {
     if (typeof p === 'object' && 'skill' in p) {
-      setPanel(prev =>
-        prev.kind === 'skill' && prev.name === p.skill
-          ? { kind: 'none' }
-          : { kind: 'skill', name: p.skill }
+      setRightPanel(prev =>
+        prev && typeof prev === 'object' && 'skill' in prev && prev.skill === p.skill
+          ? null
+          : { skill: p.skill }
       )
     } else if (p === 'games') {
-      setPanel(prev => prev.kind === 'games' ? { kind: 'none' } : { kind: 'games' })
+      setLeftPanel(prev => prev === 'games' ? null : 'games')
     } else if (p === 'work') {
-      setPanel(prev => prev.kind === 'work' ? { kind: 'none' } : { kind: 'work' })
+      setRightPanel(prev => prev === 'work' ? null : 'work')
     }
   }
 
@@ -76,7 +73,8 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
     flyDirRef.current = dir
     setDragOffset(0)
     setFlyDir(dir)
-    setPanel({ kind: 'none' })
+    setLeftPanel(null)
+    setRightPanel(null)
 
     swipeTimeout.current = setTimeout(() => {
       swipeTimeout.current = null
@@ -139,7 +137,8 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
     setFlyDir(null)
     setLikeFlash(false)
     setIndex(0)
-    setPanel({ kind: 'none' })
+    setLeftPanel(null)
+    setRightPanel(null)
   }
 
   if (!current) {
@@ -184,12 +183,6 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
     ? undefined
     : { transform: `translateX(${dragOffset}px) rotate(${rotation}deg)` }
 
-  const activePanel: PanelKind | null =
-    panel.kind === 'games' ? 'games' :
-    panel.kind === 'work' ? 'work' :
-    panel.kind === 'skill' ? { skill: panel.name } :
-    null
-
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="flex items-center gap-3 text-xs text-gray-500">
@@ -199,6 +192,11 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
       </div>
 
       <div className="npc-stack-row">
+        {/* Left panel: Games */}
+        {leftPanel === 'games' && (
+          <GamesPanel profile={current} onBack={() => setLeftPanel(null)} />
+        )}
+
         {/* Card drag container */}
         <div
           className="relative"
@@ -241,7 +239,8 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
               profile={current}
               dragOverlay={likeFlash ? 'like' : dragOverlay}
               dragOpacity={likeFlash ? 1 : dragProgress}
-              activePanel={activePanel}
+              leftPanel={leftPanel}
+              rightPanel={rightPanel}
               onPass={() => triggerSwipe('left')}
               onLike={handleCardLike}
               onMessage={() => onMessage?.(current)}
@@ -250,11 +249,12 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
           </div>
         </div>
 
-        {/* Side panel */}
-        {panel.kind === 'games' && <GamesPanel profile={current} onBack={closePanel} />}
-        {panel.kind === 'work'  && <WorkPanel  profile={current} onBack={closePanel} />}
-        {panel.kind === 'skill' && (
-          <SkillPanel profile={current} skillName={panel.name} onBack={closePanel} />
+        {/* Right panel: Work or Skill */}
+        {rightPanel === 'work' && (
+          <WorkPanel profile={current} onBack={() => setRightPanel(null)} />
+        )}
+        {rightPanel && typeof rightPanel === 'object' && 'skill' in rightPanel && (
+          <SkillPanel profile={current} skillName={rightPanel.skill} onBack={() => setRightPanel(null)} />
         )}
       </div>
     </div>

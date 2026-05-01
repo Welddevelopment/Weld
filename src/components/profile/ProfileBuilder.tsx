@@ -8,7 +8,7 @@ import { ProfileDraft, createDraft, draftToProfile } from './profile-types'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 import IdentityStep from './steps/IdentityStep'
 import RoleStep from './steps/RoleStep'
-import EditableCard, { EditorPanel } from './EditableCard'
+import EditableCard from './EditableCard'
 import SkillsEditPanel from './editor-panels/SkillsEditPanel'
 import WorkEditPanel from './editor-panels/WorkEditPanel'
 import GamesEditPanel from './editor-panels/GamesEditPanel'
@@ -161,7 +161,8 @@ export default function ProfileBuilder({
   const router = useRouter()
   const [draft, setDraft] = useState<ProfileDraft>(createDraft)
   const [phase, setPhase] = useState<Phase>(initialPhase)
-  const [editorPanel, setEditorPanel] = useState<EditorPanel>(null)
+  const [leftPanel, setLeftPanel] = useState<null | 'games'>(null)
+  const [rightPanel, setRightPanel] = useState<null | 'work' | 'skills'>(null)
   const [hydrated, setHydrated] = useState(false)
   const [accountEmail, setAccountEmail] = useState<string | null>(null)
   const [accessToken, setAccessToken] = useState<string | null>(null)
@@ -297,27 +298,30 @@ export default function ProfileBuilder({
         {header}
         <div className="pb-form-body pb-form-body--editor">
           <div className="npc-stack-row" style={{ alignItems: 'flex-start' }}>
+            {leftPanel === 'games' && (
+              <GamesEditPanel draft={draft} update={update} onClose={() => setLeftPanel(null)} />
+            )}
             <EditableCard
               draft={draft}
               update={update}
-              activePanel={editorPanel}
-              onOpenPanel={setEditorPanel}
+              leftPanel={leftPanel}
+              rightPanel={rightPanel}
+              onToggleLeft={() => setLeftPanel(p => p === 'games' ? null : 'games')}
+              onToggleRight={p => setRightPanel(prev => prev === p ? null : p)}
               onBack={() => {
-                setEditorPanel(null)
+                setLeftPanel(null)
+                setRightPanel(null)
                 if (onCancel) onCancel()
                 else setPhase('rate')
               }}
               onBackLabel={onCancel ? '← Cancel' : '← Back'}
               onPublish={handlePublish}
             />
-            {editorPanel === 'skills' && (
-              <SkillsEditPanel draft={draft} update={update} onClose={() => setEditorPanel(null)} />
+            {rightPanel === 'skills' && (
+              <SkillsEditPanel draft={draft} update={update} onClose={() => setRightPanel(null)} />
             )}
-            {editorPanel === 'work' && (
-              <WorkEditPanel draft={draft} update={update} onClose={() => setEditorPanel(null)} />
-            )}
-            {editorPanel === 'games' && (
-              <GamesEditPanel draft={draft} update={update} onClose={() => setEditorPanel(null)} />
+            {rightPanel === 'work' && (
+              <WorkEditPanel draft={draft} update={update} onClose={() => setRightPanel(null)} />
             )}
           </div>
         </div>
@@ -346,7 +350,7 @@ export default function ProfileBuilder({
           <RoleStep
             {...stepProps}
             onBack={() => setPhase('identity')}
-            onNext={() => { setEditorPanel(null); setPhase('editor') }}
+            onNext={() => { setLeftPanel(null); setRightPanel(null); setPhase('editor') }}
           />
         )}
       </div>

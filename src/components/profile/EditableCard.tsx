@@ -3,13 +3,13 @@
 import { ProfileDraft } from './profile-types'
 import { getInitials } from '@/lib/utils'
 
-export type EditorPanel = null | 'skills' | 'work' | 'games'
-
 interface Props {
   draft: ProfileDraft
   update: (patch: Partial<ProfileDraft>) => void
-  activePanel: EditorPanel
-  onOpenPanel: (p: EditorPanel) => void
+  leftPanel: null | 'games'
+  rightPanel: null | 'work' | 'skills'
+  onToggleLeft: () => void
+  onToggleRight: (p: 'work' | 'skills') => void
   onBack: () => void
   onBackLabel?: string
   onPublish: () => void
@@ -22,7 +22,7 @@ function expLabel(years: number | null): string {
   return `${years}+ yrs`
 }
 
-export default function EditableCard({ draft, update, activePanel, onOpenPanel, onBack, onBackLabel = '← Back', onPublish }: Props) {
+export default function EditableCard({ draft, update, leftPanel, rightPanel, onToggleLeft, onToggleRight, onBack, onBackLabel = '← Back', onPublish }: Props) {
   const initials = getInitials(draft.name) || '?'
   const rateDisplay = draft.rateAmount
     ? `${draft.rateAmount} ${draft.rateType ?? ''}`.trim()
@@ -30,9 +30,6 @@ export default function EditableCard({ draft, update, activePanel, onOpenPanel, 
 
   const removeSkill = (name: string) =>
     update({ selectedSkills: draft.selectedSkills.filter(s => s.name !== name) })
-
-  const toggle = (panel: EditorPanel) =>
-    onOpenPanel(activePanel === panel ? null : panel)
 
   return (
     <div className="npc-wrap">
@@ -125,7 +122,7 @@ export default function EditableCard({ draft, update, activePanel, onOpenPanel, 
                 <button
                   type="button"
                   className="npc-skill-chip-name"
-                  onClick={() => toggle('skills')}
+                  onClick={() => onToggleRight('skills')}
                 >
                   {s.name}
                 </button>
@@ -142,8 +139,8 @@ export default function EditableCard({ draft, update, activePanel, onOpenPanel, 
             {draft.selectedSkills.length < 5 && (
               <button
                 type="button"
-                className={`npc-skill-chip npc-skill-chip--add${activePanel === 'skills' ? ' npc-skill-chip--add-active' : ''}`}
-                onClick={() => toggle('skills')}
+                className={`npc-skill-chip npc-skill-chip--add${rightPanel === 'skills' ? ' npc-skill-chip--add-active' : ''}`}
+                onClick={() => onToggleRight('skills')}
               >
                 + Add skill
               </button>
@@ -154,8 +151,8 @@ export default function EditableCard({ draft, update, activePanel, onOpenPanel, 
         {/* Entry buttons */}
         <div className="npc-entries">
           <button
-            className={`npc-entry-btn${activePanel === 'games' ? ' npc-entry-btn--active' : ''}`}
-            onClick={() => toggle('games')}
+            className={`npc-entry-btn${leftPanel === 'games' ? ' npc-entry-btn--active' : ''}`}
+            onClick={onToggleLeft}
           >
             <div className="npc-entry-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -168,13 +165,13 @@ export default function EditableCard({ draft, update, activePanel, onOpenPanel, 
               Games{draft.topGames.length > 0 ? ` (${draft.topGames.length})` : ''}
             </div>
             <div className="npc-entry-sub">
-              {activePanel === 'games' ? '← Close' : "Add games I've worked on →"}
+              {leftPanel === 'games' ? '← Close' : "Add games I've worked on →"}
             </div>
           </button>
 
           <button
-            className={`npc-entry-btn${activePanel === 'work' ? ' npc-entry-btn--active' : ''}`}
-            onClick={() => toggle('work')}
+            className={`npc-entry-btn${rightPanel === 'work' ? ' npc-entry-btn--active' : ''}`}
+            onClick={() => onToggleRight('work')}
           >
             <div className="npc-entry-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -185,7 +182,7 @@ export default function EditableCard({ draft, update, activePanel, onOpenPanel, 
               My Work{draft.bestWork.length > 0 ? ` (${draft.bestWork.length})` : ''}
             </div>
             <div className="npc-entry-sub">
-              {activePanel === 'work' ? '← Close' : "Add projects I've built →"}
+              {rightPanel === 'work' ? '← Close' : "Add projects I've built →"}
             </div>
           </button>
         </div>

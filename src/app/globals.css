@@ -2139,6 +2139,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   width: 380px;
   height: 628px;
   background: #ffffff;
+  color: #111;
   border-radius: 20px;
   display: flex;
   flex-direction: column;
@@ -2483,6 +2484,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .npc-editor-bar {
   display: flex;
   width: 380px;
+  height: 68px;
   border-top: 1.5px solid rgba(0,0,0,0.08);
   border-radius: 0 0 20px 20px;
   overflow: hidden;
@@ -2592,7 +2594,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   display: block;
   width: 100%;
   background: #fff;
-  border: 1.5px solid rgba(0,0,0,0.1);
+  border: 1.5px solid rgba(220,50,30,0.25);
   border-radius: 8px;
   padding: 8px 10px;
   font-size: 13px;
@@ -2602,14 +2604,15 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   margin-bottom: 7px;
   box-sizing: border-box;
 }
+.pb-panel-input:not(:placeholder-shown) { border-color: rgba(0,0,0,0.1); }
 .pb-panel-input:focus { border-color: #4444EE; }
-.pb-panel-input::placeholder { color: rgba(0,0,0,0.28); }
+.pb-panel-input::placeholder { color: rgba(220,50,30,0.6); font-style: italic; }
 
 .pb-panel-textarea {
   display: block;
   width: 100%;
   background: #fff;
-  border: 1.5px solid rgba(0,0,0,0.1);
+  border: 1.5px solid rgba(220,50,30,0.25);
   border-radius: 8px;
   padding: 8px 10px;
   font-size: 13px;
@@ -2621,8 +2624,9 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   box-sizing: border-box;
   line-height: 1.5;
 }
+.pb-panel-textarea:not(:placeholder-shown) { border-color: rgba(0,0,0,0.1); }
 .pb-panel-textarea:focus { border-color: #4444EE; }
-.pb-panel-textarea::placeholder { color: rgba(0,0,0,0.28); }
+.pb-panel-textarea::placeholder { color: rgba(220,50,30,0.6); font-style: italic; }
 
 .pb-panel-row3 {
   display: grid;
@@ -2630,4 +2634,41 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   gap: 6px;
 }
 .pb-panel-row3 .pb-panel-input { margin-bottom: 0; font-size: 12px; }
+
+/* Type picker inside edit panel cards — overrides the old dark-theme pb-emoji-btn */
+.pb-entry-card .pb-emoji-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.pb-entry-card .pb-emoji-btn {
+  width: auto;
+  height: auto;
+  padding: 9px 6px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  background: rgba(0,0,0,0.03);
+  font-size: 12px;
+  font-family: var(--font-geist-mono);
+  color: rgba(0,0,0,0.55);
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: border-color 0.1s, background 0.1s, color 0.1s;
+  display: block;
+}
+.pb-entry-card .pb-emoji-btn:hover {
+  border-color: rgba(68,68,238,0.35);
+  color: #4444EE;
+  background: rgba(68,68,238,0.05);
+}
+.pb-entry-card .pb-emoji-btn.pb-emoji-btn--on {
+  background: rgba(68,68,238,0.1);
+  border-color: #4444EE;
+  color: #4444EE;
+  font-weight: 700;
+}
 

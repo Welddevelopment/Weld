@@ -47,6 +47,9 @@ export default function GamesEditPanel({ draft, update, onClose }: Props) {
               <button type="button" className="pb-entry-card-remove" onClick={() => remove(i)}>Remove</button>
             </div>
 
+            <div style={{ fontSize: 10, fontFamily: 'var(--font-geist-mono)', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)', marginBottom: 6 }}>
+              Category
+            </div>
             <div className="pb-emoji-row">
               {EMOJI_OPTIONS.map(e => (
                 <button key={e} type="button"
@@ -60,13 +63,13 @@ export default function GamesEditPanel({ draft, update, onClose }: Props) {
 
             <input
               className="pb-panel-input"
-              placeholder="Game title *"
+              placeholder="Game name (e.g. Tower Defence Simulator)"
               value={g.title}
               onChange={e => change(i, { ...g, title: e.target.value })}
             />
             <textarea
               className="pb-panel-textarea"
-              placeholder="Short description *"
+              placeholder="What did you work on? What was your contribution?"
               rows={2}
               value={g.desc}
               onChange={e => change(i, { ...g, desc: e.target.value })}

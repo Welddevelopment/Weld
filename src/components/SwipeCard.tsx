@@ -9,7 +9,8 @@ interface Props {
   profile: PreviewProfile
   dragOverlay?: 'like' | 'nope' | null
   dragOpacity?: number
-  activePanel?: PanelKind | null
+  leftPanel?: 'games' | null
+  rightPanel?: 'work' | { skill: string } | null
   onPass?: () => void
   onLike?: () => void
   onMessage?: () => void
@@ -65,7 +66,8 @@ export default function SwipeCard({
   profile,
   dragOverlay = null,
   dragOpacity = 0,
-  activePanel = null,
+  leftPanel = null,
+  rightPanel = null,
   onPass,
   onLike,
   onMessage,
@@ -74,8 +76,8 @@ export default function SwipeCard({
   const skills = profile.skills ?? profile.skillsNeeded ?? []
   const devStats = parseDevStats(profile)
 
-  const activeSkill = activePanel && typeof activePanel === 'object' && 'skill' in activePanel
-    ? activePanel.skill
+  const activeSkill = rightPanel && typeof rightPanel === 'object' && 'skill' in rightPanel
+    ? rightPanel.skill
     : null
 
   return (
@@ -100,7 +102,6 @@ export default function SwipeCard({
           <Avatar profile={profile} />
 
           <div className="npc-top-right">
-            {/* Socials */}
             {profile.socials && profile.socials.length > 0 ? (
               <div className="npc-socials">
                 {profile.socials.slice(0, 4).map(s => (
@@ -118,11 +119,9 @@ export default function SwipeCard({
                 ))}
               </div>
             ) : (
-              /* Placeholder social row so the stats grid aligns */
               <div style={{ height: 34 }} />
             )}
 
-            {/* Stats grid */}
             <div className="npc-stats">
               <StatItem
                 icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
@@ -163,7 +162,6 @@ export default function SwipeCard({
 
         <div className="npc-divider" />
 
-        {/* Bio */}
         {profile.bio && <p className="npc-bio">{profile.bio}</p>}
 
         {/* Rate pill + skill chips */}
@@ -188,13 +186,12 @@ export default function SwipeCard({
           </div>
         </div>
 
-        {/* Entry buttons: Games + My Work */}
+        {/* Entry buttons */}
         <div className="npc-entries">
           <button
-            className="npc-entry-btn"
+            className={`npc-entry-btn${leftPanel === 'games' ? ' npc-entry-btn--active' : ''}`}
             onMouseDown={stopDrag}
             onClick={e => { e.stopPropagation(); onOpenPanel?.('games') }}
-            disabled={!profile.bestWork?.length && !profile.topGames?.length}
           >
             <div className="npc-entry-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -208,10 +205,9 @@ export default function SwipeCard({
           </button>
 
           <button
-            className="npc-entry-btn"
+            className={`npc-entry-btn${rightPanel === 'work' ? ' npc-entry-btn--active' : ''}`}
             onMouseDown={stopDrag}
             onClick={e => { e.stopPropagation(); onOpenPanel?.('work') }}
-            disabled={!profile.bestWork?.length}
           >
             <div className="npc-entry-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
