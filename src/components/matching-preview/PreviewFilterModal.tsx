@@ -187,7 +187,7 @@ export default function PreviewFilterModal({
                   onClick={onStartMatching}
                   disabled={!canStartMatching}
                 >
-                  start matching
+                  start swiping
                 </button>
                 <button className="pf-clear-btn" type="button" onClick={onClearAll}>Clear all</button>
               </div>

@@ -186,20 +186,20 @@ function CenterCard({
           <div className="mp-match-chat-icon">
             <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
           </div>
-          <button className="mp-match-keep-btn" onClick={onKeepMatching}>Keep matching</button>
+          <button className="mp-match-keep-btn" onClick={onKeepMatching}>Keep swiping</button>
         </div>
       )}
 
       {showMatch && alreadyMatched && (
         <div className="mp-match-overlay mp-its-a-match">
-          <div className="mp-iam-heading">You have matched with {profile.name} already</div>
-          <div className="mp-iam-sub">You can keep matching or change your interaction by passing on this profile.</div>
+          <div className="mp-iam-heading">You&apos;ve already sparked with {profile.name}</div>
+          <div className="mp-iam-sub">You can keep swiping or change your interaction by passing on this profile.</div>
           <div className="mp-iam-actions">
             <button className="mp-iam-scroll-btn" onClick={onKeepMatching}>
               <div className="mp-iam-scroll-circle">
                 <svg viewBox="0 0 24 24" className="mp-iam-scroll-arrow"><polyline points="9 18 15 12 9 6"/></svg>
               </div>
-              <span className="mp-iam-btn-label">Keep matching</span>
+              <span className="mp-iam-btn-label">Keep swiping</span>
             </button>
           </div>
         </div>
@@ -208,18 +208,18 @@ function CenterCard({
       {showMatch && !isMatch && !alreadyLiked && !alreadyMatched && (
         <div className="mp-match-overlay">
           <div className="mp-match-overlay-text">💚 You swiped right!</div>
-          <div className="mp-match-overlay-sub">We&apos;ll let you know when it&apos;s a match.</div>
+          <div className="mp-match-overlay-sub">We&apos;ll let you know when you spark.</div>
           <div className="mp-match-chat-icon">
             <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           </div>
-          <button className="mp-match-keep-btn" onClick={onKeepMatching}>Keep matching →</button>
+          <button className="mp-match-keep-btn" onClick={onKeepMatching}>Keep swiping →</button>
         </div>
       )}
 
       {showMatch && isMatch && !alreadyMatched && (
         <div className="mp-match-overlay mp-its-a-match">
-          <div className="mp-iam-heading">🎉 It&apos;s a Match!</div>
-          <div className="mp-iam-sub">You and {profile.name} both liked each other</div>
+          <div className="mp-iam-heading">⚡ It&apos;s a Spark!</div>
+          <div className="mp-iam-sub">You and {profile.name} sparked — time to reach out.</div>
           <div className="mp-iam-actions">
             <button className="mp-iam-reach-btn" onClick={onKeepMatching}>
               <div className="mp-iam-reach-icon">
@@ -231,7 +231,7 @@ function CenterCard({
               <div className="mp-iam-scroll-circle">
                 <svg viewBox="0 0 24 24" className="mp-iam-scroll-arrow"><polyline points="9 18 15 12 9 6"/></svg>
               </div>
-              <span className="mp-iam-btn-label">Keep matching</span>
+              <span className="mp-iam-btn-label">Keep swiping</span>
             </button>
           </div>
         </div>

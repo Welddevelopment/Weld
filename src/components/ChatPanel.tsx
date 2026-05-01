@@ -160,7 +160,7 @@ export default function ChatPanel({
         <span className="font-mono text-sm text-white/80">{otherUser.name}</span>
         {isMatched && (
           <span className="ml-auto rounded-full border border-[#3DC77A]/30 bg-[#3DC77A]/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#85e3ad]">
-            matched
+            sparked
           </span>
         )}
       </div>
@@ -196,7 +196,7 @@ export default function ChatPanel({
       {inputBlocked ? (
         <div className="border-t border-white/10 px-5 py-4">
           <p className="text-center font-mono text-xs text-white/35">
-            You can only send one message until {otherUser.name} matches with you.
+            You can only send one message until {otherUser.name} sparks with you.
           </p>
         </div>
       ) : (

@@ -133,7 +133,7 @@ function PublishedOverlay({ onViewProfile, onStartMatching, onDismiss }: { onVie
         </div>
 
         <h2 className="pb-pub-heading">Profile is live</h2>
-        <p className="pb-pub-sub">You&apos;re now visible in the matching pool.</p>
+        <p className="pb-pub-sub">You&apos;re live — studios and devs can now find you.</p>
 
         <div className="pb-pub-actions">
           <button type="button" className="pb-pub-btn" onClick={onViewProfile}>
@@ -152,7 +152,7 @@ function PublishedOverlay({ onViewProfile, onStartMatching, onDismiss }: { onVie
                 <polyline points="9 18 15 12 9 6" />
               </svg>
             </div>
-            <span className="pb-pub-btn-label">Start matching</span>
+            <span className="pb-pub-btn-label">Start swiping</span>
           </button>
         </div>
       </div>

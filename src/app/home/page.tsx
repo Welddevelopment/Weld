@@ -75,7 +75,7 @@ function SavedProfileCard({ item, label, onClick, onMessage }: { item: SavedProf
         <div className="flex items-center gap-2">
           {item.matched && (
             <span className="rounded-full border border-[#3DC77A]/30 bg-[#3DC77A]/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-[#85e3ad]">
-              matched
+              sparked
             </span>
           )}
           {onMessage && (
@@ -92,11 +92,19 @@ function SavedProfileCard({ item, label, onClick, onMessage }: { item: SavedProf
   )
 }
 
-function EmptyState({ title, copy }: { title: string; copy: string }) {
+function EmptyState({ title, copy, cta, href }: { title: string; copy: string; cta?: string; href?: string }) {
   return (
     <div className="rounded-[18px] border border-dashed border-white/12 bg-white/[0.025] p-6 text-center">
       <p className="text-sm font-semibold text-white/70">{title}</p>
       <p className="mt-2 text-sm leading-6 text-white/38">{copy}</p>
+      {cta && href && (
+        <Link
+          href={href}
+          className="mt-4 inline-block rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.13em] text-white/55 transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white/80"
+        >
+          {cta}
+        </Link>
+      )}
     </div>
   )
 }
@@ -182,17 +190,17 @@ export default function HomePage() {
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#FFBE74]">Home</p>
             <h1 className="mt-2 text-4xl italic text-[#FFF7F1]" style={{ fontFamily: 'var(--font-instrument-serif)' }}>
-              Saved matches
+              Sparks &amp; Likes
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/45">
-              Likes and mutual matches are loaded from your account, so resetting the swipe deck will not clear this list.
+              Likes and sparks are loaded from your account, so resetting the swipe deck will not clear this list.
             </p>
           </div>
           <Link
             href="/swipe"
             className="w-fit rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.13em] text-white/70 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white/90"
           >
-            Open match
+            Start swiping
           </Link>
         </div>
 
@@ -222,17 +230,17 @@ export default function HomePage() {
 
             <section>
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="font-mono text-xs uppercase tracking-[0.16em] text-white/55">Matches</h2>
+                <h2 className="font-mono text-xs uppercase tracking-[0.16em] text-white/55">Sparks</h2>
                 <span className="font-mono text-xs text-white/30">{matches.length}</span>
               </div>
               {matches.length > 0 ? (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {matches.map(item => (
-                    <SavedProfileCard key={item.profile.userId} item={item} label="Mutual like" onClick={() => setModalProfile(item.profile)} onMessage={() => void openConversation(item.profile.userId)} />
+                    <SavedProfileCard key={item.profile.userId} item={item} label="Sparked" onClick={() => setModalProfile(item.profile)} onMessage={() => void openConversation(item.profile.userId)} />
                   ))}
                 </div>
               ) : (
-                <EmptyState title="No matches yet" copy="When someone you liked also likes you back, they will stay here." />
+                <EmptyState title="No sparks yet" copy="When someone you liked also likes you back, you'll spark — and they'll appear here." cta="Start swiping →" href="/swipe" />
               )}
             </section>
 
@@ -244,11 +252,11 @@ export default function HomePage() {
               {likes.length > 0 ? (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {likes.map(item => (
-                    <SavedProfileCard key={item.profile.userId} item={item} label={item.matched ? 'Matched' : 'Liked'} onClick={() => setModalProfile(item.profile)} onMessage={() => void openConversation(item.profile.userId)} />
+                    <SavedProfileCard key={item.profile.userId} item={item} label={item.matched ? 'Sparked' : 'Liked'} onClick={() => setModalProfile(item.profile)} onMessage={() => void openConversation(item.profile.userId)} />
                   ))}
                 </div>
               ) : (
-                <EmptyState title="No saved likes yet" copy="Like profiles from the match page and they will appear here." />
+                <EmptyState title="No likes sent yet" copy="Profiles you like from the swipe page will appear here." cta="Go to swipe →" href="/swipe" />
               )}
             </section>
 
@@ -264,7 +272,7 @@ export default function HomePage() {
                   ))}
                 </div>
               ) : (
-                <EmptyState title="No one yet" copy="Profiles that swipe right on you will appear here." />
+                <EmptyState title="No inbound likes yet" copy="When someone swipes right on you they'll show up here — and you can message them first." cta="Go to swipe →" href="/swipe" />
               )}
             </section>
           </>

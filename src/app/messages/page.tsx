@@ -84,7 +84,7 @@ function ConversationRow({
       </div>
       {conv.isMatched && (
         <span className="mt-2 inline-block rounded-full border border-[#3DC77A]/25 bg-[#3DC77A]/8 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-[#85e3ad]">
-          matched
+          sparked
         </span>
       )}
     </button>

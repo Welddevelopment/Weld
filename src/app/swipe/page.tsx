@@ -50,8 +50,8 @@ function MutualMatchScreen({
         onClick={e => e.stopPropagation()}
       >
         <div className="mp-match-overlay mp-its-a-match">
-          <div className="mp-iam-heading">🎉 It&apos;s a Match!</div>
-          <div className="mp-iam-sub">You and {profile.name} both liked each other</div>
+          <div className="mp-iam-heading">⚡ It&apos;s a Spark!</div>
+          <div className="mp-iam-sub">You and {profile.name} sparked — time to reach out.</div>
           <div className="mp-iam-actions">
             <button className="mp-iam-reach-btn" onClick={onReachOut}>
               <div className="mp-iam-reach-icon">
@@ -63,7 +63,7 @@ function MutualMatchScreen({
               <div className="mp-iam-scroll-circle">
                 <svg viewBox="0 0 24 24" className="mp-iam-scroll-arrow"><polyline points="9 18 15 12 9 6"/></svg>
               </div>
-              <span className="mp-iam-btn-label">Keep matching</span>
+              <span className="mp-iam-btn-label">Keep swiping</span>
             </button>
           </div>
         </div>
@@ -90,7 +90,7 @@ function LikeScreen({
       >
         <div className="mp-match-overlay" style={{ background: 'linear-gradient(160deg,rgba(14,12,9,0.97),rgba(30,27,22,0.97))' }}>
           <div className="mp-iam-heading" style={{ fontSize: '1.4rem' }}>👍 Liked!</div>
-          <div className="mp-iam-sub">You liked {profile.name}. Send them a message or keep matching.</div>
+          <div className="mp-iam-sub">You liked {profile.name}. Send them a message or keep swiping.</div>
           <div className="mp-iam-actions">
             <button className="mp-iam-reach-btn" onClick={onMessageThem}>
               <div className="mp-iam-reach-icon">
@@ -102,7 +102,7 @@ function LikeScreen({
               <div className="mp-iam-scroll-circle">
                 <svg viewBox="0 0 24 24" className="mp-iam-scroll-arrow"><polyline points="9 18 15 12 9 6"/></svg>
               </div>
-              <span className="mp-iam-btn-label">Keep matching</span>
+              <span className="mp-iam-btn-label">Keep swiping</span>
             </button>
           </div>
         </div>
@@ -129,12 +129,12 @@ function ExistingLikeScreen({
         <div className={`mp-match-overlay${alreadyMatched ? ' mp-its-a-match' : ''}`}>
           <div className={alreadyMatched ? 'mp-iam-heading' : 'mp-match-overlay-text'}>
             {alreadyMatched
-              ? `You have matched with ${notice.profile.name} already`
+              ? `You've already sparked with ${notice.profile.name}`
               : `You have liked ${notice.profile.name} already`}
           </div>
           <div className={alreadyMatched ? 'mp-iam-sub' : 'mp-match-overlay-sub'}>
             {alreadyMatched
-              ? 'You can keep matching or change your interaction by passing on this profile.'
+              ? 'You can keep swiping or change your interaction by passing on this profile.'
               : 'They are saved on your home page. You can still pass later if your mind changes.'}
           </div>
           <button className={alreadyMatched ? 'mp-iam-scroll-btn' : 'mp-match-keep-btn'} onClick={onKeepMatching}>
@@ -143,10 +143,10 @@ function ExistingLikeScreen({
                 <div className="mp-iam-scroll-circle">
                   <svg viewBox="0 0 24 24" className="mp-iam-scroll-arrow"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
-                <span className="mp-iam-btn-label">Keep matching</span>
+                <span className="mp-iam-btn-label">Keep swiping</span>
               </>
             ) : (
-              'Keep matching'
+              'Keep swiping'
             )}
           </button>
         </div>
@@ -327,7 +327,7 @@ export default function SwipePage() {
 
       {mode === 'unauthed' && (
         <div className="flex flex-1 flex-col items-center justify-center gap-5 py-32">
-          <p className="font-mono text-sm text-white/50">You need to be logged in to match.</p>
+          <p className="font-mono text-sm text-white/50">You need to be logged in to swipe.</p>
           <Link
             href="/login"
             className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.13em] text-white/60 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white/90"

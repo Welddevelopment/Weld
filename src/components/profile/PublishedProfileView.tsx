@@ -20,7 +20,7 @@ export default function PublishedProfileView({ profile, onEdit }: Props) {
       <div className="flex items-center gap-2">
         <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
         <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/50">
-          Live in matching pool
+          Live — you&apos;re in the swipe pool
         </span>
       </div>
 

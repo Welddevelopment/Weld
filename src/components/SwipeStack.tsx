@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, forwardRef, useImperativeHandle } from 'react'
+import Link from 'next/link'
 
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 import SwipeCard from './SwipeCard'
@@ -130,24 +131,33 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
 
   if (!current) {
     return (
-      <div className="flex flex-col items-center gap-4 text-center">
-        <p
-          className="font-mono text-sm uppercase tracking-[0.16em]"
-          style={{ color: 'rgba(255,247,241,.4)' }}
-        >
-          viewed all profiles for now
-        </p>
-        {sparks > 0 && (
-          <p className="text-sm text-green-400 font-medium">
-            ⚡ {sparks} spark{sparks > 1 ? 's' : ''} made
+      <div className="flex flex-col items-center gap-5 text-center">
+        <div>
+          <p className="font-mono text-sm uppercase tracking-[0.16em]" style={{ color: 'rgba(255,247,241,.4)' }}>
+            You&apos;ve seen everyone for now
           </p>
-        )}
-        <button
-          onClick={viewAgain}
-          className="mt-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.13em] text-white/60 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white/90"
-        >
-          View again
-        </button>
+          {sparks > 0 && (
+            <p className="mt-2 font-mono text-xs text-white/30">
+              {sparks} like{sparks !== 1 ? 's' : ''} sent — see who liked you back on your home page.
+            </p>
+          )}
+        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={viewAgain}
+            className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.13em] text-white/55 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white/80"
+          >
+            View again
+          </button>
+          {sparks > 0 && (
+            <Link
+              href="/home"
+              className="rounded-full border border-white/15 bg-white/[0.06] px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.13em] text-white/70 transition hover:border-white/25 hover:bg-white/[0.10] hover:text-white/90"
+            >
+              See activity →
+            </Link>
+          )}
+        </div>
       </div>
     )
   }

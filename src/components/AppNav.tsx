@@ -11,7 +11,7 @@ const NAV_LINKS = [
   { href: '/messages', label: 'Messages' },
   { href: '/account', label: 'Account' },
   { href: '/profile', label: 'Profile' },
-  { href: '/swipe', label: 'Match' },
+  { href: '/swipe', label: 'Swipe' },
   { href: '/preview', label: 'Preview' },
 ]
 
