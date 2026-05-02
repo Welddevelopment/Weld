@@ -44,12 +44,14 @@ async function loadAccountDraft(accessToken: string) {
 async function saveAccountProfile(
   accessToken: string,
   draft: ProfileDraft,
-  publishedProfile?: ReturnType<typeof draftToProfile>
+  publishedProfile?: ReturnType<typeof draftToProfile>,
+  signal?: AbortSignal
 ) {
   const response = await fetch('/api/account/profile', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
     body: JSON.stringify({ draft, ...(publishedProfile ? { publishedProfile } : {}) }),
+    signal,
   })
   if (!response.ok) throw new Error('Could not save account profile.')
 }
@@ -251,13 +253,20 @@ export default function ProfileBuilder({
 
   useEffect(() => {
     if (!hydrated || !accountLoaded || !accessToken) return
+    const controller = new AbortController()
     setSaveState('saving')
     const timeout = window.setTimeout(() => {
-      saveAccountProfile(accessToken, draft)
+      saveAccountProfile(accessToken, draft, undefined, controller.signal)
         .then(() => setSaveState('saved'))
-        .catch(() => setSaveState('error'))
+        .catch(error => {
+          if (error instanceof DOMException && error.name === 'AbortError') return
+          setSaveState('error')
+        })
     }, 500)
-    return () => window.clearTimeout(timeout)
+    return () => {
+      window.clearTimeout(timeout)
+      controller.abort()
+    }
   }, [draft, hydrated, accountLoaded, accessToken])
 
   const update = useCallback((patch: Partial<ProfileDraft>) => {
@@ -278,7 +287,11 @@ export default function ProfileBuilder({
 
   const handleConfirmDelete = async () => {
     setIsDeleting(true)
-    await onDelete?.()
+    try {
+      await onDelete?.()
+    } catch {
+      setIsDeleting(false)
+    }
   }
 
   if (!hydrated) return null

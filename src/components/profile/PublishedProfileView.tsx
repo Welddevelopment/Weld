@@ -79,7 +79,11 @@ export default function PublishedProfileView({ profile, onEdit, onDelete }: Prop
 
   const handleConfirmDelete = async () => {
     setIsDeleting(true)
-    await onDelete()
+    try {
+      await onDelete()
+    } catch {
+      setIsDeleting(false)
+    }
   }
 
   return (

@@ -136,7 +136,7 @@ export default function WorkEditPanel({ draft, update, onClose }: Props) {
             <div className="pb-panel-row3">
               <input className="pb-panel-input" placeholder="Time taken" value={w.time} onChange={e => change(i, { ...w, time: e.target.value })} />
               <input className="pb-panel-input" placeholder="Value paid" value={w.amount} onChange={e => change(i, { ...w, amount: e.target.value })} />
-              <input className="pb-panel-input" placeholder="Game plays" value={w.plays} onChange={e => change(i, { ...w, plays: e.target.value })} />
+              <input className="pb-panel-input" placeholder="Date" value={w.plays} onChange={e => change(i, { ...w, plays: e.target.value })} />
             </div>
           </div>
         ))}

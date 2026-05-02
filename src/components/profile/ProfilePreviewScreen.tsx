@@ -29,7 +29,7 @@ export default function ProfilePreviewScreen({ profile, onContinue, onBack, isLa
 
       <SwipeCard profile={profile} />
 
-      <div style={{ display: 'flex', gap: 10 }}>
+      <div style={{ display: 'flex', gap: 10, width: 380, maxWidth: '100%' }}>
         <button
           type="button"
           onClick={onBack}
@@ -46,6 +46,7 @@ export default function ProfilePreviewScreen({ profile, onContinue, onBack, isLa
           type="button"
           onClick={onContinue}
           style={{
+            flex: 1,
             fontFamily: 'var(--font-geist-mono)', fontSize: 11, letterSpacing: '0.1em',
             textTransform: 'uppercase', padding: '10px 28px', borderRadius: 999,
             border: '1.5px solid #E84624', background: 'rgba(232,70,36,0.15)',
