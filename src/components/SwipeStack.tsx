@@ -8,8 +8,18 @@ import GamesPanel from '@/components/matching-preview/panels/GamesPanel'
 import WorkPanel from '@/components/matching-preview/panels/WorkPanel'
 import SkillPanel from '@/components/matching-preview/panels/SkillPanel'
 import SwipeCard, { type PanelKind } from './SwipeCard'
+import { usePanelQueue } from '@/hooks/usePanelQueue'
 
 export type SwipeProfile = PreviewProfile & { userId: string }
+
+function renderPanel(panel: PanelKind, profile: PreviewProfile, onBack: () => void) {
+  if (panel === 'games') return <GamesPanel key="games" profile={profile} onBack={onBack} />
+  if (panel === 'work') return <WorkPanel key="work" profile={profile} onBack={onBack} />
+  if (typeof panel === 'object' && 'skill' in panel) {
+    return <SkillPanel key={`skill-${panel.skill}`} profile={profile} skillName={panel.skill} onBack={onBack} />
+  }
+  return null
+}
 
 const SWIPE_THRESHOLD = 100
 const CARD_WIDTH = 380
@@ -36,8 +46,7 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
   const [dragOffset, setDragOffset] = useState(0)
   const [sparks, setSparks] = useState(0)
   const [likeFlash, setLikeFlash] = useState(false)
-  const [leftPanel, setLeftPanel] = useState<null | 'games'>(null)
-  const [rightPanel, setRightPanel] = useState<null | 'work' | { skill: string }>(null)
+  const { slot0, slot1, panelOpen, openPanel, closePanel, clearPanels, leftPanelActive, rightPanelActive } = usePanelQueue()
 
   const isDragging = useRef(false)
   const startX = useRef(0)
@@ -46,24 +55,10 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
   const flyDirRef = useRef<'left' | 'right' | null>(null)
   const likeFlashTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const panelOpen = leftPanel !== null || rightPanel !== null
   const current = profiles[index]
   const next = profiles[index + 1]
   const remaining = profiles.length - index
 
-  const handleOpenPanel = (p: PanelKind) => {
-    if (typeof p === 'object' && 'skill' in p) {
-      setRightPanel(prev =>
-        prev && typeof prev === 'object' && 'skill' in prev && prev.skill === p.skill
-          ? null
-          : { skill: p.skill }
-      )
-    } else if (p === 'games') {
-      setLeftPanel(prev => prev === 'games' ? null : 'games')
-    } else if (p === 'work') {
-      setRightPanel(prev => prev === 'work' ? null : 'work')
-    }
-  }
 
   const triggerSwipe = (dir: 'left' | 'right', notify = true) => {
     if (disabled || flyDirRef.current) return
@@ -73,8 +68,7 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
     flyDirRef.current = dir
     setDragOffset(0)
     setFlyDir(dir)
-    setLeftPanel(null)
-    setRightPanel(null)
+    clearPanels()
 
     swipeTimeout.current = setTimeout(() => {
       swipeTimeout.current = null
@@ -137,8 +131,7 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
     setFlyDir(null)
     setLikeFlash(false)
     setIndex(0)
-    setLeftPanel(null)
-    setRightPanel(null)
+    clearPanels()
   }
 
   if (!current) {
@@ -192,10 +185,8 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
       </div>
 
       <div className="npc-stack-row">
-        {/* Left panel: Games */}
-        {leftPanel === 'games' && (
-          <GamesPanel profile={current} onBack={() => setLeftPanel(null)} />
-        )}
+        {/* Left panel slot */}
+        {slot0 && renderPanel(slot0, current, () => closePanel(0))}
 
         {/* Card drag container */}
         <div
@@ -239,23 +230,18 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
               profile={current}
               dragOverlay={likeFlash ? 'like' : dragOverlay}
               dragOpacity={likeFlash ? 1 : dragProgress}
-              leftPanel={leftPanel}
-              rightPanel={rightPanel}
+              leftPanel={leftPanelActive}
+              rightPanel={rightPanelActive}
               onPass={() => triggerSwipe('left')}
               onLike={handleCardLike}
               onMessage={() => onMessage?.(current)}
-              onOpenPanel={handleOpenPanel}
+              onOpenPanel={openPanel}
             />
           </div>
         </div>
 
-        {/* Right panel: Work or Skill */}
-        {rightPanel === 'work' && (
-          <WorkPanel profile={current} onBack={() => setRightPanel(null)} />
-        )}
-        {rightPanel && typeof rightPanel === 'object' && 'skill' in rightPanel && (
-          <SkillPanel profile={current} skillName={rightPanel.skill} onBack={() => setRightPanel(null)} />
-        )}
+        {/* Right panel slot */}
+        {slot1 && renderPanel(slot1, current, () => closePanel(1))}
       </div>
     </div>
   )

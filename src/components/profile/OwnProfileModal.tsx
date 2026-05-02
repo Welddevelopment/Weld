@@ -1,41 +1,35 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 import SwipeCard, { PanelKind } from '@/components/SwipeCard'
 import GamesPanel from '@/components/matching-preview/panels/GamesPanel'
 import WorkPanel from '@/components/matching-preview/panels/WorkPanel'
 import SkillPanel from '@/components/matching-preview/panels/SkillPanel'
+import { usePanelQueue } from '@/hooks/usePanelQueue'
 
 interface Props {
   profile: PreviewProfile
   onClose: () => void
 }
 
+function renderPanel(panel: PanelKind, profile: PreviewProfile, onBack: () => void) {
+  if (panel === 'games') return <GamesPanel key="games" profile={profile} onBack={onBack} />
+  if (panel === 'work') return <WorkPanel key="work" profile={profile} onBack={onBack} />
+  if (typeof panel === 'object' && 'skill' in panel) {
+    return <SkillPanel key={`skill-${panel.skill}`} profile={profile} skillName={panel.skill} onBack={onBack} />
+  }
+  return null
+}
+
 export default function OwnProfileModal({ profile, onClose }: Props) {
-  const [leftPanel, setLeftPanel] = useState<'games' | null>(null)
-  const [rightPanel, setRightPanel] = useState<'work' | { skill: string } | null>(null)
+  const { slot0, slot1, openPanel, closePanel, leftPanelActive, rightPanelActive } = usePanelQueue()
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
   }, [onClose])
-
-  function handleOpenPanel(panel: PanelKind) {
-    if (panel === 'games') {
-      setLeftPanel(p => p === 'games' ? null : 'games')
-    } else if (panel === 'work') {
-      setRightPanel(p => p === 'work' ? null : 'work')
-    } else if (typeof panel === 'object' && 'skill' in panel) {
-      const current = rightPanel !== null && typeof rightPanel === 'object' && 'skill' in rightPanel && rightPanel.skill === panel.skill
-      setRightPanel(current ? null : panel)
-    }
-  }
-
-  const activeSkillName = rightPanel !== null && typeof rightPanel === 'object' && 'skill' in rightPanel
-    ? rightPanel.skill
-    : null
 
   return (
     <div
@@ -59,23 +53,16 @@ export default function OwnProfileModal({ profile, onClose }: Props) {
       >✕</button>
 
       <div className="npc-stack-row" style={{ alignItems: 'flex-start' }} onClick={e => e.stopPropagation()}>
-        {leftPanel === 'games' && (
-          <GamesPanel profile={profile} onBack={() => setLeftPanel(null)} />
-        )}
+        {slot0 && renderPanel(slot0, profile, () => closePanel(0))}
 
         <SwipeCard
           profile={profile}
-          leftPanel={leftPanel}
-          rightPanel={rightPanel}
-          onOpenPanel={handleOpenPanel}
+          leftPanel={leftPanelActive}
+          rightPanel={rightPanelActive}
+          onOpenPanel={openPanel}
         />
 
-        {rightPanel === 'work' && (
-          <WorkPanel profile={profile} onBack={() => setRightPanel(null)} />
-        )}
-        {activeSkillName && (
-          <SkillPanel profile={profile} skillName={activeSkillName} onBack={() => setRightPanel(null)} />
-        )}
+        {slot1 && renderPanel(slot1, profile, () => closePanel(1))}
       </div>
     </div>
   )
