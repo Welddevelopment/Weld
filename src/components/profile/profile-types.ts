@@ -3,6 +3,8 @@ import { PreviewProfile, PreviewProfileType, DevWork, TopGame } from '../matchin
 export type ProfileSkillDraft = {
   name: string
   description: string
+  experienceMonths?: number
+  pastWorks?: number
   categories?: Array<{ name: string; description: string }>
   resources?: Array<{ label: string; url: string }>
 }

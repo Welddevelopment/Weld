@@ -3,17 +3,9 @@
 import { ProfileDraft, ProfileSkillDraft } from '../profile-types'
 
 const MAX_CAPS = 6
-const LEVELS = ['Beginner', 'Intermediate', 'Expert']
 
-function skillLevel(description: string) {
-  const match = description.match(/^\[(Beginner|Intermediate|Expert)\]\s*/i)
-  return match?.[1] ?? 'Intermediate'
-}
 function stripLevel(description: string) {
   return description.replace(/^\[(Beginner|Intermediate|Expert)\]\s*/i, '')
-}
-function withLevel(level: string, description: string) {
-  return `[${level}] ${stripLevel(description).trim()}`
 }
 
 function updateInList(
@@ -22,6 +14,15 @@ function updateInList(
   patch: Partial<ProfileSkillDraft>
 ): ProfileSkillDraft[] {
   return skills.map(s => s.name === name ? { ...s, ...patch } : s)
+}
+
+const LABEL_STYLE = {
+  fontSize: 10,
+  fontFamily: 'var(--font-geist-mono)' as const,
+  letterSpacing: '0.08em',
+  textTransform: 'uppercase' as const,
+  color: '#bbb',
+  marginBottom: 6,
 }
 
 interface Props {
@@ -35,7 +36,6 @@ export default function SkillDetailEditPanel({ skillName, draft, update, onBack 
   const skill = draft.selectedSkills.find(s => s.name === skillName)
   if (!skill) return null
 
-  const level = skillLevel(skill.description)
   const description = stripLevel(skill.description)
   const caps = skill.categories ?? []
 
@@ -79,47 +79,20 @@ export default function SkillDetailEditPanel({ skillName, draft, update, onBack 
           </div>
         </div>
 
-        {/* Experience level */}
-        <div style={{ fontSize: 10, fontFamily: 'var(--font-geist-mono)', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#bbb', marginBottom: 6 }}>
-          Experience level
-        </div>
-        <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
-          {LEVELS.map(opt => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => set({ description: withLevel(opt, description) })}
-              style={{
-                flex: 1, padding: '6px 0', borderRadius: 8, fontSize: 11,
-                fontFamily: 'var(--font-geist-mono)', fontWeight: 700, cursor: 'pointer',
-                border: `1.5px solid ${level === opt ? '#4444EE' : 'rgba(0,0,0,0.12)'}`,
-                background: level === opt ? 'rgba(68,68,238,0.08)' : 'transparent',
-                color: level === opt ? '#4444EE' : '#999',
-              }}
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
-
         {/* Description */}
-        <div style={{ fontSize: 10, fontFamily: 'var(--font-geist-mono)', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#bbb', marginBottom: 6 }}>
-          Description
-        </div>
+        <div style={LABEL_STYLE}>Description</div>
         <textarea
           className="pb-panel-textarea"
           value={description}
           rows={6}
           placeholder={`Describe your ${skillName} experience...`}
-          onChange={e => set({ description: withLevel(level, e.target.value) })}
+          onChange={e => set({ description: e.target.value })}
           style={{ marginBottom: 16 }}
         />
 
         {/* Capability cards */}
-        <div style={{ fontSize: 10, fontFamily: 'var(--font-geist-mono)', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#bbb', marginBottom: 6 }}>
-          What you can build with {skillName}
-        </div>
-        <div className="ob-cap-grid">
+        <div style={LABEL_STYLE}>What you can build with {skillName}</div>
+        <div className="ob-cap-grid" style={{ marginBottom: 16 }}>
           {caps.map((cap, ci) => (
             <div key={ci} className="ob-cap-card">
               <button type="button" className="ob-cap-remove" onClick={() => removeCap(ci)}>×</button>
@@ -141,6 +114,34 @@ export default function SkillDetailEditPanel({ skillName, draft, update, onBack 
           {caps.length < MAX_CAPS && (
             <button type="button" className="ob-cap-add" onClick={addCap}>+</button>
           )}
+        </div>
+
+        {/* Experience + past works */}
+        <div style={{ display: 'flex', gap: 10 }}>
+          <div style={{ flex: 1 }}>
+            <div style={LABEL_STYLE}>Experience (months)</div>
+            <input
+              className="pb-panel-input"
+              type="number"
+              min={0}
+              max={600}
+              placeholder="e.g. 24"
+              value={skill.experienceMonths ?? ''}
+              onChange={e => set({ experienceMonths: e.target.value === '' ? undefined : Number(e.target.value) })}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={LABEL_STYLE}>Past works</div>
+            <input
+              className="pb-panel-input"
+              type="number"
+              min={0}
+              max={999}
+              placeholder="e.g. 8"
+              value={skill.pastWorks ?? ''}
+              onChange={e => set({ pastWorks: e.target.value === '' ? undefined : Number(e.target.value) })}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -13,19 +13,9 @@ interface Props {
 const DEV_SKILLS = Object.keys(DEV_SKILL_DESCS)
 const MAX_SKILLS = 5
 const MAX_CAPS = 6
-const LEVELS = ['Beginner', 'Intermediate', 'Expert']
-
-function skillLevel(description: string) {
-  const match = description.match(/^\[(Beginner|Intermediate|Expert)\]\s*/i)
-  return match?.[1] ?? 'Intermediate'
-}
 
 function stripLevel(description: string) {
   return description.replace(/^\[(Beginner|Intermediate|Expert)\]\s*/i, '')
-}
-
-function withLevel(level: string, description: string) {
-  return `[${level}] ${stripLevel(description).trim()}`
 }
 
 function updateSkillField(
@@ -50,26 +40,17 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
     update({
       selectedSkills: [
         ...selected,
-        { name, description: withLevel('Intermediate', DEV_SKILL_DESCS[name] ?? '') },
+        { name, description: DEV_SKILL_DESCS[name] ?? '' },
       ],
     })
   }
 
-  const updateDescription = (name: string, desc: string, level: string) => {
-    update({ selectedSkills: updateSkillField(selected, name, { description: withLevel(level, desc) }) })
-  }
-
-  const updateLevel = (name: string, level: string, description: string) => {
-    update({ selectedSkills: updateSkillField(selected, name, { description: withLevel(level, description) }) })
-  }
-
-  const updateUrl = (name: string, url: string) => {
+  const updateUrl = (name: string, url: string) =>
     update({
       selectedSkills: updateSkillField(selected, name, {
         resources: url.trim() ? [{ label: 'Showcase', url }] : undefined,
       }),
     })
-  }
 
   const addCap = (skillName: string) => {
     update({
@@ -85,15 +66,17 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
   const updateCap = (skillName: string, idx: number, cap: { name: string; description: string }) => {
     const skill = selected.find(s => s.name === skillName)
     if (!skill) return
-    const categories = (skill.categories ?? []).map((c, i) => i === idx ? cap : c)
-    update({ selectedSkills: updateSkillField(selected, skillName, { categories }) })
+    update({ selectedSkills: updateSkillField(selected, skillName, {
+      categories: (skill.categories ?? []).map((c, i) => i === idx ? cap : c),
+    }) })
   }
 
   const removeCap = (skillName: string, idx: number) => {
     const skill = selected.find(s => s.name === skillName)
     if (!skill) return
-    const categories = (skill.categories ?? []).filter((_, i) => i !== idx)
-    update({ selectedSkills: updateSkillField(selected, skillName, { categories }) })
+    update({ selectedSkills: updateSkillField(selected, skillName, {
+      categories: (skill.categories ?? []).filter((_, i) => i !== idx),
+    }) })
   }
 
   return (
@@ -139,7 +122,6 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
         </div>
 
         {selected.map(skill => {
-          const level = skillLevel(skill.description)
           const description = stripLevel(skill.description)
           const caps = skill.categories ?? []
 
@@ -155,22 +137,6 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
                 </button>
               </div>
 
-              <div className="pb-field" style={{ marginBottom: 10 }}>
-                <label className="pb-label">Experience level</label>
-                <div className="ob-pill-row">
-                  {LEVELS.map(option => (
-                    <button
-                      key={option}
-                      type="button"
-                      className={`ob-pill${level === option ? ' ob-pill--on' : ''}`}
-                      onClick={() => updateLevel(skill.name, option, description)}
-                    >
-                      {option}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               <input
                 className="pb-input"
                 value={skill.resources?.[0]?.url ?? ''}
@@ -183,7 +149,7 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
                 value={description}
                 rows={2}
                 placeholder={`e.g. I have used ${skill.name} for 3 years to build production-ready systems.`}
-                onChange={e => updateDescription(skill.name, e.target.value, level)}
+                onChange={e => update({ selectedSkills: updateSkillField(selected, skill.name, { description: e.target.value }) })}
               />
 
               <div className="pb-field" style={{ marginTop: 10, marginBottom: 0 }}>
@@ -191,11 +157,7 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
                 <div className="ob-cap-grid">
                   {caps.map((cap, ci) => (
                     <div key={ci} className="ob-cap-card">
-                      <button
-                        type="button"
-                        className="ob-cap-remove"
-                        onClick={() => removeCap(skill.name, ci)}
-                      >×</button>
+                      <button type="button" className="ob-cap-remove" onClick={() => removeCap(skill.name, ci)}>×</button>
                       <input
                         className="ob-cap-title"
                         placeholder="e.g. Gameplay Systems"
@@ -212,11 +174,7 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
                     </div>
                   ))}
                   {caps.length < MAX_CAPS && (
-                    <button
-                      type="button"
-                      className="ob-cap-add"
-                      onClick={() => addCap(skill.name)}
-                    >+</button>
+                    <button type="button" className="ob-cap-add" onClick={() => addCap(skill.name)}>+</button>
                   )}
                 </div>
               </div>
