@@ -16,6 +16,13 @@ function colorForSkill(name: string) {
   return ICON_COLORS[h % ICON_COLORS.length]
 }
 
+function formatMonths(months: number): string {
+  if (months < 12) return `${months} mo`
+  const yrs = months / 12
+  if (yrs % 1 === 0) return `${yrs} yr${yrs === 1 ? '' : 's'}`
+  return `${Math.floor(yrs)}.5 yrs`
+}
+
 export default function SkillPanel({ profile, skillName, onBack }: Props) {
   const skill = (profile.skills ?? []).find(s => s.name === skillName)
 
@@ -23,6 +30,7 @@ export default function SkillPanel({ profile, skillName, onBack }: Props) {
   const categories = skill?.categories ?? []
   const resources = skill?.resources ?? []
   const recentGames = (profile.topGames ?? []).slice(0, 3)
+  const hasStats = skill?.experienceMonths || skill?.pastWorks
 
   return (
     <div className="npc-panel">
@@ -49,6 +57,28 @@ export default function SkillPanel({ profile, skillName, onBack }: Props) {
             )}
           </div>
         </div>
+
+        {/* Experience / past works stats */}
+        {hasStats && (
+          <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
+            {!!skill?.experienceMonths && (
+              <div style={{ flex: 1, background: '#f7f7ff', border: '1.5px solid #e8e8f5', borderRadius: 10, padding: '8px 12px' }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: '#111' }}>
+                  {formatMonths(skill.experienceMonths)}
+                </div>
+                <div style={{ fontSize: 10, color: '#999', fontFamily: 'var(--font-geist-mono)', marginTop: 2 }}>Experience</div>
+              </div>
+            )}
+            {!!skill?.pastWorks && (
+              <div style={{ flex: 1, background: '#f7f7ff', border: '1.5px solid #e8e8f5', borderRadius: 10, padding: '8px 12px' }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: '#111' }}>
+                  {skill.pastWorks}
+                </div>
+                <div style={{ fontSize: 10, color: '#999', fontFamily: 'var(--font-geist-mono)', marginTop: 2 }}>Past works</div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Reference links */}
         {resources.length > 0 && (
