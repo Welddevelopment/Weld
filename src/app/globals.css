@@ -2906,12 +2906,13 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   background: #f7f7ff;
   border: 1.5px solid #e8e8f5;
   border-radius: 12px;
-  padding: 10px;
+  padding: 12px;
+  min-height: 88px;
+  display: flex;
+  flex-direction: column;
 }
-.npc-cap-icon { color: #4444EE; margin-bottom: 6px; display: flex; }
-.npc-cap-icon svg { width: 18px; height: 18px; }
-.npc-cap-name { font-size: 12px; font-weight: 700; color: #111; margin-bottom: 3px; }
-.npc-cap-desc { font-size: 10px; color: #777; line-height: 1.4; }
+.npc-cap-name { font-size: 13px; font-weight: 700; color: #111; margin-bottom: 5px; }
+.npc-cap-desc { font-size: 11.5px; color: #666; line-height: 1.5; }
 .npc-recent-item {
   display: flex;
   align-items: center;

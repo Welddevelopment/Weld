@@ -25,12 +25,9 @@ function formatMonths(months: number): string {
 
 export default function SkillPanel({ profile, skillName, onBack }: Props) {
   const skill = (profile.skills ?? []).find(s => s.name === skillName)
-
   const color = colorForSkill(skillName)
   const categories = skill?.categories ?? []
   const resources = skill?.resources ?? []
-  const recentGames = (profile.topGames ?? []).slice(0, 3)
-  const hasStats = skill?.experienceMonths || skill?.pastWorks
 
   return (
     <div className="npc-panel">
@@ -44,7 +41,7 @@ export default function SkillPanel({ profile, skillName, onBack }: Props) {
       </div>
 
       <div className="npc-panel-body">
-        {/* Header */}
+        {/* Header: icon + name + category + stats */}
         <div className="npc-skill-hd">
           <div className="npc-skill-icon-box" style={{ background: `${color}33`, color }}>
             {skillName.slice(0, 3)}
@@ -52,32 +49,30 @@ export default function SkillPanel({ profile, skillName, onBack }: Props) {
           <div className="npc-skill-hd-copy">
             <div className="npc-skill-hd-name">{skillName}</div>
             <div className="npc-skill-hd-cat">Development Skill</div>
-            {skill?.description && (
-              <p className="npc-skill-hd-desc">{skill.description}</p>
+            {(skill?.experienceMonths || skill?.pastWorks) && (
+              <div style={{ display: 'flex', gap: 12, marginTop: 4, flexWrap: 'wrap' }}>
+                {!!skill?.experienceMonths && (
+                  <div style={{ fontSize: 11, color: '#666' }}>
+                    <span style={{ fontWeight: 700, color: '#111' }}>{formatMonths(skill.experienceMonths)}</span>
+                    {' '}experience
+                  </div>
+                )}
+                {!!skill?.pastWorks && (
+                  <div style={{ fontSize: 11, color: '#666' }}>
+                    <span style={{ fontWeight: 700, color: '#111' }}>{skill.pastWorks}</span>
+                    {' '}past works
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
 
-        {/* Experience / past works stats */}
-        {hasStats && (
-          <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
-            {!!skill?.experienceMonths && (
-              <div style={{ flex: 1, background: '#f7f7ff', border: '1.5px solid #e8e8f5', borderRadius: 10, padding: '8px 12px' }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: '#111' }}>
-                  {formatMonths(skill.experienceMonths)}
-                </div>
-                <div style={{ fontSize: 10, color: '#999', fontFamily: 'var(--font-geist-mono)', marginTop: 2 }}>Experience</div>
-              </div>
-            )}
-            {!!skill?.pastWorks && (
-              <div style={{ flex: 1, background: '#f7f7ff', border: '1.5px solid #e8e8f5', borderRadius: 10, padding: '8px 12px' }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: '#111' }}>
-                  {skill.pastWorks}
-                </div>
-                <div style={{ fontSize: 10, color: '#999', fontFamily: 'var(--font-geist-mono)', marginTop: 2 }}>Past works</div>
-              </div>
-            )}
-          </div>
+        {/* Description — full width below icon */}
+        {skill?.description && (
+          <p style={{ fontSize: 13, color: '#444', lineHeight: 1.6, margin: '0 0 16px' }}>
+            {skill.description}
+          </p>
         )}
 
         {/* Reference links */}
@@ -110,39 +105,9 @@ export default function SkillPanel({ profile, skillName, onBack }: Props) {
           </>
         )}
 
-        {/* Recent projects using this skill */}
-        {recentGames.length > 0 && (
-          <>
-            <div className="npc-section-title" style={{ marginTop: categories.length > 0 ? 4 : 0 }}>
-              Recent Projects
-            </div>
-            {recentGames.map((game, i) => (
-              <div key={i} className="npc-recent-item">
-                <div className="npc-recent-thumb">{game.emoji}</div>
-                <div className="npc-recent-copy">
-                  <div className="npc-recent-title">{game.title}</div>
-                  {game.desc && <div className="npc-recent-sub">{game.desc}</div>}
-                </div>
-                <div className="npc-recent-stats">
-                  <div className="npc-recent-stat">
-                    <span className="npc-recent-stat-val">{game.currentCcu}</span>
-                    <span className="npc-recent-stat-lbl">CCU</span>
-                  </div>
-                  <div className="npc-recent-stat">
-                    <span className="npc-recent-stat-val">{game.plays}</span>
-                    <span className="npc-recent-stat-lbl">Plays</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </>
-        )}
-
-        {categories.length === 0 && recentGames.length === 0 && (
+        {!skill?.description && categories.length === 0 && (
           <p style={{ color: '#aaa', fontSize: 13, textAlign: 'center', paddingTop: 32 }}>
-            {skill?.description
-              ? 'No additional detail added for this skill.'
-              : 'No detail added for this skill yet.'}
+            No detail added for this skill yet.
           </p>
         )}
       </div>
