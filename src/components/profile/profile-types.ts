@@ -1,5 +1,12 @@
 import { PreviewProfile, PreviewProfileType, DevWork, TopGame } from '../matching-preview/preview-types'
 
+export type ProfileSkillDraft = {
+  name: string
+  description: string
+  categories?: Array<{ name: string; description: string }>
+  resources?: Array<{ label: string; url: string }>
+}
+
 export type ProfileDraft = {
   type: PreviewProfileType
   robloxUserId: number | null
@@ -22,7 +29,7 @@ export type ProfileDraft = {
   projectValue: string
   details: string
   // Shared
-  selectedSkills: Array<{ name: string; description: string }>
+  selectedSkills: ProfileSkillDraft[]
   portfolioLinks: Array<{ name: string; url: string }>
   socials: Array<{ icon: string; label: string; url: string }>
   bestWork: DevWork[]
@@ -61,6 +68,18 @@ function selectedSkillsFromProfile(profile: PreviewProfile) {
   const skills = profile.type === 'dev' ? profile.skills : profile.skillsNeeded
   if (skills && skills.length > 0) return skills
   return profile.tags.map(name => ({ name, description: '' }))
+}
+
+function stripSkillLevel(description: string) {
+  return description.replace(/^\[(Beginner|Intermediate|Expert)\]\s*/i, '')
+}
+
+function profileSkillsFromDraft(skills: ProfileSkillDraft[]) {
+  return skills.map(skill => ({
+    ...skill,
+    description: stripSkillLevel(skill.description),
+    resources: skill.resources?.filter(resource => resource.url.trim()),
+  }))
 }
 
 function parseExperienceYears(profile: PreviewProfile) {
@@ -150,14 +169,14 @@ export function draftToProfile(draft: ProfileDraft, id: string): PreviewProfile 
   }
 
   if (isDev) {
-    if (draft.selectedSkills.length > 0) profile.skills = draft.selectedSkills
+    if (draft.selectedSkills.length > 0) profile.skills = profileSkillsFromDraft(draft.selectedSkills)
     if (draft.portfolioLinks.length > 0) profile.portfolio = { links: draft.portfolioLinks }
     if (draft.bestWork.length > 0) profile.bestWork = draft.bestWork
     if (draft.topGames.length > 0) profile.topGames = draft.topGames
     if (draft.socials.length > 0) profile.socials = draft.socials
   } else {
     if (draft.details) profile.details = draft.details
-    if (draft.selectedSkills.length > 0) profile.skillsNeeded = draft.selectedSkills
+    if (draft.selectedSkills.length > 0) profile.skillsNeeded = profileSkillsFromDraft(draft.selectedSkills)
     if (draft.topGames.length > 0) profile.topGames = draft.topGames
   }
 

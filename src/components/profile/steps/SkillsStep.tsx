@@ -1,6 +1,6 @@
 'use client'
 
-import { ProfileDraft } from '../profile-types'
+import { ProfileDraft, ProfileSkillDraft } from '../profile-types'
 import { DEV_SKILL_DESCS } from '../../matching-preview/preview-data'
 
 interface Props {
@@ -12,6 +12,7 @@ interface Props {
 
 const DEV_SKILLS = Object.keys(DEV_SKILL_DESCS)
 const MAX_SKILLS = 5
+const MAX_CAPS = 6
 const LEVELS = ['Beginner', 'Intermediate', 'Expert']
 
 function skillLevel(description: string) {
@@ -27,14 +28,22 @@ function withLevel(level: string, description: string) {
   return `[${level}] ${stripLevel(description).trim()}`
 }
 
+function updateSkillField(
+  skills: ProfileSkillDraft[],
+  name: string,
+  patch: Partial<ProfileSkillDraft>
+): ProfileSkillDraft[] {
+  return skills.map(s => s.name === name ? { ...s, ...patch } : s)
+}
+
 export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
   const selected = draft.selectedSkills
-  const selectedNames = new Set(selected.map(skill => skill.name))
-  const detailsCount = selected.filter(skill => stripLevel(skill.description).trim()).length
+  const selectedNames = new Set(selected.map(s => s.name))
+  const detailsCount = selected.filter(s => stripLevel(s.description).trim()).length
 
   const toggle = (name: string) => {
     if (selectedNames.has(name)) {
-      update({ selectedSkills: selected.filter(skill => skill.name !== name) })
+      update({ selectedSkills: selected.filter(s => s.name !== name) })
       return
     }
     if (selected.length >= MAX_SKILLS) return
@@ -46,10 +55,45 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
     })
   }
 
-  const updateSkill = (name: string, description: string) => {
+  const updateDescription = (name: string, desc: string, level: string) => {
+    update({ selectedSkills: updateSkillField(selected, name, { description: withLevel(level, desc) }) })
+  }
+
+  const updateLevel = (name: string, level: string, description: string) => {
+    update({ selectedSkills: updateSkillField(selected, name, { description: withLevel(level, description) }) })
+  }
+
+  const updateUrl = (name: string, url: string) => {
     update({
-      selectedSkills: selected.map(skill => skill.name === name ? { ...skill, description } : skill),
+      selectedSkills: updateSkillField(selected, name, {
+        resources: url.trim() ? [{ label: 'Showcase', url }] : undefined,
+      }),
     })
+  }
+
+  const addCap = (skillName: string) => {
+    update({
+      selectedSkills: updateSkillField(selected, skillName, {
+        categories: [
+          ...(selected.find(s => s.name === skillName)?.categories ?? []),
+          { name: '', description: '' },
+        ],
+      }),
+    })
+  }
+
+  const updateCap = (skillName: string, idx: number, cap: { name: string; description: string }) => {
+    const skill = selected.find(s => s.name === skillName)
+    if (!skill) return
+    const categories = (skill.categories ?? []).map((c, i) => i === idx ? cap : c)
+    update({ selectedSkills: updateSkillField(selected, skillName, { categories }) })
+  }
+
+  const removeCap = (skillName: string, idx: number) => {
+    const skill = selected.find(s => s.name === skillName)
+    if (!skill) return
+    const categories = (skill.categories ?? []).filter((_, i) => i !== idx)
+    update({ selectedSkills: updateSkillField(selected, skillName, { categories }) })
   }
 
   return (
@@ -97,6 +141,7 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
         {selected.map(skill => {
           const level = skillLevel(skill.description)
           const description = stripLevel(skill.description)
+          const caps = skill.categories ?? []
 
           return (
             <div key={skill.name} className="ob-work-entry">
@@ -104,7 +149,7 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
                 <span>{skill.name}</span>
                 <button
                   type="button"
-                  onClick={() => update({ selectedSkills: selected.filter(item => item.name !== skill.name) })}
+                  onClick={() => update({ selectedSkills: selected.filter(s => s.name !== skill.name) })}
                 >
                   Remove
                 </button>
@@ -118,7 +163,7 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
                       key={option}
                       type="button"
                       className={`ob-pill${level === option ? ' ob-pill--on' : ''}`}
-                      onClick={() => updateSkill(skill.name, withLevel(option, description))}
+                      onClick={() => updateLevel(skill.name, option, description)}
                     >
                       {option}
                     </button>
@@ -128,8 +173,8 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
 
               <input
                 className="pb-input"
-                value=""
-                readOnly
+                value={skill.resources?.[0]?.url ?? ''}
+                onChange={e => updateUrl(skill.name, e.target.value)}
                 placeholder="Showcase image URL (optional)"
               />
 
@@ -138,8 +183,43 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
                 value={description}
                 rows={2}
                 placeholder={`e.g. I have used ${skill.name} for 3 years to build production-ready systems.`}
-                onChange={event => updateSkill(skill.name, withLevel(level, event.target.value))}
+                onChange={e => updateDescription(skill.name, e.target.value, level)}
               />
+
+              <div className="pb-field" style={{ marginTop: 10, marginBottom: 0 }}>
+                <label className="pb-label">What can you build with {skill.name}?</label>
+                <div className="ob-cap-grid">
+                  {caps.map((cap, ci) => (
+                    <div key={ci} className="ob-cap-card">
+                      <button
+                        type="button"
+                        className="ob-cap-remove"
+                        onClick={() => removeCap(skill.name, ci)}
+                      >×</button>
+                      <input
+                        className="ob-cap-title"
+                        placeholder="e.g. Gameplay Systems"
+                        value={cap.name}
+                        onChange={e => updateCap(skill.name, ci, { ...cap, name: e.target.value })}
+                      />
+                      <textarea
+                        className="ob-cap-body"
+                        placeholder="Short description…"
+                        rows={2}
+                        value={cap.description}
+                        onChange={e => updateCap(skill.name, ci, { ...cap, description: e.target.value })}
+                      />
+                    </div>
+                  ))}
+                  {caps.length < MAX_CAPS && (
+                    <button
+                      type="button"
+                      className="ob-cap-add"
+                      onClick={() => addCap(skill.name)}
+                    >+</button>
+                  )}
+                </div>
+              </div>
             </div>
           )
         })}

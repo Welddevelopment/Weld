@@ -16,14 +16,6 @@ function colorForSkill(name: string) {
   return ICON_COLORS[h % ICON_COLORS.length]
 }
 
-const CAP_ICONS: Record<string, React.ReactNode> = {
-  default: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-    </svg>
-  ),
-}
-
 export default function SkillPanel({ profile, skillName, onBack }: Props) {
   const skill = (profile.skills ?? []).find(s => s.name === skillName)
 
@@ -78,11 +70,8 @@ export default function SkillPanel({ profile, skillName, onBack }: Props) {
           <>
             <div className="npc-section-title">What I can build with {skillName}</div>
             <div className="npc-cap-grid">
-              {categories.map((cat: { icon: string; name: string; description: string }, i: number) => (
+              {categories.map((cat: { name: string; description: string }, i: number) => (
                 <div key={i} className="npc-cap-card">
-                  <div className="npc-cap-icon" style={{ color }}>
-                    {CAP_ICONS[cat.icon] ?? CAP_ICONS.default}
-                  </div>
                   <div className="npc-cap-name">{cat.name}</div>
                   <div className="npc-cap-desc">{cat.description}</div>
                 </div>
