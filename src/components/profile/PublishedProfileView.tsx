@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import PreviewCard from '@/components/matching-preview/PreviewCard'
+import SwipeCard from '@/components/SwipeCard'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 
 import OwnProfileModal from './OwnProfileModal'
@@ -103,10 +103,8 @@ export default function PublishedProfileView({ profile, onEdit, onDelete }: Prop
         style={{ background: 'none', border: 'none', padding: 0 }}
         aria-label="View your full profile"
       >
-        <div className="card-stack hero-preview-stack" style={{ pointerEvents: 'none' }}>
-          <div className="fan-wrap cards-left">
-            <PreviewCard profile={profile} />
-          </div>
+        <div style={{ pointerEvents: 'none' }}>
+          <SwipeCard profile={profile} />
         </div>
       </button>
 
