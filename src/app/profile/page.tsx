@@ -7,18 +7,13 @@ import AppNav from '@/components/AppNav'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 import ProfileBuilder from '@/components/profile/ProfileBuilder'
 import PublishedProfileView from '@/components/profile/PublishedProfileView'
-import type { ProfileDraft } from '@/components/profile/profile-types'
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/browser'
-
-const DRAFT_KEY = 'weld_profile_draft'
 
 type PageMode = 'loading' | 'unauthed' | 'published' | 'editing'
 
 export default function ProfilePage() {
   const [mode, setMode] = useState<PageMode>('loading')
   const [publishedProfile, setPublishedProfile] = useState<PreviewProfile | null>(null)
-  const [token, setToken] = useState<string | null>(null)
-  const [builderKey, setBuilderKey] = useState(0)
 
   useEffect(() => {
     if (!hasBrowserSupabaseConfig()) {
@@ -34,8 +29,6 @@ export default function ProfilePage() {
         setMode('unauthed')
         return
       }
-
-      setToken(session.access_token)
 
       try {
         const res = await fetch('/api/account/profile', {
@@ -61,66 +54,35 @@ export default function ProfilePage() {
     setMode('published')
   }
 
-  async function handleDelete() {
-    try { localStorage.removeItem(DRAFT_KEY) } catch {}
-
-    if (token) {
-      try {
-        await fetch('/api/account/profile', {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${token}` },
-        })
-      } catch {}
-    }
-
-    setPublishedProfile(null)
-    setMode('editing')
-    setBuilderKey(k => k + 1)
-  }
-
-  // Full-screen editor — hides the nav
-  if (mode === 'editing') {
-    return (
-      <ProfileBuilder
-        key={builderKey}
-        onPublished={handlePublished}
-        onDelete={handleDelete}
-        initialPhase={publishedProfile ? 'editor' : 'identity'}
-        onCancel={publishedProfile ? () => setMode('published') : undefined}
-      />
-    )
-  }
-
   return (
     <div className="flex min-h-screen flex-col bg-[#0a0a0a]">
       <AppNav />
 
-      {mode === 'loading' && (
-        <div className="flex flex-1 items-center justify-center">
-          <p className="font-mono text-sm text-white/30">Loading…</p>
-        </div>
-      )}
-
       {mode === 'unauthed' && (
-        <div className="flex flex-col items-center justify-center gap-5 py-32">
-          <p className="font-mono text-sm text-white/50">
-            You need to be logged in to view this page.
-          </p>
-          <Link
-            href="/login"
-            className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.13em] text-white/60 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white/90"
-          >
-            Log in →
-          </Link>
-        </div>
+        <main className="acct-shell">
+          <section className="acct-card">
+            <span className="acct-eyebrow">Profile</span>
+            <h1 className="acct-title">Sign in to build your profile</h1>
+            <div className="acct-empty">
+              <p>Your draft saves to your account so it follows you across devices and matches.</p>
+              <div className="acct-actions">
+                <Link href="/login" className="acct-btn acct-btn--primary">Log in</Link>
+                <Link href="/signup" className="acct-btn acct-btn--ghost">Create account</Link>
+              </div>
+            </div>
+          </section>
+        </main>
       )}
 
       {mode === 'published' && publishedProfile && (
         <PublishedProfileView
           profile={publishedProfile}
           onEdit={() => setMode('editing')}
-          onDelete={handleDelete}
         />
+      )}
+
+      {mode === 'editing' && (
+        <ProfileBuilder onPublished={handlePublished} />
       )}
     </div>
   )

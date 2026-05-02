@@ -9,9 +9,9 @@ import {
 } from "@/dynamic landing page/lib/source-variant";
 
 export const metadata: Metadata = {
-  title: "weld. - Hire Roblox talent without thread diving.",
+  title: "weld. - Scout Roblox talent by proof, rate, and fit.",
   description:
-    "Screen shipped work, role fit, rates, and availability before your first message. Join the studio beta."
+    "Review friendly Roblox talent cards with role fit, rates, availability, links, proof, and shipped work before the first message."
 };
 
 export default function StudiosPage({

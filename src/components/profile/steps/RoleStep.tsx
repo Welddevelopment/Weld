@@ -16,7 +16,7 @@ const EXP_OPTIONS = [
   { label: '5+ years', value: 5 },
 ]
 
-const RATE_TYPES = ['USD / hr', 'Robux / hr', 'Fixed USD', 'Fixed Robux']
+const RATE_TYPES = ['USD / hr', 'Robux / hr', 'Fixed USD', 'Fixed Robux', 'Revenue share']
 
 const TEAM_SIZES = [
   { label: '1 – 2 people', value: 1 },
@@ -27,13 +27,13 @@ const TEAM_SIZES = [
 ]
 
 const STATUS_OPTIONS = ['Hiring Now', 'Open to Offers', 'Closed']
-const BUDGET_TYPES = ['USD', 'Robux', 'Mixed', 'Fixed']
+const BUDGET_TYPES = ['USD', 'Robux', 'Mixed', 'Revenue share']
 
 export default function RoleStep({ draft, update, onNext, onBack }: Props) {
   const isDev = draft.type === 'dev'
 
   const devReady = draft.experienceYears !== null && !!draft.rateType
-  const studioReady = draft.teamSize !== null && !!draft.status && !!draft.budgetType
+  const studioReady = draft.teamSize !== null && !!draft.status
 
   return (
     <div className="pb-step-content">
@@ -127,14 +127,14 @@ export default function RoleStep({ draft, update, onNext, onBack }: Props) {
           </div>
 
           <div className="pb-field">
-            <label className="pb-label">Budget type <span className="pb-required">*</span></label>
+            <label className="pb-label">Budget type <span className="pb-hint-label">(optional)</span></label>
             <div className="pb-option-pills">
               {BUDGET_TYPES.map(b => (
                 <button
                   key={b}
                   type="button"
                   className={`pb-option-pill${draft.budgetType === b ? ' pb-option-pill--on' : ''}`}
-                  onClick={() => update({ budgetType: b })}
+                  onClick={() => update({ budgetType: draft.budgetType === b ? null : b })}
                 >
                   {b}
                 </button>

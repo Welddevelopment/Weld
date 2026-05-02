@@ -1,14 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { getSessionId, shareInvite, trackEvent } from "@/dynamic landing page/lib/browser";
-import { PROFILE_STEP_ORDER } from "@/dynamic landing page/lib/constants";
+import { PROFILE_STEP_ORDER, SITE_URL } from "@/dynamic landing page/lib/constants";
 import {
   DISCIPLINE_OPTIONS,
-  REFERRAL_REWARDS,
   SOURCE_LINES,
   TYPE_COPY
 } from "@/dynamic landing page/lib/sample-data";
@@ -49,121 +47,103 @@ interface InviteExperienceProps {
   sourceVariant: SourceVariant;
 }
 
-const BOOT_LINES = [
-  "generating invite key...",
-  "checking lane...",
-  "loading referral state...",
-  "arming profile autosave..."
-];
-
-const SHARE_PREVIEW_COPY = {
-  developer: {
-    discord: {
-      kicker: "Discord-ready",
-      title: "No more thread diving",
-      body:
-        "I just activated my invite state for Weld. If you are building Roblox and want proof-first discovery instead of Discord noise, join here:"
-    },
-    x: {
-      kicker: "X-ready",
-      title: "Proof-first, fast",
-      body:
-        "Short, punchy, and creator-native. This version keeps the ask light and the link front and center:"
-    },
-    linkedin: {
-      kicker: "LinkedIn-ready",
-      title: "Professional proof language",
-      body:
-        "Use the cleaner proof-first framing when the audience skews more professional or studio-adjacent:"
-    },
-    copy: {
-      kicker: "Link-ready",
-      title: "Invite link copied",
-      body: "The raw invite link is available if you want to write your own message from scratch:"
-    }
-  },
-  studio: {
-    discord: {
-      kicker: "Discord-ready",
-      title: "Less thread chaos",
-      body:
-        "Share the studio angle directly: cleaner Roblox talent filtering, no scavenger hunt ops:"
-    },
-    x: {
-      kicker: "X-ready",
-      title: "Studio access unlocked",
-      body: "Keep the copy short and hiring-focused for quick social sharing:"
-    },
-    linkedin: {
-      kicker: "LinkedIn-ready",
-      title: "Proof-first scout mode",
-      body:
-        "This version frames Weld as a structured hiring workflow for studio and producer audiences:"
-    },
-    copy: {
-      kicker: "Link-ready",
-      title: "Studio invite link",
-      body: "Use the direct studio link if you want to write your own outreach or team note:"
-    }
-  }
-} as const;
-
-const STEP_TITLES: Record<DraftStepKey, string> = {
+const STEP_LABELS: Record<DraftStepKey, string> = {
   identity: "Identity",
   proof: "Proof",
   fit: "Fit"
 };
+
+const SHARE_CHANNELS: Array<{ key: ShareChannel; label: string }> = [
+  { key: "discord", label: "Discord" },
+  { key: "x", label: "X" },
+  { key: "linkedin", label: "LinkedIn" },
+  { key: "copy", label: "Copy link" }
+];
+
+const availabilityOptions = [
+  ["", "Select availability"],
+  ["10h_wk", "~10h/week"],
+  ["20h_wk", "~20h/week"],
+  ["full_time", "Full-time open"],
+  ["sprint_only", "Sprint only"]
+] as const;
+
+const rateOptions = [
+  ["", "Select rate style"],
+  ["hourly", "Hourly"],
+  ["milestone", "Milestone"],
+  ["package", "Package"],
+  ["negotiable", "Negotiable"]
+] as const;
+
+const budgetOptions = [
+  ["", "Select budget style"],
+  ["hourly", "Hourly"],
+  ["milestone", "Milestone"],
+  ["contract", "Contract"],
+  ["mixed", "Mixed"]
+] as const;
 
 export default function InviteExperience({
   initialSnapshot,
   sourceVariant
 }: InviteExperienceProps) {
   const audience = initialSnapshot.lead.audience;
-  const audienceCopy = TYPE_COPY[audience];
-  const sourceLine = SOURCE_LINES[sourceVariant][audience];
+  const copy = TYPE_COPY[audience];
   const [snapshot, setSnapshot] = useState(initialSnapshot);
+  const [form, setForm] = useState<InviteFormState>(() => buildFormState(initialSnapshot));
   const [currentStep, setCurrentStep] = useState<DraftStepKey>(
     initialSnapshot.draft.currentStep
   );
-  const [form, setForm] = useState<InviteFormState>(() => buildFormState(initialSnapshot));
-  const [shareChannel, setShareChannel] = useState<ShareChannel>("discord");
-  const [bootIndex, setBootIndex] = useState(0);
-  const [saveStatus, setSaveStatus] = useState("");
+  const [saveStatus, setSaveStatus] = useState("Ready to save.");
   const [saveError, setSaveError] = useState(false);
+  const [shareChannel, setShareChannel] = useState<ShareChannel>("discord");
   const [shareStatus, setShareStatus] = useState("");
   const [shareError, setShareError] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState("");
-  const [returnNote, setReturnNote] = useState(
-    "Save your link and come back after sharing to check progress."
-  );
-  const progressRef = useRef<HTMLElement | null>(null);
-  const shareRef = useRef<HTMLElement | null>(null);
   const profileRef = useRef<HTMLElement | null>(null);
-  const returnRef = useRef<HTMLElement | null>(null);
+  const shareRef = useRef<HTMLElement | null>(null);
   const autosaveTimer = useRef<number | null>(null);
-  const prefersReducedMotion = useRef(false);
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    prefersReducedMotion.current = mediaQuery.matches;
-
-    if (mediaQuery.matches) {
-      setBootIndex(BOOT_LINES.length);
-      return;
+  const completionPercent = snapshot.draft.completionPercent;
+  const referralGoal = 5;
+  const referralCount = Math.min(snapshot.referralCount, referralGoal);
+  const inviteUrl = snapshot.lead.shareUrl || `${SITE_URL}/invite/${snapshot.lead.inviteCode}`;
+  const sourceLine = SOURCE_LINES[sourceVariant][audience];
+  const nextReward =
+    snapshot.nextReward === null
+      ? "Top beta reward reached"
+      : `${snapshot.nextReward.threshold} referrals unlock ${snapshot.nextReward.label}`;
+  const profileSummary = useMemo(
+    () => buildProfileSummary(audience, form),
+    [audience, form]
+  );
+  const recommendedAction = useMemo(() => {
+    if (completionPercent < 100) {
+      return {
+        title: "Finish your profile",
+        body: "Save the three short profile steps so your invite has enough signal for review.",
+        label: "Continue profile",
+        target: "profile" as const
+      };
     }
 
-    const timeout = window.setInterval(() => {
-      setBootIndex((current) => {
-        if (current >= BOOT_LINES.length) {
-          window.clearInterval(timeout);
-          return current;
-        }
-        return current + 1;
-      });
-    }, 180);
+    if (snapshot.referralCount < 1) {
+      return {
+        title: "Share once",
+        body: "One referral is the cleanest next unlock. Your copy is ready below.",
+        label: "Go to share tools",
+        target: "share" as const
+      };
+    }
 
-    return () => window.clearInterval(timeout);
-  }, []);
+    return {
+      title: "Check status",
+      body: "Your invite is active. Keep the link handy and return here when you want to update proof.",
+      label: "Review status",
+      target: "status" as const
+    };
+  }, [completionPercent, snapshot.referralCount]);
 
   useEffect(() => {
     void trackEvent({
@@ -171,9 +151,7 @@ export default function InviteExperience({
       page: "invite",
       audience,
       inviteCode: snapshot.lead.inviteCode,
-      payload: {
-        sourceVariant
-      }
+      payload: { sourceVariant }
     });
   }, [audience, snapshot.lead.inviteCode, sourceVariant]);
 
@@ -185,109 +163,8 @@ export default function InviteExperience({
     };
   }, []);
 
-  const maxReferrals = REFERRAL_REWARDS[REFERRAL_REWARDS.length - 1]?.count ?? 5;
-  const referralProgress = Math.max(0, Math.min(snapshot.referralCount, maxReferrals));
-  const queueLabel = snapshot.rewardTier.label;
-  const waveHint = snapshot.waveLabel;
-  const nextUnlock =
-    snapshot.nextReward === null
-      ? "Top tier unlocked"
-      : `${snapshot.nextReward.threshold} referrals`;
-  const shareTemplate =
-    shareChannel === "copy"
-      ? snapshot.lead.shareUrl
-      : snapshot.sharePresets[shareChannel];
-  const sharePreview = SHARE_PREVIEW_COPY[audience][shareChannel];
-  const completionPercent = snapshot.draft.completionPercent;
-  const boostCaption =
-    completionPercent > 0
-      ? `Profile boost is at ${completionPercent}%. Keep stacking proof and fit signal.`
-      : "Each saved field boosts matching signal and queue clarity.";
-  const nextAction = useMemo(() => {
-    if (completionPercent >= 100 && snapshot.referralCount >= 1) {
-      return {
-        title: "Check wave status",
-        copy:
-          "Your core setup is in. Use your return state to watch queue and next unlock details.",
-        label: "Check wave status",
-        target: "progress" as const
-      };
-    }
-
-    if (completionPercent >= 60 && snapshot.referralCount < 1) {
-      return {
-        title: "Share your invite",
-        copy:
-          "One referral is the next clean unlock. Your channel-specific copy is already prepared.",
-        label: "Share invite",
-        target: "share" as const
-      };
-    }
-
-    return {
-      title: "Finish your profile loadout",
-      copy: "Each finished field improves matching signal and queue clarity.",
-      label: "Finish profile",
-      target: "profile" as const
-    };
-  }, [completionPercent, snapshot.referralCount]);
-
-  const activeProfileRows = useMemo(() => {
-    if (audience === "studio") {
-      return [
-        ["Team", form.teamSize || "Team size not set"],
-        ["Budget", form.budgetStyle || "Budget style not set"],
-        ["Timeline", form.shippingNote || "Timeline not set"]
-      ];
-    }
-
-    return [
-      ["Proof", form.proofLink || "Proof link not set"],
-      ["Availability", form.availability || "Availability not set"],
-      ["Rate", form.rateStyle || "Rate style not set"]
-    ];
-  }, [audience, form.availability, form.budgetStyle, form.proofLink, form.rateStyle, form.shippingNote, form.teamSize]);
-
-  const activeChips = useMemo(() => {
-    if (audience === "studio") {
-      return form.rolesHiring;
-    }
-
-    return [form.primaryRole, form.availability, form.rateStyle].filter(Boolean);
-  }, [audience, form.availability, form.primaryRole, form.rateStyle, form.rolesHiring]);
-
-  const previewName =
-    audience === "studio"
-      ? form.studioName || "Pending studio identity"
-      : form.displayName || "Pending creator identity";
-  const previewRole =
-    audience === "studio"
-      ? form.rolesHiring.length > 0
-        ? `Hiring: ${form.rolesHiring.join(", ")}`
-        : "Select roles hiring"
-      : form.primaryRole || "Choose a primary discipline";
-  const ringCircumference = 2 * Math.PI * 70;
-  const ringOffset =
-    ringCircumference - ringCircumference * (referralProgress / maxReferrals);
-
-  function scrollToSection(ref: React.RefObject<HTMLElement | null>) {
-    ref.current?.scrollIntoView({
-      behavior: prefersReducedMotion.current ? "auto" : "smooth",
-      block: "start"
-    });
-  }
-
-  function queueAutosave(step: DraftStepKey) {
-    if (autosaveTimer.current) {
-      window.clearTimeout(autosaveTimer.current);
-    }
-
-    setSaveStatus("Autosave armed");
-    setSaveError(false);
-
-    autosaveTimer.current = window.setTimeout(() => {
-      void saveStep(step, { silent: true });
-    }, 700);
+  function scrollTo(ref: React.RefObject<HTMLElement | null>) {
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function updateField<K extends keyof InviteFormState>(
@@ -295,24 +172,33 @@ export default function InviteExperience({
     value: InviteFormState[K],
     step: DraftStepKey
   ) {
-    setForm((current) => ({
-      ...current,
-      [key]: value
-    }));
+    setForm((current) => ({ ...current, [key]: value }));
     queueAutosave(step);
   }
 
-  function toggleRoleChip(value: string) {
-    if (audience === "studio") {
-      const nextRoles = form.rolesHiring.includes(value)
-        ? form.rolesHiring.filter((role) => role !== value)
-        : [...form.rolesHiring, value];
+  function queueAutosave(step: DraftStepKey) {
+    if (autosaveTimer.current) {
+      window.clearTimeout(autosaveTimer.current);
+    }
 
-      updateField("rolesHiring", nextRoles, "proof");
+    setSaveError(false);
+    setSaveStatus("Autosave pending...");
+
+    autosaveTimer.current = window.setTimeout(() => {
+      void saveStep(step, { silent: true });
+    }, 750);
+  }
+
+  function toggleRole(role: string) {
+    if (audience === "studio") {
+      const roles = form.rolesHiring.includes(role)
+        ? form.rolesHiring.filter((value) => value !== role)
+        : [...form.rolesHiring, role];
+      updateField("rolesHiring", roles, "proof");
       return;
     }
 
-    updateField("primaryRole", value, "identity");
+    updateField("primaryRole", role, "identity");
   }
 
   async function saveStep(
@@ -324,16 +210,14 @@ export default function InviteExperience({
     }
 
     if (!options.silent) {
-      setSaveStatus("Saving step...");
+      setSaveStatus("Saving...");
       setSaveError(false);
     }
 
     try {
       const response = await fetch("/api/profile-draft", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           inviteCode: snapshot.lead.inviteCode,
           step,
@@ -341,11 +225,10 @@ export default function InviteExperience({
           sessionId: getSessionId()
         })
       });
-
       const result = (await response.json().catch(() => null)) as SaveResponse | null;
 
       if (!response.ok || !result?.ok) {
-        throw new Error(result?.message || "Could not save profile right now.");
+        throw new Error(result?.message || "Could not save this step.");
       }
 
       const timestamp = new Date().toLocaleTimeString([], {
@@ -353,9 +236,6 @@ export default function InviteExperience({
         minute: "2-digit"
       });
 
-      setLastSavedAt(timestamp);
-      setSaveStatus(options.silent ? `Autosaved (${timestamp}).` : `Saved (${timestamp}).`);
-      setSaveError(false);
       setSnapshot((current) => ({
         ...current,
         draft: result.draft,
@@ -364,20 +244,39 @@ export default function InviteExperience({
         nextReward: result.nextReward,
         waveLabel: result.waveLabel
       }));
+      setLastSavedAt(timestamp);
+      setSaveStatus(options.silent ? `Autosaved at ${timestamp}.` : `Saved at ${timestamp}.`);
+      setSaveError(false);
       return true;
     } catch (error) {
-      setSaveStatus(
-        error instanceof Error ? error.message : "Could not save profile right now."
-      );
+      setSaveStatus(error instanceof Error ? error.message : "Could not save this step.");
       setSaveError(true);
       return false;
     }
   }
 
+  async function saveAndContinue() {
+    const saved = await saveStep(currentStep);
+
+    if (!saved) {
+      return;
+    }
+
+    const index = PROFILE_STEP_ORDER.indexOf(currentStep);
+    const nextStep = PROFILE_STEP_ORDER[index + 1];
+
+    if (nextStep) {
+      setCurrentStep(nextStep);
+      return;
+    }
+
+    scrollTo(shareRef);
+  }
+
   async function handleShare(channel: ShareChannel) {
     setShareChannel(channel);
-    setShareStatus("");
     setShareError(false);
+    setShareStatus("Preparing share copy...");
 
     try {
       const result = await shareInvite(snapshot.lead.inviteCode, channel);
@@ -396,972 +295,564 @@ export default function InviteExperience({
         intent.searchParams.set("text", result.copy);
         window.open(intent.toString(), "_blank", "noopener,noreferrer");
         setShareStatus("Opened X share window.");
-        setShareError(false);
         return;
       }
 
       const copied = await copyToClipboard(channel === "copy" ? result.shareUrl : result.copy);
-
       setShareStatus(
         copied
           ? channel === "copy"
             ? "Invite link copied."
-            : `Prepared ${channel} copy copied.`
-          : "Could not copy automatically. You can still copy manually from the field above."
+            : `${shareLabel(channel)} copy copied.`
+          : "Could not copy automatically. Copy the text manually."
       );
       setShareError(!copied);
     } catch (error) {
-      setShareStatus(
-        error instanceof Error ? error.message : "Could not prepare share copy."
-      );
+      setShareStatus(error instanceof Error ? error.message : "Could not prepare share copy.");
       setShareError(true);
     }
   }
 
-  async function handleNextStep() {
-    const saved = await saveStep(currentStep);
-
-    if (!saved) {
+  function goToRecommendedAction() {
+    if (recommendedAction.target === "share") {
+      scrollTo(shareRef);
       return;
     }
 
-    const currentIndex = PROFILE_STEP_ORDER.indexOf(currentStep);
-    const nextStep = PROFILE_STEP_ORDER[currentIndex + 1];
-
-    if (!nextStep) {
-      setReturnNote(
-        "Profile pass saved. Come back to check wave status and keep sharing your invite link."
-      );
-      scrollToSection(returnRef);
-      return;
-    }
-
-    setCurrentStep(nextStep);
+    scrollTo(profileRef);
   }
 
-  async function handleSaveForLater() {
-    const saved = await saveStep(currentStep);
-
-    if (!saved) {
-      return;
-    }
-
-    setReturnNote("Saved for later. Come back to check wave status and continue where you left off.");
-    scrollToSection(returnRef);
-  }
-
-  function handlePrimaryReturnAction() {
-    if (nextAction.target === "share") {
-      scrollToSection(shareRef);
-      return;
-    }
-
-    if (nextAction.target === "progress") {
-      scrollToSection(progressRef);
-      return;
-    }
-
-    scrollToSection(profileRef);
-  }
-
-  const accentPrimary =
-    audience === "studio"
-      ? "bg-[#229bd2] text-[#f3fbff] hover:bg-[#32b1ea] focus-visible:outline-[#32b1ea]"
-      : "bg-[#ff5a2d] text-[#fff7f1] hover:bg-[#ff734d] focus-visible:outline-[#ff734d]";
-  const accentPill =
-    audience === "studio"
-      ? "border-[#4cc9f0]/30 bg-[#4cc9f0]/12 text-[#b8efff]"
-      : "border-[#ff8c67]/30 bg-[#ff8c67]/12 text-[#ffb59c]";
-  const accentPreview =
-    audience === "studio"
-      ? "from-[#08111c] via-[#09101a] to-[#061018]"
-      : "from-[#120d14] via-[#0c0f17] to-[#080911]";
-  const accentShadow =
-    audience === "studio"
-      ? "shadow-[0_28px_90px_rgba(34,155,210,0.16)]"
-      : "shadow-[0_28px_90px_rgba(255,90,45,0.16)]";
+  const isStudio = audience === "studio";
 
   return (
-    <div className="min-h-screen bg-[#07090e] text-[#f3f5ff]">
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top,rgba(255,90,45,0.12),transparent_28%),radial-gradient(circle_at_82%_12%,rgba(34,155,210,0.14),transparent_24%),linear-gradient(180deg,#06070b_0%,#080912_100%)]" />
-      <div className="relative">
-        <header className="sticky top-0 z-40 border-b border-white/6 bg-[#090b10]/88 backdrop-blur-xl">
-          <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-4 px-5 py-4 md:px-7">
-            <Link href={audience === "studio" ? "/studios" : "/"} className="flex items-center gap-3">
-              <span className="grid h-11 w-11 place-items-center rounded-2xl border border-white/10 bg-white/[0.04]">
-                <Image
-                  src="/Assets/weld-logo-official.svg"
-                  alt="Weld logo"
-                  width={28}
-                  height={28}
-                />
+    <div className="min-h-screen bg-[#f6f8fc] text-[#0d1220]">
+      <main className="relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_12%,rgba(91,108,255,0.16),transparent_28rem),radial-gradient(circle_at_88%_18%,rgba(190,205,255,0.42),transparent_26rem),linear-gradient(180deg,#fbfcff_0%,#f3f6fb_100%)]" />
+        <div className="relative mx-auto flex w-full max-w-[1180px] flex-col gap-5 px-4 py-5 md:px-6 md:py-8">
+          <header className="flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-white/80 bg-white/70 px-4 py-3 shadow-[0_18px_60px_rgba(33,41,65,0.10)] backdrop-blur-xl">
+            <Link href={isStudio ? "/studios" : "/"} className="flex items-center gap-3">
+              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-white/70 shadow-inner">
+                <img src="/Assets/weld-logo-official.svg" alt="" className="h-7 w-7" />
               </span>
-              <span className="flex flex-col">
-                <span className="font-display text-[1.6rem] italic leading-none tracking-[-0.04em]">
-                  Weld
-                </span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/42">
-                  Invite State
-                </span>
-              </span>
+              <span className="text-3xl font-bold tracking-[-0.04em]">weld.</span>
             </Link>
 
-            <div className="flex items-center gap-3">
-              <span
-                className={`hidden rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] md:inline-flex ${accentPill}`}
-              >
-                {audienceCopy.audiencePill}
-              </span>
-              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white/65">
-                {snapshot.lead.inviteCode}
-              </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <StatusPill>{copy.audiencePill}</StatusPill>
+              <StatusPill>{snapshot.lead.inviteCode}</StatusPill>
             </div>
-          </div>
-        </header>
+          </header>
 
-        <main className="pb-12 pt-10 md:pb-16 md:pt-14">
-          <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 px-5 md:px-7">
-            <section
-              id="win-state"
-              className="overflow-hidden rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(16,19,28,0.96),rgba(9,12,18,0.98))] p-6 shadow-[0_32px_90px_rgba(0,0,0,0.42)]"
-            >
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/44">
-                State 1 - Win
-              </span>
-              <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,0.98fr)_minmax(300px,0.82fr)]">
+          <section className="grid gap-5 rounded-[34px] border border-white/80 bg-white/70 p-5 shadow-[0_28px_90px_rgba(33,41,65,0.12)] backdrop-blur-2xl lg:grid-cols-[minmax(0,1fr)_360px] md:p-7">
+            <div className="min-w-0">
+              <StatusPill>Invite active</StatusPill>
+              <h1 className="mt-5 max-w-[780px] text-[clamp(44px,7vw,76px)] font-bold leading-[0.94] tracking-[-0.06em]">
+                You are on the Weld beta list.
+              </h1>
+              <p className="mt-5 max-w-[58ch] text-lg leading-8 text-[#53607a]">
+                {copy.winCopy} Finish the short profile pass, share your invite, and come back here for status.
+              </p>
+              <p className="mt-3 max-w-[58ch] text-sm leading-7 text-[#6f7c95]">
+                {sourceLine}
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => scrollTo(profileRef)}
+                  className="min-h-[52px] rounded-full bg-[#0b0f18] px-6 text-sm font-bold text-white shadow-[0_16px_34px_rgba(10,14,26,0.24)] transition-transform hover:-translate-y-0.5"
+                >
+                  Complete profile
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollTo(shareRef)}
+                  className="min-h-[52px] rounded-full border border-white/90 bg-white/60 px-6 text-sm font-bold text-[#0d1220] shadow-inner transition-transform hover:-translate-y-0.5"
+                >
+                  Share invite
+                </button>
+              </div>
+            </div>
+
+            <aside className="rounded-[28px] border border-white/90 bg-white/75 p-5 shadow-[0_18px_50px_rgba(33,41,65,0.10)]">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-[#5b6cff]">
+                Next best step
+              </div>
+              <h2 className="mt-3 text-2xl font-bold tracking-[-0.03em]">
+                {recommendedAction.title}
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-[#53607a]">{recommendedAction.body}</p>
+              <button
+                type="button"
+                onClick={goToRecommendedAction}
+                className="mt-5 min-h-[48px] w-full rounded-full bg-[#0b0f18] px-5 text-sm font-bold text-white"
+              >
+                {recommendedAction.label}
+              </button>
+            </aside>
+          </section>
+
+          <section className="grid gap-5 md:grid-cols-3">
+            <ProgressCard
+              label="Profile"
+              value={`${completionPercent}%`}
+              helper={completionPercent >= 100 ? "Ready for review" : "Complete three steps"}
+              progress={completionPercent}
+            />
+            <ProgressCard
+              label="Referrals"
+              value={`${referralCount}/${referralGoal}`}
+              helper={nextReward}
+              progress={(referralCount / referralGoal) * 100}
+            />
+            <ProgressCard
+              label="Wave"
+              value={snapshot.rewardTier.label}
+              helper={snapshot.waveLabel}
+              progress={100}
+            />
+          </section>
+
+          <section
+            ref={profileRef}
+            className="grid gap-5 rounded-[34px] border border-white/80 bg-white/70 p-5 shadow-[0_28px_90px_rgba(33,41,65,0.10)] backdrop-blur-2xl lg:grid-cols-[minmax(0,1fr)_360px] md:p-7"
+          >
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <span
-                    className={`inline-flex rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] ${accentPill}`}
-                  >
-                    {bootIndex >= BOOT_LINES.length ? "Invite active" : "Generating"}
-                  </span>
-                  <h1 className="mt-5 font-display text-[2.8rem] italic leading-[0.94] tracking-[-0.05em] md:text-[3.8rem]">
-                    Invite active.
-                  </h1>
-                  <p className="mt-4 max-w-[46ch] text-[15px] leading-8 text-white/70">
-                    {audienceCopy.winCopy}
-                  </p>
-                  <p className="mt-3 max-w-[54ch] text-[14px] leading-7 text-white/52">
-                    {sourceLine}
-                  </p>
-                  <div className="mt-5 flex flex-wrap gap-3">
-                    <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/64">
-                      {audienceCopy.audiencePill}
-                    </span>
-                    <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/64">
-                      {queueLabel}
-                    </span>
-                    <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/64">
-                      {waveHint}
-                    </span>
-                  </div>
-                </div>
-
-                <article
-                  className={`rounded-[28px] border border-white/10 bg-gradient-to-br ${accentPreview} p-5 ${accentShadow}`}
-                >
-                  <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.16em] text-white/46">
-                    <span className="flex items-center gap-2">
-                      <span className="flex gap-1.5">
-                        <span className="h-2.5 w-2.5 rounded-full bg-[#ff5a2d]" />
-                        <span className="h-2.5 w-2.5 rounded-full bg-[#ffbd71]" />
-                        <span className="h-2.5 w-2.5 rounded-full bg-[#59d98e]" />
-                      </span>
-                      <span>{`invite.weld -- ${snapshot.lead.inviteCode}`}</span>
-                    </span>
-                  </div>
-                  <h2 className="mt-5 font-display text-[2rem] italic tracking-[-0.04em] md:text-[2.4rem]">
-                    {snapshot.lead.inviteCode}
+                  <StatusPill>Profile setup</StatusPill>
+                  <h2 className="mt-4 text-[clamp(34px,5vw,54px)] font-bold leading-none tracking-[-0.05em]">
+                    Three short steps. Save any time.
                   </h2>
-                  <ul className="mt-5 grid gap-2">
-                    {BOOT_LINES.map((line, index) => {
-                      const active = index < bootIndex;
-                      const done = index < bootIndex - 1;
-
-                      return (
-                        <li
-                          key={line}
-                          className={`grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-[18px] border px-3 py-3 font-mono text-[10px] uppercase tracking-[0.14em] transition-colors ${
-                            active
-                              ? "border-white/10 bg-white/[0.06] text-white/68"
-                              : "border-white/6 bg-white/[0.03] text-white/34"
-                          }`}
-                        >
-                          <span className={audience === "studio" ? "text-[#7addff]" : "text-[#ff9a7a]"}>
-                            &gt;
-                          </span>
-                          <span>{line}</span>
-                          <span className={done ? "text-[#9ce7bf]" : "text-white/42"}>
-                            {active ? (index === BOOT_LINES.length - 1 ? "ready" : "ok") : "..."}
-                          </span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                  <div className="mt-5 grid gap-3">
-                    <InviteInfoRow label="Email" value={snapshot.lead.email} />
-                    <InviteInfoRow
-                      label="Audience"
-                      value={audience === "studio" ? "Studio" : "Developer"}
-                    />
-                    <InviteInfoRow label="Ref code" value={snapshot.lead.inviteCode} />
-                    <InviteInfoRow label="Share link" value={snapshot.lead.shareUrl} wrap />
-                  </div>
-                </article>
-              </div>
-            </section>
-
-            <section
-              id="progress-state"
-              ref={progressRef}
-              className="rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(13,17,25,0.96),rgba(8,11,18,0.99))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.44)]"
-            >
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/44">
-                State 2 - Progress
-              </span>
-              <h2 className="mt-4 font-display text-[2.1rem] italic tracking-[-0.04em] md:text-[2.8rem]">
-                Track your queue and unlocks.
-              </h2>
-              <p className="mt-3 max-w-[56ch] text-[15px] leading-8 text-white/64">
-                No fake ranking. Just your queue hint, referral progress, next unlock, and profile boost.
-              </p>
-
-              <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,0.92fr)_minmax(300px,1.08fr)]">
-                <article className="grid gap-5 rounded-[28px] border border-white/8 bg-white/[0.03] p-5">
-                  <div className="grid gap-5 lg:grid-cols-[minmax(220px,0.52fr)_minmax(0,1fr)] lg:items-center">
-                    <div className="mx-auto grid w-full max-w-[220px] place-items-center">
-                      <div className="relative grid aspect-square w-full place-items-center">
-                        <svg viewBox="0 0 160 160" className="h-full w-full -rotate-90 overflow-visible">
-                          <circle
-                            cx="80"
-                            cy="80"
-                            r="70"
-                            className="fill-none stroke-[10] text-white/10"
-                            stroke="currentColor"
-                          />
-                          <circle
-                            cx="80"
-                            cy="80"
-                            r="70"
-                            className={audience === "studio" ? "fill-none stroke-[10] text-[#4cc9f0]" : "fill-none stroke-[10] text-[#ff5a2d]"}
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeDasharray={ringCircumference}
-                            strokeDashoffset={ringOffset}
-                            style={{
-                              transition: prefersReducedMotion.current
-                                ? "none"
-                                : "stroke-dashoffset 520ms cubic-bezier(.22,1,.36,1)"
-                            }}
-                          />
-                        </svg>
-                        <div className="absolute inset-0 grid place-items-center text-center">
-                          <div>
-                            <div className="font-display text-[2.8rem] italic leading-none tracking-[-0.05em]">
-                              {`${referralProgress}/${maxReferrals}`}
-                            </div>
-                            <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-white/42">
-                              referrals
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <MetricCard label="Queue" value={queueLabel} />
-                      <MetricCard label="Wave hint" value={waveHint} />
-                      <MetricCard label="Next unlock" value={nextUnlock} />
-                      <MetricCard
-                        label="Profile boost"
-                        value={`${completionPercent}%`}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-5 gap-2">
-                    {REFERRAL_REWARDS.map((reward) => {
-                      const isActive = referralProgress >= reward.count;
-                      const isNext = !isActive && reward.count === referralProgress + 1;
-
-                      return (
-                        <div
-                          key={reward.count}
-                          className={`grid h-11 place-items-center rounded-[14px] border font-mono text-[11px] uppercase tracking-[0.14em] ${
-                            isActive
-                              ? audience === "studio"
-                                ? "border-[#4cc9f0]/30 bg-[#4cc9f0]/16 text-[#d7f7ff]"
-                                : "border-[#ff8c67]/30 bg-[#ff8c67]/16 text-[#ffe1d7]"
-                              : isNext
-                                ? "border-white/12 bg-white/[0.05] text-white/76"
-                                : "border-white/8 bg-white/[0.02] text-white/35"
-                          }`}
-                        >
-                          {reward.count}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div>
-                    <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/42">
-                      Profile completion
-                    </div>
-                    <div className="mt-3 h-3 rounded-full border border-white/8 bg-[#0a0c12] p-[2px]">
-                      <div
-                        className={`h-full rounded-full ${
-                          audience === "studio" ? "bg-[#4cc9f0]" : "bg-[#ff5a2d]"
-                        }`}
-                        style={{
-                          width: `${completionPercent}%`,
-                          transition: prefersReducedMotion.current
-                            ? "none"
-                            : "width 320ms cubic-bezier(.22,1,.36,1)"
-                        }}
-                      />
-                    </div>
-                  </div>
-                </article>
-
-                <aside className="rounded-[28px] border border-white/8 bg-white/[0.03] p-5">
-                  <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white/68">
-                    Reward ladder
-                  </span>
-                  <div className="mt-5 grid gap-3">
-                    {REFERRAL_REWARDS.map((reward) => {
-                      const active = referralProgress >= reward.count;
-                      const next = !active && snapshot.nextReward?.threshold === reward.count;
-
-                      return (
-                        <article
-                          key={reward.count}
-                          className={`grid grid-cols-[48px_1fr] gap-4 rounded-[20px] border p-4 ${
-                            active
-                              ? audience === "studio"
-                                ? "border-[#4cc9f0]/24 bg-[#4cc9f0]/10"
-                                : "border-[#ff8c67]/24 bg-[#ff8c67]/10"
-                              : next
-                                ? "border-white/12 bg-white/[0.04]"
-                                : "border-white/8 bg-white/[0.03]"
-                          }`}
-                        >
-                          <div
-                            className={`grid h-12 w-12 place-items-center rounded-2xl font-display text-[1.4rem] italic ${
-                              active
-                                ? audience === "studio"
-                                  ? "bg-[#4cc9f0]/16 text-[#d7f7ff]"
-                                  : "bg-[#ff8c67]/16 text-[#ffe2d9]"
-                                : "bg-white/[0.04] text-white/54"
-                            }`}
-                          >
-                            {reward.count}
-                          </div>
-                          <div>
-                            <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/42">
-                              {reward.title}
-                            </div>
-                            <p className="mt-2 text-[15px] leading-7 text-white/72">
-                              {reward.detail}
-                            </p>
-                          </div>
-                        </article>
-                      );
-                    })}
-                  </div>
-                </aside>
-              </div>
-            </section>
-
-            <section
-              id="share-state"
-              ref={shareRef}
-              className="rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(13,18,30,0.96),rgba(8,11,19,0.99))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.44)]"
-            >
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/44">
-                State 3 - Share
-              </span>
-              <h2 className="mt-4 font-display text-[2.1rem] italic tracking-[-0.04em] md:text-[2.8rem]">
-                Share in your voice, fast.
-              </h2>
-              <p className="mt-3 max-w-[58ch] text-[15px] leading-8 text-white/64">
-                {audienceCopy.shareCopy}
-              </p>
-
-              <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.92fr)]">
-                <article className="grid gap-4 rounded-[28px] border border-white/8 bg-white/[0.03] p-5">
-                  <div className="flex flex-wrap gap-3">
-                    {(["discord", "x", "copy", "linkedin"] as ShareChannel[]).map((channel) => {
-                      if (
-                        channel === "linkedin" &&
-                        audience !== "studio" &&
-                        sourceVariant !== "linkedin"
-                      ) {
-                        return null;
-                      }
-
-                      return (
-                        <button
-                          key={channel}
-                          type="button"
-                          onClick={() => void handleShare(channel)}
-                          className={`rounded-full border px-4 py-3 font-mono text-[11px] uppercase tracking-[0.14em] transition-transform transition-colors hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
-                            shareChannel === channel
-                              ? audience === "studio"
-                                ? "border-[#4cc9f0]/26 bg-[#4cc9f0]/14 text-[#e4f9ff]"
-                                : "border-[#ff8c67]/26 bg-[#ff8c67]/14 text-[#fff1eb]"
-                              : "border-white/12 bg-white/[0.04] text-white/72 hover:bg-white/[0.08]"
-                          }`}
-                        >
-                          {shareButtonLabel(channel)}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <div className="grid gap-3">
-                    <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">
-                      Invite link
-                    </label>
-                    <input
-                      readOnly
-                      value={snapshot.lead.shareUrl}
-                      className="min-h-[56px] rounded-[16px] border border-white/10 bg-[#0b0f16] px-4 text-[15px] text-white/76 outline-none"
-                    />
-                    <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">
-                      Prepared share copy
-                    </label>
-                    <textarea
-                      readOnly
-                      value={shareTemplate}
-                      className="min-h-[140px] rounded-[20px] border border-white/10 bg-[#0b0f16] px-4 py-4 text-[15px] leading-7 text-white/76 outline-none"
-                    />
-                  </div>
-
-                  <p
-                    className={`min-h-[1.35rem] text-sm ${
-                      shareError ? "text-[#ffc1d6]" : "text-[#9ce7bf]"
-                    }`}
-                  >
-                    {shareStatus}
-                  </p>
-                </article>
-
-                <aside
-                  className={`grid gap-3 rounded-[28px] border border-white/8 bg-gradient-to-br ${accentPreview} p-5 ${accentShadow}`}
+                </div>
+                <div
+                  className={`rounded-full px-4 py-2 text-xs font-bold ${
+                    saveError
+                      ? "bg-[#ffe8ee] text-[#b12a42]"
+                      : "bg-[#eef6ff] text-[#3150c9]"
+                  }`}
+                  aria-live="polite"
                 >
-                  <span
-                    className={`inline-flex w-fit rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] ${accentPill}`}
-                  >
-                    {sharePreview.kicker}
-                  </span>
-                  <h3 className="font-display text-[1.8rem] italic tracking-[-0.04em]">
-                    {sharePreview.title}
-                  </h3>
-                  <p className="text-[15px] leading-8 text-white/70">{sharePreview.body}</p>
-                  <code className="rounded-[16px] border border-white/10 bg-white/[0.04] px-4 py-3 font-mono text-[12px] text-[#9ce7bf]">
-                    {snapshot.lead.shareUrl}
-                  </code>
-                </aside>
+                  {saveStatus}
+                </div>
               </div>
-            </section>
 
-            <section
-              id="profile-state"
-              ref={profileRef}
-              className="rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(13,18,30,0.96),rgba(8,11,19,0.99))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.44)]"
-            >
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/44">
-                State 4 - Profile
-              </span>
-              <h2 className="mt-4 font-display text-[2.1rem] italic tracking-[-0.04em] md:text-[2.8rem]">
-                Build your role loadout.
-              </h2>
-              <p className="mt-3 max-w-[56ch] text-[15px] leading-8 text-white/64">
-                {audienceCopy.profileCopy}
-              </p>
-
-              <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.9fr)]">
-                <article className="grid gap-5 rounded-[28px] border border-white/8 bg-white/[0.03] p-5">
-                  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div className="flex flex-wrap gap-3" role="tablist" aria-label="Profile steps">
-                      {PROFILE_STEP_ORDER.map((step) => (
-                        <button
-                          key={step}
-                          type="button"
-                          onClick={() => setCurrentStep(step)}
-                          className={`rounded-full border px-4 py-3 font-mono text-[11px] uppercase tracking-[0.14em] transition-transform transition-colors hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
-                            currentStep === step
-                              ? audience === "studio"
-                                ? "border-[#4cc9f0]/26 bg-[#4cc9f0]/14 text-[#f1fcff]"
-                                : "border-[#ff8c67]/26 bg-[#ff8c67]/14 text-[#fff5f1]"
-                              : "border-white/12 bg-white/[0.04] text-white/70 hover:bg-white/[0.08]"
-                          }`}
-                        >
-                          {STEP_TITLES[step]}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/42">
-                      {`Step ${PROFILE_STEP_ORDER.indexOf(currentStep) + 1} of 3`}
-                    </div>
-                  </div>
-
-                  <p
-                    className={`min-h-[1.35rem] text-sm ${
-                      saveError ? "text-[#ffc1d6]" : "text-[#9ce7bf]"
+              <div className="mt-6 grid grid-cols-3 gap-2">
+                {PROFILE_STEP_ORDER.map((step) => (
+                  <button
+                    key={step}
+                    type="button"
+                    onClick={() => setCurrentStep(step)}
+                    className={`min-h-[44px] rounded-full border px-3 text-sm font-bold transition-colors ${
+                      currentStep === step
+                        ? "border-[#0b0f18] bg-[#0b0f18] text-white"
+                        : "border-white/90 bg-white/60 text-[#53607a]"
                     }`}
                   >
-                    {saveStatus}
-                  </p>
-
-                  {currentStep === "identity" ? (
-                    <section className="grid gap-5">
-                      <div>
-                        <h3 className="font-display text-[1.6rem] italic tracking-[-0.04em]">
-                          Identity
-                        </h3>
-                        <p className="mt-2 text-[15px] leading-7 text-white/62">
-                          {audienceCopy.identityCopy}
-                        </p>
-                      </div>
-
-                      {audience === "studio" ? (
-                        <FieldBlock label="Studio name">
-                          <input
-                            value={form.studioName}
-                            onChange={(event) =>
-                              updateField("studioName", event.target.value, "identity")
-                            }
-                            placeholder="Your studio or team name"
-                            className={fieldClassName}
-                          />
-                        </FieldBlock>
-                      ) : (
-                        <>
-                          <FieldBlock label="Display name">
-                            <input
-                              value={form.displayName}
-                              onChange={(event) =>
-                                updateField("displayName", event.target.value, "identity")
-                              }
-                              placeholder="How studios should see you"
-                              className={fieldClassName}
-                            />
-                          </FieldBlock>
-
-                          <FieldBlock label="Primary discipline">
-                            <div className="flex flex-wrap gap-2">
-                              {DISCIPLINE_OPTIONS.map((item) => (
-                                <button
-                                  key={item}
-                                  type="button"
-                                  onClick={() => toggleRoleChip(item)}
-                                  className={`rounded-full border px-3 py-2 font-mono text-[11px] uppercase tracking-[0.14em] transition-transform transition-colors hover:-translate-y-0.5 ${
-                                    form.primaryRole === item
-                                      ? "border-[#ff8c67]/26 bg-[#ff8c67]/14 text-[#fff1eb]"
-                                      : "border-white/12 bg-white/[0.04] text-white/68 hover:bg-white/[0.08]"
-                                  }`}
-                                >
-                                  {item}
-                                </button>
-                              ))}
-                            </div>
-                            <p className="mt-3 text-sm leading-7 text-white/46">
-                              Each selected discipline improves how studios filter your loadout.
-                            </p>
-                          </FieldBlock>
-                        </>
-                      )}
-                    </section>
-                  ) : null}
-
-                  {currentStep === "proof" ? (
-                    <section className="grid gap-5">
-                      <div>
-                        <h3 className="font-display text-[1.6rem] italic tracking-[-0.04em]">
-                          Proof
-                        </h3>
-                        <p className="mt-2 text-[15px] leading-7 text-white/62">
-                          {audienceCopy.proofCopy}
-                        </p>
-                      </div>
-
-                      {audience === "studio" ? (
-                        <>
-                          <FieldBlock label="Roles hiring for">
-                            <div className="flex flex-wrap gap-2">
-                              {DISCIPLINE_OPTIONS.map((item) => (
-                                <button
-                                  key={item}
-                                  type="button"
-                                  onClick={() => toggleRoleChip(item)}
-                                  className={`rounded-full border px-3 py-2 font-mono text-[11px] uppercase tracking-[0.14em] transition-transform transition-colors hover:-translate-y-0.5 ${
-                                    form.rolesHiring.includes(item)
-                                      ? "border-[#4cc9f0]/26 bg-[#4cc9f0]/14 text-[#f1fcff]"
-                                      : "border-white/12 bg-white/[0.04] text-white/68 hover:bg-white/[0.08]"
-                                  }`}
-                                >
-                                  {item}
-                                </button>
-                              ))}
-                            </div>
-                            <p className="mt-3 text-sm leading-7 text-white/46">
-                              Selected roles show up live in your scout preview.
-                            </p>
-                          </FieldBlock>
-
-                          <FieldBlock label="Team size">
-                            <input
-                              value={form.teamSize}
-                              onChange={(event) =>
-                                updateField("teamSize", event.target.value, "proof")
-                              }
-                              placeholder="e.g. 4-8 core members"
-                              className={fieldClassName}
-                            />
-                          </FieldBlock>
-                        </>
-                      ) : (
-                        <FieldBlock label="One proof link">
-                          <input
-                            value={form.proofLink}
-                            onChange={(event) =>
-                              updateField("proofLink", event.target.value, "proof")
-                            }
-                            placeholder="Roblox game, portfolio, or reel link"
-                            className={fieldClassName}
-                          />
-                          <p className="mt-3 text-sm leading-7 text-white/46">
-                            One link is enough if it clearly proves shipped work.
-                          </p>
-                        </FieldBlock>
-                      )}
-                    </section>
-                  ) : null}
-
-                  {currentStep === "fit" ? (
-                    <section className="grid gap-5">
-                      <div>
-                        <h3 className="font-display text-[1.6rem] italic tracking-[-0.04em]">
-                          Fit
-                        </h3>
-                        <p className="mt-2 text-[15px] leading-7 text-white/62">
-                          {audienceCopy.fitCopy}
-                        </p>
-                      </div>
-
-                      {audience === "studio" ? (
-                        <>
-                          <FieldBlock label="Budget style">
-                            <select
-                              value={form.budgetStyle}
-                              onChange={(event) =>
-                                updateField("budgetStyle", event.target.value, "fit")
-                              }
-                              className={fieldClassName}
-                            >
-                              <option value="">Select style</option>
-                              <option value="hourly">Hourly</option>
-                              <option value="milestone">Milestone</option>
-                              <option value="contract">Contract</option>
-                              <option value="mixed">Mixed</option>
-                            </select>
-                          </FieldBlock>
-
-                          <FieldBlock label="Timeline / what are you building?">
-                            <textarea
-                              value={form.shippingNote}
-                              onChange={(event) =>
-                                updateField("shippingNote", event.target.value, "fit")
-                              }
-                              placeholder="Short version only. Example: launching PvP update in 6 weeks."
-                              className={`${fieldClassName} min-h-[132px] resize-y py-4`}
-                            />
-                          </FieldBlock>
-                        </>
-                      ) : (
-                        <>
-                          <div className="grid gap-5 md:grid-cols-2">
-                            <FieldBlock label="Availability">
-                              <select
-                                value={form.availability}
-                                onChange={(event) =>
-                                  updateField("availability", event.target.value, "fit")
-                                }
-                                className={fieldClassName}
-                              >
-                                <option value="">Select availability</option>
-                                <option value="10h_wk">~10h/week</option>
-                                <option value="20h_wk">~20h/week</option>
-                                <option value="full_time">Full-time open</option>
-                                <option value="sprint_only">Sprint only</option>
-                              </select>
-                            </FieldBlock>
-
-                            <FieldBlock label="Rate / budget style">
-                              <select
-                                value={form.rateStyle}
-                                onChange={(event) =>
-                                  updateField("rateStyle", event.target.value, "fit")
-                                }
-                                className={fieldClassName}
-                              >
-                                <option value="">Select style</option>
-                                <option value="hourly">Hourly</option>
-                                <option value="milestone">Milestone</option>
-                                <option value="package">Package</option>
-                                <option value="negotiable">Negotiable</option>
-                              </select>
-                            </FieldBlock>
-                          </div>
-
-                          <FieldBlock label="Short note">
-                            <textarea
-                              value={form.note}
-                              onChange={(event) => updateField("note", event.target.value, "fit")}
-                              placeholder="What work are you best at right now? Keep it short."
-                              className={`${fieldClassName} min-h-[132px] resize-y py-4`}
-                            />
-                          </FieldBlock>
-                        </>
-                      )}
-                    </section>
-                  ) : null}
-
-                  <div className="flex flex-col gap-3 md:flex-row md:flex-wrap">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const currentIndex = PROFILE_STEP_ORDER.indexOf(currentStep);
-                        const previous = PROFILE_STEP_ORDER[currentIndex - 1];
-                        if (previous) {
-                          setCurrentStep(previous);
-                        }
-                      }}
-                      disabled={PROFILE_STEP_ORDER.indexOf(currentStep) === 0}
-                      className="rounded-full border border-white/12 bg-white/[0.04] px-5 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-white/78 transition-transform transition-colors hover:-translate-y-0.5 hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-45"
-                    >
-                      Previous
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void saveStep(currentStep)}
-                      className="rounded-full border border-white/12 bg-white/[0.04] px-5 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-white/78 transition-transform transition-colors hover:-translate-y-0.5 hover:bg-white/[0.08]"
-                    >
-                      Save now
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void handleNextStep()}
-                      className={`rounded-full px-5 py-3 font-mono text-[11px] uppercase tracking-[0.14em] transition-transform transition-colors hover:-translate-y-0.5 ${accentPrimary}`}
-                    >
-                      {PROFILE_STEP_ORDER.indexOf(currentStep) === PROFILE_STEP_ORDER.length - 1
-                        ? "Finish this pass"
-                        : "Save and continue"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void handleSaveForLater()}
-                      className="rounded-full border border-white/12 bg-white/[0.04] px-5 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-white/78 transition-transform transition-colors hover:-translate-y-0.5 hover:bg-white/[0.08]"
-                    >
-                      Save and exit for now
-                    </button>
-                  </div>
-                </article>
-
-                <aside className={`grid gap-4 rounded-[28px] border border-white/8 bg-gradient-to-br ${accentPreview} p-5 ${accentShadow}`}>
-                  <div className="flex items-center justify-between gap-3">
-                    <span
-                      className={`inline-flex rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] ${accentPill}`}
-                    >
-                      Live loadout preview
-                    </span>
-                    <span
-                      className={`rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] ${
-                        saveError
-                          ? "border-[#ff85b0]/25 bg-[#ff85b0]/14 text-[#ffd8e7]"
-                          : "border-white/10 bg-white/[0.04] text-white/74"
-                      }`}
-                    >
-                      {saveError ? "Save error" : saveStatus ? "Saved state" : "Autosave armed"}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="font-display text-[1.9rem] italic tracking-[-0.04em]">
-                      {previewName}
-                    </h3>
-                    <p className="mt-2 text-[15px] text-white/70">{previewRole}</p>
-                  </div>
-                  <div className="grid gap-3">
-                    {activeProfileRows.map(([label, value]) => (
-                      <div
-                        key={label}
-                        className="flex items-center justify-between gap-4 rounded-[18px] border border-white/8 bg-white/[0.04] px-4 py-3"
-                      >
-                        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/42">
-                          {label}
-                        </span>
-                        <strong className="max-w-[60%] text-right text-[14px] leading-6 text-white/78">
-                          {value}
-                        </strong>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {(activeChips.length > 0 ? activeChips : ["Signal pending"]).map((chip) => (
-                      <span
-                        key={chip}
-                        className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white/72"
-                      >
-                        {chip}
-                      </span>
-                    ))}
-                  </div>
-                  <div>
-                    <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/42">
-                      Boost meter
-                    </div>
-                    <div className="mt-3 h-3 rounded-full border border-white/8 bg-[#0a0c12] p-[2px]">
-                      <div
-                        className={`h-full rounded-full ${
-                          audience === "studio" ? "bg-[#4cc9f0]" : "bg-[#ff5a2d]"
-                        }`}
-                        style={{
-                          width: `${completionPercent}%`,
-                          transition: prefersReducedMotion.current
-                            ? "none"
-                            : "width 320ms cubic-bezier(.22,1,.36,1)"
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <p className="text-[14px] leading-7 text-white/64">{boostCaption}</p>
-                </aside>
+                    {STEP_LABELS[step]}
+                  </button>
+                ))}
               </div>
-            </section>
 
-            <section
-              id="return-state"
-              ref={returnRef}
-              className="rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(13,18,30,0.96),rgba(8,11,19,0.99))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.44)]"
-            >
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/44">
-                State 5 - Return
-              </span>
-              <h2 className="mt-4 font-display text-[2.1rem] italic tracking-[-0.04em] md:text-[2.8rem]">
-                Come back with one clear next action.
+              <div className="mt-6 rounded-[28px] border border-white/80 bg-white/60 p-5">
+                <ProfileStep
+                  audience={audience}
+                  step={currentStep}
+                  form={form}
+                  onFieldChange={updateField}
+                  onRoleToggle={toggleRole}
+                />
+
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => void saveStep(currentStep)}
+                    className="min-h-[48px] rounded-full border border-white/90 bg-white/70 px-5 text-sm font-bold text-[#0d1220]"
+                  >
+                    Save now
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void saveAndContinue()}
+                    className="min-h-[48px] rounded-full bg-[#0b0f18] px-5 text-sm font-bold text-white"
+                  >
+                    {currentStep === "fit" ? "Save and go to share" : "Save and continue"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <aside className="rounded-[28px] border border-white/90 bg-white/75 p-5 shadow-[0_18px_50px_rgba(33,41,65,0.10)]">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-[#5b6cff]">
+                Preview
+              </div>
+              <h3 className="mt-3 text-3xl font-bold tracking-[-0.04em]">
+                {profileSummary.title}
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-[#53607a]">{profileSummary.subtitle}</p>
+              <div className="mt-5 grid gap-3">
+                {profileSummary.rows.map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="flex items-start justify-between gap-4 rounded-2xl border border-white/80 bg-white/60 px-4 py-3"
+                  >
+                    <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#6f7c95]">
+                      {label}
+                    </span>
+                    <strong className="max-w-[62%] text-right text-sm leading-6 text-[#0d1220]">
+                      {value}
+                    </strong>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-5 text-sm leading-7 text-[#6f7c95]">
+                {lastSavedAt ? `Last saved at ${lastSavedAt}.` : "Autosave starts after first edit."}
+              </p>
+            </aside>
+          </section>
+
+          <section
+            ref={shareRef}
+            className="grid gap-5 rounded-[34px] border border-white/80 bg-white/70 p-5 shadow-[0_28px_90px_rgba(33,41,65,0.10)] backdrop-blur-2xl lg:grid-cols-[minmax(0,1fr)_360px] md:p-7"
+          >
+            <div>
+              <StatusPill>Share invite</StatusPill>
+              <h2 className="mt-4 text-[clamp(34px,5vw,54px)] font-bold leading-none tracking-[-0.05em]">
+                One link. Clear copy. No guessing.
               </h2>
-              <p className="mt-3 max-w-[60ch] text-[15px] leading-8 text-white/64">
-                Your invite link stays active. Return any time to push profile completion, watch referral progress, and check wave status.
+              <p className="mt-4 max-w-[58ch] text-base leading-8 text-[#53607a]">
+                {copy.shareCopy}
               </p>
 
-              <div className="mt-5 flex flex-wrap gap-3">
-                <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/64">
-                  {`Profile ${completionPercent}%`}
-                </span>
-                <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/64">
-                  {`Referrals ${referralProgress}/${maxReferrals}`}
-                </span>
-                <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/64">
-                  {nextUnlock}
-                </span>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {SHARE_CHANNELS.map((channel) => (
+                  <button
+                    key={channel.key}
+                    type="button"
+                    onClick={() => void handleShare(channel.key)}
+                    className={`min-h-[44px] rounded-full border px-4 text-sm font-bold ${
+                      shareChannel === channel.key
+                        ? "border-[#0b0f18] bg-[#0b0f18] text-white"
+                        : "border-white/90 bg-white/60 text-[#53607a]"
+                    }`}
+                  >
+                    {channel.label}
+                  </button>
+                ))}
               </div>
 
-              <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.92fr)]">
-                <article className="rounded-[24px] border border-white/8 bg-white/[0.03] p-5">
-                  <h3 className="font-display text-[1.8rem] italic tracking-[-0.04em]">
-                    Invite link
-                  </h3>
-                  <input
-                    readOnly
-                    value={snapshot.lead.shareUrl}
-                    className="mt-4 min-h-[56px] w-full rounded-[16px] border border-white/10 bg-[#0b0f16] px-4 text-[15px] text-white/76 outline-none"
-                  />
-                  <p className="mt-4 text-[14px] leading-7 text-white/58">{returnNote}</p>
-                  <p className="mt-2 text-[14px] leading-7 text-white/48">
-                    {lastSavedAt ? `Last saved: ${lastSavedAt}.` : "Last saved: waiting for first save."}
-                  </p>
-                </article>
+              <textarea
+                readOnly
+                value={
+                  shareChannel === "copy"
+                    ? inviteUrl
+                    : snapshot.sharePresets[shareChannel] || inviteUrl
+                }
+                className="mt-5 min-h-[150px] w-full resize-y rounded-[24px] border border-white/90 bg-white/70 p-4 text-sm leading-7 text-[#0d1220] outline-none"
+              />
+              {shareStatus ? (
+                <p
+                  className={`mt-3 text-sm font-bold ${
+                    shareError ? "text-[#b12a42]" : "text-[#3150c9]"
+                  }`}
+                  aria-live="polite"
+                >
+                  {shareStatus}
+                </p>
+              ) : null}
+            </div>
 
-                <article className="rounded-[24px] border border-white/8 bg-white/[0.03] p-5">
-                  <h3 className="font-display text-[1.8rem] italic tracking-[-0.04em]">
-                    {nextAction.title}
-                  </h3>
-                  <p className="mt-3 text-[14px] leading-7 text-white/58">{nextAction.copy}</p>
-                  <div className="mt-5 flex flex-col gap-3">
-                    <button
-                      type="button"
-                      onClick={handlePrimaryReturnAction}
-                      className={`rounded-full px-5 py-3 font-mono text-[11px] uppercase tracking-[0.14em] transition-transform transition-colors hover:-translate-y-0.5 ${accentPrimary}`}
-                    >
-                      {nextAction.label}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void handleShare("copy")}
-                      className="rounded-full border border-white/12 bg-white/[0.04] px-5 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-white/78 transition-transform transition-colors hover:-translate-y-0.5 hover:bg-white/[0.08]"
-                    >
-                      Copy invite link
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => scrollToSection(profileRef)}
-                      className="rounded-full border border-white/12 bg-white/[0.04] px-5 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-white/78 transition-transform transition-colors hover:-translate-y-0.5 hover:bg-white/[0.08]"
-                    >
-                      Reopen profile builder
-                    </button>
-                  </div>
-                </article>
+            <aside className="rounded-[28px] border border-white/90 bg-white/75 p-5 shadow-[0_18px_50px_rgba(33,41,65,0.10)]">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-[#5b6cff]">
+                Direct invite
               </div>
-            </section>
+              <input
+                readOnly
+                value={inviteUrl}
+                className="mt-4 min-h-[52px] w-full rounded-2xl border border-white/90 bg-white/70 px-4 text-sm text-[#0d1220] outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => void handleShare("copy")}
+                className="mt-4 min-h-[48px] w-full rounded-full bg-[#0b0f18] px-5 text-sm font-bold text-white"
+              >
+                Copy invite link
+              </button>
+              <p className="mt-5 text-sm leading-7 text-[#53607a]">
+                Referral count updates when people use your invite. No fake counters, no hidden checklist.
+              </p>
+            </aside>
+          </section>
 
-            <p className="text-center text-[12px] uppercase tracking-[0.12em] text-white/36">
-              Weld invite state keeps referral, share, and profile actions honest. Product previews are examples only.
-            </p>
-          </div>
-        </main>
+          <footer className="rounded-[28px] border border-white/80 bg-white/60 p-5 text-sm leading-7 text-[#53607a] shadow-[0_18px_60px_rgba(33,41,65,0.08)]">
+            Invite active for <strong className="text-[#0d1220]">{snapshot.lead.email}</strong>.
+            Status: <strong className="text-[#0d1220]">{snapshot.rewardTier.label}</strong>.
+            Return here any time to update profile proof or copy your invite.
+          </footer>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function ProfileStep({
+  audience,
+  step,
+  form,
+  onFieldChange,
+  onRoleToggle
+}: {
+  audience: Audience;
+  step: DraftStepKey;
+  form: InviteFormState;
+  onFieldChange: <K extends keyof InviteFormState>(
+    key: K,
+    value: InviteFormState[K],
+    step: DraftStepKey
+  ) => void;
+  onRoleToggle: (role: string) => void;
+}) {
+  const isStudio = audience === "studio";
+
+  if (step === "identity") {
+    return (
+      <div>
+        <h3 className="text-2xl font-bold tracking-[-0.03em]">Identity</h3>
+        <p className="mt-2 text-sm leading-7 text-[#53607a]">
+          {TYPE_COPY[audience].identityCopy}
+        </p>
+        <div className="mt-5 grid gap-5">
+          {isStudio ? (
+            <Field label="Studio name">
+              <input
+                value={form.studioName}
+                onChange={(event) => onFieldChange("studioName", event.target.value, "identity")}
+                placeholder="Example: Nova Studio"
+                className={fieldClassName}
+              />
+            </Field>
+          ) : (
+            <>
+              <Field label="Display name">
+                <input
+                  value={form.displayName}
+                  onChange={(event) =>
+                    onFieldChange("displayName", event.target.value, "identity")
+                  }
+                  placeholder="Example: Eclipse"
+                  className={fieldClassName}
+                />
+              </Field>
+              <RolePicker
+                selected={form.primaryRole ? [form.primaryRole] : []}
+                multi={false}
+                onToggle={onRoleToggle}
+              />
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (step === "proof") {
+    return (
+      <div>
+        <h3 className="text-2xl font-bold tracking-[-0.03em]">Proof</h3>
+        <p className="mt-2 text-sm leading-7 text-[#53607a]">
+          {TYPE_COPY[audience].proofCopy}
+        </p>
+        <div className="mt-5 grid gap-5">
+          {isStudio ? (
+            <>
+              <RolePicker
+                selected={form.rolesHiring}
+                multi
+                onToggle={onRoleToggle}
+              />
+              <Field label="Team size">
+                <select
+                  value={form.teamSize}
+                  onChange={(event) => onFieldChange("teamSize", event.target.value, "proof")}
+                  className={fieldClassName}
+                >
+                  <option value="">Select team size</option>
+                  <option value="solo">Solo / founder</option>
+                  <option value="small">2-5 people</option>
+                  <option value="mid">6-15 people</option>
+                  <option value="large">16+ people</option>
+                </select>
+              </Field>
+            </>
+          ) : (
+            <Field label="Best proof link">
+              <input
+                value={form.proofLink}
+                onChange={(event) => onFieldChange("proofLink", event.target.value, "proof")}
+                placeholder="Roblox game, portfolio, reel, or GitHub link"
+                className={fieldClassName}
+              />
+            </Field>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h3 className="text-2xl font-bold tracking-[-0.03em]">Fit</h3>
+      <p className="mt-2 text-sm leading-7 text-[#53607a]">
+        {TYPE_COPY[audience].fitCopy}
+      </p>
+      <div className="mt-5 grid gap-5">
+        {isStudio ? (
+          <>
+            <Field label="Budget style">
+              <select
+                value={form.budgetStyle}
+                onChange={(event) => onFieldChange("budgetStyle", event.target.value, "fit")}
+                className={fieldClassName}
+              >
+                {budgetOptions.map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Timeline / need">
+              <textarea
+                value={form.shippingNote}
+                onChange={(event) => onFieldChange("shippingNote", event.target.value, "fit")}
+                placeholder="Example: launching PvP update in 6 weeks."
+                className={`${fieldClassName} min-h-[126px] resize-y py-4`}
+              />
+            </Field>
+          </>
+        ) : (
+          <>
+            <div className="grid gap-5 md:grid-cols-2">
+              <Field label="Availability">
+                <select
+                  value={form.availability}
+                  onChange={(event) =>
+                    onFieldChange("availability", event.target.value, "fit")
+                  }
+                  className={fieldClassName}
+                >
+                  {availabilityOptions.map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Rate style">
+                <select
+                  value={form.rateStyle}
+                  onChange={(event) => onFieldChange("rateStyle", event.target.value, "fit")}
+                  className={fieldClassName}
+                >
+                  {rateOptions.map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            </div>
+            <Field label="Short note">
+              <textarea
+                value={form.note}
+                onChange={(event) => onFieldChange("note", event.target.value, "fit")}
+                placeholder="What work are you best at right now?"
+                className={`${fieldClassName} min-h-[126px] resize-y py-4`}
+              />
+            </Field>
+          </>
+        )}
       </div>
     </div>
   );
 }
 
-function InviteInfoRow({
+function RolePicker({
+  selected,
+  multi,
+  onToggle
+}: {
+  selected: string[];
+  multi: boolean;
+  onToggle: (role: string) => void;
+}) {
+  return (
+    <div>
+      <div className="text-xs font-bold uppercase tracking-[0.14em] text-[#6f7c95]">
+        {multi ? "Roles hiring" : "Primary role"}
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {DISCIPLINE_OPTIONS.map((role) => {
+          const active = selected.includes(role);
+
+          return (
+            <button
+              key={role}
+              type="button"
+              onClick={() => onToggle(role)}
+              className={`min-h-[40px] rounded-full border px-4 text-sm font-bold ${
+                active
+                  ? "border-[#5b6cff] bg-[#eef1ff] text-[#253ccf]"
+                  : "border-white/90 bg-white/60 text-[#53607a]"
+              }`}
+            >
+              {role}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ProgressCard({
   label,
   value,
-  wrap
+  helper,
+  progress
 }: {
   label: string;
   value: string;
-  wrap?: boolean;
+  helper: string;
+  progress: number;
 }) {
   return (
-    <div className="flex items-start justify-between gap-4 rounded-[18px] border border-white/8 bg-white/[0.04] px-4 py-3">
-      <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/42">
-        {label}
-      </span>
-      <strong
-        className={`max-w-[65%] text-right text-[13px] leading-6 text-white/78 ${
-          wrap ? "break-all" : ""
-        }`}
-      >
-        {value}
-      </strong>
-    </div>
-  );
-}
-
-function MetricCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-[18px] border border-white/8 bg-white/[0.04] p-4">
-      <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">
-        {label}
+    <article className="rounded-[28px] border border-white/80 bg-white/70 p-5 shadow-[0_18px_60px_rgba(33,41,65,0.08)] backdrop-blur-xl">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <div className="text-xs font-bold uppercase tracking-[0.14em] text-[#6f7c95]">
+            {label}
+          </div>
+          <strong className="mt-2 block text-3xl font-bold tracking-[-0.04em]">
+            {value}
+          </strong>
+        </div>
+        <span className="rounded-full bg-[#eef1ff] px-3 py-1 text-xs font-bold text-[#3150c9]">
+          {Math.round(progress)}%
+        </span>
       </div>
-      <div className="mt-2 text-[15px] leading-7 text-white/78">{value}</div>
-    </div>
+      <div className="mt-5 h-2 rounded-full bg-[#e4e9f5]">
+        <div
+          className="h-full rounded-full bg-[#5b6cff]"
+          style={{ width: `${Math.max(0, Math.min(progress, 100))}%` }}
+        />
+      </div>
+      <p className="mt-3 text-sm leading-6 text-[#53607a]">{helper}</p>
+    </article>
   );
 }
 
-function FieldBlock({
+function Field({
   label,
   children
 }: {
@@ -1370,7 +861,7 @@ function FieldBlock({
 }) {
   return (
     <label className="grid gap-3">
-      <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/42">
+      <span className="text-xs font-bold uppercase tracking-[0.14em] text-[#6f7c95]">
         {label}
       </span>
       {children}
@@ -1378,18 +869,39 @@ function FieldBlock({
   );
 }
 
-function shareButtonLabel(channel: ShareChannel) {
-  switch (channel) {
-    case "discord":
-      return "Copy for Discord";
-    case "x":
-      return "Share on X";
-    case "linkedin":
-      return "Copy for LinkedIn";
-    case "copy":
-    default:
-      return "Copy link";
+function StatusPill({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex min-h-[32px] items-center rounded-full border border-white/90 bg-white/60 px-3 text-xs font-bold uppercase tracking-[0.12em] text-[#5b6cff] shadow-inner">
+      {children}
+    </span>
+  );
+}
+
+function buildProfileSummary(audience: Audience, form: InviteFormState) {
+  if (audience === "studio") {
+    return {
+      title: form.studioName || "Studio identity pending",
+      subtitle:
+        form.rolesHiring.length > 0
+          ? `Hiring ${form.rolesHiring.join(", ")}`
+          : "Choose roles you want to scout.",
+      rows: [
+        ["Team", form.teamSize || "Not set"],
+        ["Budget", form.budgetStyle || "Not set"],
+        ["Timeline", form.shippingNote || "Not set"]
+      ]
+    };
   }
+
+  return {
+    title: form.displayName || "Creator identity pending",
+    subtitle: form.primaryRole || "Choose a primary role.",
+    rows: [
+      ["Proof", form.proofLink || "Not set"],
+      ["Availability", form.availability || "Not set"],
+      ["Rate", form.rateStyle || "Not set"]
+    ]
+  };
 }
 
 function buildFormState(snapshot: InviteProgressSnapshot): InviteFormState {
@@ -1419,31 +931,18 @@ function getStepPayload(
 ) {
   if (step === "identity") {
     return audience === "studio"
-      ? {
-          studioName: form.studioName
-        }
-      : {
-          displayName: form.displayName,
-          primaryRole: form.primaryRole
-        };
+      ? { studioName: form.studioName }
+      : { displayName: form.displayName, primaryRole: form.primaryRole };
   }
 
   if (step === "proof") {
     return audience === "studio"
-      ? {
-          rolesHiring: form.rolesHiring,
-          teamSize: form.teamSize
-        }
-      : {
-          proofLink: form.proofLink
-        };
+      ? { rolesHiring: form.rolesHiring, teamSize: form.teamSize }
+      : { proofLink: form.proofLink };
   }
 
   return audience === "studio"
-    ? {
-        budgetStyle: form.budgetStyle,
-        shippingNote: form.shippingNote
-      }
+    ? { budgetStyle: form.budgetStyle, shippingNote: form.shippingNote }
     : {
         availability: form.availability,
         rateStyle: form.rateStyle,
@@ -1460,5 +959,19 @@ async function copyToClipboard(value: string) {
   }
 }
 
+function shareLabel(channel: ShareChannel) {
+  switch (channel) {
+    case "discord":
+      return "Discord";
+    case "x":
+      return "X";
+    case "linkedin":
+      return "LinkedIn";
+    case "copy":
+    default:
+      return "Invite link";
+  }
+}
+
 const fieldClassName =
-  "min-h-[56px] rounded-[16px] border border-white/10 bg-[#0b0f16] px-4 text-[15px] text-white/76 outline-none placeholder:text-white/28";
+  "min-h-[54px] rounded-2xl border border-white/90 bg-white/70 px-4 text-sm text-[#0d1220] outline-none placeholder:text-[#8a96ad] focus:border-[#5b6cff]";
