@@ -366,7 +366,7 @@ export default function ProfileBuilder({
               onToggleLeft={() => setLeftPanel(p => p === 'games' ? null : 'games')}
               onToggleRight={p => setRightPanel(prev => {
                 if (typeof p === 'object' && 'skill' in p) {
-                  return typeof prev === 'object' && 'skill' in prev && prev.skill === p.skill ? null : p
+                  return prev !== null && typeof prev === 'object' && 'skill' in prev && prev.skill === p.skill ? null : p
                 }
                 return prev === p ? null : p
               })}
