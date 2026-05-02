@@ -109,7 +109,7 @@ export default function SkillDetailEditPanel({ skillName, draft, update, onBack 
         <textarea
           className="pb-panel-textarea"
           value={description}
-          rows={3}
+          rows={6}
           placeholder={`Describe your ${skillName} experience...`}
           onChange={e => set({ description: withLevel(level, e.target.value) })}
           style={{ marginBottom: 16 }}
