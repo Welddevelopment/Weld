@@ -1937,7 +1937,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   position: relative;
   border: 1.5px solid rgba(28,26,23,0.16);
   border-radius: 10px;
-  background: #fff;
+  background: #f8f8f8;
   padding: 24px 8px 8px;
   display: flex;
   flex-direction: column;

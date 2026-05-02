@@ -1,15 +1,24 @@
 'use client'
 
-import { ProfileDraft } from '../profile-types'
+import { ProfileDraft, ProfileSkillDraft } from '../profile-types'
 import { DEV_SKILL_DESCS } from '@/components/matching-preview/preview-data'
 
 const DEV_SKILLS = Object.keys(DEV_SKILL_DESCS)
 const MAX = 5
+const MAX_CAPS = 6
 
 interface Props {
   draft: ProfileDraft
   update: (patch: Partial<ProfileDraft>) => void
   onClose: () => void
+}
+
+function updateSkillField(
+  skills: ProfileSkillDraft[],
+  name: string,
+  patch: Partial<ProfileSkillDraft>
+): ProfileSkillDraft[] {
+  return skills.map(s => s.name === name ? { ...s, ...patch } : s)
 }
 
 export default function SkillsEditPanel({ draft, update, onClose }: Props) {
@@ -22,6 +31,36 @@ export default function SkillsEditPanel({ draft, update, onClose }: Props) {
     } else if (selected.length < MAX) {
       update({ selectedSkills: [...selected, { name, description: DEV_SKILL_DESCS[name] ?? '' }] })
     }
+  }
+
+  const addCap = (skillName: string) => {
+    const skill = selected.find(s => s.name === skillName)
+    if (!skill) return
+    update({
+      selectedSkills: updateSkillField(selected, skillName, {
+        categories: [...(skill.categories ?? []), { name: '', description: '' }],
+      }),
+    })
+  }
+
+  const updateCap = (skillName: string, idx: number, cap: { name: string; description: string }) => {
+    const skill = selected.find(s => s.name === skillName)
+    if (!skill) return
+    update({
+      selectedSkills: updateSkillField(selected, skillName, {
+        categories: (skill.categories ?? []).map((c, i) => i === idx ? cap : c),
+      }),
+    })
+  }
+
+  const removeCap = (skillName: string, idx: number) => {
+    const skill = selected.find(s => s.name === skillName)
+    if (!skill) return
+    update({
+      selectedSkills: updateSkillField(selected, skillName, {
+        categories: (skill.categories ?? []).filter((_, i) => i !== idx),
+      }),
+    })
   }
 
   return (
@@ -65,25 +104,56 @@ export default function SkillsEditPanel({ draft, update, onClose }: Props) {
         {selected.length > 0 && (
           <>
             <div style={{ fontSize: 10, fontFamily: 'var(--font-geist-mono)', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#aaa', margin: '16px 0 10px' }}>
-              Edit your descriptions
+              Edit your skills
             </div>
-            {selected.map((s, i) => (
-              <div key={s.name} style={{ marginBottom: 12 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#555', fontFamily: 'var(--font-geist-mono)', marginBottom: 5 }}>
-                  {i + 1}. {s.name}
+            {selected.map((s, i) => {
+              const caps = s.categories ?? []
+              return (
+                <div key={s.name} style={{ marginBottom: 20 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#555', fontFamily: 'var(--font-geist-mono)', marginBottom: 5 }}>
+                    {i + 1}. {s.name}
+                  </div>
+
+                  <textarea
+                    className="pb-panel-textarea"
+                    value={s.description}
+                    rows={2}
+                    placeholder={`Describe your ${s.name} experience...`}
+                    onChange={e => {
+                      const desc = e.target.value
+                      update({ selectedSkills: selected.map(x => x.name === s.name ? { ...x, description: desc } : x) })
+                    }}
+                  />
+
+                  <div style={{ fontSize: 10, fontFamily: 'var(--font-geist-mono)', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#bbb', margin: '10px 0 6px' }}>
+                    What you can build
+                  </div>
+                  <div className="ob-cap-grid">
+                    {caps.map((cap, ci) => (
+                      <div key={ci} className="ob-cap-card">
+                        <button type="button" className="ob-cap-remove" onClick={() => removeCap(s.name, ci)}>×</button>
+                        <input
+                          className="ob-cap-title"
+                          placeholder="e.g. Gameplay Systems"
+                          value={cap.name}
+                          onChange={e => updateCap(s.name, ci, { ...cap, name: e.target.value })}
+                        />
+                        <textarea
+                          className="ob-cap-body"
+                          placeholder="Short description…"
+                          rows={2}
+                          value={cap.description}
+                          onChange={e => updateCap(s.name, ci, { ...cap, description: e.target.value })}
+                        />
+                      </div>
+                    ))}
+                    {caps.length < MAX_CAPS && (
+                      <button type="button" className="ob-cap-add" onClick={() => addCap(s.name)}>+</button>
+                    )}
+                  </div>
                 </div>
-                <textarea
-                  className="pb-panel-textarea"
-                  value={s.description}
-                  rows={2}
-                  placeholder={`Describe your ${s.name} experience...`}
-                  onChange={e => {
-                    const desc = e.target.value
-                    update({ selectedSkills: selected.map(x => x.name === s.name ? { ...x, description: desc } : x) })
-                  }}
-                />
-              </div>
-            ))}
+              )
+            })}
           </>
         )}
 
