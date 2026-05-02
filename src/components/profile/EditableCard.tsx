@@ -7,9 +7,9 @@ interface Props {
   draft: ProfileDraft
   update: (patch: Partial<ProfileDraft>) => void
   leftPanel: null | 'games'
-  rightPanel: null | 'work' | 'skills' | 'portfolio'
+  rightPanel: null | 'work' | 'skills' | 'portfolio' | { skill: string }
   onToggleLeft: () => void
-  onToggleRight: (p: 'work' | 'skills' | 'portfolio') => void
+  onToggleRight: (p: 'work' | 'skills' | 'portfolio' | { skill: string }) => void
   onBack: () => void
   onBackLabel?: string
   onPublish: () => void
@@ -197,7 +197,7 @@ export default function EditableCard({
                 <button
                   type="button"
                   className="npc-skill-chip-name"
-                  onClick={() => onToggleRight('skills')}
+                  onClick={() => onToggleRight({ skill: s.name })}
                 >
                   {s.name}
                 </button>

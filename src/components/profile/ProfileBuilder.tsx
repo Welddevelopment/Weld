@@ -14,6 +14,7 @@ import WorkStep from './steps/WorkStep'
 import SkillsStep from './steps/SkillsStep'
 import EditableCard from './EditableCard'
 import SkillsEditPanel from './editor-panels/SkillsEditPanel'
+import SkillDetailEditPanel from './editor-panels/SkillDetailEditPanel'
 import WorkEditPanel from './editor-panels/WorkEditPanel'
 import GamesEditPanel from './editor-panels/GamesEditPanel'
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/browser'
@@ -168,7 +169,7 @@ export default function ProfileBuilder({
   const [draft, setDraft] = useState<ProfileDraft>(createDraft)
   const [phase, setPhase] = useState<Phase>(initialPhase)
   const [leftPanel, setLeftPanel] = useState<null | 'games'>(null)
-  const [rightPanel, setRightPanel] = useState<null | 'work' | 'skills' | 'portfolio'>(null)
+  const [rightPanel, setRightPanel] = useState<null | 'work' | 'skills' | 'portfolio' | { skill: string }>(null)
   const [hydrated, setHydrated] = useState(false)
   const [accountEmail, setAccountEmail] = useState<string | null>(null)
   const [accessToken, setAccessToken] = useState<string | null>(null)
@@ -363,7 +364,12 @@ export default function ProfileBuilder({
               leftPanel={leftPanel}
               rightPanel={rightPanel}
               onToggleLeft={() => setLeftPanel(p => p === 'games' ? null : 'games')}
-              onToggleRight={p => setRightPanel(prev => prev === p ? null : p)}
+              onToggleRight={p => setRightPanel(prev => {
+                if (typeof p === 'object' && 'skill' in p) {
+                  return typeof prev === 'object' && 'skill' in prev && prev.skill === p.skill ? null : p
+                }
+                return prev === p ? null : p
+              })}
               onBack={() => {
                 setLeftPanel(null)
                 setRightPanel(null)
@@ -378,6 +384,14 @@ export default function ProfileBuilder({
             />
             {rightPanel === 'skills' && (
               <SkillsEditPanel draft={draft} update={update} onClose={() => setRightPanel(null)} />
+            )}
+            {rightPanel !== null && typeof rightPanel === 'object' && 'skill' in rightPanel && (
+              <SkillDetailEditPanel
+                skillName={rightPanel.skill}
+                draft={draft}
+                update={update}
+                onBack={() => setRightPanel(null)}
+              />
             )}
             {rightPanel === 'portfolio' && (
               <PortfolioStep
