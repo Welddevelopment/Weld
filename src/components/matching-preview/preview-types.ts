@@ -20,6 +20,7 @@ export type TopGame = {
   currentCcu: string
   imageUrl?: string
   gameUrl?: string
+  skills?: string[]
 }
 
 export type ProfileStats = {

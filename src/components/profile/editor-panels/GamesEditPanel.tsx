@@ -3,6 +3,10 @@
 import { useState } from 'react'
 import { ProfileDraft } from '../profile-types'
 import { TopGame } from '@/components/matching-preview/preview-types'
+import { DEV_SKILL_DESCS } from '@/components/matching-preview/preview-data'
+
+const SKILL_OPTIONS = Object.keys(DEV_SKILL_DESCS)
+const MAX_GAME_SKILLS = 3
 
 interface Props {
   draft: ProfileDraft
@@ -11,10 +15,8 @@ interface Props {
 }
 
 function emptyGame(): TopGame {
-  return { emoji: 'Game', title: '', desc: '', plays: '', topCcu: '', currentCcu: '', imageUrl: '', gameUrl: '' }
+  return { emoji: 'Game', title: '', desc: '', plays: '', topCcu: '', currentCcu: '', imageUrl: '', gameUrl: '', skills: [] }
 }
-
-const CATEGORY_OPTIONS = ['Game', 'Combat', 'Build', 'Art', 'Tools', 'VFX', 'Audio', 'World', 'Launch']
 
 export default function GamesEditPanel({ draft, update, onClose }: Props) {
   const games = draft.topGames
@@ -42,9 +44,16 @@ export default function GamesEditPanel({ draft, update, onClose }: Props) {
     const next = [...games]; next[i] = g; update({ topGames: next })
   }
 
-  const selectCategory = (i: number, g: TopGame, emoji: string) => {
-    change(i, { ...g, emoji })
-    setOpenPicker(prev => { const next = new Set(prev); next.delete(i); return next })
+  const toggleSkill = (i: number, g: TopGame, skill: string) => {
+    const current = g.skills ?? []
+    const hasSkill = current.includes(skill)
+    const nextSkills = hasSkill
+      ? current.filter(name => name !== skill)
+      : current.length < MAX_GAME_SKILLS
+        ? [...current, skill]
+        : current
+
+    change(i, { ...g, skills: nextSkills, emoji: nextSkills[0] ?? g.emoji })
   }
 
   const togglePicker = (i: number) => {
@@ -77,9 +86,9 @@ export default function GamesEditPanel({ draft, update, onClose }: Props) {
                 type="button"
                 className="pb-category-pill"
                 onClick={() => togglePicker(i)}
-                title="Change category"
+                title="Edit game skills"
               >
-                {g.emoji || 'Category'}
+                {(g.skills && g.skills.length > 0) ? g.skills.join(', ') : 'Add skills'}
                 <span className="pb-category-pill-dots">···</span>
               </button>
               <button type="button" className="pb-entry-card-remove" onClick={() => remove(i)}>Remove</button>
@@ -87,16 +96,21 @@ export default function GamesEditPanel({ draft, update, onClose }: Props) {
 
             {openPicker.has(i) && (
               <div className="pb-emoji-row">
-                {CATEGORY_OPTIONS.map(e => (
-                  <button
-                    key={e}
-                    type="button"
-                    className={`pb-emoji-btn${g.emoji === e ? ' pb-emoji-btn--on' : ''}`}
-                    onClick={() => selectCategory(i, g, e)}
-                  >
-                    {e}
-                  </button>
-                ))}
+                {SKILL_OPTIONS.map(skill => {
+                  const selected = g.skills?.includes(skill)
+                  const disabled = !selected && (g.skills?.length ?? 0) >= MAX_GAME_SKILLS
+                  return (
+                    <button
+                      key={skill}
+                      type="button"
+                      className={`pb-emoji-btn${selected ? ' pb-emoji-btn--on' : ''}${disabled ? ' pb-emoji-btn--disabled' : ''}`}
+                      onClick={() => toggleSkill(i, g, skill)}
+                      disabled={disabled}
+                    >
+                      {skill}
+                    </button>
+                  )
+                })}
               </div>
             )}
 

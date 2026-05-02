@@ -35,14 +35,15 @@ export default function GamesPanel({ profile, onBack }: Props) {
             No games added yet.
           </p>
         ) : games.map((game, i) => {
-          const color = CATEGORY_COLOR[game.emoji] ?? '#818cf8'
+          const label = game.skills?.[0] ?? game.emoji ?? 'Game'
+          const color = CATEGORY_COLOR[label] ?? '#818cf8'
           return (
             <div key={i} className="npc-game-item">
               {/* 16:9 thumbnail — Roblox screenshots are 768×432 */}
               <div className="npc-game-thumb" style={{ background: `${color}18` }}>
                 {game.imageUrl
                   ? <img src={game.imageUrl} alt={game.title} />
-                  : <span className="npc-game-thumb-cat" style={{ color }}>{game.emoji || 'Game'}</span>
+                  : <span className="npc-game-thumb-cat" style={{ color }}>{label}</span>
                 }
               </div>
 
@@ -84,7 +85,11 @@ export default function GamesPanel({ profile, onBack }: Props) {
                 )}
 
                 <div className="npc-game-tags">
-                  {game.emoji && (
+                  {game.skills?.length ? game.skills.map(skill => (
+                    <span key={skill} className="npc-game-tag" style={{ background: `${color}18`, color }}>
+                      {skill}
+                    </span>
+                  )) : game.emoji && (
                     <span className="npc-game-tag" style={{ background: `${color}18`, color }}>
                       {game.emoji}
                     </span>
