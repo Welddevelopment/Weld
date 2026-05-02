@@ -585,6 +585,104 @@
 
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+  /* ─── COLORED CHROME DOTS ─── */
+  .chrome-dot:nth-child(1) { background: #ff5f56; }
+  .chrome-dot:nth-child(2) { background: #febc2e; }
+  .chrome-dot:nth-child(3) { background: #28c840; }
+
+  /* ─── SECTION BADGE ─── */
+  .section-badge { background: var(--orange); }
+
+  /* ─── DARK LEFT PANELS → DEEP PURPLE GRADIENT ─── */
+  .panel-left[style*="background:var(--text)"] {
+    background: linear-gradient(160deg, #1a1042 0%, #0e0924 100%) !important;
+    border-right-color: rgba(107,79,200,0.2) !important;
+  }
+  .panel-left[style*="background:var(--purple)"] {
+    background: linear-gradient(160deg, #4a36b0 0%, #2d1b8e 100%) !important;
+  }
+
+  /* ─── ECLIPSE-STYLE PROFILE CARD ─── */
+  .eclipse-card {
+    border: 1.5px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    background: var(--surface);
+    box-shadow: 3px 4px 0 rgba(0,0,0,0.10);
+  }
+  .ec-top {
+    padding: 12px 12px 8px;
+    background: linear-gradient(135deg, #ede9fe 0%, #e0e7f8 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  .ec-avatar-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+  .ec-avatar {
+    width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+    background: linear-gradient(135deg, #a8c0e8 0%, #d4b8f0 100%);
+    border: 1.5px solid rgba(107,79,200,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .ec-verified {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 8px; font-weight: 700; color: var(--purple);
+    background: rgba(107,79,200,0.1); border: 1px solid rgba(107,79,200,0.25);
+    border-radius: 20px; padding: 1px 6px; margin-bottom: 2px;
+  }
+  .ec-name { font-family: 'Caveat', cursive; font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.1; }
+  .ec-role { font-size: 9px; color: var(--text-3); }
+  .ec-available {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 8px; font-weight: 700; color: var(--green);
+    background: rgba(45,106,79,0.1); border-radius: 20px; padding: 2px 8px;
+  }
+  .ec-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+  .ec-body { padding: 8px 12px 10px; }
+  .ec-bio { font-size: 9px; color: var(--text-2); line-height: 1.4; margin-bottom: 6px; }
+  .ec-pills { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 6px; }
+  .ec-pill {
+    padding: 2px 7px; border-radius: 20px;
+    border: 1.5px solid var(--border); font-size: 8px; font-weight: 700;
+    color: var(--text-2); background: var(--surface);
+  }
+  .ec-pill--on { border-color: var(--purple); color: var(--purple); background: rgba(107,79,200,0.07); }
+  .ec-links { font-size: 8px; color: var(--text-3); display: flex; gap: 8px; }
+  .ec-actions { display: flex; gap: 6px; padding: 8px 12px; border-top: 1px solid var(--border); background: var(--bg); }
+  .ec-btn-skip {
+    flex: 1; padding: 6px 0; font-size: 10px; font-weight: 700;
+    border: 1.5px solid var(--border); border-radius: 6px;
+    text-align: center; color: var(--text-3);
+  }
+  .ec-btn-like {
+    flex: 2; padding: 6px 0; font-size: 10px; font-weight: 700;
+    background: var(--purple); border-radius: 6px;
+    text-align: center; color: white;
+  }
+
+  /* ─── IMPROVED PROFILE PREVIEW CARD (screen 14) ─── */
+  .ppc-header { background: linear-gradient(135deg, #ede9fe 0%, #e0e7f8 100%); }
+  .ppc-avatar {
+    background: linear-gradient(135deg, #a8c0e8 0%, #d4b8f0 100%);
+    border: 1.5px solid rgba(107,79,200,0.25) !important;
+    border-radius: 10px !important;
+    font-size: 22px; color: inherit; font-family: inherit;
+  }
+  .profile-preview-card { box-shadow: 4px 5px 0 rgba(0,0,0,0.12); border-color: var(--border-dark); }
+
+  /* ─── MATCH STEPS (screen 15) ─── */
+  .match-steps { display: flex; flex-direction: column; gap: 7px; max-width: 280px; margin: 12px auto; text-align: left; }
+  .match-step {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg); border: 1.5px solid var(--border);
+    border-radius: 8px; padding: 7px 12px;
+  }
+  .match-step-num {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--purple); color: white;
+    font-size: 9px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .match-step-text { font-size: 10px; color: var(--text-2); line-height: 1.35; }
 </style>
 </head>
 <body>
@@ -647,14 +745,34 @@
                 </div>
               </div>
             </div>
-            <div class="wf-social-proof">
-              <div class="wf-avatars">
-                <div class="wf-avatar-bubble"></div>
-                <div class="wf-avatar-bubble" style="background:var(--border-dark)"></div>
-                <div class="wf-avatar-bubble" style="background:var(--text-2)"></div>
-                <div class="wf-avatar-bubble" style="background:var(--text-3)"></div>
+            <div style="margin-top:auto;">
+              <div class="eclipse-card" style="margin-bottom:10px;">
+                <div class="ec-top">
+                  <div class="ec-avatar-row">
+                    <div class="ec-avatar">🎮</div>
+                    <div>
+                      <div class="ec-verified">◆ Verified</div>
+                      <div class="ec-name">Eclipse</div>
+                      <div class="ec-role">Roblox scripter</div>
+                    </div>
+                  </div>
+                  <div class="ec-available"><div class="ec-dot"></div> Available for work</div>
+                </div>
+                <div class="ec-body">
+                  <div class="ec-bio">Builds clean Roblox systems, ships fast, and shows real proof of work.</div>
+                  <div class="ec-pills">
+                    <div class="ec-pill ec-pill--on">Lua</div>
+                    <div class="ec-pill ec-pill--on">Roblox API</div>
+                    <div class="ec-pill">Remote Events</div>
+                  </div>
+                  <div class="ec-links"><span>R @eclipse</span><span>DC eclipse.dev</span><span>GH eclipsedevx</span></div>
+                </div>
+                <div class="ec-actions">
+                  <div class="ec-btn-skip">Skip</div>
+                  <div class="ec-btn-like">⚡ Spark →</div>
+                </div>
               </div>
-              <div class="wf-social-proof-text"><strong>+1.2K</strong> Used by 1,200+<br>Roblox devs &amp; studios</div>
+              <div class="wf-social-proof-text"><strong>+1.2K</strong> devs already on weld.</div>
             </div>
           </div>
           <!-- RIGHT -->
@@ -1219,7 +1337,7 @@
           </div>
           <div class="panel-right">
             <div class="wf-progress"><div class="wf-progress-fill" style="width:33%"></div></div>
-            <div class="rp-step-counter"><span>Step 2 of 6 · Role</span><span>2/6</span></div>
+            <div class="rp-step-counter"><span>Step 2 of 7 · Role</span><span>2/7</span></div>
 
             <div class="wf-field">
               <div class="wf-label">Years of experience <span class="wf-required">*</span></div>
@@ -1285,7 +1403,7 @@
           </div>
           <div class="panel-right">
             <div class="wf-progress"><div class="wf-progress-fill" style="width:50%"></div></div>
-            <div class="rp-step-counter"><span>Step 3 of 6 · Bio</span><span>3/6</span></div>
+            <div class="rp-step-counter"><span>Step 3 of 7 · Bio</span><span>3/7</span></div>
 
             <div class="wf-field">
               <div class="wf-label">One-line bio <span class="wf-required">*</span></div>
@@ -1300,7 +1418,7 @@
 
             <div class="wf-nav">
               <div class="wf-nav-back">← Back</div>
-              <div class="wf-nav-next">Next: Skills →</div>
+              <div class="wf-nav-next">Next: Work →</div>
             </div>
           </div>
         </div>
@@ -1312,57 +1430,7 @@
       <svg width="32" height="18"><path d="M0 9 L24 9 M17 3 L24 9 L17 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
     </div>
 
-    <!-- 11 · Skills -->
-    <div class="screen-wrap">
-      <div class="screen">
-        <div class="screen-chrome">
-          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
-          <div class="chrome-url">weld.gg/onboarding/skills</div>
-        </div>
-        <div class="screen-split">
-          <div class="panel-left">
-            <div class="wf-brand">
-              <div class="wf-brand-asterisk">✳</div>
-              <div class="wf-brand-name">weld.</div>
-            </div>
-            <div class="wf-headline" style="font-size:26px;">your<br>skills</div>
-            <div class="wf-sub-text">Pick up to 5 that best represent what you do. These show as tags on your card.</div>
-            <div style="margin-top:auto;font-size:10px;color:var(--purple);font-weight:700;">3 / 5 selected</div>
-          </div>
-          <div class="panel-right">
-            <div class="wf-progress"><div class="wf-progress-fill" style="width:67%"></div></div>
-            <div class="rp-step-counter"><span>Step 4 of 6 · Skills</span><span>4/6</span></div>
-
-            <div class="skill-grid">
-              <div class="skill-btn skill-btn--on">Lua ✓</div>
-              <div class="skill-btn skill-btn--on">Roblox API ✓</div>
-              <div class="skill-btn skill-btn--on">Remote Events ✓</div>
-              <div class="skill-btn">Data Stores</div>
-              <div class="skill-btn">UI Design</div>
-              <div class="skill-btn">Animation</div>
-              <div class="skill-btn">VFX</div>
-              <div class="skill-btn">Building</div>
-              <div class="skill-btn">Game Design</div>
-              <div class="skill-btn">3D Modeling</div>
-              <div class="skill-btn">Sound Design</div>
-              <div class="skill-btn">Lighting</div>
-            </div>
-
-            <div class="wf-nav">
-              <div class="wf-nav-back">← Back</div>
-              <div class="wf-nav-next">Next: Work →</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="screen-label-text">11 · Skills</div>
-    </div>
-
-    <div class="connector">
-      <svg width="32" height="18"><path d="M0 9 L24 9 M17 3 L24 9 L17 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
-    </div>
-
-    <!-- 12 · Work -->
+    <!-- 11 · Work -->
     <div class="screen-wrap">
       <div class="screen">
         <div class="screen-chrome">
@@ -1385,8 +1453,8 @@
             </div>
           </div>
           <div class="panel-right">
-            <div class="wf-progress"><div class="wf-progress-fill" style="width:83%"></div></div>
-            <div class="rp-step-counter"><span>Step 5 of 6 · Work</span><span>5/6</span></div>
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:50%"></div></div>
+            <div class="rp-step-counter"><span>Step 4 of 7 · Work</span><span>4/7</span></div>
 
             <div class="work-entry">
               <div class="work-entry-hd">
@@ -1408,12 +1476,70 @@
 
             <div class="wf-nav">
               <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next">Next: Contributed Games →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label-text">11 · Work &amp; Projects</div>
+    </div>
+
+    <div class="connector">
+      <svg width="32" height="18"><path d="M0 9 L24 9 M17 3 L24 9 L17 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </div>
+
+    <!-- 12 · Contributed Games -->
+    <div class="screen-wrap">
+      <div class="screen">
+        <div class="screen-chrome">
+          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
+          <div class="chrome-url">weld.gg/onboarding/contributions</div>
+        </div>
+        <div class="screen-split">
+          <div class="panel-left" style="background:var(--text);">
+            <div class="wf-brand">
+              <div class="wf-brand-asterisk">✳</div>
+              <div class="wf-brand-name wf-brand-name--light">weld.</div>
+            </div>
+            <div class="wf-headline wf-headline--light" style="font-size:26px;">games you<br>contributed to</div>
+            <div class="wf-sub-text wf-sub-text--light">Did you work on a popular Roblox game? Add it here. Even small contributions to big games stand out.</div>
+            <div style="margin-top:auto;">
+              <div class="lp-card">
+                <div class="lp-card-title">Link the game</div>
+                <div class="lp-card-sub">Link the actual game URL so studios can see it's legit.</div>
+              </div>
+            </div>
+          </div>
+          <div class="panel-right">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:65%"></div></div>
+            <div class="rp-step-counter"><span>Step 5 of 7 · Contributions</span><span>5/7</span></div>
+
+            <div class="work-entry">
+              <div class="work-entry-hd">
+                <span class="work-entry-num">🕹 Adopt Me!</span>
+                <span class="work-entry-remove">Remove</span>
+              </div>
+              <div class="wf-input-box wf-input-box--filled" style="margin-bottom:6px;">Pet Animation Pipeline</div>
+              <div class="wf-textarea" style="height:36px;margin-bottom:6px;">Designed the walk cycle animations for the summer pets update.</div>
+              <div class="work-inputs-row">
+                <div class="wf-input-box" style="font-size:10px;color:var(--text-3);">roblox.com/games/9205872...</div>
+                <div class="wf-input-box" style="font-size:10px;color:var(--text-3);">Animator</div>
+                <div class="wf-input-box" style="font-size:10px;color:var(--text-3);">June 2023</div>
+              </div>
+            </div>
+
+            <div style="border:1.5px dashed var(--border);border-radius:8px;padding:10px;text-align:center;font-size:11px;color:var(--text-3);">
+              + Add game (up to 3)
+            </div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
               <div class="wf-nav-next">Next: Portfolio →</div>
             </div>
           </div>
         </div>
       </div>
-      <div class="screen-label-text">12 · Work &amp; Projects</div>
+      <div class="screen-label-text">12 · Contributed Games</div>
     </div>
 
     <div class="connector">
@@ -1438,8 +1564,8 @@
             <div style="margin-top:auto;font-size:10px;color:var(--text-3);">All fields optional. Skip if you don't have these yet.</div>
           </div>
           <div class="panel-right">
-            <div class="wf-progress"><div class="wf-progress-fill" style="width:100%"></div></div>
-            <div class="rp-step-counter"><span>Step 6 of 6 · Portfolio</span><span>6/6</span></div>
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:85%"></div></div>
+            <div class="rp-step-counter"><span>Step 6 of 7 · Portfolio</span><span>6/7</span></div>
 
             <div class="two-col">
               <div class="wf-field">
@@ -1464,7 +1590,7 @@
 
             <div class="wf-nav">
               <div class="wf-nav-back">← Back</div>
-              <div class="wf-nav-next wf-nav-next--green">Preview my card →</div>
+              <div class="wf-nav-next">Next: Detailed Skills →</div>
             </div>
           </div>
         </div>
@@ -1476,15 +1602,84 @@
 
 
   <!-- ═══════════════════════════════════════════════
-       SECTION E — PREVIEW & LAUNCH
+       SECTION E — SKILLS ONBOARDING
   ═══════════════════════════════════════════════ -->
   <div class="section-hd">
     <div class="section-badge">E</div>
+    <div class="section-label">Skills Onboarding</div>
+  </div>
+  <div class="screen-row">
+
+    <!-- 14 · Detailed Skills -->
+    <div class="screen-wrap">
+      <div class="screen">
+        <div class="screen-chrome">
+          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
+          <div class="chrome-url">weld.gg/onboarding/skills</div>
+        </div>
+        <div class="screen-split">
+          <div class="panel-left">
+            <div class="wf-brand">
+              <div class="wf-brand-asterisk">✳</div>
+              <div class="wf-brand-name">weld.</div>
+            </div>
+            <div class="wf-headline" style="font-size:26px;">your<br>skills</div>
+            <div class="wf-sub-text">Add details to your skills. Studios want to know exactly what you can do with the tools you use.</div>
+            <div style="margin-top:auto;font-size:10px;color:var(--purple);font-weight:700;">2 / 5 details added</div>
+          </div>
+          <div class="panel-right">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:100%"></div></div>
+            <div class="rp-step-counter"><span>Step 7 of 7 · Skills</span><span>7/7</span></div>
+
+            <div class="wf-field">
+              <div class="wf-label">Selected skills</div>
+              <div class="skill-grid" style="margin-bottom: 12px; grid-template-columns: repeat(4, 1fr);">
+                <div class="skill-btn skill-btn--on">Lua ✓</div>
+                <div class="skill-btn skill-btn--on">Roblox API ✓</div>
+                <div class="skill-btn">Remote Events</div>
+                <div class="skill-btn">+ Add Skill</div>
+              </div>
+            </div>
+
+            <div class="work-entry">
+              <div class="work-entry-hd">
+                <span class="work-entry-num">🛠 Lua</span>
+                <span class="work-entry-remove">Remove</span>
+              </div>
+              <div class="wf-field" style="margin-bottom: 6px;">
+                 <div class="wf-label" style="font-size:8px;">Experience level</div>
+                 <div class="wf-pills">
+                   <div class="wf-pill">Beginner</div>
+                   <div class="wf-pill wf-pill--on">Intermediate</div>
+                   <div class="wf-pill">Expert</div>
+                 </div>
+              </div>
+              <div class="wf-textarea" style="height:36px;margin-bottom:0;">e.g. I have used Lua for 3 years to build complex game systems and OOP frameworks.</div>
+            </div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next wf-nav-next--green">Preview my card →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label-text">14 · Detailed Skills</div>
+    </div>
+
+  </div><!-- /screen-row E -->
+
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION F — PREVIEW & LAUNCH
+  ═══════════════════════════════════════════════ -->
+  <div class="section-hd">
+    <div class="section-badge">F</div>
     <div class="section-label">Preview &amp; Launch</div>
   </div>
   <div class="screen-row">
 
-    <!-- 14 · Profile Preview -->
+    <!-- 15 · Profile Preview -->
     <div class="screen-wrap">
       <div class="screen">
         <div class="screen-chrome">
@@ -1508,7 +1703,7 @@
             <div class="profile-preview-card">
               <div class="ppc-header">
                 <div class="ppc-avatar-row">
-                  <div class="ppc-avatar">avatar</div>
+                  <div class="ppc-avatar">🎮</div>
                   <div>
                     <div class="ppc-verified"><div style="width:5px;height:5px;border-radius:50%;background:var(--purple);"></div> Verified</div>
                     <div class="ppc-name">xXBuilder99</div>
@@ -1544,14 +1739,14 @@
           </div>
         </div>
       </div>
-      <div class="screen-label-text">14 · Profile Preview</div>
+      <div class="screen-label-text">15 · Profile Preview</div>
     </div>
 
     <div class="connector">
       <svg width="32" height="18"><path d="M0 9 L24 9 M17 3 L24 9 L17 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
     </div>
 
-    <!-- 15 · Profile Live -->
+    <!-- 16 · Profile Live -->
     <div class="screen-wrap">
       <div class="screen">
         <div class="screen-chrome">
@@ -1575,7 +1770,13 @@
             <div class="success-pulse">🎉</div>
             <div class="rp-eyebrow" style="text-align:center;">Profile is live</div>
             <div class="rp-title" style="text-align:center;">You're in the matching pool</div>
-            <div class="rp-sub" style="text-align:center;max-width:280px;margin-left:auto;margin-right:auto;">Studios are already seeing profiles. Start matching or check out your published profile.</div>
+            <div class="rp-sub" style="text-align:center;max-width:280px;margin-left:auto;margin-right:auto;">Studios are already seeing profiles. Here's how matching works:</div>
+
+            <div class="match-steps">
+              <div class="match-step"><div class="match-step-num">1</div><div class="match-step-text">Studios browse the matching pool and find your card</div></div>
+              <div class="match-step"><div class="match-step-num">2</div><div class="match-step-text">They spark devs that fit — you see it on your home screen</div></div>
+              <div class="match-step"><div class="match-step-num">3</div><div class="match-step-text">You both spark → match. A shared chat opens instantly.</div></div>
+            </div>
 
             <div style="display:flex;flex-direction:column;gap:8px;max-width:280px;margin:0 auto;">
               <div class="wf-cta" style="justify-content:center;gap:8px;"><span>⚡</span> Start matching</div>
@@ -1588,10 +1789,10 @@
           </div>
         </div>
       </div>
-      <div class="screen-label-text">15 · Profile Live! 🎉</div>
+      <div class="screen-label-text">16 · Profile Live! 🎉</div>
     </div>
 
-  </div><!-- /screen-row E -->
+  </div><!-- /screen-row F -->
 
 </div><!-- /flow -->
 
