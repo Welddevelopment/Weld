@@ -1400,6 +1400,27 @@ function ChatPreviewSection({
       </div>
 
       <div className="glass-card chat-preview-shell">
+        <div className="chat-window-topbar">
+          <button type="button" aria-label="Decorative back button">
+            <ArrowLeftIcon />
+            <span>Back</span>
+          </button>
+          <div className="chat-window-identity">
+            <div className="chat-mini-profile" aria-hidden="true">
+              <span />
+              <i />
+            </div>
+            <div>
+              <strong>{profile.name.toLowerCase()}</strong>
+              <em>Online</em>
+            </div>
+          </div>
+          <div className="chat-window-actions">
+            <button type="button">View full profile <ArrowUpRightIcon /></button>
+            <button type="button" aria-label="Decorative more menu">•••</button>
+          </div>
+        </div>
+
         <aside className="chat-profile-panel" aria-label="Chat profile summary">
           <div className="chat-profile-top">
             <div className="profile-avatar-shell">
@@ -1996,6 +2017,15 @@ function GamepadIcon() {
       <path d="M7.7 9.1h8.6c2.5 0 4.1 1.8 4.4 4.6l.2 1.8c.3 2.4-1.9 3.9-3.7 2.4l-1.6-1.4H8.4l-1.6 1.4c-1.8 1.5-4-.1-3.7-2.4l.2-1.8c.3-2.8 1.9-4.6 4.4-4.6Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
       <path d="M7.7 12.7h3.2M9.3 11.1v3.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
       <path d="M15.7 12.6h.1M18 14.2h.1" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ArrowLeftIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M12.5 5 7.5 10l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 10h8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 }

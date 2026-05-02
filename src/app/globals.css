@@ -8477,3 +8477,347 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
     grid-template-columns: 1fr;
   }
 }
+
+/* Reference fidelity tuning: softer lavender glass, bigger blooms, clearer product mockups */
+.weld-glass-page {
+  background:
+    radial-gradient(circle at 88% 14%, rgba(138, 120, 255, 0.24), transparent 30%),
+    radial-gradient(circle at 6% 46%, rgba(255, 255, 255, 0.92), transparent 26%),
+    radial-gradient(circle at 80% 88%, rgba(190, 178, 255, 0.34), transparent 28%),
+    repeating-linear-gradient(135deg, rgba(105, 118, 195, 0.026) 0 2px, transparent 2px 32px),
+    linear-gradient(180deg, #fbfcff 0%, #f0f2ff 50%, #f7f7ff 100%);
+}
+
+.weld-glass-page .glass-section {
+  margin-top: clamp(58px, 7.8vw, 112px);
+}
+
+.weld-glass-page .hero-shell,
+.weld-glass-page .glass-nav-shell,
+.weld-glass-page .how-story-section,
+.weld-glass-page .chat-preview-shell,
+.weld-glass-page .waitlist-shell,
+.weld-glass-page .anti-discord-shell {
+  border: 1px solid rgba(255, 255, 255, 0.96);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.32),
+    0 30px 80px rgba(80, 91, 148, 0.13);
+}
+
+.weld-glass-page .how-story-section,
+.weld-glass-page .waitlist-shell {
+  position: relative;
+  background:
+    radial-gradient(circle at 92% 8%, rgba(139, 122, 255, 0.18), transparent 24%),
+    radial-gradient(circle at 8% 94%, rgba(255, 255, 255, 0.88), transparent 32%),
+    repeating-linear-gradient(135deg, rgba(116, 126, 205, 0.025) 0 2px, transparent 2px 30px),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.56), rgba(232, 233, 255, 0.44));
+}
+
+.weld-glass-page .how-story-section::after,
+.weld-glass-page .waitlist-shell::after,
+.weld-glass-page .chat-preview-shell::after {
+  content: "";
+  position: absolute;
+  right: -76px;
+  bottom: -92px;
+  width: 260px;
+  height: 260px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.76), transparent 19%),
+    radial-gradient(circle at 54% 56%, rgba(130, 112, 255, 0.28), rgba(174, 163, 255, 0.16) 48%, transparent 70%);
+  box-shadow:
+    inset 20px 18px 44px rgba(255, 255, 255, 0.5),
+    inset -20px -22px 52px rgba(88, 76, 210, 0.1);
+  pointer-events: none;
+}
+
+.weld-glass-page .how-story-copy h2 {
+  color: #061968;
+  font-size: clamp(64px, 7.4vw, 100px);
+  letter-spacing: -0.03em;
+}
+
+.weld-glass-page .how-story-copy p {
+  color: #4d64a8;
+}
+
+.weld-glass-page .role-explorer-tabs button,
+.weld-glass-page .how-proof-list span,
+.weld-glass-page .step-card,
+.weld-glass-page .waitlist-field input,
+.weld-glass-page .chat-row p {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(246, 248, 255, 0.44)),
+    rgba(255, 255, 255, 0.46);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    0 18px 42px rgba(77, 88, 145, 0.1);
+}
+
+.weld-glass-page .how-profile-card {
+  border-radius: 38px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.92), transparent 34%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(240, 242, 255, 0.42));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 34px 80px rgba(74, 84, 140, 0.13);
+}
+
+.weld-glass-page .how-profile-card .profile-avatar::after,
+.weld-glass-page .profile-board-avatar::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: inherit;
+  background: repeating-linear-gradient(135deg, rgba(117, 102, 255, 0.08) 0 6px, transparent 6px 14px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.weld-glass-page .how-profile-card .profile-avatar > *,
+.weld-glass-page .profile-board-avatar .profile-avatar > * {
+  z-index: 2;
+}
+
+.weld-glass-page .step-rail {
+  position: relative;
+  overflow: hidden;
+  border-radius: 40px;
+  padding: clamp(30px, 4vw, 44px);
+  background:
+    radial-gradient(circle at 4% 0%, rgba(255, 255, 255, 0.86), transparent 28%),
+    repeating-linear-gradient(135deg, rgba(110, 122, 205, 0.032) 0 2px, transparent 2px 26px),
+    rgba(255, 255, 255, 0.34);
+}
+
+.weld-glass-page .step-card {
+  min-height: 176px;
+}
+
+.weld-glass-page .profile-creation-section .section-copy,
+.weld-glass-page .chat-section-copy,
+.weld-glass-page .faq-section .section-copy {
+  margin-left: clamp(0px, 3vw, 50px);
+}
+
+.weld-glass-page .chat-preview-shell {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(320px, 0.34fr) minmax(0, 1fr);
+  grid-template-areas:
+    "top top"
+    "side thread";
+  gap: 18px;
+  padding: 22px;
+  border-radius: 44px;
+  background:
+    radial-gradient(circle at 94% 4%, rgba(255, 255, 255, 0.86), transparent 20%),
+    radial-gradient(circle at 7% 92%, rgba(151, 133, 255, 0.12), transparent 24%),
+    repeating-linear-gradient(135deg, rgba(105, 118, 195, 0.022) 0 2px, transparent 2px 30px),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.58), rgba(234, 235, 255, 0.48));
+}
+
+.weld-glass-page .chat-window-topbar {
+  position: relative;
+  z-index: 1;
+  grid-area: top;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 18px;
+  align-items: center;
+}
+
+.weld-glass-page .chat-window-topbar button,
+.weld-glass-page .chat-window-actions button {
+  display: inline-flex;
+  min-height: 58px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.6);
+  color: #1227b0;
+  font-size: 16px;
+  font-weight: 720;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.96), 0 16px 34px rgba(76, 88, 148, 0.1);
+}
+
+.weld-glass-page .chat-window-topbar svg {
+  width: 20px;
+  height: 20px;
+}
+
+.weld-glass-page .chat-window-identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.weld-glass-page .chat-mini-profile {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 12px 28px rgba(76, 88, 148, 0.1);
+}
+
+.weld-glass-page .chat-mini-profile span {
+  position: absolute;
+  inset: 15px 12px 8px;
+  border-radius: 18px 18px 10px 10px;
+  background: #11131a;
+}
+
+.weld-glass-page .chat-mini-profile i {
+  position: absolute;
+  right: 2px;
+  bottom: 3px;
+  width: 13px;
+  height: 13px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: #17d68f;
+}
+
+.weld-glass-page .chat-window-identity strong {
+  display: block;
+  color: #142dff;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.weld-glass-page .chat-window-identity em {
+  display: block;
+  margin-top: 5px;
+  color: #13bd82;
+  font-style: normal;
+  font-weight: 720;
+}
+
+.weld-glass-page .chat-window-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.weld-glass-page .chat-window-actions button:last-child {
+  width: 58px;
+  justify-content: center;
+  padding: 0;
+  font-size: 18px;
+}
+
+.weld-glass-page .chat-profile-panel {
+  grid-area: side;
+}
+
+.weld-glass-page .chat-thread-panel {
+  grid-area: thread;
+  min-height: 650px;
+}
+
+.weld-glass-page .chat-profile-panel,
+.weld-glass-page .chat-thread-panel {
+  position: relative;
+  z-index: 1;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(255, 255, 255, 0.94), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.66), rgba(244, 246, 255, 0.44));
+}
+
+.weld-glass-page .chat-thread-panel {
+  background:
+    radial-gradient(circle at 52% 0%, rgba(255, 255, 255, 0.92), transparent 25%),
+    repeating-radial-gradient(circle at 52% 46%, rgba(56, 70, 150, 0.026) 0 1px, transparent 1px 22px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.54), rgba(240, 242, 255, 0.42));
+}
+
+.weld-glass-page .chat-row.is-out p {
+  background: linear-gradient(180deg, rgba(245, 244, 255, 0.78), rgba(237, 236, 255, 0.58));
+}
+
+.weld-glass-page .waitlist-shell {
+  overflow: hidden;
+}
+
+.weld-glass-page .waitlist-shell::before {
+  content: "";
+  position: absolute;
+  left: -90px;
+  bottom: -110px;
+  width: 300px;
+  height: 300px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.82), transparent 19%),
+    radial-gradient(circle at 58% 54%, rgba(140, 122, 255, 0.2), transparent 66%);
+  pointer-events: none;
+}
+
+.weld-glass-page .waitlist-form-card {
+  background:
+    radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.9), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(246, 248, 255, 0.46));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 34px 80px rgba(78, 90, 148, 0.14);
+}
+
+.weld-glass-page .waitlist-submit {
+  color: #fff;
+  border: 0;
+}
+
+.weld-glass-page .waitlist-benefits span {
+  position: relative;
+}
+
+.weld-glass-page .waitlist-benefits svg {
+  background:
+    radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.9), transparent 36%),
+    rgba(255, 255, 255, 0.48);
+}
+
+@media (max-width: 980px) {
+  .weld-glass-page .chat-preview-shell {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "top"
+      "side"
+      "thread";
+  }
+
+  .weld-glass-page .chat-window-topbar {
+    grid-template-columns: 1fr;
+  }
+
+  .weld-glass-page .chat-window-actions {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 680px) {
+  .weld-glass-page .chat-window-actions,
+  .weld-glass-page .chat-window-identity {
+    display: none;
+  }
+
+  .weld-glass-page .chat-window-topbar {
+    display: block;
+  }
+
+  .weld-glass-page .chat-window-topbar > button {
+    min-height: 46px;
+  }
+
+  .weld-glass-page .how-story-copy h2 {
+    font-size: clamp(46px, 13vw, 64px);
+  }
+}
