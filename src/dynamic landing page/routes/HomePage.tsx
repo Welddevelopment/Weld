@@ -9,9 +9,9 @@ import {
 } from "@/dynamic landing page/lib/source-variant";
 
 export const metadata: Metadata = {
-  title: "weld. - Get discovered by Roblox studios.",
+  title: "weld. - Meet Roblox talent worth hiring.",
   description:
-    "Build one Roblox profile that proves you ship, shows your rate and availability, and gets you better-fit studio intros."
+    "Build a swipeable Roblox talent card with role, rate, availability, links, proof, and shipped work in one friendly profile."
 };
 
 export default function HomePage({

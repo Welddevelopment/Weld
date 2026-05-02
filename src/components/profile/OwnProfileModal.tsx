@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react'
 
-import { LeftAuxPanel, RightAuxPanel } from '@/components/matching-preview/PreviewAuxPanel'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 
 interface Props {
@@ -46,19 +45,19 @@ export default function OwnProfileModal({ profile, onClose }: Props) {
 
   return (
     <div
-      className="mp-modal-overlay"
+      className="fixed inset-0 z-[220] flex items-center justify-center p-4"
+      style={{
+        background: 'radial-gradient(circle at 50% 16%,rgba(224,58,30,.22),transparent 30%),rgba(6,5,5,.85)',
+        backdropFilter: 'blur(20px) saturate(1.05)',
+      }}
       onClick={onClose}
     >
       <button className="mp-modal-close-screen" onClick={e => { e.stopPropagation(); onClose() }}>
         ✕
       </button>
 
-      <div className="mp-modal-row" onClick={e => e.stopPropagation()}>
-        <div className="mp-carousel-card pos-left" style={{ overflow: 'hidden' }}>
-          <LeftAuxPanel profile={profile} />
-        </div>
-
-        <div className="mp-carousel-card pos-center">
+      <div style={{ width: '100%', maxWidth: 440, maxHeight: '90vh' }} onClick={e => e.stopPropagation()}>
+        <div className="mp-carousel-card pos-center" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
           <AvatarImg userId={profile.robloxUserId} name={profile.name} bg={profile.bg} />
 
           <div className="mp-modal-body">
@@ -147,10 +146,6 @@ export default function OwnProfileModal({ profile, onClose }: Props) {
               {profile.meta}
             </div>
           </div>
-        </div>
-
-        <div className="mp-carousel-card pos-right" style={{ overflow: 'hidden' }}>
-          <RightAuxPanel profile={profile} />
         </div>
       </div>
     </div>

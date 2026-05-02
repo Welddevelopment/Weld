@@ -14,5 +14,3 @@ export type Profile = {
   tier: string
   headerGradient: string
 }
-
-export type MatchCandidate = Profile

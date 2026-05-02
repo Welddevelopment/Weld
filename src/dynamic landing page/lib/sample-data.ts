@@ -12,10 +12,10 @@ export const AUDIENCE_COPY = {
     proofState: "Verifying link",
     matchState: "Compiling filters",
     finalState: "Standby",
-    finalTitle: "Get hired. No noise.",
+    finalTitle: "Spark with studios.",
     finalCopy:
       "Join the waitlist, finish the short profile flow, and keep your invite active with referrals and profile completion.",
-    microProof: ["Free during beta", "Developer-first", "Referral rewards"],
+    microProof: ["Swipe. Spark. Ship.", "Free during beta", "Kickstart the movement"],
     studioBridgeButton: "Join studio beta",
     studioBridgeLink: "Get hiring access"
   },
@@ -42,10 +42,10 @@ export const AUDIENCE_COPY = {
 export const SOURCE_VARIANTS = {
   default: {
     developer: {
-      title: "Get found.\nNo Discord.",
+      title: "Spark with\nstudios.",
       copy:
-        "Weld turns your shipped games into a trust-verified profile. Studios filter by role, rate, and availability, then reach out. You do not apply.",
-      sourceLine: "Built for creators tired of thread diving and dead DMs."
+        "The talent network for Roblox. Link your games, set your rate, and match with studios that actually ship.",
+      sourceLine: "Swipe. Spark. Ship. Free. Kickstart the movement."
     },
     studio: {
       title: "Hire Roblox talent.\nNo thread chaos.",

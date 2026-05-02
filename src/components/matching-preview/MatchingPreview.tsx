@@ -86,19 +86,6 @@ function parseCompactCount(value: string) {
   return amount
 }
 
-function parseMoneyValue(value: string) {
-  const compactValue = value.replace(/,/g, '')
-  const match = compactValue.match(/([\d.]+)\s*([KMB])?/i)
-  if (!match) return 0
-  const amount = Number(match[1])
-  if (Number.isNaN(amount)) return 0
-  const unit = match[2]?.toUpperCase()
-  if (unit === 'K') return amount * 1000
-  if (unit === 'M') return amount * 1000000
-  if (unit === 'B') return amount * 1000000000
-  return amount
-}
-
 function totalStudioCcu(profile: PreviewProfile, kind: 'top' | 'current') {
   if (profile.type !== 'studio') return 0
   return profile.topGames?.reduce((total, game) => {
@@ -115,23 +102,16 @@ function totalProfilePlays(profile: PreviewProfile) {
 
 function totalDevProjectValue(profile: PreviewProfile) {
   if (profile.type !== 'dev') return 0
-  return profile.bestWork?.reduce((total, item) => total + parseMoneyValue(item.amount), 0) ?? 0
+  return profile.bestWork?.reduce((total, item) => total + Number(item.amount), 0) ?? 0
 }
 
 function maxDevProjectValue(profile: PreviewProfile) {
   if (profile.type !== 'dev') return 0
-  return profile.bestWork?.reduce((max, item) => Math.max(max, parseMoneyValue(item.amount)), 0) ?? 0
+  return profile.bestWork?.reduce((max, item) => Math.max(max, Number(item.amount)), 0) ?? 0
 }
 
 function extractMetaValue(profile: PreviewProfile, label: 'Budget' | 'Rate') {
   return profile.meta.match(new RegExp(`${label}:\\s*([^-]+)`))?.[1]?.trim() ?? null
-}
-
-function matchesMetaFilter(value: string | null, active: string | null) {
-  if (!active) return true
-  if (!value) return false
-  if (active === 'Hourly') return value.includes('/ hr')
-  return value.includes(active)
 }
 
 function extractStatus(profile: PreviewProfile) {
@@ -270,10 +250,10 @@ export default function MatchingPreview({ audience: initialAudience = 'dev' }: P
         : inTeamSizeRange(extractTeamSize(p), activeRangeFilter)
       const matchesPlays = inPlayRange(totalProfilePlays(p), activePlayFilter)
       const matchesStudioStatus = p.type !== 'studio' || !activeStatusFilter || extractStatus(p) === activeStatusFilter
-      const matchesBudget = p.type !== 'studio' || matchesMetaFilter(extractMetaValue(p, 'Budget'), activeBudgetFilter)
+      const matchesBudget = p.type !== 'studio' || !activeBudgetFilter || extractMetaValue(p, 'Budget') === activeBudgetFilter
       const matchesTopCcu = p.type !== 'studio' || inStudioTopCcuRange(totalStudioCcu(p, 'top'), activeTopCcuFilter)
       const matchesCurrentCcu = p.type !== 'studio' || inStudioCurrentCcuRange(totalStudioCcu(p, 'current'), activeCurrentCcuFilter)
-      const matchesRate = p.type !== 'dev' || matchesMetaFilter(extractMetaValue(p, 'Rate'), activeRateFilter)
+      const matchesRate = p.type !== 'dev' || !activeRateFilter || extractMetaValue(p, 'Rate') === activeRateFilter
       const matchesBadge = p.type !== 'dev' || !activeBadgeFilter || p.badge === activeBadgeFilter
       const matchesValue = p.type !== 'dev' || inDevValueRange(totalDevProjectValue(p), activeValueFilter)
       const matchesMaxValue = p.type !== 'dev' || inDevMaxValueRange(maxDevProjectValue(p), activeMaxValueFilter)

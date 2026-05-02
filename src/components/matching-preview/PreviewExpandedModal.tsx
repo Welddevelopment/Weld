@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { PreviewProfile } from './preview-types'
 import { LeftAuxPanel, RightAuxPanel } from './PreviewAuxPanel'
 
@@ -33,11 +33,7 @@ interface Props {
   onClose: () => void
   onPassed: (id: string) => void
   onLiked: (id: string) => void
-  onLikeResult?: (id: string) => LikeFeedback | void | Promise<LikeFeedback | void>
-  autoLike?: boolean
 }
-
-export type LikeFeedback = 'liked' | 'matched' | 'already_liked' | 'already_matched'
 
 interface PassToastData { name: string; isDev: boolean }
 
@@ -71,7 +67,6 @@ function CenterCard({
   glowClass,
   showMatch,
   isMatch,
-  likeFeedback,
   onPass,
   onLike,
   onKeepMatching,
@@ -80,14 +75,11 @@ function CenterCard({
   glowClass: string
   showMatch: boolean
   isMatch: boolean
-  likeFeedback: LikeFeedback
   onPass: () => void
   onLike: () => void
   onKeepMatching: () => void
 }) {
   const isDev = profile.type === 'dev'
-  const alreadyLiked = likeFeedback === 'already_liked'
-  const alreadyMatched = likeFeedback === 'already_matched'
 
   return (
     <div className={`mp-carousel-card pos-center ${glowClass}`} style={{ position: 'relative' }}>
@@ -179,47 +171,21 @@ function CenterCard({
         </div>
       </div>
 
-      {showMatch && alreadyLiked && (
-        <div className="mp-match-overlay">
-          <div className="mp-match-overlay-text">You have liked {profile.name} already</div>
-          <div className="mp-match-overlay-sub">They are saved on your home page. You can still pass later if your mind changes.</div>
-          <div className="mp-match-chat-icon">
-            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          </div>
-          <button className="mp-match-keep-btn" onClick={onKeepMatching}>Keep swiping</button>
-        </div>
-      )}
-
-      {showMatch && alreadyMatched && (
-        <div className="mp-match-overlay mp-its-a-match">
-          <div className="mp-iam-heading">You&apos;ve already sparked with {profile.name}</div>
-          <div className="mp-iam-sub">You can keep swiping or change your interaction by passing on this profile.</div>
-          <div className="mp-iam-actions">
-            <button className="mp-iam-scroll-btn" onClick={onKeepMatching}>
-              <div className="mp-iam-scroll-circle">
-                <svg viewBox="0 0 24 24" className="mp-iam-scroll-arrow"><polyline points="9 18 15 12 9 6"/></svg>
-              </div>
-              <span className="mp-iam-btn-label">Keep swiping</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {showMatch && !isMatch && !alreadyLiked && !alreadyMatched && (
+      {showMatch && !isMatch && (
         <div className="mp-match-overlay">
           <div className="mp-match-overlay-text">💚 You swiped right!</div>
-          <div className="mp-match-overlay-sub">We&apos;ll let you know when you spark.</div>
+          <div className="mp-match-overlay-sub">We&apos;ll let you know when it&apos;s a match.</div>
           <div className="mp-match-chat-icon">
             <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           </div>
-          <button className="mp-match-keep-btn" onClick={onKeepMatching}>Keep swiping →</button>
+          <button className="mp-match-keep-btn" onClick={onKeepMatching}>Keep matching →</button>
         </div>
       )}
 
-      {showMatch && isMatch && !alreadyMatched && (
+      {showMatch && isMatch && (
         <div className="mp-match-overlay mp-its-a-match">
-          <div className="mp-iam-heading">⚡ It&apos;s a Spark!</div>
-          <div className="mp-iam-sub">You and {profile.name} sparked — time to reach out.</div>
+          <div className="mp-iam-heading">🎉 It&apos;s a Match!</div>
+          <div className="mp-iam-sub">You and {profile.name} both liked each other</div>
           <div className="mp-iam-actions">
             <button className="mp-iam-reach-btn" onClick={onKeepMatching}>
               <div className="mp-iam-reach-icon">
@@ -231,7 +197,7 @@ function CenterCard({
               <div className="mp-iam-scroll-circle">
                 <svg viewBox="0 0 24 24" className="mp-iam-scroll-arrow"><polyline points="9 18 15 12 9 6"/></svg>
               </div>
-              <span className="mp-iam-btn-label">Keep swiping</span>
+              <span className="mp-iam-btn-label">Keep matching</span>
             </button>
           </div>
         </div>
@@ -281,59 +247,23 @@ function PassToast({ data, onDismiss }: { data: PassToastData; onDismiss: () => 
   )
 }
 
-export default function PreviewExpandedModal({ profiles, initialId, onClose, onPassed, onLiked, onLikeResult, autoLike }: Props) {
+export default function PreviewExpandedModal({ profiles, initialId, onClose, onPassed, onLiked }: Props) {
   const [currentId, setCurrentId] = useState(initialId)
   const [glowClass, setGlowClass] = useState('')
   const [showMatch, setShowMatch] = useState(false)
   const [isMatch, setIsMatch] = useState(false)
-  const [likeFeedback, setLikeFeedback] = useState<LikeFeedback>('liked')
-  const [isLiking, setIsLiking] = useState(false)
   const [passToast, setPassToast] = useState<PassToastData | null>(null)
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
-  const pendingPassRef = useRef<string | null>(null)
-  const autoLikeInitializedRef = useRef(false)
 
   useEffect(() => {
     return () => { timersRef.current.forEach(clearTimeout) }
   }, [])
-
-  const revealLikeResult = useCallback((feedback: LikeFeedback) => {
-    setGlowClass('mp-like-glow')
-    setLikeFeedback(feedback)
-    setIsMatch(feedback === 'matched')
-    const t = setTimeout(() => setShowMatch(true), 460)
-    timersRef.current.push(t)
-  }, [])
-
-  const commitLike = useCallback(async (id: string) => {
-    setIsLiking(true)
-    try {
-      const feedback = await onLikeResult?.(id)
-      revealLikeResult(feedback ?? 'liked')
-    } catch {
-      revealLikeResult('liked')
-    } finally {
-      setIsLiking(false)
-    }
-  }, [onLikeResult, revealLikeResult])
-
-  // Auto-trigger like when opened from the card ♥ button
-  useEffect(() => {
-    if (!autoLike || autoLikeInitializedRef.current) return
-    autoLikeInitializedRef.current = true
-    const t = setTimeout(() => {
-      void commitLike(initialId)
-    }, 200)
-    timersRef.current.push(t)
-  }, [autoLike, initialId, commitLike])
 
   useEffect(() => {
     setCurrentId(initialId)
     setGlowClass('')
     setShowMatch(false)
     setIsMatch(false)
-    setLikeFeedback('liked')
-    setIsLiking(false)
   }, [initialId])
 
   const profile = profiles.find(p => p.id === currentId)
@@ -348,20 +278,22 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
     setGlowClass('')
     setShowMatch(false)
     setIsMatch(false)
-    setLikeFeedback('liked')
-    setIsLiking(false)
   }
 
   const handlePass = () => {
-    if (glowClass || isLiking) return
+    if (glowClass) return
     const { name, type } = profile
-    pendingPassRef.current = currentId
+    onPassed(currentId)
+    advance(currentId)
     setPassToast({ name, isDev: type === 'dev' })
   }
 
   const handleLike = () => {
-    if (glowClass || isLiking) return
-    void commitLike(currentId)
+    if (glowClass) return
+    setGlowClass('mp-like-glow')
+    setIsMatch(Math.random() < 0.15)
+    const t = setTimeout(() => setShowMatch(true), 460)
+    timersRef.current.push(t)
   }
 
   const handleKeepMatching = () => {
@@ -374,18 +306,7 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
       <button className="mp-modal-close-screen" onClick={e => { e.stopPropagation(); onClose() }}>✕</button>
 
       {passToast && (
-        <PassToast
-          data={passToast}
-          onDismiss={() => {
-            const pendingId = pendingPassRef.current
-            pendingPassRef.current = null
-            setPassToast(null)
-            if (pendingId !== null) {
-              onPassed(pendingId)
-              advance(pendingId)
-            }
-          }}
-        />
+        <PassToast data={passToast} onDismiss={() => setPassToast(null)} />
       )}
 
       <div className="mp-modal-row" onClick={e => e.stopPropagation()}>
@@ -398,7 +319,6 @@ export default function PreviewExpandedModal({ profiles, initialId, onClose, onP
           glowClass={glowClass}
           showMatch={showMatch}
           isMatch={isMatch}
-          likeFeedback={likeFeedback}
           onPass={handlePass}
           onLike={handleLike}
           onKeepMatching={handleKeepMatching}

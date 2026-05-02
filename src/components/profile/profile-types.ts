@@ -49,57 +49,6 @@ export function createDraft(): ProfileDraft {
   }
 }
 
-function selectedSkillsFromProfile(profile: PreviewProfile) {
-  const skills = profile.type === 'dev' ? profile.skills : profile.skillsNeeded
-  if (skills && skills.length > 0) return skills
-  return profile.tags.map(name => ({ name, description: '' }))
-}
-
-function parseExperienceYears(profile: PreviewProfile) {
-  if (profile.role.includes('<1yr')) return 0
-  const match = profile.role.match(/(\d+)yr/)
-  return match ? Number(match[1]) : null
-}
-
-function parseTeamSize(profile: PreviewProfile) {
-  const match = profile.role.match(/(\d+)\s+members/)
-  return match ? Number(match[1]) : null
-}
-
-function metaValue(profile: PreviewProfile, label: string) {
-  return profile.meta
-    .split(' - ')
-    .find(part => part.startsWith(`${label}: `))
-    ?.replace(`${label}: `, '')
-    .trim() ?? null
-}
-
-export function profileToDraft(profile: PreviewProfile): ProfileDraft {
-  const draft = createDraft()
-  const isDev = profile.type === 'dev'
-
-  return {
-    ...draft,
-    type: profile.type,
-    robloxUserId: profile.robloxUserId,
-    bg: profile.bg,
-    badge: profile.badge,
-    name: profile.name,
-    bio: profile.bio,
-    experienceYears: isDev ? parseExperienceYears(profile) : null,
-    rateType: isDev ? metaValue(profile, 'Rate') : null,
-    teamSize: isDev ? null : parseTeamSize(profile),
-    status: isDev ? null : profile.meta.split(' - ')[0] || null,
-    budgetType: isDev ? null : metaValue(profile, 'Budget'),
-    details: profile.details ?? '',
-    selectedSkills: selectedSkillsFromProfile(profile),
-    portfolioLinks: profile.portfolio?.links ?? [],
-    socials: profile.socials ?? [],
-    bestWork: profile.bestWork ?? [],
-    topGames: profile.topGames ?? [],
-  }
-}
-
 export function draftToProfile(draft: ProfileDraft, id: string): PreviewProfile {
   const isDev = draft.type === 'dev'
 
@@ -108,19 +57,19 @@ export function draftToProfile(draft: ProfileDraft, id: string): PreviewProfile 
   let tags: string[] = []
 
   if (isDev) {
-    const yr = draft.experienceYears ?? 0
-    role = yr === 0 ? 'Developer - <1yr experience' : `Developer - ${yr}yr experience`
-    const rateStr = draft.rateType
-      ? (draft.rateAmount ? `${draft.rateAmount} ${draft.rateType}` : draft.rateType)
-      : ''
-    meta = ['Available Now', rateStr ? `Rate: ${rateStr}` : '', 'Remote'].filter(Boolean).join(' - ')
+    const yr = draft.experienceYears ?? 1
+    role = `Developer - ${yr}yr experience`
+    const rate = draft.rateType
+      ? `${draft.rateAmount ? draft.rateAmount + ' ' : ''}${draft.rateType}`
+      : 'Rate negotiable'
+    meta = rate
     tags = draft.selectedSkills.slice(0, 3).map(s => s.name)
   } else {
-    const size = draft.teamSize ?? 0
+    const size = draft.teamSize ?? 1
     role = `Roblox Game Studio - ${size} members`
-    const status = draft.status ?? ''
+    const status = draft.status ?? 'Open to Offers'
     const budget = draft.budgetType ?? ''
-    meta = [status, budget ? `Budget: ${budget}` : '', 'Remote'].filter(Boolean).join(' - ')
+    meta = [status, budget].filter(Boolean).join(' · ')
     tags = draft.selectedSkills.slice(0, 3).map(s => s.name)
   }
 
@@ -129,7 +78,7 @@ export function draftToProfile(draft: ProfileDraft, id: string): PreviewProfile 
     type: draft.type,
     robloxUserId: draft.robloxUserId ?? 1,
     bg: draft.bg,
-    badge: isDev ? draft.badge : (draft.badge || 'Studio'),
+    badge: draft.badge,
     name: draft.name || 'Your Name',
     role,
     bio: draft.bio,
@@ -141,7 +90,6 @@ export function draftToProfile(draft: ProfileDraft, id: string): PreviewProfile 
     if (draft.selectedSkills.length > 0) profile.skills = draft.selectedSkills
     if (draft.portfolioLinks.length > 0) profile.portfolio = { links: draft.portfolioLinks }
     if (draft.bestWork.length > 0) profile.bestWork = draft.bestWork
-    if (draft.topGames.length > 0) profile.topGames = draft.topGames
     if (draft.socials.length > 0) profile.socials = draft.socials
   } else {
     if (draft.details) profile.details = draft.details

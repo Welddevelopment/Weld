@@ -24,9 +24,9 @@ const dmMono = DM_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://weldroblox.com"),
-  title: "weld. - Get found without begging in Discord threads.",
+  title: "weld. - Roblox talent cards for swiping and sparking.",
   description:
-    "A rebellious, Roblox-native talent network for creators and studios. Show shipped work, rates, and availability in one place.",
+    "A friendly Roblox talent marketplace where developers and studios review role, rate, availability, proof, and shipped work in one swipeable card.",
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -36,9 +36,9 @@ export const metadata: Metadata = {
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }]
   },
   openGraph: {
-    title: "weld. - Get found without begging in Discord threads.",
+    title: "weld. - Roblox talent cards for swiping and sparking.",
     description:
-      "A rebellious, Roblox-native talent network for creators and studios. Show shipped work, rates, and availability in one place.",
+      "A friendly Roblox talent marketplace where developers and studios review role, rate, availability, proof, and shipped work in one swipeable card.",
     url: "https://weldroblox.com/",
     siteName: "weld.",
     images: [{ url: "/og-image.png" }],
@@ -46,9 +46,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "weld. - Get found without begging in Discord threads.",
+    title: "weld. - Roblox talent cards for swiping and sparking.",
     description:
-      "A rebellious, Roblox-native talent network for creators and studios. Show shipped work, rates, and availability in one place.",
+      "A friendly Roblox talent marketplace where developers and studios review role, rate, availability, proof, and shipped work in one swipeable card.",
     images: ["/og-image.png"]
   }
 };

@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -35,43 +36,52 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#0c0e0f]">
+    <div className="flex min-h-screen flex-col">
       <AppNav />
-      <main className="flex flex-1 flex-col items-center justify-center px-4">
+      <main className="acct-shell">
         {loaded && (
-          <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-white/[0.03] p-8">
-            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">
-              Account
-            </span>
+          <section className="acct-card">
+            <header className="grid gap-2">
+              <span className="acct-eyebrow">Account</span>
+              <h1 className="acct-title">{email ? 'Your weld account' : 'Not signed in'}</h1>
+            </header>
 
             {email ? (
-              <div className="mt-4 flex flex-col gap-6">
-                <div>
-                  <p className="font-mono text-[10px] uppercase tracking-[0.13em] text-white/40">
-                    Signed in as
-                  </p>
-                  <p className="mt-1 font-mono text-sm text-white/80">{email}</p>
+              <>
+                <div className="acct-row">
+                  <span className="acct-label">Signed in as</span>
+                  <p className="acct-value">{email}</p>
                 </div>
-                <button
-                  onClick={handleSignOut}
-                  disabled={busy}
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.13em] text-white/60 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white/90 disabled:opacity-40"
-                >
-                  {busy ? 'Signing out...' : 'Sign out'}
-                </button>
-              </div>
+
+                <div className="acct-row">
+                  <span className="acct-label">Profile draft</span>
+                  <p className="acct-value" style={{ color: 'rgba(255,247,241,0.62)' }}>
+                    Auto-saved to this account. Open the builder to keep editing.
+                  </p>
+                </div>
+
+                <div className="acct-actions">
+                  <Link href="/profile" className="acct-btn acct-btn--primary">Open profile</Link>
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    disabled={busy}
+                    className="acct-btn acct-btn--ghost"
+                  >
+                    {busy ? 'Signing out…' : 'Sign out'}
+                  </button>
+                </div>
+              </>
             ) : (
-              <div className="mt-4 flex flex-col gap-4">
-                <p className="font-mono text-sm text-white/50">You are not signed in.</p>
-                <a
-                  href="/login"
-                  className="inline-flex items-center font-mono text-[10px] uppercase tracking-[0.13em] text-white/60 underline underline-offset-4 hover:text-white/90"
-                >
-                  Log in →
-                </a>
+              <div className="acct-empty">
+                <p>You aren&apos;t signed in. Create an account to save your draft and keep matches attached to you.</p>
+                <div className="acct-actions">
+                  <Link href="/signup" className="acct-btn acct-btn--primary">Create account</Link>
+                  <Link href="/login" className="acct-btn acct-btn--ghost">Log in</Link>
+                </div>
               </div>
             )}
-          </div>
+          </section>
         )}
       </main>
     </div>

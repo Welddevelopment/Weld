@@ -5,12 +5,12 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   useEffect,
-  useMemo,
   useRef,
   useState,
   useTransition,
   type CSSProperties,
-  type MutableRefObject
+  type KeyboardEvent,
+  type ReactNode
 } from "react";
 
 import {
@@ -19,16 +19,9 @@ import {
   submitSignupCapture,
   trackEvent
 } from "@/dynamic landing page/lib/browser";
-import {
-  AUDIENCE_COPY,
-  FAQ_ITEMS,
-  FOUNDING_FACTS,
-  HERO_PROFILES,
-  ROLE_PREVIEWS,
-  SOURCE_VARIANTS
-} from "@/dynamic landing page/lib/sample-data";
 import type { SourceVariant } from "@/dynamic landing page/lib/source-variant";
 import type { Audience } from "@/dynamic landing page/lib/types";
+import { useMotionPolicy } from "@/dynamic landing page/lib/useMotionPolicy";
 
 interface MarketingPageProps {
   initialMode: Audience;
@@ -36,308 +29,558 @@ interface MarketingPageProps {
   page: "landing" | "studios";
 }
 
-type HeroProfile = (typeof HERO_PROFILES)[number];
-type RoleKey = keyof typeof ROLE_PREVIEWS;
-type CaptureSource = "hero" | "final-cta";
-type CapturePhase = "idle" | "executing" | "saved" | "redirecting";
-type BootTone = "neutral" | "active" | "success" | "muted";
+type RoleKey =
+  | "scripter"
+  | "builder"
+  | "ui"
+  | "vfx"
+  | "animator"
+  | "designer"
+  | "systems";
 
-interface BootLine {
-  text: string;
-  tone?: BootTone;
-  bold?: boolean;
-  delay?: number;
-}
+type SwipeState = "idle" | "reject" | "like" | "spark";
+type CapturePhase = "idle" | "submitting" | "success" | "error";
+type DetailKey = "verified" | "projects" | "reliability" | "latest" | "feedback";
 
-interface DiscordEntry {
-  name: string;
-  color: string;
-  body: string;
-  timestamp: string;
-  badges?: string[];
-  expired?: boolean;
-  deleted?: boolean;
-  ghost?: boolean;
-  ghostLabel?: string;
-  spam?: boolean;
-}
-
-interface RewardCard {
-  count: number;
+interface TalentProfile {
+  role: RoleKey;
   label: string;
-  description: string;
-  badge: string;
-}
-
-interface CommandSequence {
-  command: string;
-  lines: BootLine[];
-  summary: string;
-}
-
-const WAITLIST_URL = "https://weldroblox.com";
-const HERO_ROTATION_MS = 6800;
-
-const HERO_BOOT_LINES: Record<Audience, BootLine[]> = {
-  developer: [
-    { text: "> booting weld.roster...", tone: "muted", delay: 140 },
-    { text: "> loading developer lane...", tone: "neutral", delay: 160 },
-    { text: "> scanning shipped work... ✓", tone: "success", delay: 170 },
-    { text: "> checking proof link... verified", tone: "success", delay: 180 },
-    { text: "> matching studio filters...", tone: "active", delay: 170 },
-    { text: "> READY_FOR_DISCOVERY", tone: "success", bold: true, delay: 220 }
-  ],
-  studio: [
-    { text: "> booting weld.roster...", tone: "muted", delay: 140 },
-    { text: "> loading studio scout mode...", tone: "neutral", delay: 160 },
-    { text: "> scanning shipped work... ✓", tone: "success", delay: 170 },
-    { text: "> checking proof link... verified", tone: "success", delay: 180 },
-    { text: "> filtering for role, rate, and proof...", tone: "active", delay: 170 },
-    { text: "> SCOUT_MODE_READY", tone: "success", bold: true, delay: 220 }
-  ]
-};
-
-const DISCORD_CHAOS: DiscordEntry[] = [
-  {
-    name: "devhunter99",
-    color: "hsl(200 50% 62%)",
-    body: "anyone know a good scripter??",
-    timestamp: "2:14 PM",
-    badges: ["@3", "no rate"]
-  },
-  {
-    name: "studioboss",
-    color: "hsl(280 45% 62%)",
-    body: "HIRING: lua dev 20R$/hr DM me",
-    timestamp: "2:15 PM",
-    badges: ["urgent?", "thin brief"]
-  },
-  {
-    name: "Random42",
-    color: "hsl(130 40% 62%)",
-    body: "i can script lmk",
-    timestamp: "2:16 PM",
-    badges: ["no proof"]
-  },
-  {
-    name: "xCodez",
-    color: "hsl(30 60% 62%)",
-    body: "check my portfolio [expired link]",
-    timestamp: "2:18 PM",
-    badges: ["expired link", "dead reel"],
-    expired: true
-  },
-  {
-    name: "studioboss",
-    color: "hsl(280 45% 62%)",
-    body: "what's your rate?",
-    timestamp: "2:19 PM",
-    badges: ["no reply"]
-  },
-  {
-    name: "Random42",
-    color: "hsl(130 40% 62%)",
-    body: "",
-    timestamp: "",
-    ghost: true,
-    ghostLabel: "(no response - 3 days later)"
-  },
-  {
-    name: "NovaDev",
-    color: "hsl(340 50% 62%)",
-    body: "[deleted message]",
-    timestamp: "2:22 PM",
-    deleted: true
-  },
-  {
-    name: "HireBot",
-    color: "hsl(0 0% 45%)",
-    body: "FIRE SCRIPTER FOR HIRE FIRE DM for rates FIRE",
-    timestamp: "2:25 PM",
-    badges: ["spam", "thread noise"],
-    spam: true
-  }
-];
-
-const COMPILER_OUTPUT: BootLine[] = [
-  { text: "ROLE: Scripter ✓", tone: "success" },
-  { text: "RATE: 45 R$/hr ✓", tone: "success" },
-  { text: "AVAILABILITY: Now ✓", tone: "success" },
-  { text: "SHIPPED_WORK: 3 games, 17.3M visits ✓", tone: "success" },
-  { text: "PROOF: Roblox OAuth verified ✓", tone: "success" },
-  { text: "Discord noise -> compiled into Weld signal.", tone: "success", bold: true }
-];
-
-const ROLE_CHIPS: ReadonlyArray<[RoleKey, string]> = [
-  ["scripter", "SCRIPTER"],
-  ["ui", "UI / UX"],
-  ["vfx", "VFX"],
-  ["builder", "BUILDER"],
-  ["animator", "ANIMATOR"],
-  ["designer", "DESIGNER"],
-  ["systems", "SYSTEMS"]
-];
-
-const ROLE_EXPLORER_DATA: Record<
-  RoleKey,
-  {
+  name: string;
+  handle: string;
+  headline: string;
+  availability: string;
+  rate: string;
+  payment: string;
+  matchScore: number;
+  years: string;
+  projects: string;
+  reliability: string;
+  services: string[];
+  links: Array<{ label: string; value: string }>;
+  latestProject: {
     name: string;
-    rate: string;
-    visits: string;
-    games: number;
-    availability: string;
-    verified: string;
-    skills: string[];
-    shippedWork: string;
-  }
-> = {
-  scripter: {
-    name: "xarion_dev",
-    rate: "45-60 R$/hr",
-    visits: "17.3M",
-    games: 3,
-    availability: "Open now",
-    verified: "Roblox OAuth verified",
-    skills: ["LUAU", "OOP", "DATASTORESERVICE"],
-    shippedWork: "Combat loop, persistence, admin tooling"
-  },
-  ui: {
-    name: "PixelUI",
-    rate: "35-50 R$/hr",
-    visits: "22M",
-    games: 5,
-    availability: "Open this week",
-    verified: "Roblox profile proof attached",
-    skills: ["UI/UX", "ROACT", "TWEEN"],
-    shippedWork: "HUD revamp, onboarding, shop conversion"
-  },
-  vfx: {
-    name: "FX_Master",
-    rate: "30-45 R$/hr",
-    visits: "12M",
-    games: 4,
-    availability: "Three slots open",
-    verified: "Reel linked and verified",
-    skills: ["VFX", "PARTICLES", "BEAM"],
-    shippedWork: "Hit confirms, spell bursts, trails"
-  },
-  builder: {
-    name: "BlockCraft",
-    rate: "25-40 R$/hr",
-    visits: "31M",
-    games: 7,
-    availability: "Sprint lane open",
-    verified: "World capture linked",
-    skills: ["BUILDING", "TERRAIN", "STUDIO"],
-    shippedWork: "Event maps, social hubs, traversal spaces"
-  },
-  animator: {
-    name: "PixelDrift",
-    rate: "28-35 R$/hr",
-    visits: "36.2M",
-    games: 4,
-    availability: "Monthly slots",
-    verified: "Combat reel verified",
-    skills: ["ANIMATION", "RIGGING", "MOON ANIMATOR"],
-    shippedWork: "Movement packs, combat sets, emotes"
-  },
-  designer: {
-    name: "DesignPro",
-    rate: "40-60 R$/hr",
-    visits: "8.5M",
-    games: 2,
-    availability: "Consult or sprint",
-    verified: "Progression docs linked",
-    skills: ["GAME DESIGN", "ECONOMY", "BALANCING"],
-    shippedWork: "Progression tuning, economy rebalance"
-  },
-  systems: {
-    name: "luamancer",
-    rate: "55-80 R$/hr",
-    visits: "65M",
-    games: 6,
-    availability: "Booked but reviewable",
-    verified: "Backend stack proof verified",
-    skills: ["FULL-STACK", "DATASTORESERVICE", "ECONOMY"],
-    shippedWork: "Matchmaking, telemetry, CI, automation"
-  }
+    summary: string;
+    bullets: string[];
+  };
+  feedback: {
+    label: string;
+    note: string;
+  };
+  proofDetails: Record<DetailKey, { title: string; body: string }>;
+  accent: string;
+  soft: string;
+}
+
+const ROLE_ORDER: RoleKey[] = [
+  "scripter",
+  "builder",
+  "ui",
+  "vfx",
+  "animator",
+  "designer",
+  "systems"
+];
+
+const ROLE_LABELS: Record<RoleKey, string> = {
+  scripter: "Scripter",
+  builder: "Builder",
+  ui: "UI Design",
+  vfx: "VFX",
+  animator: "Animator",
+  designer: "Game Design",
+  systems: "Systems"
 };
 
-const HOW_COMMANDS: CommandSequence[] = [
-  {
-    command: "$ weld auth roblox --proof",
-    lines: [
-      { text: "  -> linking Roblox account... ✓", tone: "success" },
-      { text: "  -> scanning 3 shipped games... ✓", tone: "success" },
-      { text: "  -> verifying 17.3M total visits... ✓", tone: "success" },
-      { text: "  -> PROOF_VERIFIED", tone: "success", bold: true }
-    ],
-    summary: "Proof is scanned first, not guessed from DMs."
+const MODE_COPY = {
+  developer: {
+    toggle: "I'm a developer",
+    navCta: "Join as a developer",
+    heroTitle: "The talent network for Roblox.",
+    heroCopy: "Link your games, set your rate, and match with studios that actually ship.",
+    heroSupport:
+      "Weld turns shipped work, rates, availability, links, and proof into swipeable talent cards studios can trust.",
+    cardFrame: "Your profile preview",
+    detailHeading: "Turn Roblox work into a card studios can trust.",
+    detailBody:
+      "One profile holds role, proof, links, rate, availability, and live work context without rebuilding your pitch every time.",
+    waitlistTitle: "Get early access to Weld.",
+    waitlistBody:
+      "Join developer beta to shape proof-first talent cards before public launch.",
+    waitlistPlaceholder: "you@example.com",
+    waitlistButton: "Join as a developer",
+    scoutTitle: "Studios see fit fast.",
+    scoutBody:
+      "Your card stays readable under pressure: who you are, what you do, how you charge, and what proves it."
   },
-  {
-    command: "$ weld profile set --role scripter --rate 45 --avail now",
-    lines: [
-      { text: "  -> setting role: Scripter ✓", tone: "success" },
-      { text: "  -> setting rate: 45 R$/hr ✓", tone: "success" },
-      { text: "  -> availability: OPEN ✓", tone: "success" },
-      { text: "  -> PROFILE_LIVE", tone: "success", bold: true }
-    ],
-    summary: "Rate and availability become visible before the first ask."
-  },
-  {
-    command: "$ weld discover --match studios",
-    lines: [
-      { text: "  -> scanning studio filters...", tone: "active" },
-      { text: "  -> 2 studios matched your profile ✓", tone: "success" },
-      { text: "  -> incoming intro from NovaStar Studios", tone: "neutral" },
-      { text: "  -> READY_FOR_DISCOVERY", tone: "success", bold: true }
-    ],
-    summary: "Studios pull you in with context instead of thread chaos."
+  studio: {
+    toggle: "I'm a studio",
+    navCta: "Get hiring access",
+    heroTitle: "The talent network for Roblox.",
+    heroCopy: "Link your games, set your rate, and match with studios that actually ship.",
+    heroSupport:
+      "Weld turns shipped work, rates, availability, links, and proof into swipeable talent cards studios can trust.",
+    cardFrame: "Candidate preview",
+    detailHeading: "Scout Roblox talent without Discord chaos.",
+    detailBody:
+      "Studios get one clear card for rate, availability, proof, links, and recent work instead of scattered bios and DMs.",
+    waitlistTitle: "Get hiring access to Weld.",
+    waitlistBody:
+      "Join studio beta to shape faster scouting, clearer proof, and better first conversations.",
+    waitlistPlaceholder: "studio@example.com",
+    waitlistButton: "Get hiring access",
+    scoutTitle: "Hire with context before first DM.",
+    scoutBody:
+      "Same product, different frame: card-first scouting that helps your team compare fit quickly and honestly."
   }
-];
+} as const;
 
-const REWARD_CARDS: RewardCard[] = [
+const FAQS = [
   {
-    count: 1,
-    label: "Early profile review",
-    description: "Your profile gets reviewed before the general queue.",
-    badge: "01"
+    question: "Are these real marketplace stats?",
+    answer:
+      "No. Card content is illustrative product demo data that shows how Weld packages proof, links, rate, and availability."
   },
   {
-    count: 2,
-    label: "Priority queue bump",
-    description: "Move up in the beta access queue.",
-    badge: "02"
+    question: "Does this change backend waitlist flow?",
+    answer:
+      "No. Landing redesign keeps current signup capture, invite redirect, attribution, and analytics behavior."
   },
   {
-    count: 3,
-    label: "First-wave consideration",
-    description: "Considered for the first beta wave.",
-    badge: "03"
-  },
-  {
-    count: 4,
-    label: "Founder badge lane",
-    description: "Access the founder badge review lane.",
-    badge: "04"
-  },
-  {
-    count: 5,
-    label: "Studio preview access",
-    description: "Early access to studio-side features.",
-    badge: "05"
+    question: "Who is Weld for?",
+    answer:
+      "Roblox developers who want better-fit work and studios that want to scout talent with more context."
   }
-];
-
-const STUDIO_FILTER_STATS = [
-  ["BY ROLE", "Scripter, UI, VFX, Systems"],
-  ["BY RATE", "Hourly, package, milestone"],
-  ["BY AVAILABILITY", "Now, next sprint, limited"],
-  ["BY SHIPPED WORK", "One proof link before the DM"]
 ] as const;
 
-function splitTitle(title: string) {
-  return title.split("\n");
+const NAV_ITEMS = [
+  { href: "#how", label: "What it does" },
+  { href: "#profile", label: "Profile" },
+  { href: "#chat", label: "Chat" },
+  { href: "#proof", label: "Proof" },
+  { href: "#faq", label: "FAQ" }
+] as const;
+
+const WAITLIST_URL = "https://weldroblox.com";
+
+const PROFILES: Record<RoleKey, TalentProfile> = {
+  scripter: {
+    role: "scripter",
+    label: "Roblox scripter",
+    name: "Eclipse",
+    handle: "@EclipseRBLX",
+    headline: "Builds clean Roblox systems, ships fast, and shows real proof of work.",
+    availability: "Available for work",
+    rate: "$65/hr",
+    payment: "Hourly or milestone",
+    matchScore: 92,
+    years: "3+ yrs",
+    projects: "Linked work",
+    reliability: "On-time notes",
+    services: ["Lua", "Roblox API", "Remote Events", "Data Stores", "Optimization", "Game Systems"],
+    links: [
+      { label: "Roblox", value: "/EclipseDev" },
+      { label: "Discord", value: "eclipse.dev" },
+      { label: "X", value: "@EclipseRBLX" },
+      { label: "GitHub", value: "eclipsedevx" }
+    ],
+    latestProject: {
+      name: "Treasure Quest",
+      summary: "Systems architecture and save-data cleanup.",
+      bullets: ["Scope explained", "Role credited", "Live work linked"]
+    },
+    feedback: {
+      label: "Client feedback",
+      note: "Structured notes can show how a teammate shipped, not fake public praise."
+    },
+    proofDetails: {
+      verified: {
+        title: "Verified profile",
+        body:
+          "Verified means Weld can explain what is confirmed, such as account ownership and linked work, without pretending demo data is live reputation."
+      },
+      projects: {
+        title: "Linked work",
+        body:
+          "Project proof connects shipped work, role, scope, and links so studios can inspect fit before messaging."
+      },
+      reliability: {
+        title: "Reliability notes",
+        body:
+          "Reliability is framed as inspectable context from completed work notes, not as a fake marketplace score."
+      },
+      latest: {
+        title: "Latest project",
+        body:
+          "Latest project area gives one readable work sample with scope, links, and proof context at card speed."
+      },
+      feedback: {
+        title: "Feedback details",
+        body:
+          "Feedback stays structured and honest. It should explain collaboration quality without made-up public praise."
+      }
+    },
+    accent: "#5b6cff",
+    soft: "#eef1ff"
+  },
+  builder: {
+    role: "builder",
+    label: "Roblox builder",
+    name: "BlockCraft",
+    handle: "@BlockCraftRBLX",
+    headline: "Designs readable maps, social hubs, and optimized worlds studios can ship with.",
+    availability: "Sprint lane open",
+    rate: "$50/hr",
+    payment: "Hourly or scoped build",
+    matchScore: 88,
+    years: "4+ yrs",
+    projects: "World links",
+    reliability: "Scope notes",
+    services: ["Terrain", "Lighting", "Modular Builds", "Optimization", "Event Maps", "Social Hubs"],
+    links: [
+      { label: "Roblox", value: "/BlockCraft" },
+      { label: "Discord", value: "blockcraft" },
+      { label: "X", value: "@BlockCraftRBLX" },
+      { label: "Portfolio", value: "world reel" }
+    ],
+    latestProject: {
+      name: "Skyline Social Hub",
+      summary: "Modular lobby, shop plaza, and event pathing.",
+      bullets: ["Map capture", "Optimization notes", "Before and after"]
+    },
+    feedback: {
+      label: "Build notes",
+      note: "Teams can inspect scope, delivery quality, and style fit in one place."
+    },
+    proofDetails: {
+      verified: {
+        title: "Verified links",
+        body:
+          "Builder proof should show ownership or contribution through linked places, captures, and portfolio context."
+      },
+      projects: {
+        title: "World proof",
+        body:
+          "World proof focuses on screenshots, optimization notes, and exact build scope instead of vague aesthetic claims."
+      },
+      reliability: {
+        title: "Scope clarity",
+        body:
+          "Scope notes help studios understand what this builder actually handled before a call starts."
+      },
+      latest: {
+        title: "Latest build",
+        body:
+          "One focused project keeps card fast to scan while still giving studios an honest path to inspect more."
+      },
+      feedback: {
+        title: "Client notes",
+        body:
+          "Feedback details stay contextual and non-performative, with no made-up praise or brand borrowing."
+      }
+    },
+    accent: "#1d9b74",
+    soft: "#eefaf6"
+  },
+  ui: {
+    role: "ui",
+    label: "Roblox UI designer",
+    name: "PixelUI",
+    handle: "@PixelUIRBLX",
+    headline: "Builds readable HUDs, shops, and onboarding flows that hold up in live games.",
+    availability: "Open this week",
+    rate: "$45/hr",
+    payment: "Hourly or screen package",
+    matchScore: 91,
+    years: "3+ yrs",
+    projects: "Screen links",
+    reliability: "Handoff notes",
+    services: ["HUD", "Shop UI", "Onboarding", "Figma", "Readability", "Economy Screens"],
+    links: [
+      { label: "Roblox", value: "/PixelUI" },
+      { label: "Discord", value: "pixel.ui" },
+      { label: "X", value: "@PixelUIRBLX" },
+      { label: "Figma", value: "case study" }
+    ],
+    latestProject: {
+      name: "Shop Refresh",
+      summary: "HUD cleanup and store purchase flow redesign.",
+      bullets: ["Before and after", "Screen states", "Handoff linked"]
+    },
+    feedback: {
+      label: "Handoff feedback",
+      note: "Studios can check how clean handoff is before starting conversation."
+    },
+    proofDetails: {
+      verified: {
+        title: "Verified UI work",
+        body:
+          "UI proof should show shipped screens, design files, and role context without burying team in tabs."
+      },
+      projects: {
+        title: "Screen proof",
+        body:
+          "Project proof highlights finished screens, state coverage, and implementation context in one clean path."
+      },
+      reliability: {
+        title: "Handoff quality",
+        body:
+          "Handoff notes explain whether assets, specs, and states are included before studio has to ask."
+      },
+      latest: {
+        title: "Latest screen set",
+        body:
+          "Latest project module gives one concrete UI example at glance instead of a generic portfolio dump."
+      },
+      feedback: {
+        title: "Feedback details",
+        body:
+          "Feedback remains inspectable and specific instead of becoming fake social proof."
+      }
+    },
+    accent: "#4d6bff",
+    soft: "#eef2ff"
+  },
+  vfx: {
+    role: "vfx",
+    label: "Roblox VFX artist",
+    name: "RikuFX",
+    handle: "@RikuFX",
+    headline: "Creates readable hits, trails, bursts, and ability polish without muddy combat.",
+    availability: "Slots open",
+    rate: "$700/pack",
+    payment: "Pack or milestone",
+    matchScore: 86,
+    years: "2+ yrs",
+    projects: "Reel linked",
+    reliability: "Pack scope",
+    services: ["Particles", "Trails", "Combat FX", "Ability Bursts", "Hit Confirms", "Polish"],
+    links: [
+      { label: "Roblox", value: "/RikuFX" },
+      { label: "Discord", value: "rikufx" },
+      { label: "X", value: "@RikuFX" },
+      { label: "Reel", value: "VFX pack" }
+    ],
+    latestProject: {
+      name: "Spell Pack",
+      summary: "Ability impact set with hit confirms and elemental trails.",
+      bullets: ["Video reel", "Pack scope", "Style tags"]
+    },
+    feedback: {
+      label: "Pack feedback",
+      note: "Pack work can show scope, revisions, and final usage context."
+    },
+    proofDetails: {
+      verified: {
+        title: "Verified reel",
+        body:
+          "VFX proof should connect reel to actual usage, scope, and contribution notes."
+      },
+      projects: {
+        title: "VFX proof",
+        body:
+          "Project card should explain pack, not only show flash. Studios need style and scope together."
+      },
+      reliability: {
+        title: "Pack scope",
+        body:
+          "Scope clarity helps teams compare deliverables before messaging."
+      },
+      latest: {
+        title: "Latest pack",
+        body:
+          "One featured pack keeps card readable while links carry deeper inspection."
+      },
+      feedback: {
+        title: "Review notes",
+        body:
+          "Feedback stays contextual and honest, with no invented volume claims."
+      }
+    },
+    accent: "#6578ff",
+    soft: "#f2f4ff"
+  },
+  animator: {
+    role: "animator",
+    label: "Roblox animator",
+    name: "Novea",
+    handle: "@NoveaMotion",
+    headline: "Ships combat timing, movement packs, emotes, and polish that feel game-ready.",
+    availability: "Monthly slots",
+    rate: "$900/pack",
+    payment: "Per set",
+    matchScore: 84,
+    years: "3+ yrs",
+    projects: "Reel linked",
+    reliability: "Revision notes",
+    services: ["Combat Rigs", "Movement", "Emotes", "Timing", "Blends", "Polish"],
+    links: [
+      { label: "Roblox", value: "/NoveaMotion" },
+      { label: "Discord", value: "novea.motion" },
+      { label: "X", value: "@NoveaMotion" },
+      { label: "Reel", value: "motion reel" }
+    ],
+    latestProject: {
+      name: "Movement Pack",
+      summary: "Run, dash, idle, and combat transition set.",
+      bullets: ["Clip reel", "Rig notes", "Pack list"]
+    },
+    feedback: {
+      label: "Motion feedback",
+      note: "Studios can review timing, style, and revision context before call."
+    },
+    proofDetails: {
+      verified: {
+        title: "Verified reel",
+        body:
+          "Animation proof should connect reel to rig details, shipped use, and exact scope."
+      },
+      projects: {
+        title: "Animation proof",
+        body:
+          "Project proof highlights pack contents and where they were used, not vague style language."
+      },
+      reliability: {
+        title: "Revision clarity",
+        body:
+          "Revision notes make collaboration expectations visible before first message."
+      },
+      latest: {
+        title: "Latest motion work",
+        body:
+          "Latest project preview gives one practical example without flooding hero with clips."
+      },
+      feedback: {
+        title: "Feedback context",
+        body:
+          "Feedback remains a structured field, not a wall of made-up praise."
+      }
+    },
+    accent: "#7d66ff",
+    soft: "#f4f0ff"
+  },
+  designer: {
+    role: "designer",
+    label: "Roblox game designer",
+    name: "LoopLab",
+    handle: "@LoopLabRBLX",
+    headline: "Shapes loops, economies, progression, and balance with readable design logic.",
+    availability: "Consult or sprint",
+    rate: "Scoped",
+    payment: "Project scope",
+    matchScore: 87,
+    years: "4+ yrs",
+    projects: "Docs linked",
+    reliability: "Scope notes",
+    services: ["Core Loops", "Economy", "Progression", "Balancing", "Design Docs", "Retention"],
+    links: [
+      { label: "Roblox", value: "/LoopLab" },
+      { label: "Discord", value: "loop.lab" },
+      { label: "X", value: "@LoopLabRBLX" },
+      { label: "Docs", value: "sample doc" }
+    ],
+    latestProject: {
+      name: "Progression Tune",
+      summary: "Economy pass, reward loop, and milestone pacing.",
+      bullets: ["Design doc", "Scope summary", "Balance notes"]
+    },
+    feedback: {
+      label: "Design feedback",
+      note: "Teams can inspect design thinking, docs, and scope before a call."
+    },
+    proofDetails: {
+      verified: {
+        title: "Verified design proof",
+        body:
+          "Design proof can include docs, shipped systems, and contribution context without performance theatre."
+      },
+      projects: {
+        title: "Design sample",
+        body:
+          "Card should surface one concrete sample instead of vague strategy language."
+      },
+      reliability: {
+        title: "Scope clarity",
+        body:
+          "Scope notes help teams know what kind of design help is actually available."
+      },
+      latest: {
+        title: "Latest design work",
+        body:
+          "Latest project details show practical thinking and deliverables in one quick read."
+      },
+      feedback: {
+        title: "Review notes",
+        body:
+          "Feedback stays specific and grounded, with no inflated momentum or client logos."
+      }
+    },
+    accent: "#5e73ff",
+    soft: "#f0f3ff"
+  },
+  systems: {
+    role: "systems",
+    label: "Roblox systems developer",
+    name: "Kaito",
+    handle: "@KaitoSystems",
+    headline: "Builds matchmaking, telemetry, live ops, and backend trust for scaling teams.",
+    availability: "Reviewable",
+    rate: "$80/hr",
+    payment: "Hourly or sprint",
+    matchScore: 89,
+    years: "5+ yrs",
+    projects: "Stack proof",
+    reliability: "Live ops notes",
+    services: ["Matchmaking", "Telemetry", "Backend", "Data Stores", "Live Ops", "Automation"],
+    links: [
+      { label: "Roblox", value: "/KaitoSystems" },
+      { label: "Discord", value: "kaito.systems" },
+      { label: "X", value: "@KaitoSystems" },
+      { label: "GitHub", value: "kaitosystems" }
+    ],
+    latestProject: {
+      name: "Match Stack",
+      summary: "Queue logic, telemetry events, and live ops support.",
+      bullets: ["Architecture notes", "Ops scope", "System links"]
+    },
+    feedback: {
+      label: "Ops feedback",
+      note: "Systems cards should make trust signals easy to inspect."
+    },
+    proofDetails: {
+      verified: {
+        title: "Verified systems proof",
+        body:
+          "Systems proof should show contribution context, stack notes, and linked work where appropriate."
+      },
+      projects: {
+        title: "Architecture proof",
+        body:
+          "Card gives enough signal to start a serious technical conversation without acting like admin chrome."
+      },
+      reliability: {
+        title: "Live ops notes",
+        body:
+          "Reliability is framed as inspectable context, not as a public marketplace score."
+      },
+      latest: {
+        title: "Latest system",
+        body:
+          "Latest project highlights scope and responsibility so teams know what was actually owned."
+      },
+      feedback: {
+        title: "Feedback details",
+        body:
+          "Feedback explains what real profile history will eventually show, without invention."
+      }
+    },
+    accent: "#5570ff",
+    soft: "#edf2ff"
+  }
+};
+
+function nextRole(role: RoleKey) {
+  const currentIndex = ROLE_ORDER.indexOf(role);
+  return ROLE_ORDER[(currentIndex + 1) % ROLE_ORDER.length];
 }
 
 function joinHref(mode: Audience, search: string) {
@@ -345,2439 +588,779 @@ function joinHref(mode: Audience, search: string) {
   return search ? `${base}?${search}` : base;
 }
 
-function wait(ms: number) {
-  return new Promise<void>((resolve) => {
-    window.setTimeout(resolve, ms);
-  });
-}
-
-function prefersReducedMotion() {
+function scrollToId(id: string) {
   if (typeof window === "undefined") {
-    return false;
+    return;
   }
 
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function cycleHeroProfile(profileIndex: number) {
-  return (profileIndex + 1) % HERO_PROFILES.length;
+export default function MarketingPage(props: MarketingPageProps) {
+  return <WeldLandingPage {...props} />;
 }
 
-function typeLine(
-  targetEl: HTMLElement | null,
-  text: string,
-  {
-    speed = 30,
-    delay = 0,
-    onComplete = null
-  }: {
-    speed?: number;
-    delay?: number;
-    onComplete?: (() => void) | null;
-  } = {}
-) {
-  if (!targetEl || typeof window === "undefined") {
-    return () => undefined;
-  }
-
-  if (prefersReducedMotion()) {
-    targetEl.textContent = text;
-    onComplete?.();
-    return () => undefined;
-  }
-
-  let rafId = 0;
-  let timeoutId = 0;
-  let startedAt = 0;
-  let cancelled = false;
-
-  const step = (timestamp: number) => {
-    if (cancelled) {
-      return;
-    }
-
-    if (!startedAt) {
-      startedAt = timestamp;
-    }
-
-    const characters = Math.min(
-      text.length,
-      Math.floor((timestamp - startedAt) / speed) + 1
-    );
-
-    targetEl.textContent = text.slice(0, characters);
-
-    if (characters < text.length) {
-      rafId = window.requestAnimationFrame(step);
-      return;
-    }
-
-    onComplete?.();
-  };
-
-  targetEl.textContent = "";
-
-  timeoutId = window.setTimeout(() => {
-    rafId = window.requestAnimationFrame(step);
-  }, delay);
-
-  return () => {
-    cancelled = true;
-    window.clearTimeout(timeoutId);
-    window.cancelAnimationFrame(rafId);
-  };
-}
-
-function runBootSequence(
-  containerEl: HTMLElement | null,
-  lines: BootLine[],
-  {
-    lineDelay = 180,
-    onComplete = null
-  }: {
-    lineDelay?: number;
-    onComplete?: (() => void) | null;
-  } = {}
-) {
-  if (!containerEl || typeof window === "undefined") {
-    return () => undefined;
-  }
-
-  containerEl.innerHTML = "";
-
-  if (prefersReducedMotion()) {
-    lines.forEach((line) => {
-      const row = document.createElement("div");
-      row.className = "boot-line";
-      row.dataset.tone = line.tone ?? "neutral";
-      if (line.bold) {
-        row.dataset.bold = "true";
-      }
-      row.textContent = line.text;
-      containerEl.appendChild(row);
-    });
-    onComplete?.();
-    return () => undefined;
-  }
-
-  let cancelled = false;
-  const cleanups: Array<() => void> = [];
-
-  const addRow = (line: BootLine) => {
-    const row = document.createElement("div");
-    row.className = "boot-line";
-    row.dataset.tone = line.tone ?? "neutral";
-    if (line.bold) {
-      row.dataset.bold = "true";
-    }
-    const textNode = document.createElement("span");
-    row.appendChild(textNode);
-    containerEl.appendChild(row);
-    return textNode;
-  };
-
-  void (async () => {
-    for (const line of lines) {
-      if (cancelled) {
-        return;
-      }
-
-      const target = addRow(line);
-      const stopTyping = typeLine(target, line.text, {
-        speed: 18
-      });
-      cleanups.push(stopTyping);
-      await wait(line.text.length * 18 + (line.delay ?? lineDelay));
-    }
-
-    if (!cancelled) {
-      onComplete?.();
-    }
-  })();
-
-  return () => {
-    cancelled = true;
-    cleanups.forEach((cleanup) => cleanup());
-  };
-}
-
-function animateNumber(
-  element: HTMLElement | null,
-  from: number,
-  to: number,
-  {
-    duration = 1200,
-    suffix = ""
-  }: {
-    duration?: number;
-    suffix?: string;
-  } = {}
-) {
-  if (!element || typeof window === "undefined") {
-    return () => undefined;
-  }
-
-  if (prefersReducedMotion()) {
-    element.textContent = `${Math.round(to)}${suffix}`;
-    return () => undefined;
-  }
-
-  let rafId = 0;
-  let startedAt = 0;
-  const range = to - from;
-
-  const step = (timestamp: number) => {
-    if (!startedAt) {
-      startedAt = timestamp;
-    }
-
-    const progress = Math.min(1, (timestamp - startedAt) / duration);
-    const value = from + range * progress;
-    const rounded = Number.isInteger(to) ? Math.round(value) : Number(value.toFixed(1));
-    element.textContent = `${rounded}${suffix}`;
-
-    if (progress < 1) {
-      rafId = window.requestAnimationFrame(step);
-    }
-  };
-
-  rafId = window.requestAnimationFrame(step);
-
-  return () => {
-    window.cancelAnimationFrame(rafId);
-  };
-}
-
-function flashNode(element: HTMLElement | null, className: string, duration = 300) {
-  if (!element || typeof window === "undefined") {
-    return () => undefined;
-  }
-
-  element.classList.add(className);
-  const timeoutId = window.setTimeout(() => {
-    element.classList.remove(className);
-  }, duration);
-
-  return () => {
-    window.clearTimeout(timeoutId);
-    element.classList.remove(className);
-  };
-}
-
-function highlightSkillChips(
-  containerEl: HTMLElement | null,
-  { staggerMs = 80 }: { staggerMs?: number } = {}
-) {
-  if (!containerEl || typeof window === "undefined") {
-    return () => undefined;
-  }
-
-  const chips = Array.from(
-    containerEl.querySelectorAll<HTMLElement>("[data-skill-chip]")
-  );
-
-  chips.forEach((chip) => chip.classList.remove("chip-active"));
-
-  if (prefersReducedMotion()) {
-    chips.forEach((chip) => chip.classList.add("chip-active"));
-    return () => undefined;
-  }
-
-  const timers: number[] = [];
-
-  chips.forEach((chip, index) => {
-    const timer = window.setTimeout(() => {
-      chip.classList.add("chip-active");
-    }, index * staggerMs);
-    timers.push(timer);
-  });
-
-  return () => {
-    timers.forEach((timer) => window.clearTimeout(timer));
-  };
-}
-
-function compileDiscordThread(
-  discordEl: HTMLElement | null,
-  weldEl: HTMLElement | null
-) {
-  if (!discordEl || !weldEl || typeof window === "undefined") {
-    return () => undefined;
-  }
-
-  const fields = Array.from(
-    weldEl.querySelectorAll<HTMLElement>("[data-compile-field]")
-  );
-
-  if (prefersReducedMotion()) {
-    discordEl.classList.add("is-compiled");
-    fields.forEach((field) => field.classList.add("is-live"));
-    return () => undefined;
-  }
-
-  const timers: number[] = [];
-  discordEl.classList.add("is-compiled");
-
-  fields.forEach((field, index) => {
-    const timer = window.setTimeout(() => {
-      field.classList.add("is-live");
-    }, 180 + index * 140);
-    timers.push(timer);
-  });
-
-  return () => {
-    timers.forEach((timer) => window.clearTimeout(timer));
-  };
-}
-
-function animateRewardProgress(
-  count: number,
-  {
-    staggerMs = 200,
-    containerEl = null
-  }: {
-    staggerMs?: number;
-    containerEl?: HTMLElement | null;
-  } = {}
-) {
-  if (typeof window === "undefined") {
-    return () => undefined;
-  }
-
-  const scope = containerEl ?? document.body;
-  const cards = Array.from(scope.querySelectorAll<HTMLElement>("[data-reward-card]"));
-
-  cards.forEach((card) => {
-    card.classList.remove("reward-live", "reward-next");
-  });
-
-  if (prefersReducedMotion()) {
-    cards.forEach((card) => {
-      const threshold = Number(card.dataset.threshold ?? "0");
-      if (threshold <= count) {
-        card.classList.add("reward-live");
-      } else if (threshold === count + 1) {
-        card.classList.add("reward-next");
-      }
-    });
-    return () => undefined;
-  }
-
-  const timers: number[] = [];
-
-  cards.forEach((card) => {
-    const threshold = Number(card.dataset.threshold ?? "0");
-
-    if (threshold <= count) {
-      const timer = window.setTimeout(() => {
-        card.classList.add("reward-live");
-      }, threshold * staggerMs);
-      timers.push(timer);
-      return;
-    }
-
-    if (threshold === count + 1) {
-      const timer = window.setTimeout(() => {
-        card.classList.add("reward-next");
-      }, (count + 1) * staggerMs);
-      timers.push(timer);
-    }
-  });
-
-  return () => {
-    timers.forEach((timer) => window.clearTimeout(timer));
-  };
-}
-
-function activateInviteKey(containerEl: HTMLElement | null) {
-  if (!containerEl) {
-    return () => undefined;
-  }
-
-  const cleanupFlash = flashNode(containerEl, "invite-activated", 520);
-  containerEl.dataset.active = "true";
-
-  return () => {
-    containerEl.dataset.active = "false";
-    cleanupFlash();
-  };
-}
-
-function setupMagneticButtons(selector: string) {
-  if (typeof window === "undefined" || prefersReducedMotion()) {
-    return () => undefined;
-  }
-
-  const buttons = Array.from(
-    document.querySelectorAll<HTMLElement>(selector)
-  );
-
-  const cleanups = buttons.map((button) => {
-    const handleMove = (event: MouseEvent) => {
-      const rect = button.getBoundingClientRect();
-      const offsetX = (event.clientX - (rect.left + rect.width / 2)) / rect.width;
-      const offsetY = (event.clientY - (rect.top + rect.height / 2)) / rect.height;
-      button.style.transform = `translate(${offsetX * 10}px, ${offsetY * 8}px)`;
-    };
-
-    const handleLeave = () => {
-      button.style.transform = "translate(0px, 0px)";
-    };
-
-    button.addEventListener("mousemove", handleMove);
-    button.addEventListener("mouseleave", handleLeave);
-
-    return () => {
-      button.removeEventListener("mousemove", handleMove);
-      button.removeEventListener("mouseleave", handleLeave);
-      button.style.transform = "translate(0px, 0px)";
-    };
-  });
-
-  return () => {
-    cleanups.forEach((cleanup) => cleanup());
-  };
-}
-
-function setupSectionReveals(
-  selector: string,
-  { threshold = 0.18 }: { threshold?: number } = {}
-) {
-  if (typeof window === "undefined") {
-    return () => undefined;
-  }
-
-  const nodes = Array.from(document.querySelectorAll<HTMLElement>(selector));
-
-  if (prefersReducedMotion()) {
-    nodes.forEach((node) => node.classList.add("is-visible"));
-    return () => undefined;
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold }
-  );
-
-  nodes.forEach((node) => observer.observe(node));
-
-  return () => {
-    observer.disconnect();
-  };
-}
-
-function scrambleText(
-  targetEl: HTMLElement | null,
-  text: string,
-  { duration = 420 }: { duration?: number } = {}
-) {
-  if (!targetEl || typeof window === "undefined") {
-    return () => undefined;
-  }
-
-  if (prefersReducedMotion()) {
-    targetEl.textContent = text;
-    return () => undefined;
-  }
-
-  const glyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#/<>-";
-  let rafId = 0;
-  let startedAt = 0;
-
-  const step = (timestamp: number) => {
-    if (!startedAt) {
-      startedAt = timestamp;
-    }
-
-    const progress = Math.min(1, (timestamp - startedAt) / duration);
-    const resolvedChars = Math.floor(text.length * progress);
-
-    targetEl.textContent = text
-      .split("")
-      .map((char, index) => {
-        if (char === " ") {
-          return " ";
-        }
-
-        if (index < resolvedChars) {
-          return text[index];
-        }
-
-        return glyphs[Math.floor(Math.random() * glyphs.length)];
-      })
-      .join("");
-
-    if (progress < 1) {
-      rafId = window.requestAnimationFrame(step);
-      return;
-    }
-
-    targetEl.textContent = text;
-  };
-
-  rafId = window.requestAnimationFrame(step);
-
-  return () => {
-    window.cancelAnimationFrame(rafId);
-    targetEl.textContent = text;
-  };
-}
-
-function parseRateMetric(rate: string) {
-  const value = Number(rate.replace(/[^\d]/g, "")) || 0;
-  const suffix = rate.includes("/pack") ? "/pack" : rate.includes("/hr") ? "/hr" : "";
-
-  return {
-    value,
-    suffix
-  };
-}
-
-function getPrimaryCta(mode: Audience) {
-  return mode === "studio" ? "GET HIRING ACCESS ->" : "CLAIM BETA INVITE ->";
-}
-
-function getInvitePrompt(mode: Audience) {
-  return mode === "studio"
-    ? "> get_hiring_access --email="
-    : "> claim_beta_invite --email=";
-}
-
-function getCaptureLabel(mode: Audience, phase: CapturePhase) {
-  if (phase === "executing") {
-    return "EXECUTING...";
-  }
-
-  if (phase === "saved") {
-    return "SAVED";
-  }
-
-  if (phase === "redirecting") {
-    return "REDIRECTING...";
-  }
-
-  return getPrimaryCta(mode);
-}
-
-export default function MarketingPage({
+function WeldLandingPage({
   initialMode,
   sourceVariant,
   page
 }: MarketingPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [mode, setMode] = useState<Audience>(initialMode);
-  const [heroIndex, setHeroIndex] = useState(0);
-  const [bootComplete, setBootComplete] = useState(false);
-  const [activeRole, setActiveRole] = useState<RoleKey>("scripter");
-  const [heroEmail, setHeroEmail] = useState("");
-  const [finalEmail, setFinalEmail] = useState("");
-  const [heroStatus, setHeroStatus] = useState("");
-  const [finalStatus, setFinalStatus] = useState("");
-  const [capturePhase, setCapturePhase] = useState<Record<CaptureSource, CapturePhase>>({
-    hero: "idle",
-    "final-cta": "idle"
-  });
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [activeFaq, setActiveFaq] = useState(0);
-  const [shareStatus, setShareStatus] = useState("");
-  const [isPending, startTransition] = useTransition();
-  const trackedDepths = useRef(new Set<number>());
-  const heroCaptureRef = useRef<HTMLDivElement | null>(null);
-  const finalCaptureRef = useRef<HTMLDivElement | null>(null);
-
-  const audienceCopy = AUDIENCE_COPY[mode];
-  const sourceCopy = SOURCE_VARIANTS[sourceVariant][mode];
-  const activeProfile = HERO_PROFILES[heroIndex];
-  const activeRolePreview = ROLE_PREVIEWS[activeRole];
-  const activeRoleDetails = ROLE_EXPLORER_DATA[activeRole];
   const searchString = searchParams.toString();
-  const accent = mode === "studio" ? "#229BD2" : "#FF5A2D";
-  const accentSoft = mode === "studio" ? "#4CC9F0" : "#FF6B4A";
-  const accentButtonClass =
-    mode === "studio"
-      ? "bg-[var(--roblox-blue)] text-white hover:bg-[var(--roblox-blue-light)]"
-      : "bg-[var(--orange-hot)] text-[#fff7f1] hover:bg-[var(--red-l)]";
-  const headerButtonClass =
-    mode === "studio"
-      ? "border-[rgba(34,155,210,0.34)] bg-[rgba(34,155,210,0.12)] text-[var(--roblox-blue-light)] hover:border-[rgba(76,201,240,0.42)] hover:bg-[rgba(34,155,210,0.18)]"
-      : "border-[rgba(255,90,45,0.3)] bg-[rgba(255,90,45,0.1)] text-[#ffd9cd] hover:border-[rgba(255,107,74,0.4)] hover:bg-[rgba(255,90,45,0.16)]";
-  const previewReferralCount = mode === "studio" ? 1 : 2;
-  const rateMetric = parseRateMetric(activeProfile.rate);
-  const heroBootLines = useMemo(() => HERO_BOOT_LINES[mode], [mode]);
+  const motionTier = useMotionPolicy();
+  const [isPending, startTransition] = useTransition();
+  const [mode, setMode] = useState<Audience>(initialMode);
+  const [role, setRole] = useState<RoleKey>("scripter");
+  const [swipeState, setSwipeState] = useState<SwipeState>("idle");
+  const [detailKey, setDetailKey] = useState<DetailKey | null>(null);
+  const [email, setEmail] = useState("");
+  const [capturePhase, setCapturePhase] = useState<CapturePhase>("idle");
+  const [captureStatus, setCaptureStatus] = useState("");
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const captureRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    setBootComplete(false);
-  }, [mode]);
+  const activeProfile = PROFILES[role];
+  const modeCopy = MODE_COPY[mode];
+  const activeDetail = detailKey ? activeProfile.proofDetails[detailKey] : null;
 
   useEffect(() => {
     captureAttributionFromLocation();
-    void trackEvent({
-      eventName: "landing_view",
-      page,
-      audience: mode,
-      payload: {
-        variant: sourceVariant
-      }
-    });
-  }, [mode, page, sourceVariant]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const max = document.body.scrollHeight - window.innerHeight;
-      const nextProgress = max <= 0 ? 0 : Math.min(1, window.scrollY / max);
-      setScrollProgress(nextProgress);
-
-      const percent = Math.round(nextProgress * 100);
-      [25, 50, 75].forEach((threshold) => {
-        if (percent >= threshold && !trackedDepths.current.has(threshold)) {
-          trackedDepths.current.add(threshold);
-          void trackEvent({
-            eventName: "scroll_depth",
-            page,
-            audience: mode,
-            payload: { threshold }
-          });
-        }
-      });
-    };
-
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
-    };
-  }, [mode, page]);
-
-  useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      setHeroIndex((current) => cycleHeroProfile(current));
-    }, HERO_ROTATION_MS);
-
-    return () => {
-      window.clearInterval(intervalId);
-    };
   }, []);
 
   useEffect(() => {
-    const cleanupReveal = setupSectionReveals("[data-reveal]", {
-      threshold: 0.18
-    });
-    const cleanupMagnetic = setupMagneticButtons("[data-magnetic='true']");
+    setMode(initialMode);
+  }, [initialMode]);
 
-    return () => {
-      cleanupReveal();
-      cleanupMagnetic();
-    };
-  }, [mode]);
+  useEffect(() => {
+    void trackEvent({
+      eventName: "landing_viewed",
+      page,
+      audience: mode,
+      payload: { variant: sourceVariant }
+    });
+  }, [mode, page, sourceVariant]);
 
   function handleModeChange(nextMode: Audience) {
     if (nextMode === mode) {
       return;
     }
 
+    setMode(nextMode);
     persistAudiencePreference(nextMode);
+    setCaptureStatus("");
+    setCapturePhase("idle");
+
     void trackEvent({
-      eventName: "audience_switch_clicked",
+      eventName: "landing_mode_changed",
       page,
       audience: nextMode,
       payload: { from: mode, to: nextMode }
     });
 
-    setMode(nextMode);
     startTransition(() => {
       router.push(joinHref(nextMode, searchString));
     });
   }
 
-  async function handleCapture(source: CaptureSource) {
-    const email = source === "hero" ? heroEmail : finalEmail;
-    const setStatus = source === "hero" ? setHeroStatus : setFinalStatus;
-    const containerRef = source === "hero" ? heroCaptureRef : finalCaptureRef;
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setStatus("Enter a valid email to unlock your invite state.");
+  function handleRoleChange(nextRoleKey: RoleKey) {
+    if (nextRoleKey === role) {
       return;
     }
 
+    setRole(nextRoleKey);
+    setSwipeState("idle");
+    setDetailKey(null);
+
     void trackEvent({
-      eventName: "cta_click",
+      eventName: "landing_role_selected",
       page,
       audience: mode,
-      payload: { source }
+      payload: { role: nextRoleKey }
+    });
+  }
+
+  function handleJoinIntent(source: "nav" | "hero") {
+    void trackEvent({
+      eventName: "landing_cta_clicked",
+      page,
+      audience: mode,
+      payload: { source, variant: sourceVariant }
     });
 
-    setCapturePhase((current) => ({
-      ...current,
-      [source]: "executing"
-    }));
-    setStatus("> executing invite capture...");
+    scrollToId("join");
+  }
+
+  function handleLearnMore() {
+    void trackEvent({
+      eventName: "landing_learn_more_clicked",
+      page,
+      audience: mode,
+      payload: { role }
+    });
+
+    scrollToId("how");
+  }
+
+  function handleSwipe(nextState: Exclude<SwipeState, "idle">) {
+    setSwipeState(nextState);
+    setDetailKey(null);
+
+    void trackEvent({
+      eventName: "landing_card_action",
+      page,
+      audience: mode,
+      payload: { role, action: nextState }
+    });
+
+    if (nextState === "reject") {
+      window.setTimeout(
+        () => {
+          setRole((current) => nextRole(current));
+          setSwipeState("idle");
+        },
+        motionTier === "reduced" ? 80 : 340
+      );
+      return;
+    }
+
+    if (nextState === "spark") {
+      window.setTimeout(() => scrollToId("join"), motionTier === "reduced" ? 0 : 180);
+    }
+
+    window.setTimeout(
+      () => setSwipeState("idle"),
+      motionTier === "reduced" ? 600 : 1100
+    );
+  }
+
+  async function handleCapture() {
+    if (!email.trim()) {
+      setCapturePhase("error");
+      setCaptureStatus("Add your email to join early access.");
+      captureRef.current?.querySelector("input")?.focus();
+      return;
+    }
+
+    setCapturePhase("submitting");
+    setCaptureStatus("Joining...");
 
     try {
-      if (!prefersReducedMotion()) {
-        await wait(220);
-      }
-
       const response = await submitSignupCapture({
         email,
         audience: mode,
-        source,
+        source: "final",
         page,
         variant: sourceVariant
       });
 
-      setCapturePhase((current) => ({
-        ...current,
-        [source]: "saved"
-      }));
-      setStatus("> saved.");
+      setCapturePhase("success");
+      setCaptureStatus("You're on list. Opening your invite...");
 
-      activateInviteKey(containerRef.current);
-
-      if (!prefersReducedMotion()) {
-        await wait(220);
-      }
-
-      setCapturePhase((current) => ({
-        ...current,
-        [source]: "redirecting"
-      }));
-      setStatus("> redirecting to invite state...");
-
-      if (!prefersReducedMotion()) {
-        await wait(280);
-      }
-
-      router.push(`/invite/${response.inviteCode}`);
-    } catch (error) {
-      setCapturePhase((current) => ({
-        ...current,
-        [source]: "idle"
-      }));
-      setStatus(error instanceof Error ? error.message : "Could not save your invite.");
+      window.setTimeout(() => {
+        router.push(response.inviteUrl || `/invite/${response.inviteCode}`);
+      }, motionTier === "reduced" ? 0 : 500);
+    } catch {
+      setCapturePhase("error");
+      setCaptureStatus("Something went wrong. Try again in a moment.");
     }
-  }
-
-  async function handleSharePreview(channel: "discord" | "x" | "linkedin" | "copy") {
-    const shareUrl = `${WAITLIST_URL}/?ref=preview`;
-    const shareText =
-      mode === "studio"
-        ? `Weld studio beta preview -> ${shareUrl}`
-        : `Weld developer beta preview -> ${shareUrl}`;
-
-    setShareStatus("");
-    void trackEvent({
-      eventName: "referral_share",
-      page,
-      audience: mode,
-      payload: { channel, surface: "landing-preview" }
-    });
-
-    if (channel === "copy") {
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-        setShareStatus("Preview share link copied.");
-      } catch {
-        setShareStatus("Copy failed. Use weldroblox.com directly.");
-      }
-      return;
-    }
-
-    if (channel === "discord") {
-      try {
-        await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
-        setShareStatus("Discord share copy copied for paste.");
-      } catch {
-        setShareStatus("Discord share copy is ready to paste.");
-      }
-      return;
-    }
-
-    if (channel === "x") {
-      window.open(
-        `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}`,
-        "_blank",
-        "noopener,noreferrer"
-      );
-      setShareStatus("X share opened.");
-      return;
-    }
-
-    window.open(
-      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
-      "_blank",
-      "noopener,noreferrer"
-    );
-    setShareStatus("LinkedIn share opened.");
   }
 
   return (
     <div
-      className="min-h-screen bg-[var(--bg)] text-[var(--cream)]"
+      className="weld-glass-page"
+      data-motion-tier={motionTier}
       style={
         {
-          "--accent": accent,
-          "--accent-soft": accentSoft
+          "--profile-accent": activeProfile.accent,
+          "--profile-soft": activeProfile.soft
         } as CSSProperties
       }
     >
-      <ScrollProgressBar progress={scrollProgress} />
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(255,90,45,0.12),transparent_28%),radial-gradient(circle_at_78%_10%,rgba(34,155,210,0.16),transparent_22%),linear-gradient(180deg,var(--bg)_0%,var(--bg2)_100%)]" />
-      <div className="relative">
-        <header
-          className={`sticky top-0 z-50 border-b backdrop-blur-[12px] transition ${
-            scrollProgress > 0.02
-              ? "border-white/10 bg-[rgba(12,14,15,0.88)] shadow-[0_20px_54px_rgba(0,0,0,0.3)]"
-              : "border-white/[0.04] bg-[rgba(12,14,15,0.74)]"
-          }`}
-        >
-          <div className="mx-auto w-full max-w-[1240px] px-4 py-3 md:px-6 lg:px-8">
-            <div className="header-rail relative overflow-hidden rounded-[30px] border border-white/[0.08] px-4 py-3 md:px-5 md:py-4">
-              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 md:grid-cols-[minmax(220px,1fr)_auto_minmax(220px,1fr)] md:gap-4">
-                <Link href={joinHref(mode, searchString)} className="flex min-w-0 items-center gap-3 justify-self-start">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[15px] border border-white/10 bg-white/[0.04] shadow-[0_10px_28px_rgba(0,0,0,0.16)]">
-                    <Image
-                      src="/Assets/weld-logo-official.svg"
-                      alt="Weld logo"
-                      width={24}
-                      height={24}
-                    />
-                  </span>
-                  <span className="flex min-w-0 flex-col">
-                    <span className="font-display text-[1.5rem] italic leading-none tracking-[-0.05em] text-white/92 md:text-[1.7rem]">
-                      weld.
-                    </span>
-                    <span className="truncate font-mono text-[9px] uppercase tracking-[0.16em] text-white/42 md:text-[10px]">
-                      Roblox talent roster
-                    </span>
-                  </span>
-                </Link>
-
-                <div className="hidden md:flex md:justify-self-center">
-                  <AudienceToggle mode={mode} onChange={handleModeChange} disabled={isPending} />
-                </div>
-
-                <div className="flex items-center gap-2 md:justify-self-end">
-                  <Link
-                    href="/login"
-                    className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-white/10 bg-white/[0.04] px-4 text-center font-mono text-[9px] uppercase tracking-[0.13em] whitespace-nowrap text-white/60 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white/90 sm:min-h-[46px] sm:px-5 sm:text-[10px]"
-                  >
-                    LOG IN
-                  </Link>
-                  <Link
-                    href="/signup"
-                    className={`magnetic-button header-command-button inline-flex min-h-[44px] items-center justify-center rounded-full border px-4 text-center font-mono text-[9px] uppercase tracking-[0.13em] whitespace-nowrap sm:min-h-[46px] sm:px-5 sm:text-[10px] ${headerButtonClass} command-button`}
-                    data-magnetic="true"
-                  >
-                    SIGN UP →
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-3 md:hidden">
-              <AudienceToggle
-                mode={mode}
-                onChange={handleModeChange}
-                disabled={isPending}
-                className="w-full"
-                fullWidth
-              />
-            </div>
-          </div>
-        </header>
-
-        <main id="top">
-          <section className="relative overflow-hidden border-b border-white/[0.05]">
-            <div className="mx-auto grid min-h-[calc(100vh-82px)] w-full max-w-[1200px] lg:grid-cols-[540px_minmax(0,1fr)]">
-              <aside className="terminal-rail relative overflow-hidden border-b border-white/[0.05] px-5 py-16 md:px-8 lg:border-b-0 lg:border-r lg:px-10 lg:py-[120px]">
-                <div className="terminal-grid pointer-events-none absolute inset-0" />
-                <div className="terminal-vignette pointer-events-none absolute inset-0" />
-                <div className="scan-overlay pointer-events-none absolute inset-x-0 top-0 h-full" />
-
-                <div className="relative">
-                  <div className="mb-5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/30">
-                    {mode === "studio"
-                      ? "// browsing verified developers"
-                      : "// your verified profile"}
-                  </div>
-
-                  <div
-                    className="is-visible rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,18,21,0.98),rgba(7,9,13,0.98))] p-5 shadow-[0_34px_90px_rgba(0,0,0,0.5)]"
-                    data-reveal
-                  >
-                    <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
-                      <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-white/42">
-                        <span className="flex gap-1.5">
-                          <span className="h-2.5 w-2.5 rounded-full bg-[var(--orange-hot)]" />
-                          <span className="h-2.5 w-2.5 rounded-full bg-[#FFBE74]" />
-                          <span className="h-2.5 w-2.5 rounded-full bg-[var(--acid-green)]" />
-                        </span>
-                        <span>weld.roster -- live_preview</span>
-                      </div>
-                      <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-[9px] uppercase tracking-[0.14em] text-white/54">
-                        {mode === "studio" ? "Studio lane" : "Developer lane"}
-                      </span>
-                    </div>
-
-                    <div className="mt-5 rounded-[18px] border border-white/[0.08] bg-[rgba(255,255,255,0.03)] p-4">
-                      <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.16em] text-white/38">
-                        boot.feed
-                      </div>
-                      <BootFeed lines={heroBootLines} onComplete={() => setBootComplete(true)} />
-                    </div>
-
-                    <div
-                      className={`mt-5 transition duration-500 ${
-                        bootComplete
-                          ? "translate-y-0 opacity-100"
-                          : "pointer-events-none translate-y-3 opacity-0"
-                      }`}
-                    >
-                      <div key={activeProfile.handle} className="animate-[fadeUp_.45s_cubic-bezier(.16,1,.3,1)]">
-                        <HeroProfileCard
-                          profile={activeProfile}
-                          accent={accent}
-                          audience={mode}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="mt-5 flex items-center justify-between gap-4">
-                      <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/36">
-                        {`${heroIndex + 1}/${HERO_PROFILES.length} live profile rotation`}
-                      </div>
-                      <div className="flex gap-2">
-                        {HERO_PROFILES.map((profile, index) => (
-                          <button
-                            key={profile.handle}
-                            type="button"
-                            aria-label={`Preview ${profile.displayName}`}
-                            onClick={() => setHeroIndex(index)}
-                            className={`rounded-full border px-3 py-2 font-mono text-[9px] uppercase tracking-[0.14em] transition ${
-                              heroIndex === index
-                                ? "border-white/18 bg-white/[0.08] text-white"
-                                : "border-white/10 bg-white/[0.03] text-white/52 hover:bg-white/[0.06]"
-                            }`}
-                          >
-                            {`0${index + 1}`}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </aside>
-
-              <div className="relative flex items-center px-5 py-16 md:px-8 lg:px-16 lg:py-[120px]">
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute -right-24 top-[-160px] h-[560px] w-[560px] rounded-full bg-[radial-gradient(circle,rgba(255,90,45,0.12),transparent_64%)]"
-                />
-                <div className="relative mx-auto w-full max-w-[540px] lg:mx-0">
-                  <span
-                    className="font-mono text-[10px] uppercase tracking-[0.18em]"
-                    style={{ color: accentSoft }}
-                  >
-                    {audienceCopy.eyebrow}
-                  </span>
-                  <h1 className="mt-6 font-display text-[3.6rem] italic leading-[0.9] tracking-[-0.05em] text-white/92 md:text-[5.7rem]">
-                    {splitTitle(sourceCopy.title).map((line, index) => (
-                      <span key={`${line}-${index}`} className="block">
-                        {line}
-                      </span>
-                    ))}
-                  </h1>
-                  <p className="mt-6 max-w-[30rem] text-[15px] leading-8 text-white/68 md:text-[16px]">
-                    {sourceCopy.copy}
-                  </p>
-                  <p className="mt-4 max-w-[34rem] font-mono text-[10px] uppercase tracking-[0.16em] text-white/34">
-                    {sourceCopy.sourceLine}
-                  </p>
-
-                  <div
-                    id="hero-capture"
-                    ref={heroCaptureRef}
-                    className="is-visible mt-10 rounded-[22px] border border-white/10 bg-[rgba(255,255,255,0.03)] p-4 shadow-[0_24px_60px_rgba(0,0,0,0.24)]"
-                    data-reveal
-                    aria-live="polite"
-                  >
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
-                      <label className="flex-1 rounded-[16px] border border-white/10 bg-[rgba(5,7,13,0.76)] px-4 py-3">
-                        <span className="sr-only">Email address</span>
-                        <input
-                          type="email"
-                          value={heroEmail}
-                          onChange={(event) => setHeroEmail(event.target.value)}
-                          onFocus={() =>
-                            void trackEvent({
-                              eventName: "hero_input_started",
-                              page,
-                              audience: mode,
-                              payload: { source: "hero" }
-                            })
-                          }
-                          placeholder={getInvitePrompt(mode)}
-                          className="w-full bg-transparent font-mono text-[11px] uppercase tracking-[0.1em] text-white outline-none placeholder:text-white/24"
-                        />
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => void handleCapture("hero")}
-                        className={`magnetic-button inline-flex min-h-[54px] items-center justify-center rounded-[16px] px-6 font-mono text-[11px] uppercase tracking-[0.16em] ${accentButtonClass} command-button`}
-                        data-magnetic="true"
-                      >
-                        {getCaptureLabel(mode, capturePhase.hero)}
-                      </button>
-                    </div>
-                    <p className="mt-4 text-sm leading-7 text-white/46">{audienceCopy.hint}</p>
-                    {heroStatus ? (
-                      <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-white/72">
-                        {heroStatus}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  <div className="is-visible mt-8 flex flex-wrap gap-2" data-reveal>
-                    {audienceCopy.microProof.map((item) => (
-                      <span
-                        key={item}
-                        className={`inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/62 ${
-                          item.toLowerCase().includes("referral")
-                            ? "text-[var(--acid-green-light)]"
-                            : ""
-                        }`}
-                      >
-                        {item.toLowerCase().includes("referral") ? (
-                          <span className="h-1.5 w-1.5 rounded-full bg-[var(--acid-green)] availability-pulse" />
-                        ) : null}
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="is-visible mt-10 grid gap-3 md:grid-cols-3" data-reveal>
-                    <AnimatedMetricCard
-                      label="Shipped games"
-                      value={activeProfile.shippedGames}
-                      sublabel="from active preview"
-                    />
-                    <AnimatedMetricCard
-                      label="Rate signal"
-                      value={rateMetric.value}
-                      prefix="$"
-                      suffix={rateMetric.suffix}
-                      sublabel="visible before the DM"
-                    />
-                    <AnimatedMetricCard
-                      label="Reply window"
-                      value={activeProfile.responseHours}
-                      suffix="h"
-                      sublabel="counted on scroll"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <PainSection accent={accent} accentSoft={accentSoft} />
-
-          <RoleExplorerSection
-            activeRole={activeRole}
-            activeRolePreview={activeRolePreview}
-            activeRoleDetails={activeRoleDetails}
-            accent={accent}
-            accentSoft={accentSoft}
-            onRoleChange={(role) => setActiveRole(role)}
-          />
-
-          <HowSection accentSoft={accentSoft} />
-
-          <BetaSection
-            mode={mode}
-            previewReferralCount={previewReferralCount}
-            onShare={handleSharePreview}
-            shareStatus={shareStatus}
-          />
-
-          <StudioBridgeSection
-            mode={mode}
-            accentButtonClass={accentButtonClass}
-            onModeChange={handleModeChange}
-          />
-
-          <HonestySection />
-
-          <FAQSection
-            activeFaq={activeFaq}
-            onToggle={(index) => setActiveFaq((current) => (current === index ? -1 : index))}
-          />
-
-          <FinalCTASection
-            mode={mode}
-            finalEmail={finalEmail}
-            finalStatus={finalStatus}
-            capturePhase={capturePhase["final-cta"]}
-            accentButtonClass={accentButtonClass}
-            onEmailChange={setFinalEmail}
-            onSubmit={() => void handleCapture("final-cta")}
-            containerRef={finalCaptureRef}
-          />
-        </main>
-
-        <Footer />
-      </div>
-    </div>
-  );
-}
-
-function ScrollProgressBar({ progress }: { progress: number }) {
-  return (
-    <div className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[3px] bg-white/[0.04]">
-      <div
-        className="h-full bg-[var(--accent)] shadow-[0_0_18px_var(--accent)] transition-[width] duration-150"
-        style={{ width: `${progress * 100}%` }}
+      <GlassNav
+        mode={mode}
+        searchString={searchString}
+        pending={isPending}
+        onModeChange={handleModeChange}
+        onJoinClick={() => handleJoinIntent("nav")}
       />
+
+      <main className="weld-glass-main">
+        <HeroShell>
+          <HeroTalentCard
+            mode={mode}
+            profile={activeProfile}
+            swipeState={swipeState}
+            onDetailToggle={setDetailKey}
+            activeDetailKey={detailKey}
+          />
+          <HeroCopyPanel
+            copy={modeCopy}
+            onJoinClick={() => handleJoinIntent("hero")}
+            onLearnMore={handleLearnMore}
+          />
+        </HeroShell>
+
+        <HowItWorksSection
+          role={role}
+          profile={activeProfile}
+          onRoleChange={handleRoleChange}
+        />
+
+        <ProfileCreationSection mode={mode} profile={activeProfile} />
+
+        <ChatPreviewSection mode={mode} profile={activeProfile} />
+
+        <AntiDiscordSection mode={mode} />
+
+        <ProofTrustSection
+          mode={mode}
+          profile={activeProfile}
+          swipeState={swipeState}
+          onDetailToggle={setDetailKey}
+          onSwipe={handleSwipe}
+        />
+
+        <StudioScoutSection copy={modeCopy} />
+
+        <WaitlistSignupSection
+          mode={mode}
+          copy={modeCopy}
+          email={email}
+          phase={capturePhase}
+          status={captureStatus}
+          captureRef={captureRef}
+          onEmailChange={setEmail}
+          onSubmit={() => void handleCapture()}
+        />
+
+        <FriendlyFAQ openFaq={openFaq} onToggle={setOpenFaq} />
+      </main>
+
+      <FooterCTA />
+
+      {activeDetail ? (
+        <ProofDetailDialog
+          title={activeDetail.title}
+          body={activeDetail.body}
+          onClose={() => setDetailKey(null)}
+        />
+      ) : null}
     </div>
   );
 }
 
-function AudienceToggle({
+function GlassNav({
   mode,
-  onChange,
-  disabled,
-  className,
-  fullWidth
+  searchString,
+  pending,
+  onModeChange,
+  onJoinClick
 }: {
   mode: Audience;
-  onChange: (nextMode: Audience) => void;
-  disabled?: boolean;
-  className?: string;
-  fullWidth?: boolean;
+  searchString: string;
+  pending?: boolean;
+  onModeChange: (mode: Audience) => void;
+  onJoinClick: () => void;
 }) {
-  const options = [
-    {
-      value: "developer" as const,
-      label: "I build games"
-    },
-    {
-      value: "studio" as const,
-      label: "I hire talent"
-    }
-  ];
-  const activeTrackStyle: CSSProperties = {
-    width: "calc(50% - 0.125rem)",
-    transform: mode === "studio" ? "translateX(calc(100% - 0.125rem))" : "translateX(0)",
-    background:
-      mode === "studio"
-        ? "linear-gradient(180deg, rgba(18,31,44,0.98), rgba(11,18,26,0.98))"
-        : "linear-gradient(180deg, rgba(30,19,15,0.98), rgba(18,12,10,0.98))",
-    boxShadow:
-      mode === "studio"
-        ? "0 10px 26px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 0 1px rgba(76,201,240,0.18)"
-        : "0 10px 26px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 0 1px rgba(255,107,74,0.18)"
-  };
-
   return (
-    <div
-      role="radiogroup"
-      aria-label="Audience mode"
-      className={`relative inline-grid min-h-[52px] grid-cols-2 items-center overflow-hidden rounded-full border border-white/10 bg-[rgba(255,255,255,0.03)] p-[3px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_14px_30px_rgba(0,0,0,0.18)] ${className ?? ""}`}
-    >
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-[3px] left-[3px] z-0 rounded-full border border-white/8 transition-transform duration-300 ease-out"
-        style={activeTrackStyle}
-      />
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-[10px] left-1/2 z-0 w-px -translate-x-1/2 bg-white/[0.06]"
-      />
-      {options.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          role="radio"
-          aria-checked={mode === option.value}
-          disabled={disabled}
-          onClick={() => onChange(option.value)}
-          className={`relative z-10 rounded-full px-4 py-[0.8rem] font-mono text-[10px] font-medium uppercase tracking-[0.14em] transition duration-300 disabled:cursor-not-allowed disabled:opacity-60 ${
-            fullWidth ? "min-w-0 flex-1" : "min-w-[150px] lg:min-w-[158px]"
-          } ${
-            mode === option.value
-              ? "text-white"
-              : "text-white/58 hover:text-white/84"
-          }`}
+    <header className="glass-nav-shell">
+      <Link href={joinHref(mode, searchString)} className="glass-brand" aria-label="Weld home">
+        <span className="glass-brand-mark">
+          <Image src="/Assets/weld-logo-official.svg" alt="" width={24} height={24} priority />
+        </span>
+        <span>weld.</span>
+      </Link>
+
+      <ModeToggle mode={mode} disabled={pending} onChange={onModeChange} />
+
+      <nav className="glass-nav-links" aria-label="Primary">
+        {NAV_ITEMS.map((item) => (
+          <a key={item.href} href={item.href}>
+            {item.label}
+          </a>
+        ))}
+        <Link href="/login">Log in</Link>
+        <a
+          href="#join"
+          className="button-primary button-nav"
+          onClick={(event) => {
+            event.preventDefault();
+            onJoinClick();
+          }}
         >
-          {option.label}
+          {MODE_COPY[mode].navCta}
+        </a>
+      </nav>
+    </header>
+  );
+}
+
+function HeroShell({ children }: { children: React.ReactNode }) {
+  return (
+    <section className="hero-shell" id="top">
+      <div className="hero-shell-bloom" aria-hidden="true" />
+      <div className="hero-shell-grid">{children}</div>
+    </section>
+  );
+}
+
+function HeroCopyPanel({
+  copy,
+  onJoinClick,
+  onLearnMore
+}: {
+  copy: (typeof MODE_COPY)[Audience];
+  onJoinClick: () => void;
+  onLearnMore: () => void;
+}) {
+  return (
+    <div className="hero-copy-panel">
+      <span className="hero-mode-pill">{copy.toggle}</span>
+      <h1>{copy.heroTitle}</h1>
+      <p className="hero-lead">{copy.heroCopy}</p>
+      <p className="hero-support">{copy.heroSupport}</p>
+
+      <div className="hero-button-row">
+        <a
+          href="#join"
+          className="button-primary"
+          onClick={(event) => {
+            event.preventDefault();
+            onJoinClick();
+          }}
+        >
+          {copy.navCta}
+        </a>
+        <button type="button" className="button-secondary" onClick={onLearnMore}>
+          Learn more
         </button>
-      ))}
+      </div>
+
+      <div className="hero-proof-line" aria-label="Landing focus">
+        <span><CheckIcon /> Developer-first</span>
+        <span><CheckIcon /> Trust and proof</span>
+        <span><CheckIcon /> Clean hierarchy</span>
+      </div>
     </div>
   );
 }
 
-function BootFeed({
-  lines,
-  onComplete
-}: {
-  lines: BootLine[];
-  onComplete: () => void;
-}) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    return runBootSequence(containerRef.current, lines, {
-      lineDelay: 160,
-      onComplete
-    });
-  }, [lines]);
-
-  return (
-    <div
-      ref={containerRef}
-      className="min-h-[168px] space-y-2"
-      aria-live="polite"
-    />
-  );
-}
-
-function HeroProfileCard({
+function HeroTalentCard({
+  mode,
   profile,
-  accent,
-  audience
+  swipeState,
+  activeDetailKey,
+  onDetailToggle
 }: {
-  profile: HeroProfile;
-  accent: string;
-  audience: Audience;
+  mode: Audience;
+  profile: TalentProfile;
+  swipeState: SwipeState;
+  activeDetailKey: DetailKey | null;
+  onDetailToggle: (key: DetailKey | null) => void;
 }) {
-  const skillContainerRef = useRef<HTMLDivElement | null>(null);
-  const shippedRef = useRef<HTMLSpanElement | null>(null);
-  const responseRef = useRef<HTMLSpanElement | null>(null);
-  const tierRef = useRef<HTMLSpanElement | null>(null);
-  const tierValue = Number(profile.referralTier.replace(/[^\d]/g, "")) || 0;
-
-  useEffect(() => {
-    const cleanups = [
-      animateNumber(shippedRef.current, 0, profile.shippedGames),
-      animateNumber(responseRef.current, 0, profile.responseHours, { suffix: "h" }),
-      animateNumber(tierRef.current, 0, tierValue),
-      highlightSkillChips(skillContainerRef.current, { staggerMs: 80 })
-    ];
-
-    return () => {
-      cleanups.forEach((cleanup) => cleanup());
-    };
-  }, [profile.handle, profile.responseHours, profile.shippedGames, tierValue]);
+  const heroStats: Array<{
+    detailKey: DetailKey;
+    label: string;
+    value: string;
+    icon: ReactNode;
+  }> = [
+    { detailKey: "projects", label: profile.years, value: "Experience", icon: <UserIcon /> },
+    { detailKey: "latest", label: "75+", value: "Projects", icon: <FolderIcon /> },
+    { detailKey: "feedback", label: "250+", value: "Scripts Built", icon: <CodeIcon /> },
+    { detailKey: "reliability", label: "100%", value: "On-time", icon: <ClockIcon /> }
+  ];
 
   return (
-    <div className="relative">
-      <div className="overflow-hidden rounded-[20px] border border-white/10 bg-[rgba(15,18,21,0.98)] shadow-[0_30px_90px_rgba(0,0,0,0.6)]">
-        <div className="flex items-center gap-2 border-b border-white/[0.06] bg-white/[0.03] px-4 py-3 font-mono text-[10px] uppercase tracking-[0.14em] text-white/34">
-          <span className="flex gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-[var(--orange-hot)]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#FFBE74]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[var(--acid-green)]" />
-          </span>
-          <span>{`weld.profile -- ${profile.handle}`}</span>
-        </div>
+    <div className="hero-card-column">
+      <div className="hero-card-frame">
+        <span>{MODE_COPY[mode].cardFrame}</span>
+        <span>{profile.matchScore}% match</span>
+      </div>
 
-        <div className="space-y-5 p-5">
-          <div className="flex items-start gap-4">
-            <div
-              className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-[14px] font-display text-[1.75rem] italic text-white shadow-[0_12px_28px_rgba(0,0,0,0.28)]"
-              style={{
-                background: `linear-gradient(135deg, ${accent}, ${accent}aa)`
-              }}
-            >
-              {profile.displayName.slice(0, 1)}
-              <span className="absolute -bottom-1 -right-1 grid h-5 w-5 place-items-center rounded-full border-2 border-[var(--terminal-mid)] bg-[#5865F2] text-[8px] font-bold not-italic text-white">
-                R
-              </span>
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="font-display text-[1.45rem] italic tracking-[-0.03em] text-white/94">
-                  {profile.displayName}
-                </h2>
-                <span className="rounded-full border border-[var(--acid-green)]/20 bg-[var(--acid-green)]/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-[var(--acid-green-light)]">
-                  Roblox verified
-                </span>
-              </div>
-              <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white/32">
-                @{profile.handle}
-              </p>
-              <p className="mt-2 text-[13px] leading-6 text-white/58">
-                {profile.proofSummary}
-              </p>
-            </div>
-
-            <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[var(--acid-green)]/20 bg-[var(--acid-green)]/10 px-3 py-2 font-mono text-[9px] uppercase tracking-[0.12em] text-[var(--acid-green-light)]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--acid-green)] availability-pulse" />
-              {profile.availability}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2">
-            <MiniStatCard label="Shipped games" valueRef={shippedRef} />
-            <MiniStatCard label="Response" valueRef={responseRef} />
-            <MiniStatCard label="Tier" valueRef={tierRef} />
-          </div>
-
-          <div ref={skillContainerRef} className="flex flex-wrap gap-2">
-            {profile.skills.map((skill) => (
-              <span
-                key={skill}
-                data-skill-chip
-                className="terminal-chip rounded-[8px] border px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.08em]"
-                style={{
-                  borderColor: `${accent}44`,
-                  background: `${accent}14`,
-                  color: accent
-                }}
-              >
-                {skill}
-              </span>
-            ))}
-            {profile.genres.map((genre) => (
-              <span
-                key={genre}
-                className="rounded-[8px] border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.08em] text-white/46"
-              >
-                {genre}
-              </span>
-            ))}
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            <ProfileField label="Role" value={profile.role} />
-            <ProfileField label="Rate" value={profile.rate} />
-            <ProfileField label="Timezone" value={profile.timezone} />
-            <ProfileField label="Payment" value={profile.payment} />
-          </div>
-
-          <div className="rounded-[14px] border border-white/[0.08] bg-white/[0.03] p-4">
-            <div className="font-mono text-[9px] uppercase tracking-[0.14em] text-white/34">
-              Proof-ready summary
-            </div>
-            <p className="mt-3 font-display text-[1.2rem] italic leading-7 tracking-[-0.02em] text-white/72">
-              "{profile.shippedWork}"
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 border-t border-white/[0.06] bg-white/[0.02] p-4">
-          <div className="rounded-[10px] border border-white/[0.08] px-4 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-white/52">
-            {audience === "studio" ? "review profile" : "signal visible"}
-          </div>
-          <div
-            className="rounded-[10px] px-4 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-white"
-            style={{
-              background: accent,
-              boxShadow: `0 10px 24px ${accent}33`
-            }}
+      <article className={`hero-talent-card is-${swipeState}`}>
+        <div className="hero-card-masthead">
+          <button
+            type="button"
+            className={`profile-avatar-shell hero-avatar-shell ${activeDetailKey === "verified" ? "is-active" : ""}`}
+            aria-label="Open verified proof"
+            aria-expanded={activeDetailKey === "verified"}
+            onClick={() => onDetailToggle(activeDetailKey === "verified" ? null : "verified")}
           >
-            {audience === "studio" ? "invite to project" : "profile live"}
-          </div>
-        </div>
-      </div>
+            <div className="profile-avatar">
+              <span className="avatar-hair" />
+              <span className="avatar-face">
+                <span className="avatar-mouth" />
+              </span>
+              <span className="avatar-hoodie" />
+            </div>
+            <span className="avatar-status-dot" />
+          </button>
 
-      <div
-        className="absolute -right-3 -top-3 inline-flex items-center gap-2 rounded-full px-3 py-2 font-mono text-[9px] uppercase tracking-[0.14em] text-white shadow-[0_10px_24px_rgba(0,0,0,0.35)]"
-        style={{
-          background: `linear-gradient(135deg, ${accent}, ${accent}b5)`
-        }}
-      >
-        <span className="h-1.5 w-1.5 rounded-full bg-white/80 availability-pulse" />
-        {audience === "studio" ? "new match" : "profile live"}
-      </div>
-    </div>
-  );
-}
-
-function MiniStatCard({
-  label,
-  valueRef
-}: {
-  label: string;
-  valueRef: MutableRefObject<HTMLSpanElement | null>;
-}) {
-  return (
-    <div className="rounded-[12px] border border-white/[0.08] bg-white/[0.03] px-3 py-3 text-center">
-      <div className="font-display text-[1.35rem] italic leading-none tracking-[-0.04em] text-white/92">
-        <span ref={valueRef}>0</span>
-      </div>
-      <div className="mt-2 font-mono text-[8px] uppercase tracking-[0.14em] text-white/34">
-        {label}
-      </div>
-    </div>
-  );
-}
-
-function ProfileField({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-[14px] border border-white/[0.08] bg-white/[0.03] p-4">
-      <div className="font-mono text-[9px] uppercase tracking-[0.14em] text-white/34">
-        {label}
-      </div>
-      <div className="mt-2 text-[14px] text-white/76">{value}</div>
-    </div>
-  );
-}
-
-function AnimatedMetricCard({
-  label,
-  value,
-  sublabel,
-  prefix = "",
-  suffix = ""
-}: {
-  label: string;
-  value: number;
-  sublabel: string;
-  prefix?: string;
-  suffix?: string;
-}) {
-  const cardRef = useRef<HTMLDivElement | null>(null);
-  const valueRef = useRef<HTMLSpanElement | null>(null);
-
-  useEffect(() => {
-    const node = cardRef.current;
-
-    if (!node) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) {
-            return;
-          }
-
-          animateNumber(valueRef.current, 0, value);
-          observer.disconnect();
-        });
-      },
-      { threshold: 0.4 }
-    );
-
-    observer.observe(node);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [suffix, value]);
-
-  return (
-    <div
-      ref={cardRef}
-      className="rounded-[18px] border border-white/[0.08] bg-white/[0.03] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.18)]"
-    >
-      <div className="font-display text-[1.8rem] italic leading-none tracking-[-0.04em] text-white/92">
-        {prefix}
-        <span ref={valueRef}>0</span>
-        {!suffix ? null : <span>{suffix}</span>}
-      </div>
-      <div className="mt-2 font-body text-[12px] font-medium text-white/68">{label}</div>
-      <div className="mt-1 font-mono text-[9px] uppercase tracking-[0.12em] text-white/32">
-        {sublabel}
-      </div>
-    </div>
-  );
-}
-
-function PainSection({
-  accent,
-  accentSoft
-}: {
-  accent: string;
-  accentSoft: string;
-}) {
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const discordRef = useRef<HTMLDivElement | null>(null);
-  const compilerRef = useRef<HTMLDivElement | null>(null);
-  const [compiled, setCompiled] = useState(false);
-
-  useEffect(() => {
-    const node = sectionRef.current;
-
-    if (!node) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) {
-            return;
-          }
-
-          setCompiled(true);
-          compileDiscordThread(discordRef.current, compilerRef.current);
-          observer.disconnect();
-        });
-      },
-      { threshold: 0.25 }
-    );
-
-    observer.observe(node);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
-  return (
-    <section
-      ref={sectionRef}
-      id="pain"
-      className="border-b border-white/[0.05] bg-[var(--bg2)] py-[100px] md:py-[140px]"
-    >
-      <SectionHeading
-        eyebrow="Discord chaos"
-        title="6 hours in Discord. One maybe."
-        copy="These are example messages, not real user activity. The product point is the workflow: Discord hides rate, availability, proof, and response signal inside thread noise."
-        eyebrowClassName="text-[var(--magenta-warn)]"
-      />
-
-      <div className="mx-auto mt-12 grid w-full max-w-[1200px] gap-6 px-5 md:px-8 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)]">
-        <article
-          ref={discordRef}
-          className="discord-thread-card relative overflow-hidden rounded-[24px] border border-[var(--magenta-warn)]/25 bg-[linear-gradient(180deg,rgba(241,91,181,0.08),transparent_30%),linear-gradient(160deg,rgba(18,10,15,0.98),rgba(8,9,13,0.985)_70%)] p-5 shadow-[0_30px_90px_rgba(0,0,0,0.45)]"
-          data-reveal
-        >
-          <div className="pointer-events-none absolute right-6 top-5 opacity-[0.08]">
-            <DiscordWatermark />
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/45">
-              discord.thread -- chaos_log
-            </span>
-            <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white/62">
-              Example messages
-            </span>
-          </div>
-
-          <div className="mt-5 grid gap-3">
-            {DISCORD_CHAOS.map((entry, index) => (
-              <div
-                key={`${entry.name}-${index}`}
-                className={`discord-message rounded-[18px] border p-4 transition duration-500 ${
-                  entry.deleted
-                    ? "border-white/6 bg-white/[0.02] text-white/40"
-                    : entry.spam
-                      ? "border-[var(--magenta-warn)]/18 bg-[var(--magenta-warn)]/8"
-                      : entry.expired
-                        ? "border-[var(--orange-hot)]/18 bg-[var(--orange-hot)]/6"
-                        : "border-white/8 bg-white/[0.03]"
-                }`}
-                style={{
-                  transitionDelay: `${index * 70}ms`
-                }}
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="h-2.5 w-2.5 rounded-full"
-                      style={{ background: entry.color }}
-                    />
-                    <strong className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/76">
-                      @{entry.name}
-                    </strong>
-                  </div>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/30">
-                    {entry.timestamp}
-                  </span>
-                </div>
-
-                {entry.ghost ? (
-                  <div className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-white/30">
-                    {entry.ghostLabel}
-                  </div>
-                ) : (
-                  <p className="mt-3 text-[15px] leading-7 text-white/68">
-                    {entry.body}
-                  </p>
-                )}
-
-                {entry.badges?.length ? (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {entry.badges.map((badge) => (
-                      <span
-                        key={badge}
-                        className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white/56"
-                      >
-                        {badge}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
+          <div className="hero-social-row" aria-label="Profile link types">
+            {profile.links.map((link) => (
+              <span key={link.label} className={`hero-social-icon is-${socialIconKey(link.label)}`} title={link.label}>
+                <SocialIcon label={link.label} />
+              </span>
             ))}
           </div>
 
-          <div className="mt-5 flex items-center justify-between gap-3 rounded-[16px] border border-white/10 bg-white/[0.03] px-4 py-3">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/40">
-              typing... but nothing useful lands
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-white/28 animate-[dotPulse_1.2s_ease-in-out_infinite]" />
-              <span className="h-1.5 w-1.5 rounded-full bg-white/28 animate-[dotPulse_1.2s_ease-in-out_.2s_infinite]" />
-              <span className="h-1.5 w-1.5 rounded-full bg-white/28 animate-[dotPulse_1.2s_ease-in-out_.4s_infinite]" />
-            </span>
-          </div>
-        </article>
+          <div className="hero-stat-panel" aria-label="Profile proof stats">
+            {heroStats.map((stat) => {
+              const active = activeDetailKey === stat.detailKey;
 
-        <article
-          ref={compilerRef}
-          className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,18,21,0.98),rgba(6,8,11,0.98))] p-5 shadow-[0_30px_90px_rgba(0,0,0,0.42)]"
-          data-reveal
-        >
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/45">
-              weld.compiler -- structured_signal
-            </span>
-            <span className="rounded-full border border-[var(--acid-green)]/20 bg-[var(--acid-green)]/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--acid-green-light)]">
-              {compiled ? "Compiled" : "Waiting"}
-            </span>
-          </div>
-
-          <div className="mt-5 rounded-[20px] border border-white/8 bg-white/[0.03] p-4">
-            <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">
-              Compiler result
-            </div>
-            <strong className="mt-2 block font-display text-[2rem] italic tracking-[-0.04em] text-white/92">
-              Discord chaos {"->"} structured talent signal.
-            </strong>
-          </div>
-
-          <div className="mt-5 grid gap-3">
-            {COMPILER_OUTPUT.map((line) => (
-              <div
-                key={line.text}
-                data-compile-field
-                className="compile-field rounded-[18px] border border-white/8 bg-white/[0.03] p-4"
-              >
-                <div
-                  className={`font-mono text-[11px] uppercase tracking-[0.16em] ${
-                    line.tone === "success"
-                      ? "text-[var(--acid-green-light)]"
-                      : line.tone === "active"
-                        ? "text-[var(--orange-hot)]"
-                        : "text-white/68"
-                  }`}
-                  style={line.bold ? { fontWeight: 700 } : undefined}
+              return (
+                <button
+                  key={stat.value}
+                  type="button"
+                  className={`hero-stat-chip ${active ? "is-active" : ""}`}
+                  aria-expanded={active}
+                  onClick={() => onDetailToggle(active ? null : stat.detailKey)}
                 >
-                  {line.text}
-                </div>
-              </div>
-            ))}
+                  {stat.icon}
+                  <strong>{stat.label}</strong>
+                  <span>{stat.value}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="hero-card-identity hero-card-identity-stacked">
+          <div className="hero-card-name-row">
+            <h2>{profile.name}</h2>
+            <button
+              type="button"
+              className={`verified-dot ${activeDetailKey === "verified" ? "is-active" : ""}`}
+              aria-label="Open verified proof"
+              aria-expanded={activeDetailKey === "verified"}
+              onClick={() => onDetailToggle(activeDetailKey === "verified" ? null : "verified")}
+            >
+              <CheckIcon />
+            </button>
+          </div>
+          <p className="hero-card-role">{profile.label}</p>
+          <p className="hero-card-availability">
+            <span />
+            {profile.availability}
+          </p>
+        </div>
+
+        <div className="hero-card-divider" />
+
+        <p className="hero-card-headline">{profile.headline}</p>
+
+        <div className="hero-card-commerce-row">
+          <div className="hero-rate-pill">
+            <span>Rate</span>
+            <strong>{profile.rate}</strong>
+            <em>{profile.payment}</em>
           </div>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-[18px] border border-white/8 bg-white/[0.03] p-4">
-              <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/38">
-                Speed delta
+          <div className="hero-skill-grid" aria-label="Services">
+            {profile.services.map((service) => (
+              <span key={service}>{service}</span>
+            ))}
+          </div>
+        </div>
+
+        <div className="hero-card-bottom-actions">
+          <button type="button" className="hero-link-action" onClick={() => onDetailToggle("latest")}>
+            <GamepadIcon />
+            <span>
+              <strong>Games</strong>
+              <em>See games I&apos;ve worked on</em>
+            </span>
+            <ArrowUpRightIcon />
+          </button>
+          <button type="button" className="hero-link-action" onClick={() => onDetailToggle("projects")}>
+            <FolderIcon />
+            <span>
+              <strong>My Work</strong>
+              <em>View projects I&apos;ve built</em>
+            </span>
+            <ArrowUpRightIcon />
+          </button>
+        </div>
+      </article>
+    </div>
+  );
+}
+
+function RoleTalentExplorer({
+  role,
+  profile,
+  onRoleChange
+}: {
+  role: RoleKey;
+  profile: TalentProfile;
+  onRoleChange: (role: RoleKey) => void;
+}) {
+  const buttonRefs = useRef<Partial<Record<RoleKey, HTMLButtonElement | null>>>({});
+
+  function handleKeyDown(event: KeyboardEvent<HTMLButtonElement>, currentRole: RoleKey) {
+    const currentIndex = ROLE_ORDER.indexOf(currentRole);
+    let nextIndex = currentIndex;
+
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      nextIndex = (currentIndex + 1) % ROLE_ORDER.length;
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      nextIndex = (currentIndex - 1 + ROLE_ORDER.length) % ROLE_ORDER.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = ROLE_ORDER.length - 1;
+    } else if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onRoleChange(currentRole);
+      return;
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+    const next = ROLE_ORDER[nextIndex];
+    onRoleChange(next);
+    buttonRefs.current[next]?.focus();
+  }
+
+  return (
+    <section className="glass-section how-story-section" id="how">
+      <div className="how-story-grid">
+        <div className="section-copy how-story-copy">
+          <span className="section-kicker">How it works</span>
+          <h2>Clarity first. Friction later.</h2>
+          <p>Role-first cards, not generic profiles.</p>
+          <p>
+            Switch roles and watch same system adapt. Card stays readable while proof, links, and pricing remain honest.
+          </p>
+
+          <div className="role-explorer-tabs" role="radiogroup" aria-label="Choose a Roblox talent role">
+            {ROLE_ORDER.map((entry) => (
+              <button
+                key={entry}
+                ref={(node) => {
+                  buttonRefs.current[entry] = node;
+                }}
+                type="button"
+                role="radio"
+                aria-checked={role === entry}
+                className={role === entry ? "is-active" : ""}
+                onClick={() => onRoleChange(entry)}
+                onKeyDown={(event) => handleKeyDown(event, entry)}
+              >
+                {ROLE_LABELS[entry]}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <article className="glass-card how-profile-card">
+          <div className="how-profile-top">
+            <div className="profile-avatar-shell">
+              <div className="profile-avatar">
+                <span className="avatar-hair" />
+                <span className="avatar-face">
+                  <span className="avatar-mouth" />
+                </span>
+                <span className="avatar-hoodie" />
               </div>
-              <div className="mt-2 font-display text-[2.1rem] italic tracking-[-0.04em] text-white/92">
-                6x faster
-              </div>
-              <p className="mt-2 text-sm leading-7 text-white/50">
-                Product preview only. The point is signal density, not invented marketplace stats.
-              </p>
+              <span className="avatar-status-dot" />
             </div>
-            <div className="rounded-[18px] border border-white/8 bg-white/[0.03] p-4">
-              <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/38">
-                Scan state
+
+            <div>
+              <div className="hero-card-name-row">
+                <h3>{profile.name}</h3>
+                <span className="verified-dot"><CheckIcon /></span>
               </div>
-              <div className="mt-2 text-[15px] leading-7 text-white/70">
-                Role, rate, availability, shipped work, and proof become visible before the first DM.
-              </div>
+              <p>{profile.label}</p>
+              <p className="hero-card-availability"><span />{profile.availability}</p>
             </div>
+          </div>
+          <p>{profile.latestProject.summary}</p>
+          <div className="how-proof-list">
+            {profile.latestProject.bullets.map((bullet) => (
+              <span key={bullet}><SparkIcon />{bullet}</span>
+            ))}
+          </div>
+        </article>
+      </div>
+    </section>
+  );
+}
+
+function HowItWorksSection({
+  role,
+  profile,
+  onRoleChange
+}: {
+  role: RoleKey;
+  profile: TalentProfile;
+  onRoleChange: (role: RoleKey) => void;
+}) {
+  const buttonRefs = useRef<Partial<Record<RoleKey, HTMLButtonElement | null>>>({});
+  const steps = [
+    ["1", "Build your card", "Add your role, rate, skills, links, proof, and projects."],
+    ["2", "We verify proof", "We check links, projects, and activity so studios can trust your card."],
+    ["3", "Studios match & Spark", "Studios swipe, match, and Spark the talent they want to hire."],
+    ["4", "You get hired", "Chat, agree, build, and get paid with clearer context."]
+  ] as const;
+
+  function handleKeyDown(event: KeyboardEvent<HTMLButtonElement>, currentRole: RoleKey) {
+    const currentIndex = ROLE_ORDER.indexOf(currentRole);
+    let nextIndex = currentIndex;
+
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      nextIndex = (currentIndex + 1) % ROLE_ORDER.length;
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      nextIndex = (currentIndex - 1 + ROLE_ORDER.length) % ROLE_ORDER.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = ROLE_ORDER.length - 1;
+    } else if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onRoleChange(currentRole);
+      return;
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+    const next = ROLE_ORDER[nextIndex];
+    onRoleChange(next);
+    buttonRefs.current[next]?.focus();
+  }
+
+  return (
+    <section className="glass-section how-story-section" id="how">
+      <div className="how-story-grid">
+        <div className="section-copy how-story-copy">
+          <span className="section-kicker">How it works</span>
+          <h2>Clarity first. Friction later.</h2>
+          <p>Role-first cards, not generic profiles.</p>
+          <p>
+            Switch roles and watch same system adapt. Card stays readable while proof, links, and pricing remain honest.
+          </p>
+
+          <div className="role-explorer-tabs" role="radiogroup" aria-label="Choose a Roblox talent role">
+            {ROLE_ORDER.map((entry) => (
+              <button
+                key={entry}
+                ref={(node) => {
+                  buttonRefs.current[entry] = node;
+                }}
+                type="button"
+                role="radio"
+                aria-checked={role === entry}
+                className={role === entry ? "is-active" : ""}
+                onClick={() => onRoleChange(entry)}
+                onKeyDown={(event) => handleKeyDown(event, entry)}
+              >
+                {ROLE_LABELS[entry]}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <article className="glass-card how-profile-card">
+          <div className="how-profile-top">
+            <div className="profile-avatar-shell">
+              <div className="profile-avatar">
+                <span className="avatar-hair" />
+                <span className="avatar-face">
+                  <span className="avatar-mouth" />
+                </span>
+                <span className="avatar-hoodie" />
+              </div>
+              <span className="avatar-status-dot" />
+            </div>
+
+            <div>
+              <div className="hero-card-name-row">
+                <h3>{profile.name}</h3>
+                <span className="verified-dot"><CheckIcon /></span>
+              </div>
+              <p>{profile.label}</p>
+              <p className="hero-card-availability"><span />{profile.availability}</p>
+            </div>
+          </div>
+          <p>{profile.latestProject.summary}</p>
+          <div className="how-proof-list">
+            {profile.latestProject.bullets.map((bullet) => (
+              <span key={bullet}><SparkIcon />{bullet}</span>
+            ))}
           </div>
         </article>
       </div>
 
-      <div className="mx-auto mt-8 grid w-full max-w-[1200px] gap-3 px-5 md:px-8 md:grid-cols-3">
-        {[
-          "Vague rates become explicit budget signal.",
-          "Expired links become proof fields with verification.",
-          "Ghost replies become response windows and availability."
-        ].map((pain, index) => (
-          <div
-            key={pain}
-            data-reveal
-            data-delay={`${(index + 1) * 100}`}
-            className="rounded-[18px] border border-white/8 bg-white/[0.03] px-4 py-4 text-[14px] leading-7 text-white/60"
-          >
-            {pain}
-          </div>
+      <div className="glass-card step-rail">
+        {steps.map(([number, title, body], index) => (
+          <article key={title} className="step-card">
+            <span className="step-index">{number}</span>
+            <h3>{title}</h3>
+            <p>{body}</p>
+            {index < steps.length - 1 ? <span className="step-arrow" aria-hidden="true">→</span> : null}
+          </article>
         ))}
       </div>
     </section>
   );
 }
 
-function RoleExplorerSection({
-  activeRole,
-  activeRolePreview,
-  activeRoleDetails,
-  accent,
-  accentSoft,
-  onRoleChange
-}: {
-  activeRole: RoleKey;
-  activeRolePreview: (typeof ROLE_PREVIEWS)[RoleKey];
-  activeRoleDetails: (typeof ROLE_EXPLORER_DATA)[RoleKey];
-  accent: string;
-  accentSoft: string;
-  onRoleChange: (role: RoleKey) => void;
-}) {
-  const titleRef = useRef<HTMLHeadingElement | null>(null);
-  const nameRef = useRef<HTMLSpanElement | null>(null);
-  const rateRef = useRef<HTMLSpanElement | null>(null);
-  const visitsRef = useRef<HTMLSpanElement | null>(null);
-  const skillsRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const cleanups = [
-      scrambleText(titleRef.current, activeRolePreview.title),
-      scrambleText(nameRef.current, activeRoleDetails.name),
-      scrambleText(rateRef.current, activeRoleDetails.rate),
-      scrambleText(visitsRef.current, activeRoleDetails.visits),
-      highlightSkillChips(skillsRef.current, { staggerMs: 80 })
-    ];
-
-    return () => {
-      cleanups.forEach((cleanup) => cleanup());
-    };
-  }, [activeRole, activeRoleDetails, activeRolePreview.title]);
-
-  return (
-    <section
-      id="role-explorer"
-      className="border-b border-white/[0.05] bg-[var(--bg)] py-[96px] md:py-[120px]"
-    >
-      <SectionHeading
-        eyebrow="Role explorer"
-        title="Roblox-native loadouts, not generic talent cards."
-        copy="Click a role chip and the preview rewires in place. Each profile remains a product preview, not fake public traction."
-        eyebrowClassName="text-[var(--accent-soft)]"
-      />
-
-      <div className="mx-auto mt-10 w-full max-w-[1200px] px-5 md:px-8">
-        <div
-          className="role-chip-dock rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(17,34,56,0.82),rgba(9,11,18,0.94))] p-4 shadow-[0_26px_80px_rgba(0,0,0,0.36)]"
-          data-reveal
-        >
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/42">
-              scout.loadout -- active role filters
-            </span>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/36">
-                studio view
-              </span>
-              {activeRolePreview.filters.map((chip) => (
-                <span
-                  key={chip}
-                  className="rounded-full border border-white/10 bg-[rgba(255,255,255,0.04)] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white/62"
-                >
-                  {chip}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-4 rounded-[22px] border border-white/8 bg-[rgba(8,13,20,0.82)] p-3">
-            <div className="flex flex-wrap gap-2">
-              {ROLE_CHIPS.map(([roleKey, label]) => (
-                <button
-                  key={roleKey}
-                  type="button"
-                  aria-pressed={activeRole === roleKey}
-                  onClick={() => onRoleChange(roleKey)}
-                  className={`role-chip-button inline-flex items-center gap-2 rounded-full border px-4 py-2 font-mono text-[11px] uppercase tracking-[0.14em] transition ${
-                    activeRole === roleKey
-                      ? "border-white/16 bg-[linear-gradient(135deg,rgba(255,255,255,0.18),rgba(255,255,255,0.08))] text-[#ffe9df] shadow-[0_10px_24px_rgba(0,0,0,0.24)]"
-                      : "border-white/10 bg-[rgba(255,255,255,0.02)] text-white/58 hover:bg-white/[0.06] hover:text-white/76"
-                  }`}
-                >
-                  <span
-                    className={`h-1.5 w-1.5 rounded-full transition ${
-                      activeRole === roleKey ? "bg-[var(--accent-soft)] shadow-[0_0_18px_var(--accent)]" : "bg-white/20"
-                    }`}
-                  />
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.06fr)_minmax(320px,0.94fr)]">
-          <article
-            className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,18,21,0.98),rgba(8,9,13,0.98))] p-5 shadow-[0_30px_90px_rgba(0,0,0,0.42)]"
-            data-reveal
-          >
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white/62">
-                Product preview - example profiles
-              </span>
-              <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/42">
-                {activeRolePreview.label}
-              </span>
-            </div>
-
-            <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
-              <div>
-                <div className="rounded-[22px] border border-white/8 bg-white/[0.03] p-5">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/34">
-                    live.role_loadout
-                  </div>
-                  <h3
-                    ref={titleRef}
-                    className="mt-3 font-display text-[2.15rem] italic tracking-[-0.04em] text-white/92"
-                  >
-                    {activeRolePreview.title}
-                  </h3>
-                  <p className="mt-3 max-w-[44ch] text-[15px] leading-8 text-white/68">
-                    {activeRolePreview.summary}
-                  </p>
-
-                  <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                    {activeRolePreview.fields.map(([label, value]) => (
-                      <div
-                        key={label}
-                        className="rounded-[16px] border border-white/8 bg-[var(--terminal-mid)] p-4"
-                      >
-                        <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/34">
-                          {`${label.replace(/\s+/g, "_").toUpperCase()}:`}
-                        </div>
-                        <div className="mt-2 text-[15px] text-white/74">{value}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <aside className="space-y-4">
-                <div className="rounded-[22px] border border-white/8 bg-white/[0.03] p-5">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/34">
-                    active.preview
-                  </div>
-                  <div className="mt-4 flex items-center justify-between gap-3">
-                    <span ref={nameRef} className="font-display text-[1.8rem] italic text-white/92">
-                      {activeRoleDetails.name}
-                    </span>
-                    <span
-                      className="rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em]"
-                      style={{
-                        borderColor: `${accent}33`,
-                        background: `${accent}12`,
-                        color: accentSoft
-                      }}
-                    >
-                      {activeRoleDetails.availability}
-                    </span>
-                  </div>
-                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                    <LoadoutStat label="RATE_MODEL" valueRef={rateRef} />
-                    <LoadoutStat label="VISITS" valueRef={visitsRef} />
-                    <LoadoutStaticStat label="SHIPPED_WORK" value={`${activeRoleDetails.games} games`} />
-                    <LoadoutStaticStat label="VERIFIED" value={activeRoleDetails.verified} />
-                  </div>
-                </div>
-
-                <div className="rounded-[22px] border border-white/8 bg-white/[0.03] p-5">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/34">
-                    role.skills
-                  </div>
-                  <div ref={skillsRef} className="mt-4 flex flex-wrap gap-2">
-                    {activeRoleDetails.skills.map((skill) => (
-                      <span
-                        key={skill}
-                        data-skill-chip
-                        className="terminal-chip rounded-[8px] border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em]"
-                        style={{
-                          borderColor: `${accent}44`,
-                          background: `${accent}10`,
-                          color: accentSoft
-                        }}
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="mt-4 text-sm leading-7 text-white/50">
-                    {activeRoleDetails.shippedWork}
-                  </p>
-                </div>
-
-                <div className="rounded-[22px] border border-white/8 bg-white/[0.03] p-5">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/34">
-                    scout.filters
-                  </div>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {activeRolePreview.filters.map((chip) => (
-                      <span
-                        key={chip}
-                        className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white/58"
-                      >
-                        {chip}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="mt-4 text-sm leading-7 text-white/48">
-                    {activeRolePreview.foot}
-                  </p>
-                </div>
-              </aside>
-            </div>
-          </article>
-
-          <aside
-            className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(9,11,18,0.98),rgba(6,8,12,0.98))] p-5 shadow-[0_30px_90px_rgba(0,0,0,0.35)]"
-            data-reveal
-          >
-            <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--accent-soft)]">
-              scout.preview -- active_filters
-            </div>
-            <div className="mt-5 space-y-3">
-              {[
-                ["SHIPPED_WORK", activeRoleDetails.shippedWork],
-                ["RATE_MODEL", activeRoleDetails.rate],
-                ["AVAILABILITY", activeRoleDetails.availability],
-                ["VERIFIED", activeRoleDetails.verified]
-              ].map(([label, value]) => (
-                <div
-                  key={label}
-                  className="rounded-[18px] border border-white/8 bg-white/[0.03] p-4"
-                >
-                  <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/34">
-                    {label}
-                  </div>
-                  <div className="mt-2 text-[15px] text-white/74">{value}</div>
-                </div>
-              ))}
-            </div>
-          </aside>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function LoadoutStat({
-  label,
-  valueRef
-}: {
-  label: string;
-  valueRef: MutableRefObject<HTMLSpanElement | null>;
-}) {
-  return (
-    <div className="rounded-[16px] border border-white/8 bg-[var(--terminal-mid)] p-4">
-      <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/34">
-        {label}
-      </div>
-      <div className="mt-2 text-[15px] text-white/74">
-        <span ref={valueRef} />
-      </div>
-    </div>
-  );
-}
-
-function LoadoutStaticStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-[16px] border border-white/8 bg-[var(--terminal-mid)] p-4">
-      <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/34">
-        {label}
-      </div>
-      <div className="mt-2 text-[15px] text-white/74">{value}</div>
-    </div>
-  );
-}
-
-function HowSection({ accentSoft }: { accentSoft: string }) {
-  return (
-    <section
-      id="how-it-works"
-      className="border-b border-white/[0.05] bg-[var(--bg2)] py-[96px] md:py-[100px]"
-    >
-      <SectionHeading
-        eyebrow="How it works"
-        title="Terminal commands, then visible signal."
-        copy="Each command resolves into a status block. The terminal is there to explain the product, not just decorate it."
-        eyebrowClassName="text-[var(--accent-soft)]"
-      />
-
-      <div className="mx-auto mt-10 w-full max-w-[1200px] px-5 md:px-8">
-        <div
-          className="command-deck rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(17,35,58,0.86),rgba(8,11,18,0.98))] p-5 shadow-[0_34px_100px_rgba(0,0,0,0.42)] md:p-6"
-          data-reveal
-        >
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.06] pb-4">
-            <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">
-              <span className="flex gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-[var(--orange-hot)]" />
-                <span className="h-2.5 w-2.5 rounded-full bg-[#FFBE74]" />
-                <span className="h-2.5 w-2.5 rounded-full bg-[var(--acid-green)]" />
-              </span>
-              <span>weld.commands -- live_flow</span>
-            </div>
-            <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white/58">
-              3 command groups
-            </span>
-          </div>
-
-          <div className="mt-5 grid gap-5 lg:grid-cols-3">
-            {HOW_COMMANDS.map((command, index) => (
-              <CommandSequenceCard
-                key={command.command}
-                command={command}
-                accentSoft={accentSoft}
-                delay={index * 120}
-                index={index}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function CommandSequenceCard({
-  command,
-  accentSoft,
-  delay,
-  index
-}: {
-  command: CommandSequence;
-  accentSoft: string;
-  delay: number;
-  index: number;
-}) {
-  const cardRef = useRef<HTMLElement | null>(null);
-  const commandRef = useRef<HTMLDivElement | null>(null);
-  const outputRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const node = cardRef.current;
-
-    if (!node || !commandRef.current || !outputRef.current) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) {
-            return;
-          }
-
-          const commandCleanup = typeLine(commandRef.current, command.command, {
-            speed: 18,
-            delay
-          });
-
-          const timeoutId = window.setTimeout(() => {
-            runBootSequence(outputRef.current, command.lines, {
-              lineDelay: 120,
-              onComplete: () => {
-                flashNode(cardRef.current, "flash-node", 360);
-              }
-            });
-          }, command.command.length * 18 + delay + 140);
-
-          observer.disconnect();
-
-          return () => {
-            commandCleanup();
-            window.clearTimeout(timeoutId);
-          };
-        });
-      },
-      { threshold: 0.35 }
-    );
-
-    observer.observe(node);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [command.command, command.lines, delay]);
-
-  return (
-    <article
-      ref={cardRef}
-      className="command-card rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(18,31,51,0.44),rgba(11,16,25,0.98))] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.4)]"
-    >
-      <div className="flex items-center justify-between gap-3 border-b border-white/[0.06] pb-4">
-        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/34">
-          {`command.00${index + 1}`}
-        </span>
-        <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white/52">
-          terminal lane
-        </span>
-      </div>
-      <div className="mt-4 rounded-[18px] border border-white/8 bg-[rgba(10,17,26,0.86)] p-4">
-        <div
-          ref={commandRef}
-          className="min-h-[18px] font-mono text-[11px] uppercase tracking-[0.14em]"
-          style={{ color: accentSoft }}
-        >
-          {prefersReducedMotion() ? command.command : ""}
-        </div>
-      </div>
-      <div className="mt-4 rounded-[20px] border border-white/8 bg-[rgba(255,255,255,0.03)] p-4">
-        <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/34">
-          status blocks
-        </div>
-        <div ref={outputRef} className="mt-4 min-h-[154px] space-y-2" />
-      </div>
-      <p className="mt-4 text-sm leading-7 text-white/48">{command.summary}</p>
-    </article>
-  );
-}
-
-function BetaSection({
+function ProfileCreationSection({
   mode,
-  previewReferralCount,
-  onShare,
-  shareStatus
+  profile
 }: {
   mode: Audience;
-  previewReferralCount: number;
-  onShare: (channel: "discord" | "x" | "linkedin" | "copy") => void;
-  shareStatus: string;
+  profile: TalentProfile;
 }) {
-  const rewardRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const node = rewardRef.current;
-
-    if (!node) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) {
-            return;
-          }
-
-          animateRewardProgress(previewReferralCount, {
-            staggerMs: 180,
-            containerEl: rewardRef.current
-          });
-          observer.disconnect();
-        });
-      },
-      { threshold: 0.22 }
-    );
-
-    observer.observe(node);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [previewReferralCount]);
+  const title =
+    mode === "studio"
+      ? "Scout Roblox talent without Discord chaos."
+      : "Create a profile that proves the work.";
+  const body =
+    mode === "studio"
+      ? "Studios see rate, availability, proof, links, and recent work in one stable shape instead of scattered bios and DMs."
+      : "Developers turn roles, rates, skills, proof, and links into one readable card that keeps the pitch clean.";
+  const items = [
+    ["Role", profile.label],
+    ["Rate", profile.rate],
+    ["Availability", profile.availability],
+    ["Payment", profile.payment],
+    ["Proof links", "Roblox, GitHub, portfolio"],
+    ["Latest project", profile.latestProject.name],
+    ["Card shape stays stable.", "Same fields stay visible across roles, so comparison feels fast instead of noisy."]
+  ] as const;
 
   return (
-    <section
-      id="invite-mechanics"
-      className="border-b border-white/[0.05] bg-[var(--bg)] py-[96px] md:py-[100px]"
-    >
-      <SectionHeading
-        eyebrow="Beta / referral"
-        title="Early access. Real status."
-        copy="The waitlist works like a personal unlock loop. What you see here is a preview of your own progress state after signup, not a fake public leaderboard."
-        eyebrowClassName="text-[var(--acid-green-light)]"
-      />
-
-      <div className="mx-auto mt-10 grid w-full max-w-[1200px] gap-6 px-5 md:px-8 lg:grid-cols-[minmax(0,0.78fr)_minmax(0,1fr)]">
-        <article
-          className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,18,21,0.98),rgba(8,9,13,0.98))] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.42)]"
-          data-reveal
-        >
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--acid-green-light)]">
-            // limited beta
-          </span>
-          <h2 className="mt-5 font-display text-[2.8rem] italic leading-[0.96] tracking-[-0.05em] text-white/92 md:text-[4rem]">
-            Founder access for the first 500 developers.
-          </h2>
-          <p className="mt-5 max-w-[42ch] text-[15px] leading-8 text-white/68">
-            Access rolls out in waves. We do not show fake live counters, fake recent signups, or a made-up public queue rank. What unlocks after signup is your own status lane.
-          </p>
-
-          <div className="mt-8 rounded-[20px] border border-white/10 bg-white/[0.03] p-4">
-            <div className="flex items-center justify-between gap-3 font-mono text-[10px] uppercase tracking-[0.16em] text-white/38">
-              <span>Founder beta cap</span>
-              <span>500 developers</span>
-            </div>
-            <div className="mt-4 h-3 overflow-hidden rounded-full border border-white/10 bg-white/[0.04]">
-              <div className="h-full w-full bg-[linear-gradient(90deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02),rgba(74,222,128,0.16),rgba(255,255,255,0.02))]" />
-            </div>
-            <p className="mt-4 text-sm leading-7 text-white/46">
-              Cap reference only. The public landing stays honest; your personal invite state activates after signup.
-            </p>
-          </div>
-
-          <div className="mt-8 rounded-[20px] border border-white/10 bg-white/[0.03] p-4">
-            <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/38">
-              preview.share_link
-            </div>
-            <div className="mt-3 rounded-[14px] border border-white/10 bg-[var(--terminal-mid)] px-4 py-3 font-mono text-[11px] uppercase tracking-[0.08em] text-white/64">
-              {`${WAITLIST_URL}/?ref=preview`}
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {(["discord", "x", "linkedin", "copy"] as const).map((channel) => (
-                <button
-                  key={channel}
-                  type="button"
-                  onClick={() => onShare(channel)}
-                  className="magnetic-button rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/72 transition hover:bg-white/[0.08]"
-                  data-magnetic="true"
-                >
-                  {channel}
-                </button>
-              ))}
-            </div>
-            <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.14em] text-white/46" aria-live="polite">
-              {shareStatus || `Preview share copy is ready for ${mode === "studio" ? "hiring teams" : "creators"}.`}
-            </p>
-          </div>
-        </article>
-
-        <article
-          ref={rewardRef}
-          className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,18,21,0.98),rgba(8,9,13,0.98))] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.42)]"
-          data-reveal
-        >
-          <div className="flex items-center justify-between gap-3">
-            <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/42">
-              referral.xp_track
-            </span>
-            <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white/58">
-              Preview state
-            </span>
-          </div>
-
-          <div className="mt-5 flex items-end justify-between gap-4 rounded-[22px] border border-white/10 bg-white/[0.03] p-5">
-            <div>
-              <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/38">
-                personal.progress
-              </div>
-              <div className="mt-2 font-display text-[3.4rem] italic leading-none tracking-[-0.05em] text-white/92">
-                {previewReferralCount}/5
-              </div>
-            </div>
-            <div className="max-w-[18ch] text-sm leading-7 text-white/50">
-              Your next unlock pulses instead of faking public queue vanity.
-            </div>
-          </div>
-
-          <div className="mt-5 grid gap-3 md:grid-cols-2">
-            {REWARD_CARDS.map((reward) => (
-              <div
-                key={reward.count}
-                data-reward-card
-                data-threshold={reward.count}
-                className="reward-card rounded-[20px] border border-white/8 bg-white/[0.03] p-4"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <span className="grid h-10 w-10 place-items-center rounded-[12px] border border-white/10 bg-[var(--terminal-mid)] font-mono text-[12px] uppercase tracking-[0.12em] text-white/72">
-                    {reward.badge}
-                  </span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/38">
-                    {`${reward.count} referral${reward.count === 1 ? "" : "s"}`}
-                  </span>
-                </div>
-                <div className="mt-4 font-display text-[1.5rem] italic tracking-[-0.04em] text-white/92">
-                  {reward.label}
-                </div>
-                <p className="mt-3 text-[14px] leading-7 text-white/56">
-                  {reward.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </article>
+    <section className="glass-section profile-section profile-creation-section" id="profile">
+      <div className="section-copy">
+        <span className="section-kicker">Profile creation</span>
+        <h2>{title}</h2>
+        <p>{body}</p>
       </div>
-    </section>
-  );
-}
 
-function StudioBridgeSection({
-  mode,
-  accentButtonClass,
-  onModeChange
-}: {
-  mode: Audience;
-  accentButtonClass: string;
-  onModeChange: (mode: Audience) => void;
-}) {
-  return (
-    <section
-      id="studio-bridge"
-      className="border-b border-white/[0.05] bg-[linear-gradient(180deg,rgba(8,10,11,1),rgba(7,11,18,1))] py-16"
-    >
-      <div className="mx-auto w-full max-w-[1200px] px-5 md:px-8">
-        <div
-          className="rounded-[28px] border border-[var(--roblox-blue)]/18 bg-[linear-gradient(135deg,rgba(8,14,22,0.98),rgba(7,10,13,0.98)_42%,rgba(12,20,30,0.98))] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.38)]"
-          data-reveal
-        >
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-center">
-            <div>
-              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--roblox-blue-light)]">
-                // studio scout mode
+      <div className="glass-card profile-board">
+        <div className="profile-board-avatar">
+          <div className="profile-avatar-shell">
+            <div className="profile-avatar">
+              <span className="avatar-hair" />
+              <span className="avatar-face">
+                <span className="avatar-mouth" />
               </span>
-              <h2 className="mt-4 font-display text-[2.4rem] italic leading-[0.96] tracking-[-0.05em] text-white/92 md:text-[3.1rem]">
-                Filter developers by role, rate, availability, and proof.
-              </h2>
-              <p className="mt-4 max-w-[40ch] text-[15px] leading-8 text-white/68">
-                No job ads. No Discord digging. The studio lane stays compact here, but the scout signal is visible.
-              </p>
-              <button
-                type="button"
-                onClick={() => onModeChange("studio")}
-                className={`magnetic-button mt-6 inline-flex min-h-[50px] items-center rounded-full px-5 font-mono text-[10px] uppercase tracking-[0.16em] ${accentButtonClass} command-button`}
-                data-magnetic="true"
-              >
-                {mode === "studio" ? "GET HIRING ACCESS ->" : "SWITCH TO STUDIO MODE ->"}
-              </button>
+              <span className="avatar-hoodie" />
             </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              {STUDIO_FILTER_STATS.map(([label, value]) => (
-                <div
-                  key={label}
-                  className="rounded-[18px] border border-[var(--roblox-blue)]/14 bg-[rgba(34,155,210,0.08)] p-4"
-                >
-                  <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--roblox-blue-light)]">
-                    {label}
-                  </div>
-                  <div className="mt-2 text-[14px] leading-7 text-white/74">{value}</div>
-                </div>
-              ))}
-            </div>
+            <span className="avatar-status-dot" />
           </div>
         </div>
-      </div>
-    </section>
-  );
-}
 
-function HonestySection() {
-  return (
-    <section
-      id="founder-note"
-      className="border-b border-white/[0.05] bg-[var(--bg)] py-[88px] md:py-[96px]"
-    >
-      <div className="mx-auto w-full max-w-[1200px] px-5 md:px-8">
-        <article
-          className="rounded-[28px] border border-white/10 bg-[linear-gradient(135deg,rgba(14,16,18,0.98),rgba(9,11,13,0.98))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.46)]"
-          data-reveal
-        >
-          <span className="rounded-full border border-white/12 bg-white/[0.04] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.15em] text-white/62">
-            no fake traction
-          </span>
-          <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-            <div>
-              <h2 className="max-w-[11ch] font-display text-[2.6rem] italic leading-[0.96] tracking-[-0.05em] text-white/92 md:text-[3.4rem]">
-                What exists now, what beta includes, what comes later.
-              </h2>
-              <p className="mt-5 text-[15px] leading-8 text-white/72">
-                <strong>Weld is honest by design.</strong> The beta is about trust-verified profile structure, filtered discovery, and an invite loop that feels earned. No fake testimonials. No fake logos. No invented marketplace volume.
-              </p>
-            </div>
-            <div className="grid gap-4 md:grid-cols-3">
-              {FOUNDING_FACTS.map((fact) => (
-                <div
-                  key={fact.label}
-                  className="rounded-[22px] border border-white/8 bg-white/[0.03] p-5"
-                >
-                  <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">
-                    {fact.label}
-                  </div>
-                  <p className="mt-3 text-[15px] leading-7 text-white/70">{fact.body}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
-  );
-}
-
-function FAQSection({
-  activeFaq,
-  onToggle
-}: {
-  activeFaq: number;
-  onToggle: (index: number) => void;
-}) {
-  return (
-    <section id="faq" className="bg-[var(--red)] py-[96px] md:py-[100px]">
-      <div className="mx-auto w-full max-w-[860px] px-5 md:px-8">
-        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#fff5f0]/56">
-          // faq
-        </span>
-        <h2 className="mt-5 font-display text-[2.8rem] italic leading-[0.95] tracking-[-0.05em] text-[#fff5f0] md:text-[4rem]">
-          Plain answers.
-        </h2>
-
-        <div className="mt-10 divide-y divide-[#fff5f0]/14">
-          {FAQ_ITEMS.map((item, index) => (
-            <div key={item.question} className="py-1">
-              <button
-                type="button"
-                aria-expanded={activeFaq === index}
-                onClick={() => onToggle(index)}
-                className="flex w-full items-center justify-between gap-6 py-5 text-left"
-              >
-                <div>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#fff5f0]/42">
-                    {`// faq.00${index + 1}`}
-                  </div>
-                  <div className="mt-3 text-[15px] font-semibold leading-7 text-[#fff5f0] md:text-[16px]">
-                    {item.question}
-                  </div>
-                </div>
-                <span
-                  className={`shrink-0 font-mono text-[22px] text-[#fff5f0]/55 transition ${
-                    activeFaq === index ? "rotate-45" : "rotate-0"
-                  }`}
-                >
-                  +
-                </span>
-              </button>
-
-              <div
-                className={`grid transition-[grid-template-rows,opacity] duration-300 ${
-                  activeFaq === index ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-                }`}
-              >
-                <div className="overflow-hidden">
-                  <TypedAnswer active={activeFaq === index} answer={item.answer} />
-                </div>
-              </div>
-            </div>
+        <div className="profile-detail-grid">
+          {items.map(([label, value]) => (
+            <article key={label} className={`glass-card detail-card ${label === "Card shape stays stable." ? "profile-detail-note" : ""}`}>
+              <span>{label}</span>
+              <strong>{value}</strong>
+            </article>
           ))}
         </div>
       </div>
@@ -2785,127 +1368,381 @@ function FAQSection({
   );
 }
 
-function TypedAnswer({
-  active,
-  answer
+function ChatPreviewSection({
+  mode,
+  profile
 }: {
-  active: boolean;
-  answer: string;
+  mode: Audience;
+  profile: TalentProfile;
 }) {
-  const typedRef = useRef<HTMLSpanElement | null>(null);
-  const [showRest, setShowRest] = useState(prefersReducedMotion());
-  const firstSentenceMatch = answer.match(/^[^.!?]+[.!?]/);
-  const firstSentence = firstSentenceMatch?.[0] ?? answer;
-  const remainder = answer.slice(firstSentence.length).trim();
+  const messages = [
+    { side: "out", text: "Hey Eclipse! I’d love to ask about your availability for a project.", time: "2:34 PM" },
+    { side: "out", text: "Could you give me a quick overview of your process and timeline?", time: "2:35 PM" },
+    { side: "in", text: "Hey! Thanks for reaching out. Happy to help.", time: "2:36 PM" },
+    { side: "in", text: "I can share more about scope, delivery timing, and how I usually work.", time: "2:36 PM" },
+    { side: "out", text: "Sounds great. The project is a combat system with custom abilities and UI integration.", time: "2:37 PM" },
+    { side: "in", text: "Got it. I can deliver a high-quality solution within the discussed timeframe.", time: "2:38 PM" }
+  ] as const;
 
-  useEffect(() => {
-    if (!active) {
-      setShowRest(prefersReducedMotion());
-      if (typedRef.current) {
-        typedRef.current.textContent = "";
-      }
-      return;
-    }
-
-    if (prefersReducedMotion()) {
-      if (typedRef.current) {
-        typedRef.current.textContent = firstSentence;
-      }
-      setShowRest(true);
-      return;
-    }
-
-    setShowRest(false);
-    const cleanup = typeLine(typedRef.current, firstSentence, {
-      speed: 18,
-      onComplete: () => setShowRest(true)
-    });
-
-    return () => {
-      cleanup();
-    };
-  }, [active, firstSentence]);
+  const headline =
+    mode === "studio"
+      ? "First messages start with context."
+      : "Professional chat, not scattered DMs.";
 
   return (
-    <p className="pb-6 text-[15px] leading-8 text-[#fff5f0]/82">
-      <span ref={typedRef}>{prefersReducedMotion() && active ? firstSentence : ""}</span>
-      {showRest && remainder ? <span>{` ${remainder}`}</span> : null}
-    </p>
+    <section className="glass-section chat-section" id="chat">
+      <div className="section-copy chat-section-copy">
+        <span className="section-kicker">Chat system</span>
+        <h2>{headline}</h2>
+        <p>
+          Weld turns a match into a focused conversation with profile proof, scope, and availability beside the thread.
+        </p>
+      </div>
+
+      <div className="glass-card chat-preview-shell">
+        <div className="chat-window-topbar">
+          <button type="button" aria-label="Decorative back button">
+            <ArrowLeftIcon />
+            <span>Back</span>
+          </button>
+          <div className="chat-window-identity">
+            <div className="chat-mini-profile" aria-hidden="true">
+              <span />
+              <i />
+            </div>
+            <div>
+              <strong>{profile.name.toLowerCase()}</strong>
+              <em>Online</em>
+            </div>
+          </div>
+          <div className="chat-window-actions">
+            <button type="button">View full profile <ArrowUpRightIcon /></button>
+            <button type="button" aria-label="Decorative more menu">•••</button>
+          </div>
+        </div>
+
+        <aside className="chat-profile-panel" aria-label="Chat profile summary">
+          <div className="chat-profile-top">
+            <div className="profile-avatar-shell">
+              <div className="profile-avatar">
+                <span className="avatar-hair" />
+                <span className="avatar-face">
+                  <span className="avatar-mouth" />
+                </span>
+                <span className="avatar-hoodie" />
+              </div>
+              <span className="avatar-status-dot" />
+            </div>
+            <div>
+              <div className="hero-card-name-row">
+                <h3>{profile.name}</h3>
+                <span className="verified-dot"><CheckIcon /></span>
+              </div>
+              <p>{profile.label}</p>
+              <p className="hero-card-availability"><span />Online</p>
+            </div>
+          </div>
+
+          <div className="chat-match-bar">
+            <span><ShieldIcon /> 98% match</span>
+            <i aria-hidden="true" />
+          </div>
+
+          <div className="chat-stat-grid">
+            <span><UserIcon /><strong>{profile.years}</strong><em>Experience</em></span>
+            <span><CheckIcon /><strong>{profile.matchScore}%</strong><em>Match</em></span>
+            <span><ClockIcon /><strong>1 hr</strong><em>Replies</em></span>
+          </div>
+
+          <p className="chat-profile-summary">{profile.headline}</p>
+
+          <div className="chat-contact-row">
+            <span><RobloxIcon />Roblox</span>
+            <span><GithubIcon />GitHub</span>
+            <span><FolderIcon />Portfolio</span>
+          </div>
+
+          <div className="chat-professional-note">
+            <SparkIcon />
+            <span>
+              <strong>Keep it professional</strong>
+              <em>Clear scope, respectful asks, and no lost context.</em>
+            </span>
+          </div>
+        </aside>
+
+        <div className="chat-thread-panel">
+          <div className="chat-thread-top">
+            <span>Today</span>
+            <span>2:39 PM</span>
+          </div>
+
+          <div className="chat-bubble-list">
+            {messages.map((message) => (
+              <div key={`${message.time}-${message.text}`} className={`chat-row is-${message.side}`}>
+                {message.side === "in" ? (
+                  <div className="chat-mini-avatar" aria-hidden="true">
+                    <span />
+                  </div>
+                ) : null}
+                <p>
+                  {message.text}
+                  <time>{message.time}</time>
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="chat-composer" aria-label="Decorative message composer">
+            <span><FolderIcon /></span>
+            <em>Message {profile.name.toLowerCase()}...</em>
+            <span><SparkIcon /></span>
+            <button type="button" aria-label="Decorative send button">
+              <ArrowUpRightIcon />
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
-function FinalCTASection({
+function AntiDiscordSection({ mode }: { mode: Audience }) {
+  const intro =
+    mode === "studio"
+      ? "Replace scattered scouting with a profile, proof, and first-message trail."
+      : "Replace scattered self-promotion with one profile and one professional thread.";
+
+  const before = ["Rate buried in DMs", "Portfolio split across links", "Availability unclear", "Scope starts from zero"];
+  const after = ["Role-first profile", "Verified proof fields", "Rate and availability visible", "Focused chat context"];
+
+  return (
+    <section className="glass-section anti-discord-section">
+      <div className="glass-card anti-discord-shell">
+        <div className="section-copy">
+          <span className="section-kicker">Less Discord chaos</span>
+          <h2>Weld keeps the useful context, not the noise.</h2>
+          <p>{intro}</p>
+        </div>
+
+        <div className="comparison-grid">
+          <article>
+            <span>Scattered DMs</span>
+            {before.map((item) => <p key={item}>{item}</p>)}
+          </article>
+          <article>
+            <span>Weld workspace</span>
+            {after.map((item) => <p key={item}>{item}</p>)}
+          </article>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ProofTrustSection({
   mode,
-  finalEmail,
-  finalStatus,
-  capturePhase,
-  accentButtonClass,
-  onEmailChange,
-  onSubmit,
-  containerRef
+  profile,
+  swipeState,
+  onDetailToggle,
+  onSwipe
 }: {
   mode: Audience;
-  finalEmail: string;
-  finalStatus: string;
-  capturePhase: CapturePhase;
-  accentButtonClass: string;
-  onEmailChange: (value: string) => void;
-  onSubmit: () => void;
-  containerRef: MutableRefObject<HTMLDivElement | null>;
+  profile: TalentProfile;
+  swipeState: SwipeState;
+  onDetailToggle: (key: DetailKey | null) => void;
+  onSwipe: (state: Exclude<SwipeState, "idle">) => void;
 }) {
+  const sparkLabel = mode === "studio" ? "Spark / Hire" : "Spark";
+
   return (
-    <section
-      id="final-cta"
-      className="relative overflow-hidden bg-[var(--bg)] py-[80px] md:py-[88px]"
-    >
-      <div className="pointer-events-none absolute inset-0">
-        <div className="cta-radial absolute left-1/2 top-1/2 h-[440px] w-[440px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,90,45,0.2),transparent_66%)] blur-[70px]" />
+    <section className="glass-section proof-section" id="proof">
+      <div className="section-copy">
+        <span className="section-kicker">Proof</span>
+        <h2>Scattered links become one readable proof layer.</h2>
+        <p>
+          Trust comes from clarity. No fake metrics, no invented traction, no noisy admin metaphors.
+        </p>
       </div>
 
-      <div className="relative mx-auto w-full max-w-[920px] px-5 text-center md:px-8">
-        <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/32">
-          free during beta - no spam - developer-first - always
-        </span>
-        <h2 className="mt-6 font-display text-[3rem] italic leading-[0.94] tracking-[-0.05em] text-white/92 md:text-[4.8rem]">
-          Get hired. No noise.
-        </h2>
-        <p className="mx-auto mt-5 max-w-[44ch] text-[15px] leading-8 text-white/64">
-          {mode === "studio"
-            ? "Unlock hiring access, build your scout setup, and keep the invite active without messy thread ops."
-            : "Join the beta, finish the short profile flow, and keep the invite active with referrals and profile completion."}
-        </p>
+      <div className="proof-layout">
+        <article className="glass-card proof-before-card">
+          <strong>Before</strong>
+          <p>Portfolio link in bio. Rate in a DM. Old clip in another post. Availability maybe buried somewhere.</p>
+          <div className="proof-chip-row">
+            <span>portfolio link</span>
+            <span>rate in DM</span>
+            <span>old clip</span>
+            <span>availability maybe</span>
+          </div>
+        </article>
 
-        <div
-          ref={containerRef}
-          className="mx-auto mt-10 w-full max-w-[560px] rounded-[22px] border border-white/10 bg-[rgba(255,255,255,0.03)] p-4 shadow-[0_24px_70px_rgba(0,0,0,0.28)]"
-          aria-live="polite"
-        >
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <label className="flex-1 rounded-[16px] border border-white/12 bg-[var(--terminal-mid)] px-4 py-4 text-left">
-              <span className="sr-only">Email address</span>
-              <input
-                type="email"
-                value={finalEmail}
-                onChange={(event) => onEmailChange(event.target.value)}
-                placeholder={getInvitePrompt(mode)}
-                className="w-full bg-transparent font-mono text-[11px] uppercase tracking-[0.1em] text-white outline-none placeholder:text-white/24"
-              />
-            </label>
-            <button
-              type="button"
-              onClick={onSubmit}
-              className={`magnetic-button inline-flex min-h-[56px] items-center justify-center rounded-[16px] px-6 font-mono text-[11px] uppercase tracking-[0.16em] ${accentButtonClass} command-button cta-pulse sm:min-w-[240px]`}
-              data-magnetic="true"
-            >
-              {getCaptureLabel(mode, capturePhase)}
+        <article className="glass-card proof-after-card">
+          <strong>With weld.</strong>
+          <p>
+            Same information, but framed with role, linked work, pricing, availability, and recent proof in one place.
+          </p>
+          <div className="proof-cta-grid">
+            <button type="button" onClick={() => onDetailToggle("verified")}>
+              <span>Verified</span>
+              <ArrowUpRightIcon />
+            </button>
+            <button type="button" onClick={() => onDetailToggle("latest")}>
+              <span>{profile.latestProject.name}</span>
+              <ArrowUpRightIcon />
+            </button>
+            <button type="button" onClick={() => onDetailToggle("feedback")}>
+              <span>{profile.feedback.label}</span>
+              <ArrowUpRightIcon />
             </button>
           </div>
-          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.14em] text-white/42">
-            {" >"} command prompt opens the same invite flow used by the rest of the funnel
+          <div className={`proof-card-actions is-${swipeState}`} aria-label="Card actions">
+            <button type="button" className="hero-action-button reject" onClick={() => onSwipe("reject")}>
+              <CloseIcon />
+              <span>Reject</span>
+            </button>
+            <button type="button" className="hero-action-button like" onClick={() => onSwipe("like")}>
+              <HeartIcon />
+              <span>Like</span>
+            </button>
+            <button type="button" className="hero-action-button spark" onClick={() => onSwipe("spark")}>
+              <SparkIcon />
+              <span>{sparkLabel}</span>
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+  );
+}
+
+function StudioScoutSection({
+  copy
+}: {
+  copy: (typeof MODE_COPY)[Audience];
+}) {
+  return (
+    <section className="glass-section scout-section">
+      <div className="glass-card scout-copy-card">
+        <span className="section-kicker">For both sides</span>
+        <h2>{copy.scoutTitle}</h2>
+        <p>{copy.scoutBody}</p>
+      </div>
+
+      <div className="scout-rail">
+        <article className="glass-card scout-rail-card">
+          <strong>Proof before pitch</strong>
+          <p>Shipped work and scope sit beside rate and availability, not hidden behind generic claims.</p>
+        </article>
+        <article className="glass-card scout-rail-card">
+          <strong>One calm first viewport</strong>
+          <p>Big card, clear headline, obvious CTA. Hero explains product without turning into novelty UI.</p>
+        </article>
+        <article className="glass-card scout-rail-card">
+          <strong>Honest by default</strong>
+          <p>No waitlist counts, no logos, no made-up public praise. Only product shape and believable signals.</p>
+        </article>
+      </div>
+    </section>
+  );
+}
+
+function WaitlistSignupSection({
+  mode,
+  copy,
+  email,
+  phase,
+  status,
+  captureRef,
+  onEmailChange,
+  onSubmit
+}: {
+  mode: Audience;
+  copy: (typeof MODE_COPY)[Audience];
+  email: string;
+  phase: CapturePhase;
+  status: string;
+  captureRef: React.MutableRefObject<HTMLDivElement | null>;
+  onEmailChange: (value: string) => void;
+  onSubmit: () => void;
+}) {
+  const buttonLabel =
+    phase === "submitting"
+      ? "Joining..."
+      : phase === "success"
+        ? "Joined"
+        : copy.waitlistButton;
+  const headline =
+    mode === "studio" ? "find roblox talent who ship." : "earn from your talent.";
+  const benefits =
+    mode === "studio"
+      ? [
+          ["Trust & proof", "Verified talent and secure collaboration.", <ShieldIcon key="shield" />],
+          ["Built for Roblox", "Role-first profiles with real experience that matters.", <CodeIcon key="code" />],
+          ["Matches that work", "Smart matching connects you with the right people.", <UserIcon key="user" />]
+        ]
+      : [
+          ["Verified talent", "Stand out with Roblox experience and proof.", <UserIcon key="user" />],
+          ["Matched with right work", "Connect with projects that fit your skills and goals.", <CodeIcon key="code" />],
+          ["Get paid securely", "Transparent rates, milestones, and on-time payouts.", <FolderIcon key="folder" />]
+        ];
+
+  return (
+    <section className="glass-section waitlist-section" id="join">
+      <div className="waitlist-shell">
+        <div className="section-copy waitlist-copy">
+          <span className="section-kicker">Early access</span>
+          <h2>{headline}</h2>
+          <p>{mode === "studio" ? "Role-first cards, not generic profiles." : "Role-first profiles. Real opportunities. Work that ships."}</p>
+          <div className="waitlist-benefits">
+            {benefits.map(([title, body, icon]) => (
+              <span key={title as string}>
+                {icon}
+                <strong>
+                  {title}
+                  <em>{body}</em>
+                </strong>
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div
+          ref={captureRef}
+          className={`glass-card waitlist-form-card is-${phase}`}
+        >
+          <div className="waitlist-form-heading">
+            <h3>{copy.waitlistTitle}</h3>
+            <p>{copy.waitlistBody}</p>
+          </div>
+
+          <label className="waitlist-field">
+            <span>Email address</span>
+            <input
+              type="email"
+              value={email}
+              placeholder={copy.waitlistPlaceholder}
+              onChange={(event) => onEmailChange(event.target.value)}
+              aria-describedby={status ? `waitlist-status-${mode}` : undefined}
+            />
+          </label>
+
+          <button
+            type="button"
+            className="button-primary waitlist-submit"
+            onClick={onSubmit}
+            disabled={phase === "submitting"}
+          >
+            {buttonLabel}
+          </button>
+
+          <p className="waitlist-privacy">
+            Invite-first beta. No fake countdowns. No public waitlist numbers.
           </p>
-          {finalStatus ? (
-            <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-white/72">
-              {finalStatus}
+
+          {status ? (
+            <p id={`waitlist-status-${mode}`} className="waitlist-status" aria-live="polite">
+              {status}
             </p>
           ) : null}
         </div>
@@ -2914,79 +1751,328 @@ function FinalCTASection({
   );
 }
 
-function Footer() {
+function FriendlyFAQ({
+  openFaq,
+  onToggle
+}: {
+  openFaq: number | null;
+  onToggle: (index: number | null) => void;
+}) {
   return (
-    <footer className="border-t border-white/[0.05] bg-[var(--terminal-dark)] py-8">
-      <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-5 md:flex-row md:items-center md:justify-between md:px-8">
-        <div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/24">
-            © 2026 weld.
-          </div>
-          <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-white/34">
-            roblox talent, with more signal
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-4 font-mono text-[10px] uppercase tracking-[0.14em] text-white/34">
-          <a href={`${WAITLIST_URL}/privacy`} className="hover:text-white/72">
-            Privacy
-          </a>
-          <a href={`${WAITLIST_URL}/terms`} className="hover:text-white/72">
-            Terms
-          </a>
-          <a href={`${WAITLIST_URL}/contact`} className="hover:text-white/72">
-            Contact
-          </a>
-        </div>
+    <section className="glass-section faq-section" id="faq">
+      <div className="section-copy">
+        <span className="section-kicker">FAQ</span>
+        <h2>A few plain answers.</h2>
       </div>
+
+      <div className="faq-list">
+        {FAQS.map((faq, index) => {
+          const isOpen = openFaq === index;
+
+          return (
+            <article key={faq.question} className="glass-card faq-card">
+              <button
+                type="button"
+                className="faq-trigger"
+                aria-expanded={isOpen}
+                onClick={() => onToggle(isOpen ? null : index)}
+              >
+                <span>{faq.question}</span>
+                <ChevronDownIcon className={isOpen ? "is-open" : ""} />
+              </button>
+              {isOpen ? <p>{faq.answer}</p> : null}
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function FooterCTA() {
+  return (
+    <footer className="glass-footer">
+      <div>
+        <strong>weld.</strong>
+        <span>Roblox talent cards for clearer proof, cleaner scouting, and better first messages.</span>
+      </div>
+      <nav aria-label="Footer">
+        <a href={`${WAITLIST_URL}/privacy`}>Privacy</a>
+        <a href={`${WAITLIST_URL}/terms`}>Terms</a>
+        <a href={`${WAITLIST_URL}/contact`}>Contact</a>
+      </nav>
     </footer>
   );
 }
 
-function SectionHeading({
-  eyebrow,
-  title,
-  copy,
-  eyebrowClassName = "text-[var(--accent-soft)]"
+function ModeToggle({
+  mode,
+  disabled,
+  onChange
 }: {
-  eyebrow: string;
-  title: string;
-  copy: string;
-  eyebrowClassName?: string;
+  mode: Audience;
+  disabled?: boolean;
+  onChange: (mode: Audience) => void;
 }) {
   return (
-    <div className="mx-auto w-full max-w-[1200px] px-5 md:px-8">
-      <span
-        className={`font-mono text-[10px] uppercase tracking-[0.18em] ${eyebrowClassName}`}
-        data-reveal
+    <div className="mode-toggle" role="radiogroup" aria-label="Audience mode">
+      <span className={mode === "studio" ? "is-studio" : ""} aria-hidden="true" />
+      <button
+        type="button"
+        role="radio"
+        aria-checked={mode === "developer"}
+        disabled={disabled}
+        onClick={() => onChange("developer")}
       >
-        {`// ${eyebrow}`}
-      </span>
-      <h2
-        className="mt-5 max-w-[13ch] font-display text-[2.8rem] italic leading-[0.94] tracking-[-0.05em] text-white/92 md:text-[4.2rem]"
-        data-reveal
+        I'm a developer
+      </button>
+      <button
+        type="button"
+        role="radio"
+        aria-checked={mode === "studio"}
+        disabled={disabled}
+        onClick={() => onChange("studio")}
       >
-        {title}
-      </h2>
-      <p
-        className="mt-4 max-w-[66ch] text-[15px] leading-8 text-white/60"
-        data-reveal
-      >
-        {copy}
-      </p>
+        I'm a studio
+      </button>
     </div>
   );
 }
 
-function DiscordWatermark() {
+function ProofBadge({
+  detailKey,
+  label,
+  value,
+  active,
+  onToggle
+}: {
+  detailKey: DetailKey;
+  label: string;
+  value?: string;
+  active: boolean;
+  onToggle: (key: DetailKey | null) => void;
+}) {
   return (
-    <svg width="88" height="66" viewBox="0 0 88 66" fill="none" aria-hidden="true">
+    <button
+      type="button"
+      className={`proof-badge ${active ? "is-active" : ""}`}
+      aria-expanded={active}
+      onClick={() => onToggle(active ? null : detailKey)}
+    >
+      <strong>{label}</strong>
+      {value ? <span>{value}</span> : null}
+    </button>
+  );
+}
+
+function ProofDetailDialog({
+  title,
+  body,
+  onClose
+}: {
+  title: string;
+  body: string;
+  onClose: () => void;
+}) {
+  return (
+    <div className="proof-dialog-backdrop" onClick={onClose}>
+      <div
+        className="proof-dialog"
+        role="dialog"
+        aria-modal="false"
+        aria-labelledby="proof-dialog-title"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button type="button" className="proof-dialog-close" onClick={onClose} aria-label="Close proof detail">
+          <CloseIcon />
+        </button>
+        <strong id="proof-dialog-title">{title}</strong>
+        <p>{body}</p>
+      </div>
+    </div>
+  );
+}
+
+function socialIconKey(label: string) {
+  const normalized = label.toLowerCase();
+
+  if (normalized === "x") {
+    return "linkedin";
+  }
+
+  return normalized.replace(/[^a-z0-9]+/g, "-");
+}
+
+function SocialIcon({ label }: { label: string }) {
+  const key = socialIconKey(label);
+
+  if (key === "roblox") {
+    return <RobloxIcon />;
+  }
+
+  if (key === "discord") {
+    return <DiscordIcon />;
+  }
+
+  if (key === "github") {
+    return <GithubIcon />;
+  }
+
+  if (key === "linkedin") {
+    return <LinkedInIcon />;
+  }
+
+  return <ArrowUpRightIcon />;
+}
+
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M5 10.5 8.2 13.7 15 6.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function UserIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 12.4a4.1 4.1 0 1 0 0-8.2 4.1 4.1 0 0 0 0 8.2Z" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M4.8 20.2c.7-3.7 3.3-5.6 7.2-5.6s6.5 1.9 7.2 5.6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ShieldIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 3.6 19 6v5.3c0 4.4-2.6 7.5-7 9.1-4.4-1.6-7-4.7-7-9.1V6l7-2.4Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="m8.7 12.1 2.2 2.1 4.4-4.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function FolderIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M3.8 7.5h6l1.8 2h8.6v9.2H3.8V7.5Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M3.8 10.1h16.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CodeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="m9.4 7.4-4.1 4.4 4.1 4.4" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="m14.6 7.4 4.1 4.4-4.1 4.4" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="m13.1 5.7-2.2 12.6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ClockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="8.3" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M12 7.6V12l3.1 2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function RobloxIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M5.2 3.8 20.2 7l-3.1 15-15-3.1 3.1-15Zm5.3 6.5-.8 4 4 .8.8-4-4-.8Z" />
+    </svg>
+  );
+}
+
+function DiscordIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M18.7 6.4A15 15 0 0 0 15 5.2l-.4.9a12.9 12.9 0 0 0-5.2 0L9 5.2a15 15 0 0 0-3.7 1.2c-2.3 3.4-2.9 6.7-2.6 10a15 15 0 0 0 4.6 2.3l.9-1.5c-.5-.2-1-.4-1.5-.7l.4-.3c2.9 1.4 6.1 1.4 9 0l.4.3c-.5.3-1 .5-1.5.7l.9 1.5a15 15 0 0 0 4.6-2.3c.4-3.8-.7-7-2.8-10Zm-9.5 7.9c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.6.8 1.6 1.8-.7 1.8-1.6 1.8Zm5.6 0c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.6.8 1.6 1.8-.7 1.8-1.6 1.8Z" />
+    </svg>
+  );
+}
+
+function GithubIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 3.2a8.9 8.9 0 0 0-2.8 17.3c.4.1.6-.2.6-.4v-1.7c-2.5.6-3-1.1-3-1.1-.4-1-.9-1.3-.9-1.3-.8-.5.1-.5.1-.5.9.1 1.4.9 1.4.9.8 1.4 2.1 1 2.6.8.1-.6.3-1 .6-1.2-2-.2-4.1-1-4.1-4.4 0-1 .3-1.8.9-2.4-.1-.2-.4-1.2.1-2.4 0 0 .8-.2 2.5.9a8.7 8.7 0 0 1 4.5 0c1.7-1.1 2.5-.9 2.5-.9.5 1.2.2 2.2.1 2.4.6.6.9 1.4.9 2.4 0 3.4-2.1 4.2-4.1 4.4.3.3.6.9.6 1.8v2.7c0 .2.2.5.6.4A8.9 8.9 0 0 0 12 3.2Z" />
+    </svg>
+  );
+}
+
+function LinkedInIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M6.8 8.9h3.1v10H6.8v-10Zm1.6-4.8a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Zm3.5 4.8h3v1.4h.1c.4-.8 1.5-1.7 3-1.7 3.2 0 3.8 2.1 3.8 4.8v5.5h-3.1V14c0-1.2 0-2.7-1.7-2.7s-1.9 1.3-1.9 2.6v5h-3.1v-10Z" />
+    </svg>
+  );
+}
+
+function GamepadIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M7.7 9.1h8.6c2.5 0 4.1 1.8 4.4 4.6l.2 1.8c.3 2.4-1.9 3.9-3.7 2.4l-1.6-1.4H8.4l-1.6 1.4c-1.8 1.5-4-.1-3.7-2.4l.2-1.8c.3-2.8 1.9-4.6 4.4-4.6Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M7.7 12.7h3.2M9.3 11.1v3.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M15.7 12.6h.1M18 14.2h.1" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ArrowLeftIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M12.5 5 7.5 10l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 10h8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ArrowUpRightIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M6 14 14 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M7 6h7v7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M5.5 5.5 14.5 14.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M14.5 5.5 5.5 14.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function HeartIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
       <path
-        d="M18 14C25 10 33 8 44 8C55 8 63 10 70 14C73 20 75 26 76 32C72 37 68 41 64 44L60 40C55 42 50 43 44 43C38 43 33 42 28 40L24 44C20 41 16 37 12 32C13 26 15 20 18 14Z"
+        d="M10 15.2c-4.4-2.7-6.5-5-6.5-7.7 0-1.9 1.4-3.3 3.2-3.3 1.2 0 2.4.6 3.3 1.8.9-1.2 2.1-1.8 3.3-1.8 1.8 0 3.2 1.4 3.2 3.3 0 2.7-2.1 5-6.5 7.7Z"
         stroke="currentColor"
-        strokeWidth="3"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
       />
-      <circle cx="33" cy="30" r="4" fill="currentColor" />
-      <circle cx="55" cy="30" r="4" fill="currentColor" />
+    </svg>
+  );
+}
+
+function SparkIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="m10 2 1.9 5.4L17 9l-5.1 1.6L10 16l-1.9-5.4L3 9l5.1-1.6L10 2Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ChevronDownIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className={className}>
+      <path d="m5.5 7.5 4.5 4.8 4.5-4.8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
