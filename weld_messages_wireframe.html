@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weld — Messages</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:          #f2efe9;
+      --surface:     #faf9f6;
+      --border:      #c8c3bb;
+      --text:        #1c1a17;
+      --text-2:      #5a564f;
+      --text-3:      #9a958e;
+      --orange:      #d4540a;
+      --purple:      #6b4fc8;
+      --green:       #2f9e6b;
+      --tag:         #e6e2da;
+
+      --font-sans:                  'Space Mono', monospace;
+      --color-text-primary:         #1c1a17;
+      --color-text-secondary:       #5a564f;
+      --color-text-tertiary:        #9a958e;
+      --color-text-info:            #6b4fc8;
+      --color-background-primary:   #faf9f6;
+      --color-background-secondary: #f2efe9;
+      --color-background-tertiary:  #e6e2da;
+      --color-background-info:      rgba(107,79,200,0.10);
+      --color-border-primary:       #d4540a;
+      --color-border-secondary:     #c8c3bb;
+      --color-border-tertiary:      #c8c3bb;
+      --border-radius-md:           6px;
+      --border-radius-lg:           10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+    }
+
+    .wf { color: var(--color-text-primary); font-size: 13px; line-height: 1.5; }
+
+    /* Nav — verbatim from homepage wireframe */
+    .wf-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; border-bottom: 0.5px solid var(--color-border-secondary); position: sticky; top: 0; z-index: 100; background: var(--bg); }
+    .wf-logo { font-size: 20px; font-weight: 700; font-family: 'Caveat', cursive; }
+    .wf-nav-links { display: flex; gap: 4px; }
+    .wf-nav-link { padding: 5px 10px; font-size: 12px; border-radius: var(--border-radius-md); color: var(--color-text-secondary); border: 0.5px solid transparent; cursor: default; }
+    .wf-nav-link.active { color: var(--color-text-primary); border-color: var(--color-border-secondary); background: var(--color-background-secondary); }
+
+    .wf-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+
+    .wf-page-head { display: flex; align-items: center; justify-content: space-between; padding: 0 2px; }
+    .wf-crumb { font-size: 11px; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
+    .wf-page-title { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; display: flex; align-items: baseline; gap: 8px; }
+    .wf-page-title-count { font-size: 11px; color: var(--color-text-info); background: var(--color-background-info); border-radius: 10px; padding: 2px 8px; font-weight: 700; letter-spacing: 0; }
+
+    /* Shared button + annotation */
+    .wf-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 13px; font-weight: 700; cursor: default; background: var(--color-background-primary); white-space: nowrap; font-family: 'Space Mono', monospace; }
+    .wf-btn-fill { background: var(--orange); color: #ffffff; border-color: transparent; }
+    .wf-btn-xs { font-size: 11px; padding: 4px 10px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); cursor: default; font-family: 'Space Mono', monospace; background: var(--color-background-primary); }
+    .wf-annotation { font-family: 'Caveat', cursive; font-size: 13px; color: var(--orange); padding: 0 2px; }
+    .wf-divider { height: 0.5px; background: var(--color-border-tertiary); }
+
+    /* Two-pane grid */
+    .wf-msg-grid { display: grid; grid-template-columns: 360px 1fr; gap: 16px; align-items: start; }
+
+    /* ----- LEFT: conversation list ----- */
+    .wf-msg-list { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; background: var(--surface); }
+    .wf-msg-list-head { padding: 10px 14px; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; justify-content: space-between; background: var(--color-background-secondary); }
+    .wf-msg-list-head-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-secondary); }
+    .wf-msg-list-head-count { font-size: 11px; color: var(--color-text-tertiary); background: var(--color-background-tertiary); border-radius: 10px; padding: 1px 7px; }
+
+    .wf-msg-search { padding: 10px 14px; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; gap: 8px; }
+    .wf-msg-search-input { flex: 1; height: 28px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 0 10px; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--color-text-tertiary); background: var(--color-background-primary); display: flex; align-items: center; gap: 6px; }
+    .wf-msg-search-glyph { font-size: 11px; color: var(--color-text-tertiary); }
+
+    .wf-msg-filter { display: flex; gap: 6px; padding: 10px 14px; border-bottom: 0.5px solid var(--color-border-tertiary); background: var(--surface); }
+    .wf-msg-chip { font-size: 11px; padding: 3px 9px; border: 0.5px solid var(--color-border-secondary); border-radius: 10px; color: var(--color-text-secondary); background: var(--color-background-primary); cursor: default; font-family: 'Space Mono', monospace; }
+    .wf-msg-chip.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-secondary); }
+    .wf-msg-chip-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--purple); margin-right: 4px; vertical-align: 1px; }
+
+    .wf-msg-row { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 0.5px solid var(--color-border-tertiary); position: relative; cursor: default; transition: background 0.15s ease; }
+    .wf-msg-row:hover { background: var(--color-background-secondary); }
+    .wf-msg-row.is-selected { background: var(--color-background-secondary); box-shadow: inset 2px 0 0 var(--orange); }
+    .wf-msg-row:last-of-type { border-bottom: none; }
+    .wf-msg-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--color-text-secondary); font-family: 'Space Mono', monospace; position: relative; }
+    .wf-msg-avatar-presence { position: absolute; right: -1px; bottom: -1px; width: 9px; height: 9px; border-radius: 50%; background: var(--green); border: 1.5px solid var(--surface); }
+    .wf-msg-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .wf-msg-name-row { display: flex; align-items: center; gap: 5px; }
+    .wf-msg-name { font-size: 13px; font-weight: 700; }
+    .wf-msg-tick { width: 11px; height: 11px; border-radius: 50%; background: var(--purple); color: #fff; font-size: 8px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; line-height: 1; font-family: 'Space Mono', monospace; }
+    .wf-msg-preview { font-size: 12px; color: var(--color-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
+    .wf-msg-preview.is-unread { color: var(--color-text-primary); font-weight: 700; }
+    .wf-msg-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+    .wf-msg-time { font-size: 11px; color: var(--color-text-tertiary); }
+    .wf-msg-unread-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--purple); }
+
+    .wf-msg-list-foot { padding: 12px 14px; border-top: 0.5px dashed var(--color-border-secondary); display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--color-background-secondary); }
+    .wf-msg-list-foot-text { font-size: 11px; color: var(--color-text-secondary); line-height: 1.45; }
+
+    /* ----- RIGHT: dev profile preview pane ----- */
+    .wf-msg-preview-panel { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; background: var(--surface); display: flex; flex-direction: column; }
+
+    .wf-msg-preview-head { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 0.5px solid var(--color-border-tertiary); background: var(--color-background-secondary); }
+    .wf-msg-preview-head-mid { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+    .wf-msg-preview-head-mid .wf-msg-avatar { width: 28px; height: 28px; font-size: 10px; }
+    .wf-msg-preview-name { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+    .wf-msg-presence { font-size: 11px; color: var(--green); display: inline-flex; align-items: center; gap: 4px; }
+    .wf-msg-presence::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; }
+    .wf-msg-preview-head-actions { display: flex; gap: 6px; }
+
+    .wf-msg-profile { padding: 18px 18px 14px; display: flex; align-items: flex-start; gap: 14px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+    .wf-msg-profile-avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--color-background-tertiary); border: 0.5px solid var(--color-border-secondary); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: var(--color-text-secondary); position: relative; flex-shrink: 0; font-family: 'Space Mono', monospace; }
+    .wf-msg-profile-avatar .wf-msg-avatar-presence { width: 12px; height: 12px; border-width: 2px; }
+    .wf-msg-profile-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+    .wf-msg-profile-name { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; display: flex; align-items: center; gap: 6px; }
+    .wf-msg-profile-name .wf-msg-tick { width: 14px; height: 14px; font-size: 9px; }
+    .wf-msg-profile-role { font-size: 13px; color: var(--color-text-info); font-weight: 700; }
+    .wf-msg-profile-status { font-size: 11px; color: var(--green); display: inline-flex; align-items: center; gap: 5px; margin-top: 2px; }
+    .wf-msg-profile-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+    .wf-msg-match { padding: 14px 18px; display: flex; align-items: center; gap: 12px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+    .wf-msg-match-label { font-size: 12px; font-weight: 700; color: var(--color-text-info); white-space: nowrap; }
+    .wf-progress-bar { flex: 1; height: 4px; background: var(--color-background-tertiary); border-radius: 2px; overflow: hidden; }
+    .wf-progress-fill { height: 100%; width: 98%; background: var(--purple); border-radius: 2px; }
+
+    .wf-msg-stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 14px 18px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+    .wf-stat { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 1px 3px rgba(28,26,23,0.06); border: 0.5px solid var(--color-border-secondary); }
+    .wf-stat-label { font-size: 11px; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.04em; }
+    .wf-stat-val { font-size: 20px; font-weight: 700; font-family: 'Space Mono', monospace; letter-spacing: -0.02em; }
+    .wf-stat-sub { font-size: 11px; color: var(--color-text-secondary); }
+
+    .wf-msg-bio { padding: 14px 18px; font-size: 13px; color: var(--color-text-primary); line-height: 1.7; border-bottom: 0.5px solid var(--color-border-tertiary); }
+
+    .wf-msg-refs { padding: 14px 18px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+    .wf-msg-refs-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .wf-msg-refs-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-secondary); }
+    .wf-msg-refs-count { font-size: 11px; color: var(--color-text-tertiary); background: var(--color-background-tertiary); border-radius: 10px; padding: 1px 7px; }
+    .wf-msg-ref-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .wf-msg-ref-tile { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 12px; display: flex; align-items: center; gap: 10px; background: var(--color-background-primary); transition: box-shadow 0.15s ease, transform 0.15s ease; }
+    .wf-msg-ref-tile:hover { box-shadow: 2px 3px 0 rgba(28,26,23,0.10); transform: translateY(-1px); }
+    .wf-msg-ref-glyph { width: 28px; height: 28px; border-radius: var(--border-radius-md); background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--color-text-secondary); flex-shrink: 0; }
+    .wf-msg-ref-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .wf-msg-ref-label { font-size: 11px; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.04em; }
+    .wf-msg-ref-handle { font-size: 12px; font-weight: 700; color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .wf-msg-tip { margin: 14px 18px; padding: 12px 14px; border: 0.5px solid rgba(107,79,200,0.30); border-radius: var(--border-radius-md); background: var(--color-background-info); display: flex; align-items: flex-start; gap: 10px; }
+    .wf-msg-tip-icon { width: 24px; height: 24px; border-radius: 50%; background: var(--purple); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; font-family: 'Space Mono', monospace; }
+    .wf-msg-tip-text { display: flex; flex-direction: column; gap: 2px; }
+    .wf-msg-tip-title { font-size: 12px; font-weight: 700; color: var(--color-text-info); }
+    .wf-msg-tip-body { font-size: 12px; color: var(--color-text-secondary); line-height: 1.55; }
+
+    .wf-msg-cta-row { padding: 14px 18px 18px; display: flex; gap: 10px; border-top: 0.5px solid var(--color-border-tertiary); background: var(--color-background-secondary); }
+    .wf-msg-cta-row .wf-btn { flex: 1; justify-content: center; }
+  </style>
+</head>
+<body>
+
+<div class="wf">
+  <h2 style="position:absolute;width:1px;height:1px;overflow:hidden">Weld messages wireframe — conversation list with selected developer profile preview</h2>
+
+  <div class="wf-nav">
+    <span class="wf-logo">weld.</span>
+    <div class="wf-nav-links">
+      <span class="wf-nav-link">Home</span>
+      <span class="wf-nav-link active">Messages</span>
+      <span class="wf-nav-link">Swipe</span>
+      <span class="wf-nav-link">Profile</span>
+      <span class="wf-nav-link">Account</span>
+    </div>
+  </div>
+
+  <div class="wf-body">
+
+    <div class="wf-page-head">
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <span class="wf-crumb">Messages</span>
+        <span class="wf-page-title">Conversations <span class="wf-page-title-count">3</span></span>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="wf-btn-xs">Mark all read</button>
+        <button class="wf-btn-xs">Filters</button>
+      </div>
+    </div>
+
+    <div class="wf-annotation">↑ count + quick actions in head — list rules below, decision panel right</div>
+
+    <div class="wf-divider"></div>
+
+    <div class="wf-msg-grid">
+
+      <!-- LEFT: conversation list -->
+      <div class="wf-msg-list">
+        <div class="wf-msg-list-head">
+          <span class="wf-msg-list-head-title">All conversations</span>
+          <span class="wf-msg-list-head-count">3</span>
+        </div>
+
+        <div class="wf-msg-search">
+          <div class="wf-msg-search-input">
+            <span class="wf-msg-search-glyph">⌕</span>
+            <span>Search conversations</span>
+          </div>
+        </div>
+
+        <div class="wf-msg-filter">
+          <span class="wf-msg-chip active">All</span>
+          <span class="wf-msg-chip"><span class="wf-msg-chip-dot"></span>Unread · 1</span>
+          <span class="wf-msg-chip">Sparks</span>
+        </div>
+
+        <div class="wf-msg-row is-selected">
+          <div class="wf-msg-avatar">EC<span class="wf-msg-avatar-presence"></span></div>
+          <div class="wf-msg-content">
+            <div class="wf-msg-name-row">
+              <span class="wf-msg-name">eclipse</span>
+              <span class="wf-msg-tick">✓</span>
+            </div>
+            <span class="wf-msg-preview">Happy to help. I can share more about the scope…</span>
+          </div>
+          <div class="wf-msg-meta">
+            <span class="wf-msg-time">2:38 PM</span>
+          </div>
+        </div>
+
+        <div class="wf-msg-row">
+          <div class="wf-msg-avatar">DS</div>
+          <div class="wf-msg-content">
+            <div class="wf-msg-name-row">
+              <span class="wf-msg-name">dsaf</span>
+            </div>
+            <span class="wf-msg-preview is-unread">New project brief — combat system + UI integration…</span>
+          </div>
+          <div class="wf-msg-meta">
+            <span class="wf-msg-time">Apr 30</span>
+            <span class="wf-msg-unread-dot"></span>
+          </div>
+        </div>
+
+        <div class="wf-msg-row">
+          <div class="wf-msg-avatar">MD</div>
+          <div class="wf-msg-content">
+            <div class="wf-msg-name-row">
+              <span class="wf-msg-name">mira_dev</span>
+              <span class="wf-msg-tick">✓</span>
+            </div>
+            <span class="wf-msg-preview">Sounds good — I'll send the milestone breakdown by Friday.</span>
+          </div>
+          <div class="wf-msg-meta">
+            <span class="wf-msg-time">Apr 28</span>
+          </div>
+        </div>
+
+        <div class="wf-msg-list-foot">
+          <span class="wf-msg-list-foot-text">Match with more devs to start new conversations.</span>
+          <button class="wf-btn-xs">Go to swipe →</button>
+        </div>
+      </div>
+
+      <!-- RIGHT: developer profile preview -->
+      <div class="wf-msg-preview-panel">
+
+        <div class="wf-msg-preview-head">
+          <button class="wf-btn-xs">← Back</button>
+          <div class="wf-msg-preview-head-mid">
+            <div class="wf-msg-avatar">EC<span class="wf-msg-avatar-presence"></span></div>
+            <div style="display: flex; flex-direction: column; gap: 1px; min-width: 0;">
+              <span class="wf-msg-preview-name">eclipse <span class="wf-msg-tick">✓</span></span>
+              <span class="wf-msg-presence">Online</span>
+            </div>
+          </div>
+          <div class="wf-msg-preview-head-actions">
+            <button class="wf-btn-xs">View full profile ↗</button>
+            <button class="wf-btn-xs">⋯</button>
+          </div>
+        </div>
+
+        <div class="wf-msg-profile">
+          <div class="wf-msg-profile-avatar">EC<span class="wf-msg-avatar-presence"></span></div>
+          <div class="wf-msg-profile-info">
+            <span class="wf-msg-profile-name">eclipse <span class="wf-msg-tick">✓</span></span>
+            <span class="wf-msg-profile-role">Roblox scripter</span>
+            <span class="wf-msg-profile-status">Available for work</span>
+          </div>
+        </div>
+
+        <div class="wf-msg-match">
+          <span class="wf-msg-match-label">98% Match</span>
+          <div class="wf-progress-bar"><div class="wf-progress-fill"></div></div>
+        </div>
+
+        <div class="wf-msg-stat-row">
+          <div class="wf-stat">
+            <span class="wf-stat-label">Experience</span>
+            <span class="wf-stat-val">3+ yrs</span>
+            <span class="wf-stat-sub">on Roblox</span>
+          </div>
+          <div class="wf-stat">
+            <span class="wf-stat-label">Match</span>
+            <span class="wf-stat-val">98%</span>
+            <span class="wf-stat-sub">to your brief</span>
+          </div>
+          <div class="wf-stat">
+            <span class="wf-stat-label">Replies</span>
+            <span class="wf-stat-val">~1hr</span>
+            <span class="wf-stat-sub">avg response</span>
+          </div>
+        </div>
+
+        <div class="wf-msg-bio">
+          Builds clean Roblox systems, ships fast, and shows real proof of work.
+        </div>
+
+        <div class="wf-msg-refs">
+          <div class="wf-msg-refs-head">
+            <span class="wf-msg-refs-title">References attached</span>
+            <span class="wf-msg-refs-count">3 verified</span>
+          </div>
+          <div class="wf-msg-ref-grid">
+            <div class="wf-msg-ref-tile">
+              <div class="wf-msg-ref-glyph">RB</div>
+              <div class="wf-msg-ref-text">
+                <span class="wf-msg-ref-label">Roblox</span>
+                <span class="wf-msg-ref-handle">/eclipseDev</span>
+              </div>
+            </div>
+            <div class="wf-msg-ref-tile">
+              <div class="wf-msg-ref-glyph">DC</div>
+              <div class="wf-msg-ref-text">
+                <span class="wf-msg-ref-label">Discord</span>
+                <span class="wf-msg-ref-handle">eclipse.dev</span>
+              </div>
+            </div>
+            <div class="wf-msg-ref-tile">
+              <div class="wf-msg-ref-glyph">GH</div>
+              <div class="wf-msg-ref-text">
+                <span class="wf-msg-ref-label">GitHub</span>
+                <span class="wf-msg-ref-handle">eclipsedevx</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wf-annotation" style="padding: 4px 18px 0;">↑ refs surfaced before chat opens — trust check up front, not buried two screens deep</div>
+
+        <div class="wf-msg-tip">
+          <div class="wf-msg-tip-icon">!</div>
+          <div class="wf-msg-tip-text">
+            <span class="wf-msg-tip-title">Keep it professional</span>
+            <span class="wf-msg-tip-body">Be respectful and clear about your project needs — scope, timeline, and budget up front.</span>
+          </div>
+        </div>
+
+        <div class="wf-msg-cta-row">
+          <button class="wf-btn">View full profile</button>
+          <button class="wf-btn wf-btn-fill">Open chat →</button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="wf-annotation">↑ list left, dev card right — mirrors chat.png rail so the user already knows the dev before they type</div>
+
+    <div class="wf-divider"></div>
+
+    <div class="wf-annotation" style="padding: 0 2px;">↑ unread dot = purple, primary CTA = orange — never mix the two roles</div>
+
+  </div>
+</div>
+
+</body>
+</html>
