@@ -11,6 +11,7 @@ import AvailabilityStep from './steps/AvailabilityStep'
 import RoleStep from './steps/RoleStep'
 import PortfolioStep from './steps/PortfolioStep'
 import WorkStep from './steps/WorkStep'
+import SkillsStep from './steps/SkillsStep'
 import EditableCard from './EditableCard'
 import SkillsEditPanel from './editor-panels/SkillsEditPanel'
 import WorkEditPanel from './editor-panels/WorkEditPanel'
@@ -58,7 +59,7 @@ async function saveAccountProfile(
   if (!response.ok) throw new Error('Could not save account profile.')
 }
 
-type Phase = 'identity' | 'availability' | 'rate' | 'work' | 'portfolio' | 'editor' | 'published'
+type Phase = 'identity' | 'availability' | 'rate' | 'work' | 'portfolio' | 'skills' | 'editor' | 'published'
 type SaveState = 'local' | 'loading' | 'saving' | 'saved' | 'error'
 
 function saveStateLabel(s: SaveState) {
@@ -307,10 +308,10 @@ export default function ProfileBuilder({
   ) : null
 
   // Header shown in all phases
-  const isQuickStep = phase === 'identity' || phase === 'availability' || phase === 'rate' || phase === 'work' || phase === 'portfolio'
-  const quickStepNum = phase === 'identity' ? 1 : phase === 'availability' ? 2 : phase === 'rate' ? 3 : phase === 'work' ? 4 : 5
-  const quickStepLabel = phase === 'identity' ? 'Roblox' : phase === 'availability' ? 'Availability' : phase === 'rate' ? 'Rate' : phase === 'work' ? 'Work' : 'Portfolio'
-  const quickStepCount = 5
+  const isQuickStep = phase === 'identity' || phase === 'availability' || phase === 'rate' || phase === 'work' || phase === 'portfolio' || phase === 'skills'
+  const quickStepNum = phase === 'identity' ? 1 : phase === 'availability' ? 2 : phase === 'rate' ? 3 : phase === 'work' ? 4 : phase === 'portfolio' ? 5 : 6
+  const quickStepLabel = phase === 'identity' ? 'Roblox' : phase === 'availability' ? 'Availability' : phase === 'rate' ? 'Rate' : phase === 'work' ? 'Work' : phase === 'portfolio' ? 'Portfolio' : 'Skills'
+  const quickStepCount = 6
 
   const header = (
     <div className="pb-form-top">
@@ -367,7 +368,7 @@ export default function ProfileBuilder({
                 setLeftPanel(null)
                 setRightPanel(null)
                 if (onCancel) onCancel()
-                else setPhase('portfolio')
+                else setPhase('skills')
               }}
               onBackLabel={onCancel ? '← Cancel' : '← Back'}
               onPublish={handlePublish}
@@ -465,6 +466,14 @@ export default function ProfileBuilder({
             draft={draft}
             update={update}
             onBack={() => setPhase('work')}
+            onNext={() => setPhase('skills')}
+          />
+        )}
+        {phase === 'skills' && (
+          <SkillsStep
+            draft={draft}
+            update={update}
+            onBack={() => setPhase('portfolio')}
             onNext={() => { setLeftPanel(null); setRightPanel(null); setPhase('editor') }}
           />
         )}

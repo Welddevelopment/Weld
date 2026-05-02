@@ -62,10 +62,10 @@ export default function IdentityStep({ draft, update, onNext, onBack }: Props) {
       </aside>
 
       <section className="ob-main">
-        <div className="ob-progress"><span style={{ width: '20%' }} /></div>
+        <div className="ob-progress"><span style={{ width: `${100 / 6}%` }} /></div>
         <div className="ob-step-row">
-          <span>Step 1 of 5 - Link Roblox</span>
-          <span>1/5</span>
+          <span>Step 1 of 6 - Link Roblox</span>
+          <span>1/6</span>
         </div>
 
         <div className="ob-social-item ob-social-item--linked">

@@ -32,10 +32,10 @@ export default function AvailabilityStep({ draft, update, onNext, onBack }: Prop
       </aside>
 
       <section className="ob-main">
-        <div className="ob-progress"><span style={{ width: '40%' }} /></div>
+        <div className="ob-progress"><span style={{ width: `${(2 / 6) * 100}%` }} /></div>
         <div className="ob-step-row">
-          <span>Step 2 of 5 - Availability</span>
-          <span>2/5</span>
+          <span>Step 2 of 6 - Availability</span>
+          <span>2/6</span>
         </div>
 
         <div className="pb-field">

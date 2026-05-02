@@ -54,10 +54,10 @@ export default function WorkStep({ draft, update, onNext, onBack }: Props) {
       </aside>
 
       <section className="ob-main">
-        <div className="ob-progress"><span style={{ width: '80%' }} /></div>
+        <div className="ob-progress"><span style={{ width: `${(4 / 6) * 100}%` }} /></div>
         <div className="ob-step-row">
-          <span>Step 4 of 5 - Work</span>
-          <span>4/5</span>
+          <span>Step 4 of 6 - Work</span>
+          <span>4/6</span>
         </div>
 
         <div className="ob-work-list">
