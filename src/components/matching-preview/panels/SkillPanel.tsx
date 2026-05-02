@@ -49,22 +49,6 @@ export default function SkillPanel({ profile, skillName, onBack }: Props) {
           <div className="npc-skill-hd-copy">
             <div className="npc-skill-hd-name">{skillName}</div>
             <div className="npc-skill-hd-cat">Development Skill</div>
-            {(skill?.experienceMonths || skill?.pastWorks) && (
-              <div style={{ display: 'flex', gap: 12, marginTop: 4, flexWrap: 'wrap' }}>
-                {!!skill?.experienceMonths && (
-                  <div style={{ fontSize: 11, color: '#666' }}>
-                    <span style={{ fontWeight: 700, color: '#111' }}>{formatMonths(skill.experienceMonths)}</span>
-                    {' '}experience
-                  </div>
-                )}
-                {!!skill?.pastWorks && (
-                  <div style={{ fontSize: 11, color: '#666' }}>
-                    <span style={{ fontWeight: 700, color: '#111' }}>{skill.pastWorks}</span>
-                    {' '}past works
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         </div>
 
@@ -103,6 +87,24 @@ export default function SkillPanel({ profile, skillName, onBack }: Props) {
               ))}
             </div>
           </>
+        )}
+
+        {/* Stats at the bottom */}
+        {(skill?.experienceMonths || skill?.pastWorks) && (
+          <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+            {!!skill?.experienceMonths && (
+              <div style={{ flex: 1, background: '#f7f7ff', border: '1.5px solid #e8e8f5', borderRadius: 10, padding: '8px 12px' }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: '#111' }}>{formatMonths(skill.experienceMonths)}</div>
+                <div style={{ fontSize: 10, color: '#999', fontFamily: 'var(--font-geist-mono)', marginTop: 2 }}>Experience</div>
+              </div>
+            )}
+            {!!skill?.pastWorks && (
+              <div style={{ flex: 1, background: '#f7f7ff', border: '1.5px solid #e8e8f5', borderRadius: 10, padding: '8px 12px' }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: '#111' }}>{skill.pastWorks}</div>
+                <div style={{ fontSize: 10, color: '#999', fontFamily: 'var(--font-geist-mono)', marginTop: 2 }}>Past works</div>
+              </div>
+            )}
+          </div>
         )}
 
         {!skill?.description && categories.length === 0 && (
