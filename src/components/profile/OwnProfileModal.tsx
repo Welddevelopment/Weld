@@ -25,14 +25,11 @@ export default function OwnProfileModal({ profile, onClose }: Props) {
   function handleOpenPanel(panel: PanelKind) {
     if (panel === 'games') {
       setLeftPanel(p => p === 'games' ? null : 'games')
-      setRightPanel(null)
     } else if (panel === 'work') {
       setRightPanel(p => p === 'work' ? null : 'work')
-      setLeftPanel(null)
     } else if (typeof panel === 'object' && 'skill' in panel) {
       const current = rightPanel !== null && typeof rightPanel === 'object' && 'skill' in rightPanel && rightPanel.skill === panel.skill
       setRightPanel(current ? null : panel)
-      setLeftPanel(null)
     }
   }
 
