@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Weld — Onboarding Flow Wireframe (Desktop)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f2efe9;
+    --surface: #faf9f6;
+    --border: #c8c3bb;
+    --border-dark: #8a8580;
+    --text: #1c1a17;
+    --text-2: #5a564f;
+    --text-3: #9a958e;
+    --accent: #1c1a17;
+    --orange: #d4540a;
+    --purple: #6b4fc8;
+    --green: #2d6a4f;
+    --red: #b52b1e;
+    --tag: #e6e2da;
+    --tag-active-text: #faf9f6;
+    font-family: 'Space Mono', monospace;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: var(--bg);
+    border-bottom: 1.5px solid var(--border);
+    padding: 10px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .header-logo { font-family: 'Caveat', cursive; font-size: 21px; font-weight: 700; }
+  .header-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); }
+  .header-sep { flex: 1; }
+  .header-note { font-family: 'Caveat', cursive; font-size: 15px; color: var(--text-3); }
+
+  /* ─── PAGE FLOW ─── */
+  .flow { padding: 36px 48px 80px; display: flex; flex-direction: column; gap: 0; }
+
+  /* ─── SECTION HEADER ─── */
+  .section-hd {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    margin-top: 52px;
+  }
+  .section-hd:first-child { margin-top: 0; }
+  .section-badge {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--text);
+    color: var(--surface);
+    font-size: 11px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-label {
+    font-family: 'Caveat', cursive;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-2);
+  }
+  .section-hd::after {
+    content: '';
+    flex: 1;
+    border-top: 1.5px dashed var(--border);
+  }
+
+  /* ─── SCREEN ROW ─── */
+  .screen-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 44px;
+  }
+
+  /* ─── SCREEN WRAPPER ─── */
+  .screen-wrap {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  /* ─── DESKTOP SCREEN ─── */
+  .screen {
+    width: 780px;
+    height: 460px;
+    background: var(--surface);
+    border: 2px solid var(--border-dark);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 5px 0 rgba(0,0,0,0.10);
+    flex-shrink: 0;
+  }
+
+  /* browser chrome */
+  .screen-chrome {
+    background: var(--tag);
+    border-bottom: 1.5px solid var(--border);
+    padding: 7px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .chrome-dots { display: flex; gap: 5px; }
+  .chrome-dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--border-dark);
+  }
+  .chrome-url {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-size: 10px;
+    color: var(--text-3);
+    max-width: 380px;
+  }
+
+  /* split layout */
+  .screen-split {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* LEFT PANEL */
+  .panel-left {
+    width: 320px;
+    flex-shrink: 0;
+    background: var(--bg);
+    border-right: 1.5px solid var(--border);
+    padding: 28px 28px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .panel-left--dark {
+    background: var(--text);
+    border-right-color: rgba(255,255,255,0.1);
+  }
+
+  /* RIGHT PANEL */
+  .panel-right {
+    flex: 1;
+    padding: 28px 32px;
+    overflow-y: auto;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── SHARED WF ELEMENTS ─── */
+  .wf-brand {
+    display: flex; align-items: center; gap: 7px;
+    margin-bottom: 20px;
+  }
+  .wf-brand-asterisk {
+    width: 18px; height: 18px;
+    background: var(--orange);
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: white; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .wf-brand-name {
+    font-family: 'Caveat', cursive;
+    font-size: 21px; font-weight: 700; color: var(--text);
+  }
+  .wf-brand-name--light { color: white; }
+
+  .wf-headline {
+    font-family: 'Caveat', cursive;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .wf-headline--light { color: white; }
+  .wf-headline em { color: var(--purple); font-style: normal; }
+
+  .wf-sub-text {
+    font-size: 11px;
+    color: var(--text-2);
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+  .wf-sub-text--light { color: rgba(255,255,255,0.6); }
+
+  .wf-feature-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .wf-feature {
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .wf-feature-icon {
+    width: 22px; height: 22px;
+    border-radius: 5px;
+    background: var(--tag);
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .wf-feature-icon--light { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.2); }
+  .wf-feature-content {}
+  .wf-feature-title { font-size: 11px; font-weight: 700; color: var(--text); margin-bottom: 1px; }
+  .wf-feature-title--light { color: white; }
+  .wf-feature-desc { font-size: 9px; color: var(--text-3); line-height: 1.4; }
+  .wf-feature-desc--light { color: rgba(255,255,255,0.5); }
+
+  .wf-social-proof {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: auto;
+  }
+  .wf-avatars { display: flex; }
+  .wf-avatar-bubble {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 2px solid var(--bg);
+    margin-left: -5px;
+  }
+  .wf-avatar-bubble:first-child { margin-left: 0; }
+  .wf-social-proof-text { font-size: 9px; color: var(--text-3); line-height: 1.4; }
+
+  /* RIGHT side elements */
+  .rp-eyebrow { font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); margin-bottom: 4px; }
+  .rp-title { font-family: 'Caveat', cursive; font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 4px; line-height: 1.2; }
+  .rp-sub { font-size: 11px; color: var(--text-3); margin-bottom: 18px; line-height: 1.4; }
+
+  .wf-progress {
+    height: 3px; background: var(--border); border-radius: 2px;
+    margin-bottom: 18px; overflow: hidden;
+    position: relative;
+  }
+  .wf-progress-fill {
+    height: 100%; background: var(--purple); border-radius: 2px;
+    transition: width 0.3s;
+  }
+  .wf-progress-label {
+    font-size: 9px; color: var(--text-3);
+    margin-bottom: 14px; margin-top: -12px;
+    text-align: right;
+  }
+
+  /* auth buttons */
+  .auth-btn {
+    display: flex; align-items: center; justify-content: space-between;
+    border: 1.5px solid var(--border-dark);
+    border-radius: 8px;
+    padding: 11px 14px;
+    margin-bottom: 8px;
+    font-size: 11px; font-weight: 700; color: var(--text);
+    background: var(--surface);
+    gap: 10px;
+  }
+  .auth-btn-left { display: flex; align-items: center; gap: 10px; }
+  .auth-icon {
+    width: 22px; height: 22px; border-radius: 5px;
+    background: var(--tag);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 900;
+    flex-shrink: 0;
+  }
+  .auth-arrow { color: var(--purple); font-size: 14px; }
+
+  .wf-divider {
+    display: flex; align-items: center; gap: 8px;
+    margin: 10px 0; font-size: 10px; color: var(--text-3);
+  }
+  .wf-divider::before, .wf-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  .wf-input {
+    display: flex; align-items: center; gap: 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 7px; padding: 10px 12px;
+    margin-bottom: 8px; font-size: 11px; color: var(--text-3);
+    background: var(--bg);
+  }
+  .wf-input--filled { color: var(--text); background: var(--surface); border-color: var(--border-dark); }
+  .wf-input svg { flex-shrink: 0; opacity: 0.45; }
+
+  .wf-cta {
+    background: var(--purple); color: white;
+    border-radius: 8px; padding: 12px 16px;
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 6px; margin-bottom: 8px;
+  }
+  .wf-cta--green { background: var(--green); }
+  .wf-cta--outline { background: transparent; color: var(--purple); border: 1.5px solid var(--purple); }
+  .wf-cta--ghost { background: transparent; color: var(--text-2); border: 1.5px solid var(--border-dark); }
+
+  .wf-trust-row {
+    display: flex; gap: 14px; justify-content: center;
+    margin-top: 4px; margin-bottom: 6px;
+  }
+  .wf-trust-item {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 9px; color: var(--text-3);
+  }
+  .wf-trust-check {
+    width: 13px; height: 13px; border-radius: 50%;
+    border: 1px solid var(--text-3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 7px;
+  }
+
+  .wf-link { font-size: 10px; color: var(--text-3); text-align: center; margin-top: 4px; }
+  .wf-link strong { color: var(--purple); cursor: pointer; }
+
+  /* type cards */
+  .type-cards { display: flex; gap: 16px; margin-bottom: 18px; }
+  .type-card {
+    flex: 1; border: 2px solid var(--border);
+    border-radius: 10px; padding: 16px 14px;
+    background: var(--bg); cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .type-card--active { border-color: var(--purple); background: rgba(107,79,200,0.06); }
+  .type-card-icon { font-size: 24px; margin-bottom: 6px; }
+  .type-card-title { font-family: 'Caveat', cursive; font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .type-card-desc { font-size: 10px; color: var(--text-3); line-height: 1.4; }
+
+  /* field */
+  .wf-field { margin-bottom: 14px; }
+  .wf-label {
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.07em; color: var(--text-2); margin-bottom: 5px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .wf-required { color: var(--orange); }
+  .wf-hint { font-size: 8px; color: var(--text-3); font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .wf-input-box {
+    border: 1.5px solid var(--border); border-radius: 7px;
+    padding: 10px 12px; font-size: 11px; color: var(--text-3);
+    background: var(--bg); width: 100%;
+  }
+  .wf-input-box--filled { color: var(--text); background: var(--surface); border-color: var(--border-dark); }
+  .wf-textarea {
+    border: 1.5px solid var(--border); border-radius: 7px;
+    padding: 10px 12px; font-size: 11px; color: var(--text-3);
+    background: var(--bg); width: 100%; resize: none;
+  }
+  .wf-textarea--filled { color: var(--text); background: var(--surface); border-color: var(--border-dark); }
+
+  /* pills */
+  .wf-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .wf-pill {
+    padding: 5px 10px; border-radius: 20px;
+    border: 1.5px solid var(--border);
+    font-size: 10px; font-weight: 700; color: var(--text-2);
+    background: var(--surface);
+  }
+  .wf-pill--on { border-color: var(--purple); background: rgba(107,79,200,0.1); color: var(--purple); }
+
+  /* skill grid */
+  .skill-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 4px; }
+  .skill-btn {
+    border: 1.5px solid var(--border); border-radius: 7px;
+    padding: 8px 10px; font-size: 10px; font-weight: 700; color: var(--text-2);
+    background: var(--surface); display: flex; align-items: center; justify-content: space-between;
+  }
+  .skill-btn--on { border-color: var(--purple); background: rgba(107,79,200,0.08); color: var(--purple); }
+
+  /* nav */
+  .wf-nav { display: flex; gap: 8px; margin-top: auto; padding-top: 14px; }
+  .wf-nav-back {
+    flex: 1; border: 1.5px solid var(--border);
+    border-radius: 7px; padding: 10px 0;
+    font-size: 11px; font-weight: 700; color: var(--text-2);
+    text-align: center; background: transparent; max-width: 100px;
+  }
+  .wf-nav-next {
+    flex: 3; background: var(--purple);
+    border-radius: 7px; padding: 10px 0;
+    font-size: 11px; font-weight: 700; color: white;
+    text-align: center;
+  }
+  .wf-nav-next--green { background: var(--green); }
+
+  /* social items */
+  .social-item {
+    display: flex; align-items: center; gap: 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px; padding: 10px 12px;
+    margin-bottom: 7px; background: var(--bg);
+  }
+  .social-item--linked { border-color: var(--green); background: rgba(45,106,79,0.05); }
+  .social-icon {
+    width: 26px; height: 26px; border-radius: 7px;
+    background: var(--tag);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .social-info { flex: 1; }
+  .social-name { font-size: 11px; font-weight: 700; color: var(--text); }
+  .social-handle { font-size: 9px; color: var(--text-3); }
+  .social-badge {
+    font-size: 9px; padding: 2px 8px; border-radius: 10px;
+    background: rgba(45,106,79,0.12); color: var(--green); font-weight: 700;
+  }
+  .social-link-btn {
+    font-size: 9px; padding: 4px 10px; border-radius: 10px;
+    border: 1px solid var(--border-dark); color: var(--text-2); font-weight: 700;
+  }
+
+  /* work entry */
+  .work-entry {
+    border: 1.5px dashed var(--border); border-radius: 8px;
+    padding: 12px 14px; margin-bottom: 8px; background: var(--bg);
+  }
+  .work-entry-hd {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+  }
+  .work-entry-num { font-size: 11px; font-weight: 700; color: var(--text-2); }
+  .work-entry-remove { font-size: 10px; color: var(--red); font-weight: 700; }
+  .work-inputs-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 6px; }
+
+  /* profile card preview */
+  .profile-preview-card {
+    border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden;
+    flex-shrink: 0; width: 280px;
+  }
+  .ppc-header {
+    padding: 14px 14px 10px; background: var(--tag);
+  }
+  .ppc-body { padding: 12px 14px; }
+  .ppc-avatar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .ppc-avatar {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: var(--border); border: 2px dashed var(--border-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: var(--text-3); text-align: center;
+    font-family: 'Caveat', cursive; font-size: 11px; flex-shrink: 0;
+  }
+  .ppc-verified {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 8px; font-weight: 700; color: var(--purple);
+    border: 1px solid var(--purple); border-radius: 10px;
+    padding: 2px 6px; margin-bottom: 4px;
+  }
+  .ppc-name { font-family: 'Caveat', cursive; font-size: 16px; font-weight: 700; color: var(--text); }
+  .ppc-role { font-size: 9px; color: var(--text-3); }
+  .ppc-available {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 9px; font-weight: 700;
+    background: rgba(45,106,79,0.1); color: var(--green);
+    border-radius: 20px; padding: 3px 8px; width: fit-content;
+    margin-top: 4px;
+  }
+  .ppc-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+  .ppc-bio { font-size: 9px; color: var(--text-2); margin-bottom: 8px; line-height: 1.4; }
+  .ppc-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+  .ppc-pill {
+    padding: 3px 7px; border-radius: 20px; border: 1.5px solid var(--border);
+    font-size: 8px; font-weight: 700; color: var(--text-2); background: var(--surface);
+  }
+  .ppc-links { display: flex; gap: 8px; font-size: 8px; color: var(--text-3); }
+
+  /* swatches */
+  .wf-swatches { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .wf-swatch {
+    width: 22px; height: 22px; border-radius: 5px;
+    border: 2px solid transparent;
+  }
+  .wf-swatch--active { border-color: var(--text); outline: 2px solid white; outline-offset: -3px; }
+
+  /* username preview */
+  .username-preview {
+    background: var(--tag); border-radius: 6px;
+    padding: 7px 10px; font-size: 10px; color: var(--text-2);
+    margin-top: 5px; font-family: 'Space Mono', monospace;
+  }
+  .username-preview span { color: var(--purple); font-weight: 700; }
+  .username-ok { display: flex; align-items: center; gap: 5px; font-size: 9px; margin-top: 4px; color: var(--green); }
+
+  /* email confirm */
+  .email-confirm {
+    background: rgba(45,106,79,0.08);
+    border: 1px solid rgba(45,106,79,0.3);
+    border-radius: 8px; padding: 12px 14px;
+    font-size: 11px; color: var(--green); margin-bottom: 12px;
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+
+  /* step counter */
+  .rp-step-counter {
+    font-size: 10px; color: var(--text-3); margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  /* success pulse */
+  .success-pulse {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--purple);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 14px; font-size: 26px;
+  }
+
+  /* ─── CONNECTOR ─── */
+  .connector {
+    display: flex; align-items: center;
+    padding: 0 16px; flex-shrink: 0;
+    padding-top: 200px;
+    color: var(--text-3);
+    flex-direction: column; gap: 4px;
+    position: relative;
+  }
+  .connector-label {
+    position: absolute; top: 180px;
+    font-family: 'Caveat', cursive;
+    font-size: 12px; color: var(--text-3);
+    white-space: nowrap; text-align: center;
+  }
+  .connector svg { display: block; }
+
+  /* screen label */
+  .screen-label-text {
+    font-family: 'Caveat', cursive;
+    font-size: 15px; font-weight: 600; color: var(--text-2);
+    margin-top: 10px; text-align: center;
+  }
+
+  /* annotation */
+  .annotation {
+    font-family: 'Caveat', cursive;
+    font-size: 13px; color: var(--orange);
+    line-height: 1.4; max-width: 200px;
+    margin-top: 4px; text-align: center;
+  }
+
+  /* left panel card (used in later steps) */
+  .lp-card {
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 9px; padding: 10px 12px; margin-bottom: 10px;
+  }
+  .lp-card--light { background: var(--surface); border-color: var(--border); }
+  .lp-card-title { font-size: 11px; font-weight: 700; color: white; margin-bottom: 3px; }
+  .lp-card-title--dark { color: var(--text); }
+  .lp-card-sub { font-size: 9px; color: rgba(255,255,255,0.5); line-height: 1.35; }
+  .lp-card-sub--dark { color: var(--text-3); }
+
+  /* footnotes */
+  .footnotes { padding: 0 48px 60px; display: flex; flex-wrap: wrap; gap: 20px; margin-top: 24px; }
+  .fn-card {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 16px 18px; min-width: 200px; max-width: 260px;
+  }
+  .fn-title { font-family: 'Caveat', cursive; font-size: 16px; font-weight: 700; margin-bottom: 10px; color: var(--text); }
+  .fn-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+  .fn-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); margin-top: 4px; flex-shrink: 0; }
+  .fn-text { font-size: 10px; color: var(--text-2); line-height: 1.45; }
+
+  .wf-security { display: flex; align-items: center; gap: 5px; font-size: 9px; color: var(--text-3); margin-top: 8px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">✳ weld.</div>
+  <div class="header-title">Onboarding Flow — Desktop Wireframe</div>
+  <div class="header-sep"></div>
+  <div class="header-note">scroll down ↓ · each frame = one screen</div>
+</div>
+
+<div class="flow">
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION A — ENTRY & AUTH
+  ═══════════════════════════════════════════════ -->
+  <div class="section-hd">
+    <div class="section-badge">A</div>
+    <div class="section-label">Entry &amp; Auth</div>
+  </div>
+  <div class="screen-row">
+
+    <!-- 01 · Sign Up -->
+    <div class="screen-wrap">
+      <div class="screen">
+        <div class="screen-chrome">
+          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
+          <div class="chrome-url">weld.gg/signup</div>
+        </div>
+        <div class="screen-split">
+          <!-- LEFT -->
+          <div class="panel-left">
+            <div class="wf-brand">
+              <div class="wf-brand-asterisk">✳</div>
+              <div class="wf-brand-name">weld.</div>
+            </div>
+            <div class="wf-headline">find roblox talent<br><em>who ship.</em></div>
+            <div class="wf-sub-text">Role-first cards, not generic profiles.</div>
+            <div class="wf-feature-list">
+              <div class="wf-feature">
+                <div class="wf-feature-icon">🛡</div>
+                <div class="wf-feature-content">
+                  <div class="wf-feature-title">Trust &amp; proof</div>
+                  <div class="wf-feature-desc">Verified talent and secure collaboration.</div>
+                </div>
+              </div>
+              <div class="wf-feature">
+                <div class="wf-feature-icon">&lt;/&gt;</div>
+                <div class="wf-feature-content">
+                  <div class="wf-feature-title">Built for Roblox</div>
+                  <div class="wf-feature-desc">Role-first profiles with real experience that matters.</div>
+                </div>
+              </div>
+              <div class="wf-feature">
+                <div class="wf-feature-icon">⚡</div>
+                <div class="wf-feature-content">
+                  <div class="wf-feature-title">Matches that work</div>
+                  <div class="wf-feature-desc">Smart matching connects you with the right people.</div>
+                </div>
+              </div>
+            </div>
+            <div class="wf-social-proof">
+              <div class="wf-avatars">
+                <div class="wf-avatar-bubble"></div>
+                <div class="wf-avatar-bubble" style="background:var(--border-dark)"></div>
+                <div class="wf-avatar-bubble" style="background:var(--text-2)"></div>
+                <div class="wf-avatar-bubble" style="background:var(--text-3)"></div>
+              </div>
+              <div class="wf-social-proof-text"><strong>+1.2K</strong> Used by 1,200+<br>Roblox devs &amp; studios</div>
+            </div>
+          </div>
+          <!-- RIGHT -->
+          <div class="panel-right">
+            <div class="rp-eyebrow">Create account</div>
+            <div class="rp-title">Join weld.</div>
+            <div class="rp-sub">Start hiring or get hired in minutes.</div>
+
+            <div class="auth-btn">
+              <div class="auth-btn-left">
+                <div class="auth-icon" style="background:#000;color:white;">R</div>
+                Continue with Roblox
+              </div>
+              <span class="auth-arrow">→</span>
+            </div>
+            <div class="auth-btn">
+              <div class="auth-btn-left">
+                <div class="auth-icon">G</div>
+                Continue with Google
+              </div>
+              <span class="auth-arrow">→</span>
+            </div>
+            <div class="auth-btn">
+              <div class="auth-btn-left">
+                <div class="auth-icon" style="background:#5865F2;color:white;font-size:9px;">DC</div>
+                Continue with Discord
+              </div>
+              <span class="auth-arrow">→</span>
+            </div>
+
+            <div class="wf-divider">or</div>
+
+            <div class="wf-input">
+              <svg width="13" height="10" viewBox="0 0 13 10" fill="none"><rect x="0.5" y="0.5" width="12" height="9" rx="1.5" stroke="#888"/><path d="M0.5 2.5L6.5 6L12.5 2.5" stroke="#888"/></svg>
+              <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e59c8a90a5809d8488958980cb868a88">[email&#160;protected]</a>
+            </div>
+            <div class="wf-input">
+              <svg width="12" height="14" viewBox="0 0 12 14" fill="none"><rect x="1" y="6" width="10" height="8" rx="1.5" stroke="#888"/><path d="M4 6V4a2 2 0 114 0v2" stroke="#888"/></svg>
+              Create a strong password
+            </div>
+
+            <div class="wf-cta">Create account <span>→</span></div>
+            <div class="wf-trust-row">
+              <div class="wf-trust-item"><div class="wf-trust-check">✓</div> Free forever</div>
+              <div class="wf-trust-item"><div class="wf-trust-check">✓</div> No credit card</div>
+              <div class="wf-trust-item"><div class="wf-trust-check">✓</div> Cancel anytime</div>
+            </div>
+            <div class="wf-link">Already have an account? <strong>Log in</strong></div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-top:8px;">
+              <div class="wf-security"><svg width="12" height="14" viewBox="0 0 12 14" fill="none"><path d="M6 1L1 3.5v4C1 10 3.2 12.2 6 13c2.8-.8 5-3 5-5.5v-4L6 1z" stroke="#9a958e" stroke-width="1.2" fill="none"/></svg> Your data is always secure</div>
+              <div class="wf-security">⚙ We never post without permission</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label-text">01 · Sign Up</div>
+    </div>
+
+    <div class="connector">
+      <div class="connector-label">login</div>
+      <svg width="32" height="18"><path d="M0 9 L24 9 M17 3 L24 9 L17 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </div>
+
+    <!-- 02 · Log In -->
+    <div class="screen-wrap">
+      <div class="screen">
+        <div class="screen-chrome">
+          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
+          <div class="chrome-url">weld.gg/login</div>
+        </div>
+        <div class="screen-split">
+          <div class="panel-left">
+            <div class="wf-brand">
+              <div class="wf-brand-asterisk">✳</div>
+              <div class="wf-brand-name">weld.</div>
+            </div>
+            <div class="wf-headline">welcome<br>back.</div>
+            <div class="wf-sub-text">Pick up your profile draft and keep your matching setup attached to your account.</div>
+            <div style="margin-top:auto;">
+              <div style="font-size:10px;color:var(--text-3);margin-bottom:6px;">Your draft auto-saves locally.<br>Log in to sync across devices.</div>
+            </div>
+          </div>
+          <div class="panel-right">
+            <div class="rp-eyebrow">Welcome back</div>
+            <div class="rp-title">Log in to weld.</div>
+            <div class="rp-sub">Pick up where you left off.</div>
+
+            <div class="auth-btn">
+              <div class="auth-btn-left">
+                <div class="auth-icon" style="background:#000;color:white;">R</div>
+                Continue with Roblox
+              </div>
+              <span class="auth-arrow">→</span>
+            </div>
+            <div class="auth-btn">
+              <div class="auth-btn-left">
+                <div class="auth-icon">G</div>
+                Continue with Google
+              </div>
+              <span class="auth-arrow">→</span>
+            </div>
+            <div class="auth-btn">
+              <div class="auth-btn-left">
+                <div class="auth-icon" style="background:#5865F2;color:white;font-size:9px;">DC</div>
+                Continue with Discord
+              </div>
+              <span class="auth-arrow">→</span>
+            </div>
+
+            <div class="wf-divider">or</div>
+
+            <div class="wf-input">
+              <svg width="13" height="10" viewBox="0 0 13 10" fill="none"><rect x="0.5" y="0.5" width="12" height="9" rx="1.5" stroke="#888"/><path d="M0.5 2.5L6.5 6L12.5 2.5" stroke="#888"/></svg>
+              Email address
+            </div>
+            <div class="wf-input">
+              <svg width="12" height="14" viewBox="0 0 12 14" fill="none"><rect x="1" y="6" width="10" height="8" rx="1.5" stroke="#888"/><path d="M4 6V4a2 2 0 114 0v2" stroke="#888"/></svg>
+              Password
+            </div>
+
+            <div class="wf-cta">Log in <span>→</span></div>
+            <div class="wf-link">Need an account? <strong>Create one</strong></div>
+            <div class="wf-link" style="margin-top:4px;"><strong>Forgot password?</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label-text">02 · Log In</div>
+    </div>
+
+    <div class="connector">
+      <div class="connector-label">email only</div>
+      <svg width="32" height="18"><path d="M0 9 L24 9 M17 3 L24 9 L17 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </div>
+
+    <!-- 03 · Email Confirm -->
+    <div class="screen-wrap">
+      <div class="screen">
+        <div class="screen-chrome">
+          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
+          <div class="chrome-url">weld.gg/confirm-email</div>
+        </div>
+        <div class="screen-split">
+          <div class="panel-left">
+            <div class="wf-brand">
+              <div class="wf-brand-asterisk">✳</div>
+              <div class="wf-brand-name">weld.</div>
+            </div>
+            <div class="wf-headline">almost<br>there.</div>
+            <div class="wf-sub-text">One quick step — confirm your email and you're in.</div>
+            <div style="background:var(--tag);border-radius:8px;padding:10px 12px;margin-top:auto;font-size:10px;color:var(--text-3);line-height:1.5;">
+              💡 If you used Roblox, Google, or Discord to sign up, you skip this step entirely.
+            </div>
+          </div>
+          <div class="panel-right" style="justify-content:center;align-items:center;text-align:center;">
+            <div style="font-size:36px;margin-bottom:14px;">📬</div>
+            <div class="rp-eyebrow" style="text-align:center;">Check your inbox</div>
+            <div class="rp-title" style="text-align:center;">Confirm your email</div>
+            <div class="rp-sub" style="text-align:center;">We sent a link to <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3b42544e7b5e435a564b575e15585456">[email&#160;protected]</a></strong>.<br>Click it to continue.</div>
+            <div class="email-confirm" style="text-align:left;max-width:320px;">
+              <span>✉</span>
+              <div>Open the email and click the confirmation link to activate your account.</div>
+            </div>
+            <div class="wf-cta" style="background:var(--tag);color:var(--text-2);max-width:280px;">Open Gmail <span style="color:var(--text-2);">→</span></div>
+            <div class="wf-link" style="margin-top:10px;">Wrong address? <strong>Go back</strong></div>
+            <div class="wf-link" style="margin-top:6px;">Didn't receive it? <strong>Resend email</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label-text">03 · Email Confirm <span style="font-size:11px;color:var(--orange);">(email signup only)</span></div>
+    </div>
+
+  </div><!-- /screen-row A -->
+
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION B — ACCOUNT TYPE & IDENTITY
+  ═══════════════════════════════════════════════ -->
+  <div class="section-hd">
+    <div class="section-badge">B</div>
+    <div class="section-label">Account Type &amp; Identity</div>
+  </div>
+  <div class="screen-row">
+
+    <!-- 04 · Who Are You -->
+    <div class="screen-wrap">
+      <div class="screen">
+        <div class="screen-chrome">
+          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
+          <div class="chrome-url">weld.gg/onboarding</div>
+        </div>
+        <div class="screen-split">
+          <div class="panel-left">
+            <div class="wf-brand">
+              <div class="wf-brand-asterisk">✳</div>
+              <div class="wf-brand-name">weld.</div>
+            </div>
+            <div class="wf-headline">who are<br>you on<br>weld?</div>
+            <div class="wf-sub-text">Your profile type shapes everything — the fields you fill out, how studios find you, and what shows on your card.</div>
+            <div style="font-size:10px;color:var(--text-3);margin-top:auto;">⚠ Can't change profile type after this step.</div>
+          </div>
+          <div class="panel-right">
+            <div class="rp-eyebrow">Step 0</div>
+            <div class="rp-title">Choose your profile type</div>
+            <div class="rp-sub">Pick the one that best describes you. You can always create a second account for the other type.</div>
+
+            <div class="type-cards">
+              <div class="type-card type-card--active">
+                <div class="type-card-icon">🛠</div>
+                <div class="type-card-title">Developer</div>
+                <div class="type-card-desc">I create games, scripts, art, or audio and I'm looking for studios to work with.</div>
+              </div>
+              <div class="type-card">
+                <div class="type-card-icon">🎮</div>
+                <div class="type-card-title">Studio</div>
+                <div class="type-card-desc">I run or represent a Roblox game studio and I'm looking to hire developers.</div>
+              </div>
+            </div>
+
+            <div class="wf-cta">Continue as Developer <span>→</span></div>
+            <div class="wf-link" style="margin-top:6px;">Not sure? <strong>Learn about each type</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label-text">04 · Who Are You?</div>
+    </div>
+
+    <div class="connector">
+      <svg width="32" height="18"><path d="M0 9 L24 9 M17 3 L24 9 L17 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </div>
+
+    <!-- 05 · Username & Identity -->
+    <div class="screen-wrap">
+      <div class="screen">
+        <div class="screen-chrome">
+          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
+          <div class="chrome-url">weld.gg/onboarding/identity</div>
+        </div>
+        <div class="screen-split">
+          <div class="panel-left">
+            <div class="wf-brand">
+              <div class="wf-brand-asterisk">✳</div>
+              <div class="wf-brand-name">weld.</div>
+            </div>
+            <div class="wf-headline" style="font-size:26px;">your<br>identity</div>
+            <div class="wf-sub-text">How you'll appear to studios and other developers on Weld.</div>
+            <div style="margin-top:auto;">
+              <div class="lp-card lp-card--light">
+                <div class="lp-card-title lp-card-title--dark" style="font-size:10px;">Preview</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+                  <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#a8c0e8,#d4b8f0);border:1.5px dashed var(--border-dark);"></div>
+                  <div>
+                    <div style="font-family:'Caveat',cursive;font-size:14px;font-weight:700;">xXBuilder99</div>
+                    <div style="font-size:9px;color:var(--text-3);">Roblox scripter</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="panel-right">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:16%"></div></div>
+            <div class="rp-step-counter"><span>Step 1 of 6 · Identity</span><span>1/6</span></div>
+
+            <div class="two-col">
+              <div class="wf-field">
+                <div class="wf-label">Display name <span class="wf-required">*</span></div>
+                <div class="wf-input-box wf-input-box--filled">xXBuilder99</div>
+                <div class="username-preview">weld.gg/<span>xXBuilder99</span></div>
+                <div class="username-ok">
+                  <svg width="11" height="11" viewBox="0 0 11 11"><circle cx="5.5" cy="5.5" r="5" stroke="#2d6a4f" fill="none"/><path d="M3 5.5l1.8 1.8 3-3.5" stroke="#2d6a4f" stroke-width="1.3" stroke-linecap="round"/></svg>
+                  Available
+                </div>
+              </div>
+              <div class="wf-field">
+                <div class="wf-label">Profile colour</div>
+                <div class="wf-swatches">
+                  <div class="wf-swatch wf-swatch--active" style="background:linear-gradient(135deg,#a8c0e8,#d4b8f0)"></div>
+                  <div class="wf-swatch" style="background:linear-gradient(135deg,#f0b8b8,#f0d4b8)"></div>
+                  <div class="wf-swatch" style="background:linear-gradient(135deg,#b8f0c0,#b8e8f0)"></div>
+                  <div class="wf-swatch" style="background:linear-gradient(135deg,#f0e8b8,#e8c0b8)"></div>
+                  <div class="wf-swatch" style="background:linear-gradient(135deg,#1a1917,#3a3735)"></div>
+                  <div class="wf-swatch" style="background:linear-gradient(135deg,#e0d8f0,#c8d8f0)"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-label">Badge <span class="wf-hint">(optional — pick one)</span></div>
+              <div class="wf-pills">
+                <div class="wf-pill wf-pill--on">⭐ Rising Star</div>
+                <div class="wf-pill">🔥 Hot Right Now</div>
+                <div class="wf-pill">🚀 Fast Delivery</div>
+                <div class="wf-pill">🏆 Top Rated</div>
+                <div class="wf-pill">✅ Verified</div>
+              </div>
+            </div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next">Next: Link Roblox →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label-text">05 · Username &amp; Identity</div>
+    </div>
+
+    <div class="connector">
+      <svg width="32" height="18"><path d="M0 9 L24 9 M17 3 L24 9 L17 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </div>
+
+    <!-- 06 · Link Roblox -->
+    <div class="screen-wrap">
+      <div class="screen">
+        <div class="screen-chrome">
+          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
+          <div class="chrome-url">weld.gg/onboarding/identity</div>
+        </div>
+        <div class="screen-split">
+          <div class="panel-left" style="background:var(--text);">
+            <div class="wf-brand">
+              <div class="wf-brand-asterisk">✳</div>
+              <div class="wf-brand-name wf-brand-name--light">weld.</div>
+            </div>
+            <div class="wf-headline wf-headline--light" style="font-size:26px;">link your<br>roblox</div>
+            <div class="wf-sub-text wf-sub-text--light">Pulls in your avatar and username. Studios trust verified Roblox accounts far more.</div>
+            <div style="margin-top:auto;">
+              <div class="lp-card">
+                <div class="lp-card-title">Why Roblox?</div>
+                <div class="lp-card-sub">Your Roblox profile is proof you're real. It lets us verify your experience and show your avatar on your card.</div>
+              </div>
+            </div>
+          </div>
+          <div class="panel-right">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:25%"></div></div>
+            <div class="rp-step-counter"><span>Step 1 of 6 · Identity</span><span>—</span></div>
+
+            <div class="social-item" style="border-color:var(--green);background:rgba(45,106,79,0.05);">
+              <div class="social-icon" style="background:#000;color:white;font-weight:900;">R</div>
+              <div class="social-info">
+                <div class="social-name">Roblox</div>
+                <div class="social-handle">@xXBuilder99 · 3 years experience</div>
+              </div>
+              <div class="social-badge">✓ Linked</div>
+            </div>
+
+            <div style="font-size:10px;color:var(--text-3);margin:6px 0 10px;text-align:center;">— or paste your profile URL instead —</div>
+
+            <div class="wf-field">
+              <div class="wf-label">Roblox profile URL <span class="wf-hint">(alternative to OAuth)</span></div>
+              <div class="wf-input-box">https://www.roblox.com/users/12345/profile</div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:12px;background:var(--bg);border-radius:9px;padding:10px 12px;margin-bottom:10px;">
+              <div style="width:42px;height:42px;border-radius:10px;background:var(--tag);border:1.5px dashed var(--border-dark);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-3);font-family:'Caveat',cursive;flex-shrink:0;">avatar</div>
+              <div>
+                <div style="font-family:'Caveat',cursive;font-size:15px;font-weight:700;">xXBuilder99</div>
+                <div style="font-size:9px;color:var(--text-3);">Roblox scripter · ID: 12345</div>
+                <div style="display:flex;align-items:center;gap:4px;font-size:9px;font-weight:700;color:var(--green);margin-top:3px;">
+                  <div style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div> Available for work
+                </div>
+              </div>
+            </div>
+
+            <div class="wf-security"><svg width="12" height="14" viewBox="0 0 12 14" fill="none"><path d="M6 1L1 3.5v4C1 10 3.2 12.2 6 13c2.8-.8 5-3 5-5.5v-4L6 1z" stroke="#9a958e" stroke-width="1.2" fill="none"/></svg> We never post without permission</div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next">Next: Link Socials →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label-text">06 · Link Roblox</div>
+    </div>
+
+  </div><!-- /screen-row B -->
+
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION C — SOCIAL ACCOUNTS
+  ═══════════════════════════════════════════════ -->
+  <div class="section-hd">
+    <div class="section-badge">C</div>
+    <div class="section-label">Social Accounts &amp; Availability</div>
+  </div>
+  <div class="screen-row">
+
+    <!-- 07 · Link Socials -->
+    <div class="screen-wrap">
+      <div class="screen">
+        <div class="screen-chrome">
+          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
+          <div class="chrome-url">weld.gg/onboarding/identity</div>
+        </div>
+        <div class="screen-split">
+          <div class="panel-left">
+            <div class="wf-brand">
+              <div class="wf-brand-asterisk">✳</div>
+              <div class="wf-brand-name">weld.</div>
+            </div>
+            <div class="wf-headline" style="font-size:26px;">link your<br>socials</div>
+            <div class="wf-sub-text">More links = higher trust score. Studios want to see you're real and reachable.</div>
+            <div style="margin-top:auto;">
+              <div style="font-size:10px;color:var(--text-3);line-height:1.5;margin-bottom:4px;">Trust score breakdown:</div>
+              <div style="height:6px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:6px;">
+                <div style="height:100%;width:65%;background:var(--purple);border-radius:4px;"></div>
+              </div>
+              <div style="font-size:9px;color:var(--text-3);">2 / 4 accounts linked · +65 trust</div>
+            </div>
+          </div>
+          <div class="panel-right">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:33%"></div></div>
+            <div class="rp-step-counter"><span>Step 1 of 6 · Identity</span><span>—</span></div>
+
+            <div class="social-item social-item--linked">
+              <div class="social-icon" style="background:#5865F2;color:white;font-size:9px;font-weight:700;">DC</div>
+              <div class="social-info">
+                <div class="social-name">Discord</div>
+                <div class="social-handle">eclipse.dev · #4521</div>
+              </div>
+              <div class="social-badge">✓ Linked</div>
+            </div>
+            <div class="social-item social-item--linked">
+              <div class="social-icon" style="background:#24292e;color:white;font-size:10px;font-weight:700;">GH</div>
+              <div class="social-info">
+                <div class="social-name">GitHub</div>
+                <div class="social-handle">eclipsedevx</div>
+              </div>
+              <div class="social-badge">✓ Linked</div>
+            </div>
+            <div class="social-item">
+              <div class="social-icon" style="background:#000;color:white;font-size:12px;font-weight:900;">𝕏</div>
+              <div class="social-info">
+                <div class="social-name">X / Twitter</div>
+                <div class="social-handle">Connect your account</div>
+              </div>
+              <div class="social-link-btn">Link →</div>
+            </div>
+            <div class="social-item">
+              <div class="social-icon" style="background:#FF0000;color:white;font-size:9px;font-weight:700;">YT</div>
+              <div class="social-info">
+                <div class="social-name">YouTube</div>
+                <div class="social-handle">Connect your account</div>
+              </div>
+              <div class="social-link-btn">Link →</div>
+            </div>
+            <div style="font-size:9px;color:var(--text-3);text-align:center;margin-top:4px;">All optional. You can add more from your profile settings later.</div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next">Next: Availability →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label-text">07 · Link Socials</div>
+    </div>
+
+    <div class="connector">
+      <svg width="32" height="18"><path d="M0 9 L24 9 M17 3 L24 9 L17 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </div>
+
+    <!-- 08 · Availability -->
+    <div class="screen-wrap">
+      <div class="screen">
+        <div class="screen-chrome">
+          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
+          <div class="chrome-url">weld.gg/onboarding/identity</div>
+        </div>
+        <div class="screen-split">
+          <div class="panel-left">
+            <div class="wf-brand">
+              <div class="wf-brand-asterisk">✳</div>
+              <div class="wf-brand-name">weld.</div>
+            </div>
+            <div class="wf-headline" style="font-size:26px;">your<br>availability</div>
+            <div class="wf-sub-text">Studios filter by availability status. You can update this anytime from your profile.</div>
+            <div style="margin-top:auto;">
+              <div style="display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;color:var(--green);background:rgba(45,106,79,0.1);border-radius:20px;padding:6px 10px;width:fit-content;">
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--green);"></div>
+                Available for work
+              </div>
+            </div>
+          </div>
+          <div class="panel-right">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:40%"></div></div>
+            <div class="rp-step-counter"><span>Step 1 of 6 · Identity</span><span>—</span></div>
+
+            <div class="wf-field">
+              <div class="wf-label">Work status <span class="wf-required">*</span></div>
+              <div class="wf-pills">
+                <div class="wf-pill wf-pill--on">Available for work</div>
+                <div class="wf-pill">Open to offers</div>
+                <div class="wf-pill">Not available</div>
+              </div>
+            </div>
+
+            <div class="two-col">
+              <div class="wf-field">
+                <div class="wf-label">Hours / week <span class="wf-hint">(optional)</span></div>
+                <div class="wf-pills" style="flex-wrap:wrap;">
+                  <div class="wf-pill">Under 10</div>
+                  <div class="wf-pill wf-pill--on">10–20 hrs</div>
+                  <div class="wf-pill">20–40 hrs</div>
+                  <div class="wf-pill">Full-time</div>
+                </div>
+              </div>
+              <div class="wf-field">
+                <div class="wf-label">Timezone <span class="wf-hint">(optional)</span></div>
+                <div class="wf-input-box wf-input-box--filled">EST (UTC-5)</div>
+              </div>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-label">Note <span class="wf-hint">(optional — shown on card)</span></div>
+              <div class="wf-input-box">e.g. "Available for short projects, 2 week turnaround"</div>
+            </div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next">Next: Role &amp; Rate →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label-text">08 · Availability</div>
+    </div>
+
+  </div><!-- /screen-row C -->
+
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION D — PROFILE CONTENT
+  ═══════════════════════════════════════════════ -->
+  <div class="section-hd">
+    <div class="section-badge">D</div>
+    <div class="section-label">Profile Content</div>
+  </div>
+  <div class="screen-row">
+
+    <!-- 09 · Role & Rate -->
+    <div class="screen-wrap">
+      <div class="screen">
+        <div class="screen-chrome">
+          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
+          <div class="chrome-url">weld.gg/onboarding/role</div>
+        </div>
+        <div class="screen-split">
+          <div class="panel-left" style="background:var(--text);">
+            <div class="wf-brand">
+              <div class="wf-brand-asterisk">✳</div>
+              <div class="wf-brand-name wf-brand-name--light">weld.</div>
+            </div>
+            <div class="wf-headline wf-headline--light" style="font-size:26px;">your<br>experience<br>&amp; rate</div>
+            <div class="wf-sub-text wf-sub-text--light">This is what studios see front-and-centre on your card. Be honest — it builds trust.</div>
+            <div style="margin-top:auto;">
+              <div class="lp-card">
+                <div class="lp-card-title">Tip</div>
+                <div class="lp-card-sub">Set a rate even if it's approximate. Studios filter by budget and skip cards without one.</div>
+              </div>
+            </div>
+          </div>
+          <div class="panel-right">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:33%"></div></div>
+            <div class="rp-step-counter"><span>Step 2 of 6 · Role</span><span>2/6</span></div>
+
+            <div class="wf-field">
+              <div class="wf-label">Years of experience <span class="wf-required">*</span></div>
+              <div class="wf-pills">
+                <div class="wf-pill">Under 1 year</div>
+                <div class="wf-pill wf-pill--on">1–2 years</div>
+                <div class="wf-pill">3–4 years</div>
+                <div class="wf-pill">5+ years</div>
+              </div>
+            </div>
+
+            <div class="two-col">
+              <div class="wf-field">
+                <div class="wf-label">Rate type <span class="wf-required">*</span></div>
+                <div class="wf-pills">
+                  <div class="wf-pill wf-pill--on">USD / hr</div>
+                  <div class="wf-pill">Robux / hr</div>
+                  <div class="wf-pill">Fixed USD</div>
+                  <div class="wf-pill">Rev share</div>
+                </div>
+              </div>
+              <div class="wf-field">
+                <div class="wf-label">Rate amount <span class="wf-hint">(optional)</span></div>
+                <div class="wf-input-box wf-input-box--filled">$65 / hr</div>
+              </div>
+            </div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next">Next: Bio →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label-text">09 · Role &amp; Rate</div>
+    </div>
+
+    <div class="connector">
+      <svg width="32" height="18"><path d="M0 9 L24 9 M17 3 L24 9 L17 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </div>
+
+    <!-- 10 · Bio -->
+    <div class="screen-wrap">
+      <div class="screen">
+        <div class="screen-chrome">
+          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
+          <div class="chrome-url">weld.gg/onboarding/bio</div>
+        </div>
+        <div class="screen-split">
+          <div class="panel-left">
+            <div class="wf-brand">
+              <div class="wf-brand-asterisk">✳</div>
+              <div class="wf-brand-name">weld.</div>
+            </div>
+            <div class="wf-headline" style="font-size:26px;">your bio</div>
+            <div class="wf-sub-text">One sentence. What do you do and how do you do it? Specifics beat superlatives every time.</div>
+            <div style="margin-top:auto;">
+              <div style="background:rgba(107,79,200,0.08);border:1px dashed var(--purple);border-radius:8px;padding:10px 12px;font-size:9px;color:var(--purple);line-height:1.5;">
+                💡 Good: "Builds clean Roblox systems, ships fast, and shows real proof of work."<br><br>
+                Bad: "I am an experienced developer with many skills."
+              </div>
+            </div>
+          </div>
+          <div class="panel-right">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:50%"></div></div>
+            <div class="rp-step-counter"><span>Step 3 of 6 · Bio</span><span>3/6</span></div>
+
+            <div class="wf-field">
+              <div class="wf-label">One-line bio <span class="wf-required">*</span></div>
+              <div class="wf-textarea wf-textarea--filled" style="height:60px;">Builds clean Roblox systems, ships fast, and shows real proof of work.</div>
+              <div style="font-size:9px;color:var(--text-3);text-align:right;margin-top:3px;">54 / 120 chars</div>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-label">Extended bio <span class="wf-hint">(optional)</span></div>
+              <div class="wf-textarea" style="height:72px;">Longer pitch — experience, process, what you bring to a project, how you communicate...</div>
+            </div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next">Next: Skills →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label-text">10 · Bio</div>
+    </div>
+
+    <div class="connector">
+      <svg width="32" height="18"><path d="M0 9 L24 9 M17 3 L24 9 L17 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </div>
+
+    <!-- 11 · Skills -->
+    <div class="screen-wrap">
+      <div class="screen">
+        <div class="screen-chrome">
+          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
+          <div class="chrome-url">weld.gg/onboarding/skills</div>
+        </div>
+        <div class="screen-split">
+          <div class="panel-left">
+            <div class="wf-brand">
+              <div class="wf-brand-asterisk">✳</div>
+              <div class="wf-brand-name">weld.</div>
+            </div>
+            <div class="wf-headline" style="font-size:26px;">your<br>skills</div>
+            <div class="wf-sub-text">Pick up to 5 that best represent what you do. These show as tags on your card.</div>
+            <div style="margin-top:auto;font-size:10px;color:var(--purple);font-weight:700;">3 / 5 selected</div>
+          </div>
+          <div class="panel-right">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:67%"></div></div>
+            <div class="rp-step-counter"><span>Step 4 of 6 · Skills</span><span>4/6</span></div>
+
+            <div class="skill-grid">
+              <div class="skill-btn skill-btn--on">Lua ✓</div>
+              <div class="skill-btn skill-btn--on">Roblox API ✓</div>
+              <div class="skill-btn skill-btn--on">Remote Events ✓</div>
+              <div class="skill-btn">Data Stores</div>
+              <div class="skill-btn">UI Design</div>
+              <div class="skill-btn">Animation</div>
+              <div class="skill-btn">VFX</div>
+              <div class="skill-btn">Building</div>
+              <div class="skill-btn">Game Design</div>
+              <div class="skill-btn">3D Modeling</div>
+              <div class="skill-btn">Sound Design</div>
+              <div class="skill-btn">Lighting</div>
+            </div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next">Next: Work →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label-text">11 · Skills</div>
+    </div>
+
+    <div class="connector">
+      <svg width="32" height="18"><path d="M0 9 L24 9 M17 3 L24 9 L17 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </div>
+
+    <!-- 12 · Work -->
+    <div class="screen-wrap">
+      <div class="screen">
+        <div class="screen-chrome">
+          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
+          <div class="chrome-url">weld.gg/onboarding/work</div>
+        </div>
+        <div class="screen-split">
+          <div class="panel-left" style="background:var(--text);">
+            <div class="wf-brand">
+              <div class="wf-brand-asterisk">✳</div>
+              <div class="wf-brand-name wf-brand-name--light">weld.</div>
+            </div>
+            <div class="wf-headline wf-headline--light" style="font-size:26px;">your<br>best work</div>
+            <div class="wf-sub-text wf-sub-text--light">Up to 3 projects you're most proud of. Real stats win trust — include plays, CCU, pay if you have them.</div>
+            <div style="margin-top:auto;">
+              <div class="lp-card">
+                <div class="lp-card-title">Optional but powerful</div>
+                <div class="lp-card-sub">Profiles with at least one work entry get 3× more studio matches than empty profiles.</div>
+              </div>
+            </div>
+          </div>
+          <div class="panel-right">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:83%"></div></div>
+            <div class="rp-step-counter"><span>Step 5 of 6 · Work</span><span>5/6</span></div>
+
+            <div class="work-entry">
+              <div class="work-entry-hd">
+                <span class="work-entry-num">🎮 Project 1</span>
+                <span class="work-entry-remove">Remove</span>
+              </div>
+              <div class="wf-input-box wf-input-box--filled" style="margin-bottom:6px;">Combat System Revamp</div>
+              <div class="wf-textarea" style="height:36px;margin-bottom:6px;">Built modular combat with custom abilities and UI integration...</div>
+              <div class="work-inputs-row">
+                <div class="wf-input-box" style="font-size:10px;color:var(--text-3);">Tools: Luau, Blender</div>
+                <div class="wf-input-box" style="font-size:10px;color:var(--text-3);">2 weeks</div>
+                <div class="wf-input-box" style="font-size:10px;color:var(--text-3);">$300</div>
+              </div>
+            </div>
+
+            <div style="border:1.5px dashed var(--border);border-radius:8px;padding:10px;text-align:center;font-size:11px;color:var(--text-3);">
+              + Add project (up to 3)
+            </div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next">Next: Portfolio →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label-text">12 · Work &amp; Projects</div>
+    </div>
+
+    <div class="connector">
+      <svg width="32" height="18"><path d="M0 9 L24 9 M17 3 L24 9 L17 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </div>
+
+    <!-- 13 · Portfolio Links -->
+    <div class="screen-wrap">
+      <div class="screen">
+        <div class="screen-chrome">
+          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
+          <div class="chrome-url">weld.gg/onboarding/portfolio</div>
+        </div>
+        <div class="screen-split">
+          <div class="panel-left">
+            <div class="wf-brand">
+              <div class="wf-brand-asterisk">✳</div>
+              <div class="wf-brand-name">weld.</div>
+            </div>
+            <div class="wf-headline" style="font-size:26px;">portfolio<br>links</div>
+            <div class="wf-sub-text">Live proof beats descriptions. Link any work that's publicly accessible.</div>
+            <div style="margin-top:auto;font-size:10px;color:var(--text-3);">All fields optional. Skip if you don't have these yet.</div>
+          </div>
+          <div class="panel-right">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:100%"></div></div>
+            <div class="rp-step-counter"><span>Step 6 of 6 · Portfolio</span><span>6/6</span></div>
+
+            <div class="two-col">
+              <div class="wf-field">
+                <div class="wf-label">Portfolio / website</div>
+                <div class="wf-input-box">https://...</div>
+              </div>
+              <div class="wf-field">
+                <div class="wf-label">Live Roblox game URL</div>
+                <div class="wf-input-box">roblox.com/games/...</div>
+              </div>
+            </div>
+            <div class="two-col">
+              <div class="wf-field">
+                <div class="wf-label">YouTube showreel</div>
+                <div class="wf-input-box">youtube.com/...</div>
+              </div>
+              <div class="wf-field">
+                <div class="wf-label">Additional link</div>
+                <div class="wf-input-box">https://...</div>
+              </div>
+            </div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next wf-nav-next--green">Preview my card →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label-text">13 · Portfolio Links</div>
+    </div>
+
+  </div><!-- /screen-row D -->
+
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION E — PREVIEW & LAUNCH
+  ═══════════════════════════════════════════════ -->
+  <div class="section-hd">
+    <div class="section-badge">E</div>
+    <div class="section-label">Preview &amp; Launch</div>
+  </div>
+  <div class="screen-row">
+
+    <!-- 14 · Profile Preview -->
+    <div class="screen-wrap">
+      <div class="screen">
+        <div class="screen-chrome">
+          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
+          <div class="chrome-url">weld.gg/onboarding/preview</div>
+        </div>
+        <div class="screen-split">
+          <div class="panel-left" style="background:var(--text);">
+            <div class="wf-brand">
+              <div class="wf-brand-asterisk">✳</div>
+              <div class="wf-brand-name wf-brand-name--light">weld.</div>
+            </div>
+            <div class="wf-headline wf-headline--light" style="font-size:22px;">here's how<br>studios<br>see you</div>
+            <div class="wf-sub-text wf-sub-text--light">This is exactly what your card looks like in the matching pool. Happy with it? Publish.</div>
+            <div style="margin-top:auto;font-size:10px;color:rgba(255,255,255,0.4);line-height:1.5;">
+              You can edit anything after publishing from your profile page.
+            </div>
+          </div>
+          <div class="panel-right" style="flex-direction:row;gap:20px;align-items:flex-start;padding:20px 20px;">
+            <!-- card preview -->
+            <div class="profile-preview-card">
+              <div class="ppc-header">
+                <div class="ppc-avatar-row">
+                  <div class="ppc-avatar">avatar</div>
+                  <div>
+                    <div class="ppc-verified"><div style="width:5px;height:5px;border-radius:50%;background:var(--purple);"></div> Verified</div>
+                    <div class="ppc-name">xXBuilder99</div>
+                    <div class="ppc-role">Roblox scripter</div>
+                  </div>
+                </div>
+                <div class="ppc-available"><div class="ppc-dot"></div> Available for work</div>
+              </div>
+              <div class="ppc-body">
+                <div class="ppc-bio">Builds clean Roblox systems, ships fast, and shows real proof of work.</div>
+                <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--text-3);margin-bottom:8px;">
+                  <span>3+ yrs</span><span>$65/hr</span><span>10–20 hrs/wk</span>
+                </div>
+                <div class="ppc-pills">
+                  <div class="ppc-pill">Lua</div>
+                  <div class="ppc-pill">Roblox API</div>
+                  <div class="ppc-pill">Remote Events</div>
+                </div>
+                <div class="ppc-links">
+                  <span>R /Builder99</span>
+                  <span>DC eclipse.dev</span>
+                  <span>GH eclipsedevx</span>
+                </div>
+              </div>
+            </div>
+            <!-- right side actions -->
+            <div style="flex:1;display:flex;flex-direction:column;gap:10px;">
+              <div style="font-size:11px;color:var(--text-3);line-height:1.5;margin-bottom:4px;">Looks good? Publishing makes you visible to studios immediately.</div>
+              <div class="wf-cta wf-cta--green">🚀 Publish profile</div>
+              <div class="wf-cta wf-cta--ghost">← Edit something</div>
+              <div style="font-size:9px;color:var(--text-3);text-align:center;margin-top:4px;">Profile can be edited or unpublished at any time.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label-text">14 · Profile Preview</div>
+    </div>
+
+    <div class="connector">
+      <svg width="32" height="18"><path d="M0 9 L24 9 M17 3 L24 9 L17 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </div>
+
+    <!-- 15 · Profile Live -->
+    <div class="screen-wrap">
+      <div class="screen">
+        <div class="screen-chrome">
+          <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
+          <div class="chrome-url">weld.gg/home</div>
+        </div>
+        <div class="screen-split">
+          <div class="panel-left" style="background:var(--purple);">
+            <div class="wf-brand">
+              <div class="wf-brand-asterisk" style="background:white;color:var(--purple);">✳</div>
+              <div class="wf-brand-name wf-brand-name--light">weld.</div>
+            </div>
+            <div class="wf-headline wf-headline--light" style="font-size:28px;">you're<br>live! 🎉</div>
+            <div class="wf-sub-text wf-sub-text--light">You're now visible in the matching pool. Studios can find and spark you.</div>
+            <div style="margin-top:auto;font-size:9px;color:rgba(255,255,255,0.5);">
+              Share your profile:<br>
+              <span style="color:white;font-weight:700;">weld.gg/xXBuilder99</span>
+            </div>
+          </div>
+          <div class="panel-right" style="justify-content:center;align-items:center;text-align:center;">
+            <div class="success-pulse">🎉</div>
+            <div class="rp-eyebrow" style="text-align:center;">Profile is live</div>
+            <div class="rp-title" style="text-align:center;">You're in the matching pool</div>
+            <div class="rp-sub" style="text-align:center;max-width:280px;margin-left:auto;margin-right:auto;">Studios are already seeing profiles. Start matching or check out your published profile.</div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;max-width:280px;margin:0 auto;">
+              <div class="wf-cta" style="justify-content:center;gap:8px;"><span>⚡</span> Start matching</div>
+              <div class="auth-btn" style="justify-content:center;gap:8px;"><span>👁</span> View my profile</div>
+            </div>
+
+            <div style="font-size:9px;color:var(--text-3);margin-top:14px;">
+              Share: <strong style="color:var(--purple);">weld.gg/xXBuilder99</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label-text">15 · Profile Live! 🎉</div>
+    </div>
+
+  </div><!-- /screen-row E -->
+
+</div><!-- /flow -->
+
+
+<!-- FOOTNOTES -->
+<div class="footnotes">
+  <div class="fn-card">
+    <div class="fn-title">🔑 Auth methods</div>
+    <div class="fn-item"><div class="fn-dot"></div><div class="fn-text">OAuth (Roblox, Google, Discord) → auto-fills identity, skips email confirm</div></div>
+    <div class="fn-item"><div class="fn-dot"></div><div class="fn-text">Email + password → requires confirm email step before entering builder</div></div>
+    <div class="fn-item"><div class="fn-dot"></div><div class="fn-text">Draft saves locally on every change; syncs to account once signed in</div></div>
+  </div>
+  <div class="fn-card">
+    <div class="fn-title">🎭 Dev vs Studio split</div>
+    <div class="fn-item"><div class="fn-dot"></div><div class="fn-text">Screens above show <strong>Developer</strong> path (6 steps)</div></div>
+    <div class="fn-item"><div class="fn-dot"></div><div class="fn-text">Studio swaps Role step: Rate → Team size + Hiring status + Budget</div></div>
+    <div class="fn-item"><div class="fn-dot"></div><div class="fn-text">Studio Work step = Top Games (3 max) not Projects</div></div>
+    <div class="fn-item"><div class="fn-dot"></div><div class="fn-text">Studio has no Portfolio Links step (5 steps total)</div></div>
+  </div>
+  <div class="fn-card">
+    <div class="fn-title">🔗 Social linking notes</div>
+    <div class="fn-item"><div class="fn-dot"></div><div class="fn-text">Roblox: required for trust badge + avatar (URL fallback available)</div></div>
+    <div class="fn-item"><div class="fn-dot"></div><div class="fn-text">Discord: shown prominently — studios DM devs there</div></div>
+    <div class="fn-item"><div class="fn-dot"></div><div class="fn-text">GitHub, X, YouTube: optional, each boosts trust score</div></div>
+  </div>
+  <div class="fn-card">
+    <div class="fn-title">✅ Step map (Dev, 6 steps)</div>
+    <div class="fn-item"><div class="fn-dot"></div><div class="fn-text"><strong>0</strong> Type selection</div></div>
+    <div class="fn-item"><div class="fn-dot"></div><div class="fn-text"><strong>1</strong> Identity: name · Roblox · socials · colour · availability</div></div>
+    <div class="fn-item"><div class="fn-dot"></div><div class="fn-text"><strong>2</strong> Role: experience + rate type + amount</div></div>
+    <div class="fn-item"><div class="fn-dot"></div><div class="fn-text"><strong>3</strong> Bio: short + extended</div></div>
+    <div class="fn-item"><div class="fn-dot"></div><div class="fn-text"><strong>4</strong> Skills: up to 5 with descriptions</div></div>
+    <div class="fn-item"><div class="fn-dot"></div><div class="fn-text"><strong>5</strong> Work: up to 3 projects + stats</div></div>
+    <div class="fn-item"><div class="fn-dot"></div><div class="fn-text"><strong>6</strong> Portfolio: links → preview → publish</div></div>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>

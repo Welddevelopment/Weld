@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Weld — Onboarding Flow Wireframe</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f2efe9;
+    --surface: #faf9f6;
+    --border: #c8c3bb;
+    --border-dark: #8a8580;
+    --text: #1c1a17;
+    --text-2: #5a564f;
+    --text-3: #9a958e;
+    --accent: #1c1a17;
+    --orange: #d4540a;
+    --purple: #6b4fc8;
+    --green: #2d6a4f;
+    --red: #b52b1e;
+    --tag: #e6e2da;
+    --tag-active: #1c1a17;
+    --tag-active-text: #faf9f6;
+    font-family: 'Space Mono', monospace;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: auto;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 1.5px solid var(--border);
+    padding: 12px 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .header-logo {
+    font-family: 'Caveat', cursive;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .header-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-2);
+  }
+  .header-sep { flex: 1; }
+  .header-note {
+    font-size: 11px;
+    color: var(--text-3);
+    font-style: italic;
+    font-family: 'Caveat', cursive;
+    font-size: 15px;
+  }
+
+  /* ─── FLOW LABEL SECTIONS ─── */
+  .flow-wrap {
+    padding: 32px 40px 60px;
+    min-width: max-content;
+  }
+
+  .flow-section {
+    margin-bottom: 56px;
+  }
+
+  .flow-section-label {
+    font-family: 'Caveat', cursive;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-2);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .flow-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    border-top: 1.5px dashed var(--border);
+    min-width: 40px;
+  }
+
+  .flow-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  /* ─── ARROW CONNECTOR ─── */
+  .arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    padding-top: 90px;
+    flex-shrink: 0;
+    color: var(--text-3);
+    font-size: 20px;
+    position: relative;
+  }
+  .arrow-label {
+    position: absolute;
+    top: 68px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Caveat', cursive;
+    font-size: 12px;
+    color: var(--text-3);
+    white-space: nowrap;
+  }
+  .arrow svg { display: block; }
+
+  /* ─── BRANCH ARROW ─── */
+  .branch-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 8px;
+    padding-top: 80px;
+    gap: 0;
+  }
+  .branch-label {
+    font-family: 'Caveat', cursive;
+    font-size: 13px;
+    color: var(--orange);
+    margin-bottom: 4px;
+    text-align: center;
+  }
+
+  /* ─── SCREEN ─── */
+  .screen {
+    flex-shrink: 0;
+    width: 220px;
+    background: var(--surface);
+    border: 2px solid var(--border-dark);
+    border-radius: 18px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 3px 4px 0 rgba(0,0,0,0.12);
+  }
+  .screen--tall { /* auto height */ }
+
+  .screen-chrome {
+    background: var(--surface);
+    border-bottom: 1.5px solid var(--border);
+    padding: 8px 14px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .screen-time {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .screen-icons {
+    display: flex;
+    gap: 4px;
+    font-size: 9px;
+    color: var(--text-2);
+  }
+
+  .screen-body {
+    padding: 14px 14px 16px;
+  }
+
+  .screen-num {
+    font-size: 10px;
+    color: var(--text-3);
+    margin-bottom: 4px;
+    font-family: 'Caveat', cursive;
+    font-size: 13px;
+  }
+
+  .screen-label {
+    position: absolute;
+    bottom: -26px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Caveat', cursive;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-2);
+    white-space: nowrap;
+  }
+
+  /* ─── WELD BRAND BAR ─── */
+  .brand-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .brand-asterisk {
+    width: 14px; height: 14px;
+    background: var(--orange);
+    border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: white; font-weight: 700;
+  }
+  .brand-name {
+    font-family: 'Caveat', cursive;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* ─── WIREFRAME ELEMENTS ─── */
+  .wf-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.25;
+    margin-bottom: 4px;
+    font-family: 'Caveat', cursive;
+  }
+  .wf-sub {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+
+  .wf-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    border: 1.5px solid var(--border-dark);
+    border-radius: 8px;
+    padding: 9px 10px;
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text);
+    background: var(--surface);
+  }
+  .wf-btn-icon {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    background: var(--tag);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+    flex-shrink: 0;
+  }
+  .wf-btn-arrow {
+    font-size: 12px;
+    color: var(--purple);
+    flex-shrink: 0;
+  }
+
+  .wf-divider {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 8px 0;
+    font-size: 10px;
+    color: var(--text-3);
+  }
+  .wf-divider::before, .wf-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .wf-input {
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 10px;
+    margin-bottom: 7px;
+    font-size: 10px;
+    color: var(--text-3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg);
+  }
+  .wf-input svg { flex-shrink: 0; opacity: 0.5; }
+
+  .wf-cta {
+    background: var(--purple);
+    color: white;
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 4px;
+    margin-bottom: 6px;
+  }
+
+  .wf-cta--outline {
+    background: transparent;
+    color: var(--purple);
+    border: 1.5px solid var(--purple);
+  }
+
+  .wf-trust-row {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-top: 6px;
+  }
+  .wf-trust-item {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 9px;
+    color: var(--text-3);
+  }
+  .wf-trust-check {
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    border: 1px solid var(--text-3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 7px;
+    flex-shrink: 0;
+  }
+
+  .wf-link-row {
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-3);
+    margin-top: 6px;
+  }
+  .wf-link-row span {
+    color: var(--purple);
+    font-weight: 700;
+  }
+
+  .wf-section-divider {
+    border: none;
+    border-top: 1.5px dashed var(--border);
+    margin: 10px 0;
+  }
+
+  /* type cards */
+  .wf-type-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 10px 0;
+  }
+  .wf-type-card {
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    background: var(--bg);
+  }
+  .wf-type-card--active {
+    border-color: var(--purple);
+    background: rgba(107,79,200,0.06);
+  }
+  .wf-type-card-icon {
+    font-size: 18px;
+    margin-bottom: 3px;
+  }
+  .wf-type-card-title {
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'Caveat', cursive;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .wf-type-card-desc {
+    font-size: 9px;
+    color: var(--text-3);
+    line-height: 1.35;
+  }
+
+  /* progress bar */
+  .wf-progress {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .wf-progress-fill {
+    height: 100%;
+    background: var(--purple);
+    border-radius: 2px;
+  }
+
+  /* field */
+  .wf-field {
+    margin-bottom: 10px;
+  }
+  .wf-field-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-2);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .wf-required { color: var(--orange); }
+  .wf-hint { font-size: 8px; color: var(--text-3); font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+  .wf-input-box {
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 10px;
+    font-size: 10px;
+    color: var(--text-3);
+    background: var(--bg);
+    width: 100%;
+  }
+
+  .wf-textarea {
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 10px;
+    font-size: 10px;
+    color: var(--text-3);
+    background: var(--bg);
+    width: 100%;
+    height: 44px;
+    resize: none;
+  }
+
+  /* pills */
+  .wf-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 4px;
+  }
+  .wf-pill {
+    padding: 4px 8px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-2);
+    background: var(--surface);
+  }
+  .wf-pill--on {
+    border-color: var(--purple);
+    background: rgba(107,79,200,0.1);
+    color: var(--purple);
+  }
+
+  /* skill grid */
+  .wf-skill-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    margin-top: 4px;
+  }
+  .wf-skill-btn {
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 7px;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-2);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .wf-skill-btn--on {
+    border-color: var(--purple);
+    background: rgba(107,79,200,0.08);
+    color: var(--purple);
+  }
+
+  /* nav row */
+  .wf-nav {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .wf-nav-back {
+    flex: 1;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 0;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-2);
+    text-align: center;
+    background: transparent;
+  }
+  .wf-nav-next {
+    flex: 2;
+    background: var(--purple);
+    border-radius: 7px;
+    padding: 7px 0;
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+    text-align: center;
+  }
+
+  /* social link item */
+  .wf-social-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    background: var(--bg);
+  }
+  .wf-social-item--linked {
+    border-color: var(--green);
+    background: rgba(45,106,79,0.05);
+  }
+  .wf-social-icon {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    background: var(--tag);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+  .wf-social-info { flex: 1; }
+  .wf-social-name { font-size: 11px; font-weight: 700; color: var(--text); }
+  .wf-social-handle { font-size: 9px; color: var(--text-3); }
+  .wf-social-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    background: rgba(45,106,79,0.12);
+    color: var(--green);
+    font-weight: 700;
+  }
+  .wf-social-link-btn {
+    font-size: 9px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    border: 1px solid var(--border-dark);
+    color: var(--text-2);
+    font-weight: 700;
+  }
+
+  /* avatar row */
+  .wf-avatar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .wf-avatar-placeholder {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    background: var(--tag);
+    border: 2px dashed var(--border-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+    color: var(--text-3);
+    text-align: center;
+    line-height: 1.2;
+    flex-shrink: 0;
+    font-family: 'Caveat', cursive;
+    font-size: 10px;
+  }
+  .wf-avatar-meta { flex: 1; }
+  .wf-avatar-name {
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Caveat', cursive;
+    color: var(--text);
+  }
+  .wf-avatar-role {
+    font-size: 9px;
+    color: var(--text-3);
+  }
+
+  /* colour swatches */
+  .wf-swatches {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .wf-swatch {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    border: 1.5px solid transparent;
+  }
+  .wf-swatch--active {
+    border-color: var(--text);
+    outline: 2px solid white;
+    outline-offset: -3px;
+  }
+
+  /* work entry */
+  .wf-work-entry {
+    border: 1.5px dashed var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    background: var(--bg);
+  }
+  .wf-work-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .wf-work-entry-num {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-2);
+  }
+  .wf-work-remove {
+    font-size: 9px;
+    color: var(--red);
+    font-weight: 700;
+  }
+
+  /* profile card preview */
+  .wf-profile-card {
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .wf-profile-card-header {
+    padding: 10px 10px 8px;
+    background: var(--tag);
+  }
+  .wf-profile-card-body {
+    padding: 8px 10px;
+  }
+  .wf-verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 8px;
+    font-weight: 700;
+    color: var(--purple);
+    border: 1px solid var(--purple);
+    border-radius: 10px;
+    padding: 2px 6px;
+    margin-bottom: 6px;
+  }
+  .wf-verified-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--purple);
+  }
+
+  /* annotation */
+  .annotation {
+    font-family: 'Caveat', cursive;
+    font-size: 12px;
+    color: var(--orange);
+    margin-top: 28px;
+    margin-bottom: 0;
+    line-height: 1.4;
+    max-width: 180px;
+  }
+  .annotation-arrow {
+    font-size: 16px;
+    color: var(--orange);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  /* success screen */
+  .wf-success-pulse {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--purple);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 10px;
+    font-size: 20px;
+  }
+
+  /* step counter badge */
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--text);
+    color: var(--surface);
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* scroll indicator */
+  .scroll-hint {
+    position: fixed;
+    bottom: 20px;
+    right: 24px;
+    font-family: 'Caveat', cursive;
+    font-size: 14px;
+    color: var(--text-3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+  }
+
+  /* section annotation */
+  .section-annot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 6px;
+    padding-top: 70px;
+    min-width: 60px;
+    gap: 4px;
+  }
+  .section-annot-text {
+    font-family: 'Caveat', cursive;
+    font-size: 12px;
+    color: var(--orange);
+    text-align: center;
+    line-height: 1.3;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+
+  .wf-login-link {
+    font-size: 10px;
+    color: var(--text-3);
+    text-align: center;
+    margin-top: 8px;
+  }
+  .wf-login-link strong { color: var(--purple); }
+
+  /* footnotes */
+  .footnotes {
+    padding: 0 40px 48px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  .footnote-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    min-width: 200px;
+    max-width: 260px;
+  }
+  .footnote-title {
+    font-family: 'Caveat', cursive;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .footnote-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .footnote-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--orange);
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+  .footnote-text {
+    font-size: 10px;
+    color: var(--text-2);
+    line-height: 1.45;
+  }
+
+  /* security shield */
+  .wf-security {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 9px;
+    color: var(--text-3);
+    margin-top: 8px;
+  }
+
+  .wf-step-eyebrow {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    margin-bottom: 3px;
+  }
+
+  .wf-email-confirm {
+    background: rgba(45,106,79,0.08);
+    border: 1px solid rgba(45,106,79,0.3);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 10px;
+    color: var(--green);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .wf-checkbox-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    margin-bottom: 8px;
+    font-size: 9px;
+    color: var(--text-2);
+    line-height: 1.4;
+  }
+  .wf-checkbox {
+    width: 13px; height: 13px;
+    border: 1.5px solid var(--border-dark);
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .wf-availability-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 20px;
+    width: fit-content;
+  }
+  .wf-availability-status--available {
+    background: rgba(45,106,79,0.1);
+    color: var(--green);
+  }
+  .wf-availability-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+
+  .wf-username-preview {
+    background: var(--tag);
+    border-radius: 6px;
+    padding: 6px 9px;
+    font-size: 10px;
+    color: var(--text-2);
+    margin-top: 4px;
+    font-family: 'Space Mono', monospace;
+  }
+  .wf-username-preview span {
+    color: var(--purple);
+    font-weight: 700;
+  }
+  .wf-username-status {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 9px;
+    margin-top: 3px;
+    color: var(--green);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">✳ weld.</div>
+  <div class="header-title">Onboarding Flow — Wireframe</div>
+  <div class="header-sep"></div>
+  <div class="header-note">← scroll right to follow the flow →</div>
+</div>
+
+<div class="flow-wrap">
+
+  <!-- ─── SECTION 1: ENTRY POINT ─── -->
+  <div class="flow-section">
+    <div class="flow-section-label">
+      <span class="step-badge">A</span> Entry &amp; Auth
+    </div>
+    <div class="flow-row">
+
+      <!-- SCREEN 1: Landing / Signup CTA -->
+      <div style="position:relative; margin-right: 32px;">
+        <div class="screen">
+          <div class="screen-chrome">
+            <span class="screen-time">9:41</span>
+            <span class="screen-icons">▲ ● ●</span>
+          </div>
+          <div class="screen-body">
+            <div class="brand-bar">
+              <div class="brand-asterisk">✳</div>
+              <div class="brand-name">weld.</div>
+            </div>
+            <div class="wf-title">find roblox talent who ship.</div>
+            <div class="wf-sub">Role-first cards, not generic profiles.</div>
+            <div style="height:8px;"></div>
+            <div class="wf-cta" style="margin-bottom:7px;">Join as a developer <span>→</span></div>
+            <div class="wf-cta wf-cta--outline">I'm a studio →</div>
+            <div class="wf-divider">or</div>
+            <div class="wf-login-link">Already have an account? <strong>Log in</strong></div>
+            <hr class="wf-section-divider">
+            <div style="display:flex;align-items:center;gap:6px;font-size:9px;color:var(--text-3);">
+              <div style="display:flex;margin-left:-4px;">
+                <div style="width:16px;height:16px;border-radius:50%;background:var(--tag);border:1.5px solid var(--surface);margin-left:4px;"></div>
+                <div style="width:16px;height:16px;border-radius:50%;background:var(--border);border:1.5px solid var(--surface);margin-left:4px;"></div>
+                <div style="width:16px;height:16px;border-radius:50%;background:var(--border-dark);border:1.5px solid var(--surface);margin-left:4px;"></div>
+              </div>
+              <span>1,200+ Roblox devs</span>
+            </div>
+          </div>
+        </div>
+        <div class="screen-label">01 · Landing</div>
+      </div>
+
+      <div class="arrow">
+        <svg width="28" height="16"><path d="M0 8 L20 8 M14 3 L20 8 L14 13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      </div>
+
+      <!-- SCREEN 2: Create Account -->
+      <div style="position:relative; margin-right: 32px;">
+        <div class="screen">
+          <div class="screen-chrome">
+            <span class="screen-time">9:41</span>
+            <span class="screen-icons">▲ ● ●</span>
+          </div>
+          <div class="screen-body">
+            <div class="wf-step-eyebrow">Create account</div>
+            <div class="wf-title">Join weld.</div>
+            <div class="wf-sub" style="margin-bottom:10px;">Start hiring or get hired in minutes.</div>
+
+            <div class="wf-btn">
+              <div style="display:flex;align-items:center;gap:7px;">
+                <div class="wf-btn-icon" style="background:#000;color:white;font-weight:900;">R</div>
+                <span>Continue with Roblox</span>
+              </div>
+              <span class="wf-btn-arrow">→</span>
+            </div>
+            <div class="wf-btn">
+              <div style="display:flex;align-items:center;gap:7px;">
+                <div class="wf-btn-icon" style="font-size:11px;">G</div>
+                <span>Continue with Google</span>
+              </div>
+              <span class="wf-btn-arrow">→</span>
+            </div>
+            <div class="wf-btn">
+              <div style="display:flex;align-items:center;gap:7px;">
+                <div class="wf-btn-icon" style="background:#5865F2;color:white;font-size:9px;">DC</div>
+                <span>Continue with Discord</span>
+              </div>
+              <span class="wf-btn-arrow">→</span>
+            </div>
+
+            <div class="wf-divider">or email</div>
+
+            <div class="wf-input">
+              <svg width="11" height="9" viewBox="0 0 11 9" fill="none"><rect x="0.5" y="0.5" width="10" height="8" rx="1.5" stroke="#666"/><path d="M0.5 2L5.5 5L10.5 2" stroke="#666"/></svg>
+              <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1e67716b5e7b667f736e727b307d7173">[email&#160;protected]</a>
+            </div>
+            <div class="wf-input">
+              <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><rect x="1" y="5" width="8" height="7" rx="1.5" stroke="#666"/><path d="M3 5V3.5a2 2 0 114 0V5" stroke="#666"/></svg>
+              Create a strong password
+            </div>
+            <div class="wf-cta">Create account <span>→</span></div>
+            <div class="wf-trust-row">
+              <div class="wf-trust-item"><div class="wf-trust-check">✓</div> Free</div>
+              <div class="wf-trust-item"><div class="wf-trust-check">✓</div> No card</div>
+              <div class="wf-trust-item"><div class="wf-trust-check">✓</div> Cancel</div>
+            </div>
+          </div>
+        </div>
+        <div class="screen-label">02 · Sign Up</div>
+      </div>
+
+      <div class="arrow">
+        <svg width="28" height="16"><path d="M0 8 L20 8 M14 3 L20 8 L14 13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      </div>
+
+      <!-- SCREEN 3: Email Confirm (conditional) -->
+      <div style="position:relative; margin-right: 6px;">
+        <div class="screen">
+          <div class="screen-chrome">
+            <span class="screen-time">9:41</span>
+            <span class="screen-icons">▲ ● ●</span>
+          </div>
+          <div class="screen-body">
+            <div class="wf-step-eyebrow">Check your inbox</div>
+            <div class="wf-title">Confirm your email</div>
+            <div class="wf-sub">We sent a link to <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ec958399ac89948d819c8089c28f8381">[email&#160;protected]</a></strong></div>
+            <div class="wf-email-confirm">
+              <span>📬</span>
+              <div>Open the email and click the confirm link to continue.</div>
+            </div>
+            <div class="wf-cta" style="background:var(--tag);color:var(--text-2);">Open Gmail <span style="color:var(--text-2)">→</span></div>
+            <div class="wf-login-link" style="margin-top:8px;">Wrong address? <strong>Go back</strong></div>
+            <hr class="wf-section-divider" style="margin-top:12px;">
+            <div style="font-size:9px;color:var(--text-3);text-align:center;">Didn't receive it? <span style="color:var(--purple);font-weight:700;">Resend</span></div>
+          </div>
+        </div>
+        <div class="screen-label" style="white-space:nowrap;">03 · Email Confirm</div>
+        <div class="annotation">
+          <span class="annotation-arrow">↑</span>
+          Only if email signup. OAuth skips this.
+        </div>
+      </div>
+
+      <div class="arrow" style="padding-top:70px;">
+        <svg width="28" height="16"><path d="M0 8 L20 8 M14 3 L20 8 L14 13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      </div>
+
+      <!-- SCREEN 4: Login -->
+      <div style="position:relative; margin-right: 32px;">
+        <div class="screen">
+          <div class="screen-chrome">
+            <span class="screen-time">9:41</span>
+            <span class="screen-icons">▲ ● ●</span>
+          </div>
+          <div class="screen-body">
+            <div class="wf-step-eyebrow">Welcome back</div>
+            <div class="wf-title">Log in to weld.</div>
+            <div class="wf-sub" style="margin-bottom:10px;">Pick up where you left off.</div>
+
+            <div class="wf-btn">
+              <div style="display:flex;align-items:center;gap:7px;">
+                <div class="wf-btn-icon" style="background:#000;color:white;font-weight:900;">R</div>
+                <span>Continue with Roblox</span>
+              </div>
+              <span class="wf-btn-arrow">→</span>
+            </div>
+            <div class="wf-btn">
+              <div style="display:flex;align-items:center;gap:7px;">
+                <div class="wf-btn-icon" style="font-size:11px;">G</div>
+                <span>Continue with Google</span>
+              </div>
+              <span class="wf-btn-arrow">→</span>
+            </div>
+            <div class="wf-btn">
+              <div style="display:flex;align-items:center;gap:7px;">
+                <div class="wf-btn-icon" style="background:#5865F2;color:white;font-size:9px;">DC</div>
+                <span>Continue with Discord</span>
+              </div>
+              <span class="wf-btn-arrow">→</span>
+            </div>
+
+            <div class="wf-divider">or</div>
+            <div class="wf-input">
+              <svg width="11" height="9" viewBox="0 0 11 9" fill="none"><rect x="0.5" y="0.5" width="10" height="8" rx="1.5" stroke="#666"/><path d="M0.5 2L5.5 5L10.5 2" stroke="#666"/></svg>
+              Email
+            </div>
+            <div class="wf-input">
+              <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><rect x="1" y="5" width="8" height="7" rx="1.5" stroke="#666"/><path d="M3 5V3.5a2 2 0 114 0V5" stroke="#666"/></svg>
+              Password
+            </div>
+            <div class="wf-cta">Log in <span>→</span></div>
+            <div class="wf-login-link">Need an account? <strong>Create one</strong></div>
+            <div class="wf-login-link" style="margin-top:4px;"><strong>Forgot password?</strong></div>
+          </div>
+        </div>
+        <div class="screen-label">04 · Log In</div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ─── SECTION 2: ACCOUNT TYPE ─── -->
+  <div class="flow-section">
+    <div class="flow-section-label">
+      <span class="step-badge">B</span> Account Type &amp; Identity
+    </div>
+    <div class="flow-row">
+
+      <!-- SCREEN 5: Who are you? -->
+      <div style="position:relative; margin-right: 32px;">
+        <div class="screen">
+          <div class="screen-chrome">
+            <span class="screen-time">9:41</span>
+            <span class="screen-icons">▲ ● ●</span>
+          </div>
+          <div class="screen-body">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:0%"></div></div>
+            <div class="wf-step-eyebrow">Step 0 of 6</div>
+            <div class="wf-title">Who are you on weld?</div>
+            <div class="wf-sub">Choose your profile type. Can't change later.</div>
+
+            <div class="wf-type-cards">
+              <div class="wf-type-card wf-type-card--active">
+                <div class="wf-type-card-icon">🛠</div>
+                <div class="wf-type-card-title">Developer</div>
+                <div class="wf-type-card-desc">I create scripts, art, or audio and want to work with studios.</div>
+              </div>
+              <div class="wf-type-card">
+                <div class="wf-type-card-icon">🎮</div>
+                <div class="wf-type-card-title">Studio</div>
+                <div class="wf-type-card-desc">I run a Roblox game studio and want to hire developers.</div>
+              </div>
+            </div>
+
+            <div class="wf-cta" style="margin-top:10px;">Continue as Developer <span>→</span></div>
+          </div>
+        </div>
+        <div class="screen-label" style="white-space:nowrap;">05 · Who Are You?</div>
+      </div>
+
+      <div class="arrow">
+        <svg width="28" height="16"><path d="M0 8 L20 8 M14 3 L20 8 L14 13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      </div>
+
+      <!-- SCREEN 6: Username / Display Name -->
+      <div style="position:relative; margin-right: 32px;">
+        <div class="screen">
+          <div class="screen-chrome">
+            <span class="screen-time">9:41</span>
+            <span class="screen-icons">▲ ● ●</span>
+          </div>
+          <div class="screen-body">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:16%"></div></div>
+            <div class="wf-step-eyebrow">Step 1 of 6 · Identity</div>
+            <div class="wf-title">Your identity</div>
+            <div class="wf-sub">How you'll appear to everyone.</div>
+
+            <div class="wf-field">
+              <div class="wf-field-label">Display name <span class="wf-required">*</span></div>
+              <div class="wf-input-box" style="color:var(--text);font-weight:700;">xXBuilder99</div>
+              <div class="wf-username-preview">weld.gg/<span>xXBuilder99</span></div>
+              <div class="wf-username-status">
+                <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.5" stroke="#2d6a4f" fill="none"/><path d="M3 5l1.5 1.5 2.5-3" stroke="#2d6a4f" stroke-width="1.3" stroke-linecap="round"/></svg>
+                Available
+              </div>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-field-label">Profile colour</div>
+              <div class="wf-swatches">
+                <div class="wf-swatch wf-swatch--active" style="background:linear-gradient(135deg,#a8c0e8,#d4b8f0)"></div>
+                <div class="wf-swatch" style="background:linear-gradient(135deg,#f0b8b8,#f0d4b8)"></div>
+                <div class="wf-swatch" style="background:linear-gradient(135deg,#b8f0c0,#b8e8f0)"></div>
+                <div class="wf-swatch" style="background:linear-gradient(135deg,#f0e8b8,#e8c0b8)"></div>
+                <div class="wf-swatch" style="background:linear-gradient(135deg,#1a1917,#3a3735)"></div>
+                <div class="wf-swatch" style="background:linear-gradient(135deg,#e0d8f0,#c8d8f0)"></div>
+              </div>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-field-label">Badge <span class="wf-hint">(optional)</span></div>
+              <div class="wf-pills">
+                <div class="wf-pill wf-pill--on">⭐ Rising Star</div>
+                <div class="wf-pill">🔥 Hot Now</div>
+                <div class="wf-pill">🚀 Fast Delivery</div>
+              </div>
+            </div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next">Next →</div>
+            </div>
+          </div>
+        </div>
+        <div class="screen-label" style="white-space:nowrap;">06 · Username + Identity</div>
+      </div>
+
+      <div class="arrow">
+        <svg width="28" height="16"><path d="M0 8 L20 8 M14 3 L20 8 L14 13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      </div>
+
+      <!-- SCREEN 7: Link Roblox -->
+      <div style="position:relative; margin-right: 32px;">
+        <div class="screen">
+          <div class="screen-chrome">
+            <span class="screen-time">9:41</span>
+            <span class="screen-icons">▲ ● ●</span>
+          </div>
+          <div class="screen-body">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:25%"></div></div>
+            <div class="wf-step-eyebrow">Step 1 of 6 · Identity</div>
+            <div class="wf-title">Link your Roblox</div>
+            <div class="wf-sub">Pulls in your avatar + username. Studios trust verified accounts.</div>
+
+            <div class="wf-social-item wf-social-item--linked">
+              <div class="wf-social-icon" style="background:#000;color:white;font-weight:900;font-size:10px;">R</div>
+              <div class="wf-social-info">
+                <div class="wf-social-name">Roblox</div>
+                <div class="wf-social-handle">@xXBuilder99</div>
+              </div>
+              <div class="wf-social-badge">✓ Linked</div>
+            </div>
+
+            <div class="wf-field" style="margin-top:8px;">
+              <div class="wf-field-label">Or paste your profile URL <span class="wf-hint">(alternative)</span></div>
+              <div class="wf-input-box" style="color:var(--text-3);">roblox.com/users/12345/profile</div>
+            </div>
+
+            <div class="wf-avatar-row" style="margin-top:10px;">
+              <div class="wf-avatar-placeholder">avatar<br/>preview</div>
+              <div class="wf-avatar-meta">
+                <div class="wf-avatar-name">xXBuilder99</div>
+                <div class="wf-avatar-role">Roblox scripter</div>
+                <div class="wf-availability-status wf-availability-status--available" style="margin-top:4px;">
+                  <div class="wf-availability-dot"></div> Available
+                </div>
+              </div>
+            </div>
+
+            <div class="wf-security">
+              <svg width="11" height="12" viewBox="0 0 11 12" fill="none"><path d="M5.5 1L1 3v4c0 2.5 2 4.2 4.5 5C10 11.2 10 7 10 7V3L5.5 1z" stroke="#9a958e" stroke-width="1.2" fill="none"/></svg>
+              We never post without permission
+            </div>
+
+            <div class="wf-nav" style="margin-top:10px;">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next">Next →</div>
+            </div>
+          </div>
+        </div>
+        <div class="screen-label" style="white-space:nowrap;">07 · Link Roblox</div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ─── SECTION 3: SOCIAL LINKING ─── -->
+  <div class="flow-section">
+    <div class="flow-section-label">
+      <span class="step-badge">C</span> Social Accounts &amp; Verification
+    </div>
+    <div class="flow-row">
+
+      <!-- SCREEN 8: Link Discord -->
+      <div style="position:relative; margin-right: 32px;">
+        <div class="screen">
+          <div class="screen-chrome">
+            <span class="screen-time">9:41</span>
+            <span class="screen-icons">▲ ● ●</span>
+          </div>
+          <div class="screen-body">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:33%"></div></div>
+            <div class="wf-step-eyebrow">Step 1 of 6 · Identity</div>
+            <div class="wf-title">Link your socials</div>
+            <div class="wf-sub">More links = more trust. Add what you have.</div>
+
+            <!-- Discord -->
+            <div class="wf-social-item wf-social-item--linked">
+              <div class="wf-social-icon" style="background:#5865F2;color:white;font-size:9px;font-weight:700;">DC</div>
+              <div class="wf-social-info">
+                <div class="wf-social-name">Discord</div>
+                <div class="wf-social-handle">eclipse.dev</div>
+              </div>
+              <div class="wf-social-badge">✓ Linked</div>
+            </div>
+
+            <!-- GitHub -->
+            <div class="wf-social-item">
+              <div class="wf-social-icon" style="background:#24292e;color:white;font-size:10px;font-weight:700;">GH</div>
+              <div class="wf-social-info">
+                <div class="wf-social-name">GitHub</div>
+                <div class="wf-social-handle">Connect account</div>
+              </div>
+              <div class="wf-social-link-btn">Link →</div>
+            </div>
+
+            <!-- X/Twitter -->
+            <div class="wf-social-item">
+              <div class="wf-social-icon" style="background:#000;color:white;font-size:11px;font-weight:900;">𝕏</div>
+              <div class="wf-social-info">
+                <div class="wf-social-name">X / Twitter</div>
+                <div class="wf-social-handle">Connect account</div>
+              </div>
+              <div class="wf-social-link-btn">Link →</div>
+            </div>
+
+            <!-- YouTube -->
+            <div class="wf-social-item">
+              <div class="wf-social-icon" style="background:#FF0000;color:white;font-size:9px;font-weight:700;">YT</div>
+              <div class="wf-social-info">
+                <div class="wf-social-name">YouTube</div>
+                <div class="wf-social-handle">Connect account</div>
+              </div>
+              <div class="wf-social-link-btn">Link →</div>
+            </div>
+
+            <div style="font-size:9px;color:var(--text-3);text-align:center;margin-top:4px;">
+              All optional. More links = higher trust score.
+            </div>
+
+            <div class="wf-nav" style="margin-top:8px;">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next">Next →</div>
+            </div>
+          </div>
+        </div>
+        <div class="screen-label" style="white-space:nowrap;">08 · Link Socials</div>
+      </div>
+
+      <div class="arrow">
+        <svg width="28" height="16"><path d="M0 8 L20 8 M14 3 L20 8 L14 13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      </div>
+
+      <!-- SCREEN 9: Roblox OAuth Popup -->
+      <div style="position:relative; margin-right: 32px;">
+        <div class="screen" style="min-height:260px;">
+          <div class="screen-chrome">
+            <span class="screen-time">9:41</span>
+            <span class="screen-icons">▲ ● ●</span>
+          </div>
+          <!-- dim overlay -->
+          <div style="background:rgba(28,26,23,0.4);position:absolute;inset:36px 0 0;z-index:1;border-radius:0 0 16px 16px;"></div>
+          <!-- popup sheet -->
+          <div style="position:absolute;bottom:0;left:0;right:0;z-index:2;background:var(--surface);border-radius:16px 16px 16px 16px;border:1.5px solid var(--border-dark);padding:14px 14px 16px;box-shadow:0 -8px 24px rgba(0,0,0,0.18);">
+            <div style="width:32px;height:3px;background:var(--border);border-radius:2px;margin:0 auto 12px;"></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:28px;height:28px;background:#5865F2;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:700;">DC</div>
+              <div>
+                <div style="font-size:11px;font-weight:700;font-family:'Caveat',cursive;">Authorize weld.</div>
+                <div style="font-size:9px;color:var(--text-3);">Discord wants to access your account</div>
+              </div>
+            </div>
+            <div style="font-size:9px;color:var(--text-2);margin-bottom:10px;line-height:1.4;">
+              weld. will be able to see your:<br>
+              · Username &amp; discriminator<br>
+              · Avatar<br>
+              · Email address
+            </div>
+            <div class="wf-cta" style="background:#5865F2;margin-bottom:6px;font-size:10px;">Authorize <span>→</span></div>
+            <div style="text-align:center;font-size:9px;color:var(--text-3);">Cancel</div>
+          </div>
+          <div class="screen-body" style="padding-top:8px;">
+            <div style="font-size:9px;color:var(--text-3);margin-bottom:60px;">Behind the OAuth sheet...</div>
+          </div>
+        </div>
+        <div class="screen-label" style="white-space:nowrap;">09 · OAuth Popup</div>
+        <div class="annotation">
+          <span class="annotation-arrow">↑</span>
+          OAuth sheet for Discord, GitHub, X, etc.
+        </div>
+      </div>
+
+      <div class="arrow" style="padding-top:70px;">
+        <svg width="28" height="16"><path d="M0 8 L20 8 M14 3 L20 8 L14 13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      </div>
+
+      <!-- SCREEN 10: Availability -->
+      <div style="position:relative; margin-right: 32px;">
+        <div class="screen">
+          <div class="screen-chrome">
+            <span class="screen-time">9:41</span>
+            <span class="screen-icons">▲ ● ●</span>
+          </div>
+          <div class="screen-body">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:40%"></div></div>
+            <div class="wf-step-eyebrow">Step 1 of 6 · Identity</div>
+            <div class="wf-title">Your availability</div>
+            <div class="wf-sub">Studios see this on your card. You can change it anytime.</div>
+
+            <div class="wf-field">
+              <div class="wf-field-label">Current status <span class="wf-required">*</span></div>
+              <div class="wf-pills">
+                <div class="wf-pill wf-pill--on">Available for work</div>
+                <div class="wf-pill">Open to offers</div>
+                <div class="wf-pill">Not available</div>
+              </div>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-field-label">Hours / week <span class="wf-hint">(optional)</span></div>
+              <div class="wf-pills">
+                <div class="wf-pill">Under 10</div>
+                <div class="wf-pill wf-pill--on">10–20 hrs</div>
+                <div class="wf-pill">20–40 hrs</div>
+                <div class="wf-pill">Full-time</div>
+              </div>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-field-label">Timezone <span class="wf-hint">(optional)</span></div>
+              <div class="wf-input-box" style="color:var(--text);">EST (UTC-5)</div>
+            </div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next">Next →</div>
+            </div>
+          </div>
+        </div>
+        <div class="screen-label" style="white-space:nowrap;">10 · Availability</div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ─── SECTION 4: PROFILE CONTENT ─── -->
+  <div class="flow-section">
+    <div class="flow-section-label">
+      <span class="step-badge">D</span> Profile Content
+    </div>
+    <div class="flow-row">
+
+      <!-- SCREEN 11: Role & Rate -->
+      <div style="position:relative; margin-right: 32px;">
+        <div class="screen">
+          <div class="screen-chrome">
+            <span class="screen-time">9:41</span>
+            <span class="screen-icons">▲ ● ●</span>
+          </div>
+          <div class="screen-body">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:33%"></div></div>
+            <div class="wf-step-eyebrow">Step 2 of 6 · Role</div>
+            <div class="wf-title">Your experience &amp; rate</div>
+            <div class="wf-sub">Helps studios know your level and what you charge.</div>
+
+            <div class="wf-field">
+              <div class="wf-field-label">Years of experience <span class="wf-required">*</span></div>
+              <div class="wf-pills">
+                <div class="wf-pill">Under 1yr</div>
+                <div class="wf-pill wf-pill--on">1–2 yrs</div>
+                <div class="wf-pill">3–4 yrs</div>
+                <div class="wf-pill">5+ yrs</div>
+              </div>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-field-label">Rate type <span class="wf-required">*</span></div>
+              <div class="wf-pills">
+                <div class="wf-pill wf-pill--on">USD / hr</div>
+                <div class="wf-pill">Robux / hr</div>
+                <div class="wf-pill">Fixed USD</div>
+                <div class="wf-pill">Rev share</div>
+              </div>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-field-label">Rate amount <span class="wf-hint">(optional)</span></div>
+              <div class="wf-input-box" style="color:var(--text);">$65 / hr</div>
+            </div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next">Next →</div>
+            </div>
+          </div>
+        </div>
+        <div class="screen-label" style="white-space:nowrap;">11 · Role &amp; Rate</div>
+      </div>
+
+      <div class="arrow">
+        <svg width="28" height="16"><path d="M0 8 L20 8 M14 3 L20 8 L14 13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      </div>
+
+      <!-- SCREEN 12: Bio -->
+      <div style="position:relative; margin-right: 32px;">
+        <div class="screen">
+          <div class="screen-chrome">
+            <span class="screen-time">9:41</span>
+            <span class="screen-icons">▲ ● ●</span>
+          </div>
+          <div class="screen-body">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:50%"></div></div>
+            <div class="wf-step-eyebrow">Step 3 of 6 · Bio</div>
+            <div class="wf-title">Your bio</div>
+            <div class="wf-sub">One sentence. What do you do and how?</div>
+
+            <div class="wf-field">
+              <div class="wf-field-label">Bio <span class="wf-required">*</span></div>
+              <div class="wf-textarea" style="color:var(--text);height:60px;">Builds clean Roblox systems, ships fast, and shows real proof of work.</div>
+              <div style="font-size:9px;color:var(--text-3);text-align:right;margin-top:3px;">54/120 chars</div>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-field-label">Details <span class="wf-hint">(optional)</span></div>
+              <div class="wf-textarea" style="height:50px;color:var(--text-3);">Longer pitch — experience, process, what you bring...</div>
+            </div>
+
+            <div style="background:rgba(107,79,200,0.07);border:1px dashed var(--purple);border-radius:7px;padding:7px 9px;font-size:9px;color:var(--purple);margin-bottom:10px;">
+              💡 Keep it factual. Studios read hundreds. Specifics win.
+            </div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next">Next →</div>
+            </div>
+          </div>
+        </div>
+        <div class="screen-label">12 · Bio</div>
+      </div>
+
+      <div class="arrow">
+        <svg width="28" height="16"><path d="M0 8 L20 8 M14 3 L20 8 L14 13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      </div>
+
+      <!-- SCREEN 13: Skills -->
+      <div style="position:relative; margin-right: 32px;">
+        <div class="screen">
+          <div class="screen-chrome">
+            <span class="screen-time">9:41</span>
+            <span class="screen-icons">▲ ● ●</span>
+          </div>
+          <div class="screen-body">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:67%"></div></div>
+            <div class="wf-step-eyebrow">Step 4 of 6 · Skills</div>
+            <div class="wf-title">Your skills</div>
+            <div class="wf-sub">Pick up to 5 that best represent you.</div>
+
+            <div class="wf-skill-grid">
+              <div class="wf-skill-btn wf-skill-btn--on">Lua ✓</div>
+              <div class="wf-skill-btn wf-skill-btn--on">Roblox API ✓</div>
+              <div class="wf-skill-btn wf-skill-btn--on">Remote Events ✓</div>
+              <div class="wf-skill-btn">Data Stores</div>
+              <div class="wf-skill-btn">UI Design</div>
+              <div class="wf-skill-btn">Animation</div>
+              <div class="wf-skill-btn">VFX</div>
+              <div class="wf-skill-btn">Building</div>
+              <div class="wf-skill-btn">Game Design</div>
+              <div class="wf-skill-btn">3D Modeling</div>
+            </div>
+
+            <div style="font-size:9px;color:var(--purple);margin-top:6px;font-weight:700;">3 / 5 selected</div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next">Next →</div>
+            </div>
+          </div>
+        </div>
+        <div class="screen-label">13 · Skills</div>
+      </div>
+
+      <div class="arrow">
+        <svg width="28" height="16"><path d="M0 8 L20 8 M14 3 L20 8 L14 13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      </div>
+
+      <!-- SCREEN 14: Work/Portfolio -->
+      <div style="position:relative; margin-right: 32px;">
+        <div class="screen">
+          <div class="screen-chrome">
+            <span class="screen-time">9:41</span>
+            <span class="screen-icons">▲ ● ●</span>
+          </div>
+          <div class="screen-body">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:83%"></div></div>
+            <div class="wf-step-eyebrow">Step 5 of 6 · Work</div>
+            <div class="wf-title">Your best work</div>
+            <div class="wf-sub">Up to 3 projects. Real stats help a lot.</div>
+
+            <div class="wf-work-entry">
+              <div class="wf-work-entry-header">
+                <span class="wf-work-entry-num">🎮 Project 1</span>
+                <span class="wf-work-remove">Remove</span>
+              </div>
+              <div class="wf-input-box" style="margin-bottom:5px;color:var(--text);">Combat System Revamp</div>
+              <div class="wf-textarea" style="height:36px;color:var(--text-3);">Built modular combat with custom abilities...</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:5px;">
+                <div class="wf-input-box" style="font-size:9px;color:var(--text-3);">2 weeks</div>
+                <div class="wf-input-box" style="font-size:9px;color:var(--text-3);">$300</div>
+              </div>
+            </div>
+
+            <div style="border:1.5px dashed var(--border);border-radius:8px;padding:8px;text-align:center;font-size:10px;color:var(--text-3);margin-bottom:10px;">
+              + Add project
+            </div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next">Next →</div>
+            </div>
+          </div>
+        </div>
+        <div class="screen-label" style="white-space:nowrap;">14 · Work &amp; Portfolio</div>
+      </div>
+
+      <div class="arrow">
+        <svg width="28" height="16"><path d="M0 8 L20 8 M14 3 L20 8 L14 13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      </div>
+
+      <!-- SCREEN 15: Portfolio links -->
+      <div style="position:relative; margin-right: 32px;">
+        <div class="screen">
+          <div class="screen-chrome">
+            <span class="screen-time">9:41</span>
+            <span class="screen-icons">▲ ● ●</span>
+          </div>
+          <div class="screen-body">
+            <div class="wf-progress"><div class="wf-progress-fill" style="width:100%"></div></div>
+            <div class="wf-step-eyebrow">Step 6 of 6 · Portfolio</div>
+            <div class="wf-title">Portfolio links</div>
+            <div class="wf-sub">Link any live work — Roblox games, YouTube, etc.</div>
+
+            <div class="wf-field">
+              <div class="wf-field-label">Portfolio / website <span class="wf-hint">(optional)</span></div>
+              <div class="wf-input-box" style="color:var(--text-3);">https://...</div>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-field-label">Live Roblox game URL <span class="wf-hint">(optional)</span></div>
+              <div class="wf-input-box" style="color:var(--text-3);">roblox.com/games/...</div>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-field-label">YouTube showreel <span class="wf-hint">(optional)</span></div>
+              <div class="wf-input-box" style="color:var(--text-3);">youtube.com/...</div>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-field-label">Additional link <span class="wf-hint">(optional)</span></div>
+              <div class="wf-input-box" style="color:var(--text-3);">https://...</div>
+            </div>
+
+            <div class="wf-nav">
+              <div class="wf-nav-back">← Back</div>
+              <div class="wf-nav-next" style="background:var(--green);">Preview Card →</div>
+            </div>
+          </div>
+        </div>
+        <div class="screen-label" style="white-space:nowrap;">15 · Portfolio Links</div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ─── SECTION 5: REVIEW & LAUNCH ─── -->
+  <div class="flow-section">
+    <div class="flow-section-label">
+      <span class="step-badge">E</span> Preview &amp; Launch
+    </div>
+    <div class="flow-row">
+
+      <!-- SCREEN 16: Profile preview -->
+      <div style="position:relative; margin-right: 32px;">
+        <div class="screen">
+          <div class="screen-chrome">
+            <span class="screen-time">9:41</span>
+            <span class="screen-icons">▲ ● ●</span>
+          </div>
+          <div class="screen-body">
+            <div class="wf-step-eyebrow">Preview your card</div>
+            <div class="wf-title">Here's how studios see you</div>
+
+            <div class="wf-profile-card">
+              <div class="wf-profile-card-header">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                  <div class="wf-avatar-placeholder" style="width:36px;height:36px;font-size:8px;">avatar</div>
+                  <div>
+                    <div class="wf-verified-badge"><div class="wf-verified-dot"></div> Verified</div>
+                    <div style="font-family:'Caveat',cursive;font-size:13px;font-weight:700;">xXBuilder99</div>
+                    <div style="font-size:8px;color:var(--text-3);">Roblox scripter</div>
+                  </div>
+                </div>
+                <div class="wf-availability-status wf-availability-status--available" style="font-size:8px;padding:2px 7px;">
+                  <div class="wf-availability-dot" style="width:5px;height:5px;"></div> Available for work
+                </div>
+              </div>
+              <div class="wf-profile-card-body">
+                <div style="font-size:9px;color:var(--text-2);margin-bottom:7px;line-height:1.4;">Builds clean Roblox systems, ships fast, and shows real proof of work.</div>
+                <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:7px;">
+                  <div class="wf-pill" style="font-size:8px;padding:2px 6px;">Lua</div>
+                  <div class="wf-pill" style="font-size:8px;padding:2px 6px;">Roblox API</div>
+                  <div class="wf-pill" style="font-size:8px;padding:2px 6px;">Remote Events</div>
+                </div>
+                <div style="display:flex;gap:6px;font-size:8px;color:var(--text-3);">
+                  <span>R /Builder99</span>
+                  <span>DC eclipse.dev</span>
+                  <span>GH eclipsedevx</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="font-size:9px;color:var(--text-3);text-align:center;margin-bottom:8px;">Looks good? Publish to go live.</div>
+
+            <div class="wf-cta" style="background:var(--green);">Publish profile 🚀</div>
+            <div class="wf-login-link" style="margin-top:6px;"><strong>← Edit something</strong></div>
+          </div>
+        </div>
+        <div class="screen-label" style="white-space:nowrap;">16 · Profile Preview</div>
+      </div>
+
+      <div class="arrow">
+        <svg width="28" height="16"><path d="M0 8 L20 8 M14 3 L20 8 L14 13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      </div>
+
+      <!-- SCREEN 17: Profile live! -->
+      <div style="position:relative; margin-right: 32px;">
+        <div class="screen">
+          <div class="screen-chrome">
+            <span class="screen-time">9:41</span>
+            <span class="screen-icons">▲ ● ●</span>
+          </div>
+          <div class="screen-body" style="text-align:center;padding-top:20px;">
+            <div class="wf-success-pulse">🎉</div>
+            <div class="wf-title" style="text-align:center;margin-bottom:4px;">Profile is live!</div>
+            <div class="wf-sub" style="text-align:center;margin-bottom:14px;">You're now visible in the matching pool.</div>
+
+            <div class="wf-btn" style="margin-bottom:7px;justify-content:center;gap:6px;">
+              <span>👁</span> View my profile
+            </div>
+            <div class="wf-btn" style="justify-content:center;gap:6px;background:var(--purple);color:white;border-color:var(--purple);">
+              <span style="font-size:14px;">⚡</span> Start matching
+            </div>
+
+            <hr class="wf-section-divider" style="margin-top:14px;">
+            <div style="font-size:9px;color:var(--text-3);text-align:center;line-height:1.5;">
+              Share your profile link:<br>
+              <span style="color:var(--purple);font-weight:700;">weld.gg/xXBuilder99</span>
+            </div>
+          </div>
+        </div>
+        <div class="screen-label" style="white-space:nowrap;">17 · Profile Live! 🎉</div>
+      </div>
+
+      <!-- annotation column -->
+      <div style="padding-top:60px;padding-left:16px;">
+        <div class="annotation" style="max-width:160px;">
+          <span class="annotation-arrow">↑</span>
+          After publish → drops into matching pool. Studios start swiping immediately.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /flow-wrap -->
+
+
+<!-- ─── FOOTNOTES ─── -->
+<div class="footnotes">
+
+  <div class="footnote-card">
+    <div class="footnote-title">🔑 Auth methods</div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text">OAuth (Roblox, Google, Discord) → skips email confirm step, auto-fills identity fields</div></div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text">Email+password → requires confirm email step before entering builder</div></div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text">Draft saves locally on every change; syncs to account once signed in</div></div>
+  </div>
+
+  <div class="footnote-card">
+    <div class="footnote-title">🔗 Social linking notes</div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text">Roblox link: required for trust badge + avatar pull-in (can use URL fallback)</div></div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text">Discord: shown prominently on card — studios DM devs there</div></div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text">GitHub, X, YouTube: optional, each adds to trust score</div></div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text">Can add/remove socials later from profile settings</div></div>
+  </div>
+
+  <div class="footnote-card">
+    <div class="footnote-title">🎭 Two paths (Dev vs Studio)</div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text">Screens 11–15 shown above are Dev path</div></div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text">Studio path replaces Rate with Team Size + Status + Budget</div></div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text">Studio Work step = Top Games (3 max) instead of Projects</div></div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text">Studio has no Portfolio links step (5 steps vs 6)</div></div>
+  </div>
+
+  <div class="footnote-card">
+    <div class="footnote-title">💾 Data persistence</div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text">LocalStorage draft saves on every change</div></div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text">Account sync saves to Supabase when logged in</div></div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text">User can exit mid-flow and resume from same step</div></div>
+  </div>
+
+  <div class="footnote-card">
+    <div class="footnote-title">✅ Step summary (Dev)</div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text"><strong>0</strong> Type: Dev or Studio</div></div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text"><strong>1</strong> Identity: name, Roblox link, socials, colour, availability</div></div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text"><strong>2</strong> Role: experience + rate type + amount</div></div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text"><strong>3</strong> Bio: short pitch + details</div></div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text"><strong>4</strong> Skills: up to 5, with descriptions</div></div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text"><strong>5</strong> Work: up to 3 projects + stats</div></div>
+    <div class="footnote-item"><div class="footnote-dot"></div><div class="footnote-text"><strong>6</strong> Portfolio: links, then preview + publish</div></div>
+  </div>
+
+</div>
+
+<div class="scroll-hint">scroll right → →</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>

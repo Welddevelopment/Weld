@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weld — Home</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Brand primitives */
+      --bg:          #f2efe9;
+      --surface:     #faf9f6;
+      --border:      #c8c3bb;
+      --text:        #1c1a17;
+      --text-2:      #5a564f;
+      --text-3:      #9a958e;
+      --orange:      #d4540a;
+      --purple:      #6b4fc8;
+      --tag:         #e6e2da;
+
+      /* Homepage token aliases */
+      --font-sans:                  'Space Mono', monospace;
+      --color-text-primary:         #1c1a17;
+      --color-text-secondary:       #5a564f;
+      --color-text-tertiary:        #9a958e;
+      --color-text-info:            #6b4fc8;
+      --color-background-primary:   #faf9f6;
+      --color-background-secondary: #f2efe9;
+      --color-background-tertiary:  #e6e2da;
+      --color-background-info:      rgba(107,79,200,0.10);
+      --color-border-primary:       #d4540a;
+      --color-border-secondary:     #c8c3bb;
+      --color-border-tertiary:      #c8c3bb;
+      --border-radius-md:           6px;
+      --border-radius-lg:           10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+    }
+
+    .wf { color: var(--color-text-primary); font-size: 13px; line-height: 1.5; }
+    .wf-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; border-bottom: 0.5px solid var(--color-border-secondary); position: sticky; top: 0; z-index: 100; background: var(--bg); }
+    .wf-logo { font-size: 20px; font-weight: 700; font-family: 'Caveat', cursive; }
+    .wf-nav-links { display: flex; gap: 4px; }
+    .wf-nav-link { padding: 5px 10px; font-size: 12px; border-radius: var(--border-radius-md); color: var(--color-text-secondary); border: 0.5px solid transparent; cursor: default; }
+    .wf-nav-link.active { color: var(--color-text-primary); border-color: var(--color-border-secondary); background: var(--color-background-secondary); }
+    .wf-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .wf-stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .wf-stat { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 1px 3px rgba(28,26,23,0.06); border: 0.5px solid var(--color-border-secondary); transition: box-shadow 0.15s ease; }
+    .wf-stat:hover { box-shadow: 0 3px 8px rgba(28,26,23,0.10); }
+    .wf-stat-label { font-size: 11px; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.04em; }
+    .wf-stat-val { font-size: 22px; font-weight: 700; font-family: 'Space Mono', monospace; letter-spacing: -0.02em; }
+    .wf-stat-sub { font-size: 11px; color: var(--color-text-secondary); }
+    .wf-cta-banner { border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; background: var(--surface); box-shadow: 0 1px 3px rgba(28,26,23,0.06); }
+    .wf-cta-text { display: flex; flex-direction: column; gap: 3px; }
+    .wf-cta-text strong { font-size: 14px; font-weight: 700; }
+    .wf-cta-text span { font-size: 12px; color: var(--color-text-secondary); }
+    .wf-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 13px; font-weight: 700; cursor: default; background: var(--color-background-primary); white-space: nowrap; font-family: 'Space Mono', monospace; }
+    .wf-btn-fill { background: var(--orange); color: #ffffff; border-color: transparent; }
+    .wf-two-col { display: grid; grid-template-columns: 3fr 2fr; gap: 16px; }
+    .wf-section { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+    .wf-section-head { padding: 10px 14px; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; justify-content: space-between; background: var(--color-background-secondary); }
+    .wf-section-head-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-secondary); }
+    .wf-section-head-count { font-size: 11px; color: var(--color-text-tertiary); background: var(--color-background-tertiary); border-radius: 10px; padding: 1px 7px; }
+    .wf-section-body { padding: 14px; }
+    .wf-card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .wf-profile-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); overflow: hidden; transition: box-shadow 0.15s ease, transform 0.15s ease; }
+    .wf-profile-card:hover { box-shadow: 2px 3px 0 rgba(28,26,23,0.12); transform: translateY(-1px); }
+    .wf-profile-photo { height: 68px; background: var(--color-background-tertiary); display: flex; align-items: center; justify-content: center; }
+    .wf-avatar-circle { width: 36px; height: 36px; border-radius: 50%; background: var(--tag); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--color-text-secondary); font-family: 'Space Mono', monospace; }
+    .wf-profile-info { padding: 8px 10px; display: flex; flex-direction: column; gap: 3px; }
+    .wf-profile-name { font-size: 13px; font-weight: 700; }
+    .wf-profile-sub { font-size: 11px; color: var(--color-text-secondary); }
+    .wf-profile-tag { display: inline-block; align-self: flex-start; font-size: 10px; border: 0.5px solid var(--color-border-tertiary); border-radius: 10px; padding: 1px 7px; color: var(--color-text-secondary); margin-top: 2px; background: var(--tag); }
+    .wf-profile-footer { padding: 8px 10px; border-top: 0.5px solid var(--color-border-tertiary); display: flex; justify-content: space-between; align-items: center; }
+    .wf-btn-xs { font-size: 11px; padding: 4px 10px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); cursor: default; font-family: 'Space Mono', monospace; }
+    .wf-badge-new { font-size: 10px; color: var(--color-text-info); background: var(--color-background-info); border-radius: 10px; padding: 1px 7px; }
+    .wf-empty { padding: 24px 14px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .wf-empty-icon { width: 32px; height: 32px; border-radius: 50%; background: var(--color-background-secondary); border: 0.5px dashed var(--orange); margin: 0 auto 4px; opacity: 0.45; }
+    .wf-empty-text { font-size: 13px; font-weight: 700; }
+    .wf-empty-sub { font-size: 12px; color: var(--color-text-secondary); max-width: 160px; }
+    .wf-msg-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+    .wf-msg-row:last-child { border-bottom: none; }
+    .wf-msg-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--color-text-secondary); font-family: 'Space Mono', monospace; }
+    .wf-msg-content { flex: 1; min-width: 0; }
+    .wf-msg-name { font-size: 13px; font-weight: 700; }
+    .wf-msg-preview { font-size: 12px; color: var(--color-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .wf-msg-meta { font-size: 11px; color: var(--color-text-tertiary); flex-shrink: 0; text-align: right; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+    .wf-spark-row { display: flex; gap: 10px; overflow-x: auto; padding: 14px; }
+    .wf-spark-card { flex-shrink: 0; width: 80px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .wf-spark-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--color-text-secondary); font-family: 'Space Mono', monospace; }
+    .wf-spark-name { font-size: 11px; text-align: center; color: var(--color-text-secondary); }
+    .wf-completeness { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+    .wf-progress-bar { height: 3px; background: var(--color-background-tertiary); border-radius: 2px; }
+    .wf-progress-fill { height: 100%; width: 60%; background: var(--color-border-primary); border-radius: 2px; }
+    .wf-complete-body { padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .wf-complete-left { display: flex; flex-direction: column; gap: 3px; }
+    .wf-annotation { font-family: 'Caveat', cursive !important; font-size: 13px !important; color: var(--orange) !important; font-style: normal !important; }
+    .wf-divider { height: 0.5px; background: var(--color-border-tertiary); }
+    .wf-section-full { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+    .wf-liked-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 14px; }
+  </style>
+</head>
+<body>
+
+<div class="wf">
+  <h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden">Weld homepage wireframe — improved layout showing stat bar, liked you, sparks, messages, and profile completeness</h2>
+
+  <div class="wf-nav">
+    <span class="wf-logo">weld.</span>
+    <div class="wf-nav-links">
+      <span class="wf-nav-link active">Home</span>
+      <span class="wf-nav-link">Messages</span>
+      <span class="wf-nav-link">Swipe</span>
+      <span class="wf-nav-link">Profile</span>
+      <span class="wf-nav-link">Account</span>
+    </div>
+  </div>
+
+  <div class="wf-body">
+
+    <div class="wf-stat-row">
+      <div class="wf-stat">
+        <span class="wf-stat-label">Liked you</span>
+        <span class="wf-stat-val">2</span>
+        <span class="wf-stat-sub">waiting to review</span>
+      </div>
+      <div class="wf-stat">
+        <span class="wf-stat-label">Sparks</span>
+        <span class="wf-stat-val">0</span>
+        <span class="wf-stat-sub">mutual matches</span>
+      </div>
+      <div class="wf-stat">
+        <span class="wf-stat-label">Messages</span>
+        <span class="wf-stat-val">0</span>
+        <span class="wf-stat-sub">unread</span>
+      </div>
+      <div class="wf-stat">
+        <span class="wf-stat-label">Profile views</span>
+        <span class="wf-stat-val">—</span>
+        <span class="wf-stat-sub">last 7 days</span>
+      </div>
+    </div>
+
+    <div class="wf-cta-banner">
+      <div class="wf-cta-text">
+        <strong>Ready to find your match?</strong>
+        <span>You have new profiles in your deck — keep the momentum going.</span>
+      </div>
+      <button class="wf-btn wf-btn-fill">Start swiping →</button>
+    </div>
+
+    <div class="wf-annotation" style="padding: 0 2px">↑ stat bar + CTA above the fold — highest-value info first</div>
+
+    <div class="wf-divider"></div>
+
+    <div class="wf-section-full">
+      <div class="wf-section-head">
+        <span class="wf-section-head-title">Liked you</span>
+        <span class="wf-section-head-count">2 new</span>
+      </div>
+      <div class="wf-liked-grid">
+        <div class="wf-profile-card">
+          <div class="wf-profile-photo"><div class="wf-avatar-circle">UN</div></div>
+          <div class="wf-profile-info">
+            <span class="wf-profile-name">Unknown profile</span>
+            <span class="wf-profile-sub">Loading failed</span>
+          </div>
+          <div class="wf-profile-footer">
+            <span class="wf-annotation">Apr 29</span>
+            <span class="wf-btn-xs">Message</span>
+          </div>
+        </div>
+        <div class="wf-profile-card">
+          <div class="wf-profile-photo"><div class="wf-avatar-circle">DS</div></div>
+          <div class="wf-profile-info">
+            <span class="wf-profile-name">dsaf</span>
+            <span class="wf-profile-sub">Developer · 3yr exp</span>
+            <span class="wf-profile-tag">UI Design</span>
+          </div>
+          <div class="wf-profile-footer">
+            <span class="wf-annotation">Apr 29</span>
+            <span class="wf-btn-xs">Message</span>
+          </div>
+        </div>
+        <div class="wf-profile-card" style="border-style: dashed; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 140px;">
+          <div style="text-align: center; padding: 12px; display: flex; flex-direction: column; gap: 6px; align-items: center;">
+            <div style="width: 28px; height: 28px; border-radius: 50%; border: 0.5px dashed var(--color-border-secondary);"></div>
+            <span style="font-size: 12px; color: var(--color-text-tertiary);">More when you swipe</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wf-annotation" style="padding: 0 2px">↑ "Liked you" promoted above sparks — it's the most actionable content</div>
+
+    <div class="wf-two-col">
+
+      <div class="wf-section">
+        <div class="wf-section-head">
+          <span class="wf-section-head-title">Sparks</span>
+          <span class="wf-section-head-count">0</span>
+        </div>
+        <div class="wf-empty">
+          <div class="wf-empty-icon"></div>
+          <span class="wf-empty-text">No sparks yet</span>
+          <span class="wf-empty-sub">When someone you liked matches back, they appear here.</span>
+          <button class="wf-btn" style="margin-top: 6px; font-size: 12px;">Go to swipe →</button>
+        </div>
+      </div>
+
+      <div class="wf-section">
+        <div class="wf-section-head">
+          <span class="wf-section-head-title">Recent messages</span>
+          <span class="wf-btn-xs" style="font-size: 10px; padding: 3px 8px;">View all</span>
+        </div>
+        <div class="wf-empty">
+          <div class="wf-empty-icon"></div>
+          <span class="wf-empty-text">No messages yet</span>
+          <span class="wf-empty-sub">Message someone you liked to get started.</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="wf-annotation" style="padding: 0 2px">↑ empty states compact & inline — not full-page blocks</div>
+
+    <div class="wf-completeness">
+      <div class="wf-progress-bar"><div class="wf-progress-fill"></div></div>
+      <div class="wf-complete-body">
+        <div class="wf-complete-left">
+          <span style="font-size: 13px; font-weight: 700;">Profile 60% complete</span>
+          <span style="font-size: 12px; color: var(--color-text-secondary);">Add a photo and bio to get 3× more matches.</span>
+        </div>
+        <button class="wf-btn" style="font-size: 12px;">Complete profile</button>
+      </div>
+    </div>
+
+    <div class="wf-annotation" style="padding: 0 2px">↑ profile nudge at bottom — engagement hook without dominating</div>
+
+  </div>
+</div>
+
+</body>
+</html>
