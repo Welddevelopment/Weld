@@ -22,11 +22,22 @@ function expLabel(years: number | null): string {
   return `${years}+ yrs`
 }
 
+function formatPortfolioLink(link: { name: string; url: string } | undefined) {
+  if (!link?.url?.trim()) return null
+  const url = link.url.trim()
+  return {
+    href: /^https?:\/\//i.test(url) ? url : `https://${url}`,
+    label: link.name?.trim() || url,
+  }
+}
+
 export default function EditableCard({ draft, update, leftPanel, rightPanel, onToggleLeft, onToggleRight, onBack, onBackLabel = '← Back', onPublish }: Props) {
   const initials = getInitials(draft.name) || '?'
   const rateDisplay = draft.rateAmount
     ? `${draft.rateAmount} ${draft.rateType ?? ''}`.trim()
     : draft.rateType ?? null
+  const socialLinks = draft.socials.filter(s => s.url?.trim())
+  const portfolioLink = formatPortfolioLink(draft.portfolioLinks.find(link => link.url?.trim()))
 
   const removeSkill = (name: string) =>
     update({ selectedSkills: draft.selectedSkills.filter(s => s.name !== name) })
@@ -52,7 +63,6 @@ export default function EditableCard({ draft, update, leftPanel, rightPanel, onT
           </div>
 
           <div className="npc-top-right">
-            <div style={{ height: 34 }} />
             <div className="npc-stats">
               <div className="npc-stat">
                 <div className="npc-stat-val">{expLabel(draft.experienceYears)}</div>
@@ -71,6 +81,22 @@ export default function EditableCard({ draft, update, leftPanel, rightPanel, onT
                 <div className="npc-stat-lbl">On-time</div>
               </div>
             </div>
+
+            {socialLinks.length > 0 && (
+              <div className="npc-socials" style={{ marginTop: 6 }}>
+                {socialLinks.slice(0, 4).map(s => (
+                  <a
+                    key={s.label}
+                    href={s.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="npc-social-btn"
+                  >
+                    {s.icon || s.label[0]}
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -95,6 +121,18 @@ export default function EditableCard({ draft, update, leftPanel, rightPanel, onT
           <p className="npc-role">
             {draft.experienceYears !== null ? `Dev · ${expLabel(draft.experienceYears)}` : 'Developer'}
           </p>
+          {portfolioLink && (
+            <div className="npc-portfolio-row">
+              <a
+                className="npc-portfolio-link"
+                href={portfolioLink.href}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {portfolioLink.label}
+              </a>
+            </div>
+          )}
         </div>
 
         <div className="npc-divider" />
