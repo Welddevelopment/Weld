@@ -25,14 +25,6 @@ function expLabel(years: number | null): string {
   return `${years}+ yrs`
 }
 
-function formatPortfolioLink(link: { name: string; url: string } | undefined) {
-  if (!link?.url?.trim()) return null
-  const url = link.url.trim()
-  return {
-    href: /^https?:\/\//i.test(url) ? url : `https://${url}`,
-    label: link.name?.trim() || url,
-  }
-}
 
 export default function EditableCard({
   draft,
@@ -53,7 +45,6 @@ export default function EditableCard({
     ? `${draft.rateAmount} ${draft.rateType ?? ''}`.trim()
     : draft.rateType ?? null
   const socialLinks = draft.socials.filter(s => s.url?.trim())
-  const portfolioLink = formatPortfolioLink(draft.portfolioLinks.find(link => link.url?.trim()))
   const experienceInput = draft.experienceYears === null ? '' : draft.experienceYears.toString()
 
   const removeSkill = (name: string) =>
@@ -94,8 +85,8 @@ export default function EditableCard({
                 <div className="npc-stat-lbl">Games</div>
               </div>
               <div className="npc-stat">
-                <div className="npc-stat-val">—</div>
-                <div className="npc-stat-lbl">On-time</div>
+                <div className="npc-stat-val">{draft.selectedSkills.length > 0 ? draft.selectedSkills.length : '—'}</div>
+                <div className="npc-stat-lbl">Skills</div>
               </div>
             </div>
 
@@ -114,6 +105,18 @@ export default function EditableCard({
                 ))}
               </div>
             )}
+            {draft.portfolioLinks.filter(l => l.url?.trim()).slice(0, 2).map(link => (
+              <a
+                key={link.url}
+                href={/^https?:\/\//i.test(link.url) ? link.url : `https://${link.url}`}
+                target="_blank"
+                rel="noreferrer"
+                className="npc-portfolio-top-link"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="10" height="10"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                {link.name || link.url}
+              </a>
+            ))}
           </div>
         </div>
 
@@ -158,18 +161,6 @@ export default function EditableCard({
               </div>
             )}
           </div>
-          {portfolioLink && (
-            <div className="npc-portfolio-row">
-              <a
-                className="npc-portfolio-link"
-                href={portfolioLink.href}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {portfolioLink.label}
-              </a>
-            </div>
-          )}
         </div>
 
         <div className="npc-divider" />

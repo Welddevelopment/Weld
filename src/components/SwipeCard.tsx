@@ -120,9 +120,9 @@ export default function SwipeCard({
                 label="Scripts"
               />
               <StatItem
-                icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>}
-                value={devStats.onTime}
-                label="On-time"
+                icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>}
+                value={skills.length > 0 ? String(skills.length) : '—'}
+                label="Skills"
               />
             </div>
 
@@ -143,6 +143,19 @@ export default function SwipeCard({
                 ))}
               </div>
             )}
+            {(profile.portfolio?.links ?? []).filter(l => l.url?.trim()).slice(0, 2).map(link => (
+              <a
+                key={link.url}
+                href={/^https?:\/\//i.test(link.url) ? link.url : `https://${link.url}`}
+                target="_blank"
+                rel="noreferrer"
+                className="npc-portfolio-top-link"
+                onMouseDown={stopDrag}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="10" height="10"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                {link.name || link.url}
+              </a>
+            ))}
           </div>
         </div>
 
