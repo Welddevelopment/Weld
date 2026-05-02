@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { Session } from '@supabase/supabase-js'
@@ -171,6 +171,9 @@ export default function ProfileBuilder({
   const [saveState, setSaveState] = useState<SaveState>('local')
   const [showDeleteWarning, setShowDeleteWarning] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [showScrollActions, setShowScrollActions] = useState(false)
+  const [checklistOpen, setChecklistOpen] = useState(true)
+  const bodyRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const d = loadDraft()
@@ -216,6 +219,35 @@ export default function ProfileBuilder({
     if (!hydrated) return
     try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)) } catch {}
   }, [draft, hydrated])
+
+  useEffect(() => {
+    const root = bodyRef.current
+    if (!root) return
+    const onScroll = () => setShowScrollActions(root.scrollTop > 120)
+    root.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => root.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const checklistTasks = useMemo(() => {
+    const hasName = !!draft.name.trim()
+    const hasBio = !!draft.bio.trim()
+    const hasSkill = draft.selectedSkills.length > 0
+    const hasGame = draft.topGames.length > 0
+    const hasWork = draft.bestWork.length > 0
+    const hasPortfolio = draft.portfolioLinks.some(link => link.url?.trim()) || draft.socials.some(link => link.url?.trim())
+
+    return [
+      { label: 'Fill in your name', completed: hasName },
+      { label: 'Write a short bio', completed: hasBio },
+      { label: 'Add at least one skill', completed: hasSkill },
+      { label: 'Add a game you worked on', completed: hasGame },
+      { label: 'Share your work or socials', completed: hasPortfolio },
+      { label: 'Link a project or portfolio item', completed: hasWork },
+    ]
+  }, [draft])
+
+  const completedChecklistCount = checklistTasks.filter(task => task.completed).length
 
   useEffect(() => {
     if (!hydrated || !accountLoaded || !accessToken) return
@@ -304,7 +336,7 @@ export default function ProfileBuilder({
     return (
       <div className="pb-form-shell">
         {header}
-        <div className="pb-form-body pb-form-body--editor">
+        <div className="pb-form-body pb-form-body--editor" ref={bodyRef}>
           <div className="npc-stack-row" style={{ alignItems: 'flex-start' }}>
             {leftPanel === 'games' && (
               <GamesEditPanel draft={draft} update={update} onClose={() => setLeftPanel(null)} />
@@ -324,6 +356,9 @@ export default function ProfileBuilder({
               }}
               onBackLabel={onCancel ? '← Cancel' : '← Back'}
               onPublish={handlePublish}
+              showPortfolioButton={true}
+              showExperienceEdit={true}
+              showScrollActions={showScrollActions}
             />
             {rightPanel === 'skills' && (
               <SkillsEditPanel draft={draft} update={update} onClose={() => setRightPanel(null)} />
@@ -339,6 +374,32 @@ export default function ProfileBuilder({
             {rightPanel === 'work' && (
               <WorkEditPanel draft={draft} update={update} onClose={() => setRightPanel(null)} />
             )}
+            <aside className={`pb-checklist-panel${checklistOpen ? '' : ' pb-checklist-panel--collapsed'}`}>
+              <div className="pb-checklist-header">
+                <div>
+                  <div className="pb-checklist-title">Builder checklist</div>
+                  <div className="pb-checklist-meta">{completedChecklistCount} of {checklistTasks.length} completed</div>
+                </div>
+                <button type="button" className="pb-checklist-toggle" onClick={() => setChecklistOpen(open => !open)}>
+                  {checklistOpen ? 'Hide' : 'Show'}
+                </button>
+              </div>
+              <div className="pb-checklist-progress">
+                <div className="pb-checklist-progress-fill" style={{ width: `${(completedChecklistCount / checklistTasks.length) * 100}%` }} />
+              </div>
+              {checklistOpen && (
+                <div className="pb-checklist-tasks">
+                  {checklistTasks.map(task => (
+                    <div key={task.label} className={`pb-checklist-task${task.completed ? ' pb-checklist-task--done' : ''}`}>
+                      <div className="pb-checklist-bullet">
+                        {task.completed ? '✓' : '•'}
+                      </div>
+                      <div className="pb-checklist-task-label">{task.label}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </aside>
           </div>
         </div>
         {publishedOverlay}

@@ -13,6 +13,9 @@ interface Props {
   onBack: () => void
   onBackLabel?: string
   onPublish: () => void
+  showPortfolioButton?: boolean
+  showExperienceEdit?: boolean
+  showScrollActions?: boolean
 }
 
 function expLabel(years: number | null): string {
@@ -31,7 +34,20 @@ function formatPortfolioLink(link: { name: string; url: string } | undefined) {
   }
 }
 
-export default function EditableCard({ draft, update, leftPanel, rightPanel, onToggleLeft, onToggleRight, onBack, onBackLabel = '← Back', onPublish }: Props) {
+export default function EditableCard({
+  draft,
+  update,
+  leftPanel,
+  rightPanel,
+  onToggleLeft,
+  onToggleRight,
+  onBack,
+  onBackLabel = '← Back',
+  onPublish,
+  showPortfolioButton = false,
+  showExperienceEdit = false,
+  showScrollActions = false,
+}: Props) {
   const initials = getInitials(draft.name) || '?'
   const rateDisplay = draft.rateAmount
     ? `${draft.rateAmount} ${draft.rateType ?? ''}`.trim()
@@ -123,22 +139,24 @@ export default function EditableCard({ draft, update, leftPanel, rightPanel, onT
             <p className="npc-role">
               {draft.experienceYears !== null ? `Dev · ${expLabel(draft.experienceYears)}` : 'Developer'}
             </p>
-            <div className="npc-experience-edit">
-              <label htmlFor="npc-exp-input" className="npc-exp-label">Edit years</label>
-              <input
-                id="npc-exp-input"
-                className="npc-exp-input"
-                type="number"
-                min={0}
-                max={30}
-                value={experienceInput}
-                onChange={e => {
-                  const value = e.target.value
-                  update({ experienceYears: value === '' ? null : Number(value) })
-                }}
-                placeholder="0"
-              />
-            </div>
+            {showExperienceEdit && (
+              <div className="npc-experience-edit">
+                <label htmlFor="npc-exp-input" className="npc-exp-label">Edit years</label>
+                <input
+                  id="npc-exp-input"
+                  className="npc-exp-input"
+                  type="number"
+                  min={0}
+                  max={30}
+                  value={experienceInput}
+                  onChange={e => {
+                    const value = e.target.value
+                    update({ experienceYears: value === '' ? null : Number(value) })
+                  }}
+                  placeholder="0"
+                />
+              </div>
+            )}
           </div>
           {portfolioLink && (
             <div className="npc-portfolio-row">
@@ -243,33 +261,46 @@ export default function EditableCard({ draft, update, leftPanel, rightPanel, onT
             </div>
           </button>
 
-          <button
-            className={`npc-entry-btn${rightPanel === 'portfolio' ? ' npc-entry-btn--active' : ''}`}
-            onClick={() => onToggleRight('portfolio')}
-          >
-            <div className="npc-entry-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 5v14" />
-                <path d="M5 12h14" />
-              </svg>
-            </div>
-            <div className="npc-entry-title">
-              Portfolio
-            </div>
-            <div className="npc-entry-sub">
-              {rightPanel === 'portfolio' ? '← Close' : 'Add links & socials →'}
-            </div>
-          </button>
+          {showPortfolioButton && (
+            <button
+              className={`npc-entry-btn${rightPanel === 'portfolio' ? ' npc-entry-btn--active' : ''}`}
+              onClick={() => onToggleRight('portfolio')}
+            >
+              <div className="npc-entry-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 5v14" />
+                  <path d="M5 12h14" />
+                </svg>
+              </div>
+              <div className="npc-entry-title">
+                Portfolio
+              </div>
+              <div className="npc-entry-sub">
+                {rightPanel === 'portfolio' ? '← Close' : 'Add links & socials →'}
+              </div>
+            </button>
+          )}
         </div>
       </div>
 
       {/* Editor action bar */}
-      <div className="npc-editor-bar">
+      <div className={`npc-editor-bar${showScrollActions ? ' npc-editor-bar--hidden' : ''}`}>
+        <button type="button" className="npc-editor-publish" onClick={onPublish}>
+          Publish Profile
+        </button>
         <button type="button" className="npc-editor-back" onClick={onBack}>
           {onBackLabel}
         </button>
-        <button type="button" className="npc-editor-publish" onClick={onPublish}>
-          Publish Profile
+      </div>
+      <div className={`npc-editor-scroll-actions${showScrollActions ? ' npc-editor-scroll-actions--show' : ''}`}>
+        <button type="button" className="npc-action-seg" onClick={onBack}>
+          Back
+        </button>
+        <button type="button" className="npc-action-seg" onClick={onBack}>
+          Save
+        </button>
+        <button type="button" className="npc-action-seg" onClick={onPublish}>
+          Publish
         </button>
       </div>
     </div>

@@ -2550,40 +2550,152 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 /* Editor action bar (replaces swipe action bar) */
 .npc-editor-bar {
   display: flex;
-  width: 380px;
-  height: 68px;
+  flex-direction: column;
+  width: 100%;
+  max-width: 420px;
   border-top: 1.5px solid rgba(0,0,0,0.08);
   border-radius: 0 0 20px 20px;
   overflow: hidden;
   flex-shrink: 0;
+  background: #fff;
 }
-.npc-editor-back {
-  flex: 1;
-  background: rgba(0,0,0,0.04);
+.npc-editor-bar--hidden {
+  display: none;
+}
+.npc-editor-back,
+.npc-editor-publish {
+  width: 100%;
   border: none;
   padding: 14px;
   font-family: var(--font-geist-mono);
   font-size: 10px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(0,0,0,0.38);
   cursor: pointer;
-  border-right: 1px solid rgba(0,0,0,0.08);
+}
+.npc-editor-back {
+  background: rgba(0,0,0,0.04);
+  color: rgba(0,0,0,0.38);
 }
 .npc-editor-back:hover { background: rgba(0,0,0,0.07); }
 .npc-editor-publish {
-  flex: 2;
   background: #4444EE;
-  border: none;
-  padding: 14px;
-  font-family: var(--font-geist-mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: #fff;
-  cursor: pointer;
 }
 .npc-editor-publish:hover { background: #3333cc; }
+.npc-editor-scroll-actions {
+  display: none;
+  width: 100%;
+  max-width: 420px;
+  border-top: 1.5px solid rgba(0,0,0,0.08);
+  border-radius: 0 0 20px 20px;
+  overflow: hidden;
+  background: #fff;
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+}
+.npc-editor-scroll-actions--show {
+  display: flex;
+}
+.npc-editor-scroll-actions .npc-action-seg {
+  flex: 1;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 16px 0;
+  font-family: var(--font-geist-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,0.72);
+}
+.npc-editor-scroll-actions .npc-action-seg:hover {
+  background: rgba(0,0,0,0.04);
+}
+
+.pb-checklist-panel {
+  min-width: 280px;
+  max-width: 280px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 24px;
+  padding: 20px;
+  color: #f5f5f5;
+  position: sticky;
+  top: 92px;
+  align-self: flex-start;
+}
+.pb-checklist-panel--collapsed .pb-checklist-tasks,
+.pb-checklist-panel--collapsed .pb-checklist-progress {
+  display: none;
+}
+.pb-checklist-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.pb-checklist-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #fff;
+}
+.pb-checklist-meta {
+  font-size: 11px;
+  color: rgba(255,255,255,0.68);
+}
+.pb-checklist-toggle {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.6);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  padding: 0;
+}
+.pb-checklist-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.1);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.pb-checklist-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4444EE, #E84624);
+  transition: width 0.2s ease;
+}
+.pb-checklist-task {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  color: rgba(255,255,255,0.76);
+}
+.pb-checklist-task--done {
+  color: rgba(255,255,255,0.4);
+}
+.pb-checklist-bullet {
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #fff;
+}
+.pb-checklist-task-label {
+  font-size: 12px;
+  line-height: 1.4;
+}
 
 /* ── EDIT PANELS (skills / work / games) ────────────────────── */
 
