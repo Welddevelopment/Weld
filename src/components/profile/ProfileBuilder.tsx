@@ -8,6 +8,7 @@ import { ProfileDraft, createDraft, draftToProfile } from './profile-types'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 import IdentityStep from './steps/IdentityStep'
 import RoleStep from './steps/RoleStep'
+import PortfolioStep from './steps/PortfolioStep'
 import EditableCard from './EditableCard'
 import SkillsEditPanel from './editor-panels/SkillsEditPanel'
 import WorkEditPanel from './editor-panels/WorkEditPanel'
@@ -53,7 +54,7 @@ async function saveAccountProfile(
   if (!response.ok) throw new Error('Could not save account profile.')
 }
 
-type Phase = 'identity' | 'rate' | 'editor' | 'published'
+type Phase = 'identity' | 'rate' | 'portfolio' | 'editor' | 'published'
 type SaveState = 'local' | 'loading' | 'saving' | 'saved' | 'error'
 
 function saveStateLabel(s: SaveState) {
@@ -162,7 +163,7 @@ export default function ProfileBuilder({
   const [draft, setDraft] = useState<ProfileDraft>(createDraft)
   const [phase, setPhase] = useState<Phase>(initialPhase)
   const [leftPanel, setLeftPanel] = useState<null | 'games'>(null)
-  const [rightPanel, setRightPanel] = useState<null | 'work' | 'skills'>(null)
+  const [rightPanel, setRightPanel] = useState<null | 'work' | 'skills' | 'portfolio'>(null)
   const [hydrated, setHydrated] = useState(false)
   const [accountEmail, setAccountEmail] = useState<string | null>(null)
   const [accessToken, setAccessToken] = useState<string | null>(null)
@@ -259,8 +260,10 @@ export default function ProfileBuilder({
   ) : null
 
   // Header shown in all phases
-  const isQuickStep = phase === 'identity' || phase === 'rate'
-  const quickStepNum = phase === 'identity' ? 1 : 2
+  const isQuickStep = phase === 'identity' || phase === 'rate' || phase === 'portfolio'
+  const quickStepNum = phase === 'identity' ? 1 : phase === 'rate' ? 2 : 3
+  const quickStepLabel = phase === 'identity' ? 'Identity' : phase === 'rate' ? 'Rate' : 'Portfolio'
+  const quickStepCount = 3
 
   const header = (
     <div className="pb-form-top">
@@ -269,16 +272,21 @@ export default function ProfileBuilder({
       {isQuickStep && (
         <>
           <span className="pb-form-step-indicator">
-            {phase === 'identity' ? 'Identity' : 'Rate'} · {quickStepNum} of 2
+            {quickStepLabel} · {quickStepNum} of {quickStepCount}
           </span>
           <div className="pb-form-progress">
-            <div className="pb-form-progress-fill" style={{ width: `${quickStepNum * 50}%` }} />
+            <div className="pb-form-progress-fill" style={{ width: `${(quickStepNum / quickStepCount) * 100}%` }} />
           </div>
         </>
       )}
       {!isQuickStep && (
         <span className="pb-form-step-indicator" style={{ marginLeft: 'auto' }}>
           Edit your profile
+        </span>
+      )}
+      {isQuickStep && (
+        <span className="pb-form-step-indicator">
+          {quickStepLabel} · {quickStepNum} of {quickStepCount}
         </span>
       )}
       <button
@@ -320,6 +328,14 @@ export default function ProfileBuilder({
             {rightPanel === 'skills' && (
               <SkillsEditPanel draft={draft} update={update} onClose={() => setRightPanel(null)} />
             )}
+            {rightPanel === 'portfolio' && (
+              <PortfolioStep
+                draft={draft}
+                update={update}
+                onBack={() => setRightPanel(null)}
+                onNext={() => setRightPanel(null)}
+              />
+            )}
             {rightPanel === 'work' && (
               <WorkEditPanel draft={draft} update={update} onClose={() => setRightPanel(null)} />
             )}
@@ -350,6 +366,14 @@ export default function ProfileBuilder({
           <RoleStep
             {...stepProps}
             onBack={() => setPhase('identity')}
+            onNext={() => { setLeftPanel(null); setRightPanel(null); setPhase('portfolio') }}
+          />
+        )}
+        {phase === 'portfolio' && (
+          <PortfolioStep
+            draft={draft}
+            update={update}
+            onBack={() => setPhase('rate')}
             onNext={() => { setLeftPanel(null); setRightPanel(null); setPhase('editor') }}
           />
         )}

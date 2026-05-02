@@ -7,9 +7,9 @@ interface Props {
   draft: ProfileDraft
   update: (patch: Partial<ProfileDraft>) => void
   leftPanel: null | 'games'
-  rightPanel: null | 'work' | 'skills'
+  rightPanel: null | 'work' | 'skills' | 'portfolio'
   onToggleLeft: () => void
-  onToggleRight: (p: 'work' | 'skills') => void
+  onToggleRight: (p: 'work' | 'skills' | 'portfolio') => void
   onBack: () => void
   onBackLabel?: string
   onPublish: () => void
@@ -38,6 +38,7 @@ export default function EditableCard({ draft, update, leftPanel, rightPanel, onT
     : draft.rateType ?? null
   const socialLinks = draft.socials.filter(s => s.url?.trim())
   const portfolioLink = formatPortfolioLink(draft.portfolioLinks.find(link => link.url?.trim()))
+  const experienceInput = draft.experienceYears === null ? '' : draft.experienceYears.toString()
 
   const removeSkill = (name: string) =>
     update({ selectedSkills: draft.selectedSkills.filter(s => s.name !== name) })
@@ -118,9 +119,27 @@ export default function EditableCard({ draft, update, leftPanel, rightPanel, onT
               </span>
             )}
           </div>
-          <p className="npc-role">
-            {draft.experienceYears !== null ? `Dev · ${expLabel(draft.experienceYears)}` : 'Developer'}
-          </p>
+          <div className="npc-role-row">
+            <p className="npc-role">
+              {draft.experienceYears !== null ? `Dev · ${expLabel(draft.experienceYears)}` : 'Developer'}
+            </p>
+            <div className="npc-experience-edit">
+              <label htmlFor="npc-exp-input" className="npc-exp-label">Edit years</label>
+              <input
+                id="npc-exp-input"
+                className="npc-exp-input"
+                type="number"
+                min={0}
+                max={30}
+                value={experienceInput}
+                onChange={e => {
+                  const value = e.target.value
+                  update({ experienceYears: value === '' ? null : Number(value) })
+                }}
+                placeholder="0"
+              />
+            </div>
+          </div>
           {portfolioLink && (
             <div className="npc-portfolio-row">
               <a
@@ -221,6 +240,24 @@ export default function EditableCard({ draft, update, leftPanel, rightPanel, onT
             </div>
             <div className="npc-entry-sub">
               {rightPanel === 'work' ? '← Close' : "Add projects I've built →"}
+            </div>
+          </button>
+
+          <button
+            className={`npc-entry-btn${rightPanel === 'portfolio' ? ' npc-entry-btn--active' : ''}`}
+            onClick={() => onToggleRight('portfolio')}
+          >
+            <div className="npc-entry-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 5v14" />
+                <path d="M5 12h14" />
+              </svg>
+            </div>
+            <div className="npc-entry-title">
+              Portfolio
+            </div>
+            <div className="npc-entry-sub">
+              {rightPanel === 'portfolio' ? '← Close' : 'Add links & socials →'}
             </div>
           </button>
         </div>
