@@ -49,7 +49,7 @@ export async function DELETE(request: NextRequest) {
     .from('user_profiles')
     .update({
       published_profile: null,
-      profile_draft: null,
+      profile_draft: {},
       updated_at: new Date().toISOString(),
     })
     .eq('user_id', auth.user.id)

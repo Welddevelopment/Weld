@@ -5,7 +5,10 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import AppNav from '@/components/AppNav'
-import PreviewExpandedModal, { type LikeFeedback } from '@/components/matching-preview/PreviewExpandedModal'
+import GamesPanel from '@/components/matching-preview/panels/GamesPanel'
+import SkillPanel from '@/components/matching-preview/panels/SkillPanel'
+import WorkPanel from '@/components/matching-preview/panels/WorkPanel'
+import SwipeCard, { type PanelKind } from '@/components/SwipeCard'
 import type { SwipeProfile } from '@/components/SwipeStack'
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/browser'
 
@@ -24,6 +27,7 @@ type HomeMatchesResponse = {
 }
 
 type PageMode = 'loading' | 'unauthed' | 'ready'
+type LikeFeedback = 'liked' | 'matched' | 'already_liked' | 'already_matched'
 
 function formatSavedAt(value: string | null) {
   if (!value) return 'saved'
@@ -105,6 +109,76 @@ function EmptyState({ title, copy, cta, href }: { title: string; copy: string; c
           {cta}
         </Link>
       )}
+    </div>
+  )
+}
+
+function SavedProfileModal({
+  profile,
+  onClose,
+  onPass,
+  onLike,
+  onMessage,
+}: {
+  profile: SwipeProfile
+  onClose: () => void
+  onPass: () => void
+  onLike: () => void
+  onMessage: () => void
+}) {
+  const [leftPanel, setLeftPanel] = useState<null | 'games'>(null)
+  const [rightPanel, setRightPanel] = useState<null | 'work' | { skill: string }>(null)
+
+  const handleOpenPanel = (panel: PanelKind) => {
+    if (typeof panel === 'object' && 'skill' in panel) {
+      setRightPanel(prev =>
+        prev && typeof prev === 'object' && 'skill' in prev && prev.skill === panel.skill
+          ? null
+          : { skill: panel.skill }
+      )
+    } else if (panel === 'games') {
+      setLeftPanel(prev => prev === 'games' ? null : 'games')
+    } else if (panel === 'work') {
+      setRightPanel(prev => prev === 'work' ? null : 'work')
+    }
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-[500] flex items-center justify-center overflow-auto bg-[rgba(0,0,0,0.88)] px-5 py-8 backdrop-blur-md"
+      onClick={onClose}
+    >
+      <button
+        type="button"
+        aria-label="Close profile"
+        onClick={e => { e.stopPropagation(); onClose() }}
+        className="fixed right-5 top-5 z-[510] flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-xl text-white/70 transition hover:border-white/20 hover:bg-white/[0.1] hover:text-white"
+      >
+        x
+      </button>
+
+      <div className="npc-stack-row" onClick={e => e.stopPropagation()}>
+        {leftPanel === 'games' && (
+          <GamesPanel profile={profile} onBack={() => setLeftPanel(null)} />
+        )}
+
+        <SwipeCard
+          profile={profile}
+          leftPanel={leftPanel}
+          rightPanel={rightPanel}
+          onPass={onPass}
+          onLike={onLike}
+          onMessage={onMessage}
+          onOpenPanel={handleOpenPanel}
+        />
+
+        {rightPanel === 'work' && (
+          <WorkPanel profile={profile} onBack={() => setRightPanel(null)} />
+        )}
+        {rightPanel && typeof rightPanel === 'object' && 'skill' in rightPanel && (
+          <SkillPanel profile={profile} skillName={rightPanel.skill} onBack={() => setRightPanel(null)} />
+        )}
+      </div>
     </div>
   )
 }
@@ -280,16 +354,12 @@ export default function HomePage() {
       </main>
 
       {modalProfile && (
-        <PreviewExpandedModal
-          profiles={[modalProfile]}
-          initialId={modalProfile.id}
+        <SavedProfileModal
+          profile={modalProfile}
           onClose={() => setModalProfile(null)}
-          onPassed={() => setModalProfile(null)}
-          onLiked={() => setModalProfile(null)}
-          onLikeResult={async (id) => {
-            const feedback = await recordSwipe(id, 'like')
-            return feedback ?? 'liked'
-          }}
+          onPass={() => { void recordSwipe(modalProfile.userId, 'pass'); setModalProfile(null) }}
+          onLike={() => { void recordSwipe(modalProfile.userId, 'like'); setModalProfile(null) }}
+          onMessage={() => { void openConversation(modalProfile.userId); setModalProfile(null) }}
         />
       )}
     </div>

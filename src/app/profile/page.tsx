@@ -14,6 +14,15 @@ const DRAFT_KEY = 'weld_profile_draft'
 
 type PageMode = 'loading' | 'unauthed' | 'empty' | 'published' | 'editing'
 
+function hasSavedDraft(value: unknown) {
+  return Boolean(
+    value &&
+    typeof value === 'object' &&
+    !Array.isArray(value) &&
+    Object.keys(value).length > 0
+  )
+}
+
 export default function ProfilePage() {
   const router = useRouter()
   const [mode, setMode] = useState<PageMode>('loading')
@@ -51,7 +60,7 @@ export default function ProfilePage() {
             setMode('published')
             return
           }
-          setHasDraft(Boolean(json.profile?.draft))
+          setHasDraft(hasSavedDraft(json.profile?.draft))
         }
       } catch {}
 

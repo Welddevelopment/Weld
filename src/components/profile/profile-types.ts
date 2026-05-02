@@ -11,6 +11,10 @@ export type ProfileDraft = {
   experienceYears: number | null
   rateType: string | null
   rateAmount: string
+  availabilityStatus: string
+  availabilityHours: string
+  availabilityTimezone: string
+  availabilityNote: string
   // Studio-specific
   teamSize: number | null
   status: string | null
@@ -36,6 +40,10 @@ export function createDraft(): ProfileDraft {
     experienceYears: null,
     rateType: null,
     rateAmount: '',
+    availabilityStatus: 'Available Now',
+    availabilityHours: '',
+    availabilityTimezone: '',
+    availabilityNote: '',
     teamSize: null,
     status: null,
     budgetType: null,
@@ -88,6 +96,10 @@ export function profileToDraft(profile: PreviewProfile): ProfileDraft {
     bio: profile.bio,
     experienceYears: isDev ? parseExperienceYears(profile) : null,
     rateType: isDev ? metaValue(profile, 'Rate') : null,
+    availabilityStatus: isDev ? (profile.meta.split(' - ')[0] || 'Available Now') : 'Available Now',
+    availabilityHours: '',
+    availabilityTimezone: '',
+    availabilityNote: '',
     teamSize: isDev ? null : parseTeamSize(profile),
     status: isDev ? null : profile.meta.split(' - ')[0] || null,
     budgetType: isDev ? null : metaValue(profile, 'Budget'),
@@ -113,7 +125,7 @@ export function draftToProfile(draft: ProfileDraft, id: string): PreviewProfile 
     const rateStr = draft.rateType
       ? (draft.rateAmount ? `${draft.rateAmount} ${draft.rateType}` : draft.rateType)
       : ''
-    meta = ['Available Now', rateStr ? `Rate: ${rateStr}` : '', 'Remote'].filter(Boolean).join(' - ')
+    meta = [draft.availabilityStatus || 'Available Now', rateStr ? `Rate: ${rateStr}` : '', 'Remote'].filter(Boolean).join(' - ')
     tags = draft.selectedSkills.slice(0, 3).map(s => s.name)
   } else {
     const size = draft.teamSize ?? 0

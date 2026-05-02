@@ -11,95 +11,118 @@ interface Props {
 }
 
 function emptyWork(): DevWork {
-  return { emoji: 'Game', title: '', desc: '', tools: '', time: '', amount: '', plays: '' }
+  return { emoji: 'Game', title: '', desc: '', tools: '', time: '', amount: '', plays: '', imageUrl: '' }
 }
 
-function filled(value: string) {
-  return value.trim().length > 0
+function hasAnyWorkValue(work: DevWork) {
+  return [work.title, work.desc, work.tools, work.time, work.amount, work.plays, work.imageUrl ?? '']
+    .some(value => value.trim().length > 0)
 }
 
-function workReady(work: DevWork) {
-  return filled(work.title) && filled(work.desc) && filled(work.amount) && filled(work.plays)
-}
-
-const EMOJI_OPTIONS = ['Game', 'Combat', 'Build', 'Art', 'Tools', 'VFX', 'Audio', 'World', 'Launch']
-
-function EmojiPicker({ value, onChange }: { value: string; onChange: (e: string) => void }) {
-  return (
-    <div className="pb-emoji-row">
-      {EMOJI_OPTIONS.map(e => (
-        <button
-          key={e}
-          type="button"
-          className={`pb-emoji-btn${value === e ? ' pb-emoji-btn--on' : ''}`}
-          onClick={() => onChange(e)}
-        >
-          {e}
-        </button>
-      ))}
-    </div>
-  )
-}
-
-function WorkEntry({
-  work,
-  index,
-  onChange,
-  onRemove,
-}: {
-  work: DevWork
-  index: number
-  onChange: (w: DevWork) => void
-  onRemove: () => void
-}) {
-  return (
-    <div className="pb-work-entry">
-      <div className="pb-work-entry-header">
-        <span className="pb-work-entry-num">Project {index + 1}</span>
-        <button type="button" className="pb-work-remove" onClick={onRemove}>Remove</button>
-      </div>
-      <EmojiPicker value={work.emoji} onChange={e => onChange({ ...work, emoji: e })} />
-      <input className="pb-input" placeholder="Project title *" value={work.title} onChange={e => onChange({ ...work, title: e.target.value })} />
-      <textarea className="pb-textarea" placeholder="Short description *" rows={2} value={work.desc} onChange={e => onChange({ ...work, desc: e.target.value })} />
-      <input className="pb-input" placeholder="Tools used (e.g. Luau, Blender)" value={work.tools} onChange={e => onChange({ ...work, tools: e.target.value })} />
-      <div className="pb-work-row2">
-        <input className="pb-input" placeholder="Time taken (e.g. 2 weeks)" value={work.time} onChange={e => onChange({ ...work, time: e.target.value })} />
-        <input className="pb-input" placeholder="Project value * (e.g. 5000)" value={work.amount} onChange={e => onChange({ ...work, amount: e.target.value })} />
-        <input className="pb-input" placeholder="Plays * (e.g. 14M)" value={work.plays} onChange={e => onChange({ ...work, plays: e.target.value })} />
-      </div>
-    </div>
-  )
+function isCompleteEnough(work: DevWork) {
+  return !hasAnyWorkValue(work) || (work.title.trim().length > 0 && work.desc.trim().length > 0)
 }
 
 export default function WorkStep({ draft, update, onNext, onBack }: Props) {
   const works = draft.bestWork
-  const ready = works.length > 0 && works.every(workReady)
+  const ready = works.every(isCompleteEnough)
+
   const addWork = () => update({ bestWork: [...works, emptyWork()] })
-  const updateWork = (i: number, w: DevWork) => {
-    const next = [...works]; next[i] = w; update({ bestWork: next })
+  const updateWork = (i: number, work: DevWork) => {
+    const next = [...works]
+    next[i] = work
+    update({ bestWork: next })
   }
   const removeWork = (i: number) => update({ bestWork: works.filter((_, idx) => idx !== i) })
 
   return (
-    <div className="pb-step-content">
-      <div className="pb-step-eyebrow">Step 5</div>
-      <h1 className="pb-step-title">Your best work</h1>
-      <p className="pb-step-sub">Add at least 1 project with play and value stats so studios can find you.</p>
+    <div className="ob-screen">
+      <aside className="ob-side ob-side--dark">
+        <div className="ob-brand ob-brand--light">
+          <span className="ob-mark">*</span>
+          <span>weld.</span>
+        </div>
+        <h1 className="ob-title ob-title--light">your<br />best work</h1>
+        <p className="ob-copy ob-copy--light">
+          Up to 3 projects you&apos;re most proud of. Real proof wins trust, even if the stats are simple.
+        </p>
 
-      {works.map((w, i) => (
-        <WorkEntry key={i} work={w} index={i} onChange={w2 => updateWork(i, w2)} onRemove={() => removeWork(i)} />
-      ))}
+        <div className="ob-note-card">
+          <strong>Optional but powerful</strong>
+          <span>Profiles with at least one work entry give studios more to trust than empty profiles.</span>
+        </div>
+      </aside>
 
-      {works.length < 3 && (
-        <button type="button" className="pb-add-btn" onClick={addWork}>+ Add project</button>
-      )}
+      <section className="ob-main">
+        <div className="ob-progress"><span style={{ width: '80%' }} /></div>
+        <div className="ob-step-row">
+          <span>Step 4 of 5 - Work</span>
+          <span>4/5</span>
+        </div>
 
-      <div className="pb-nav">
-        <button className="pb-btn pb-btn--ghost" type="button" onClick={onBack}>Back</button>
-        <button className="pb-btn pb-btn--primary" type="button" onClick={onNext} disabled={!ready}>
-          Next
-        </button>
-      </div>
+        <div className="ob-work-list">
+          {works.map((work, i) => (
+            <div key={i} className="ob-work-entry">
+              <div className="ob-work-head">
+                <span>Project {i + 1}</span>
+                <button type="button" onClick={() => removeWork(i)}>Remove</button>
+              </div>
+              <input
+                className="pb-input"
+                value={work.title}
+                onChange={e => updateWork(i, { ...work, title: e.target.value })}
+                placeholder="Project title"
+              />
+              <textarea
+                className="pb-textarea"
+                value={work.desc}
+                onChange={e => updateWork(i, { ...work, desc: e.target.value })}
+                placeholder="Built modular combat with custom abilities and UI integration..."
+                rows={2}
+              />
+              <div className="ob-three-col">
+                <input
+                  className="pb-input"
+                  value={work.tools}
+                  onChange={e => updateWork(i, { ...work, tools: e.target.value })}
+                  placeholder="Tools: Luau, Blender"
+                />
+                <input
+                  className="pb-input"
+                  value={work.time}
+                  onChange={e => updateWork(i, { ...work, time: e.target.value })}
+                  placeholder="2 weeks"
+                />
+                <input
+                  className="pb-input"
+                  value={work.amount}
+                  onChange={e => updateWork(i, { ...work, amount: e.target.value })}
+                  placeholder="$300"
+                />
+              </div>
+              <input
+                className="pb-input"
+                value={work.plays}
+                onChange={e => updateWork(i, { ...work, plays: e.target.value })}
+                placeholder="Date"
+              />
+            </div>
+          ))}
+        </div>
+
+        {works.length < 3 && (
+          <button type="button" className="ob-add-dashed" onClick={addWork}>
+            + Add project (up to 3)
+          </button>
+        )}
+
+        <div className="pb-nav">
+          <button className="pb-btn pb-btn--ghost" type="button" onClick={onBack}>Back</button>
+          <button className="pb-btn pb-btn--primary" type="button" onClick={onNext} disabled={!ready}>
+            Next: Portfolio
+          </button>
+        </div>
+      </section>
     </div>
   )
 }
