@@ -1906,6 +1906,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   display: flex;
   gap: 12px;
   padding: 16px 16px 0;
+  align-items: flex-start;
 }
 .npc-avatar-wrap {
   width: 110px;
@@ -1953,6 +1954,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   flex-direction: column;
   gap: 8px;
   min-width: 0;
+  align-items: flex-start;
 }
 
 /* Socials */

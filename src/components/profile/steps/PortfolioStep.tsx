@@ -10,8 +10,16 @@ interface Props {
   onBack: () => void
 }
 
-const SOCIAL_ICONS = ['🐦', '📺', '📸', '💬', '🌐', '📧']
-const SOCIAL_LABELS = ['Twitter / X', 'YouTube', 'Instagram', 'Discord', 'Website', 'Email']
+const SOCIAL_OPTIONS = [
+  { icon: '🐦', label: 'Twitter / X', domains: ['twitter.com', 'x.com'] },
+  { icon: '📺', label: 'YouTube', domains: ['youtube.com', 'youtu.be'] },
+  { icon: '📸', label: 'Instagram', domains: ['instagram.com'] },
+  { icon: '💬', label: 'Discord', domains: ['discord.com', 'discordapp.com', 'discord.gg'] },
+  { icon: '🌐', label: 'Website', domains: [] },
+  { icon: '📧', label: 'Email', domains: [] },
+]
+const SOCIAL_ICONS = SOCIAL_OPTIONS.map(s => s.icon)
+const SOCIAL_LABELS = SOCIAL_OPTIONS.map(s => s.label)
 
 function isValidUrl(raw: string): boolean {
   const val = raw.trim()
@@ -25,14 +33,77 @@ function isValidUrl(raw: string): boolean {
 }
 
 function isValidEmail(val: string): boolean {
-  return !val.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim())
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim())
+}
+
+function isDiscordLink(raw: string): boolean {
+  const val = raw.trim()
+  if (!val) return false
+  if (/^@[^\s]{2,32}$/.test(val)) return true
+  const url = /^https?:\/\//i.test(val) ? val : `https://${val}`
+  try {
+    const hostname = new URL(url).hostname.toLowerCase()
+    return ['discord.com', 'discordapp.com', 'discord.gg'].some(domain => hostname === domain || hostname.endsWith(`.${domain}`))
+  } catch {
+    return false
+  }
+}
+
+function detectSocialType(raw: string): { icon: string; label: string } | null {
+  const val = raw.trim()
+  if (!val) return null
+  if (isValidEmail(val)) return { icon: '📧', label: 'Email' }
+  if (isDiscordLink(val)) return { icon: '💬', label: 'Discord' }
+
+  const url = /^https?:\/\//i.test(val) ? val : `https://${val}`
+  try {
+    const hostname = new URL(url).hostname.toLowerCase()
+    if (hostname.includes('twitter.com') || hostname === 'x.com' || hostname.endsWith('.x.com')) {
+      return { icon: '🐦', label: 'Twitter / X' }
+    }
+    if (hostname.includes('youtube.com') || hostname === 'youtu.be') {
+      return { icon: '📺', label: 'YouTube' }
+    }
+    if (hostname.includes('instagram.com')) {
+      return { icon: '📸', label: 'Instagram' }
+    }
+    if (hostname.includes('discord.com') || hostname.includes('discordapp.com') || hostname.includes('discord.gg')) {
+      return { icon: '💬', label: 'Discord' }
+    }
+    if (hostname.includes('.')) {
+      return { icon: '🌐', label: 'Website' }
+    }
+  } catch {
+    // ignore parse failures
+  }
+
+  return null
+}
+
+function socialMatchesIcon(icon: string, raw: string): boolean {
+  const val = raw.trim()
+  if (!val) return true
+  if (icon === '📧') return isValidEmail(val)
+  if (icon === '💬') return isDiscordLink(val)
+  if (icon === '🐦') {
+    const detected = detectSocialType(val)
+    return detected?.icon === '🐦'
+  }
+  if (icon === '📺') {
+    const detected = detectSocialType(val)
+    return detected?.icon === '📺'
+  }
+  if (icon === '📸') {
+    const detected = detectSocialType(val)
+    return detected?.icon === '📸'
+  }
+  if (icon === '🌐') return isValidUrl(val)
+  return true
 }
 
 function validateSocial(icon: string, url: string): boolean {
   if (!url.trim()) return true
-  if (icon === '📧') return isValidEmail(url)
-  if (icon === '💬') return true // Discord handles are acceptable
-  return isValidUrl(url)
+  return socialMatchesIcon(icon, url)
 }
 
 function socialPlaceholder(icon: string): string {
@@ -82,6 +153,8 @@ export default function PortfolioStep({ draft, update, onNext, onBack }: Props) 
     setSocialErrors(prev => reindex(prev, i))
   }
 
+  const getSocialOptionByIcon = (icon: string) => SOCIAL_OPTIONS.find(option => option.icon === icon)
+
   const handleLinkUrlBlur = (i: number, url: string) => {
     if (!isValidUrl(url)) {
       setLinkErrors(prev => ({ ...prev, [i]: 'Enter a valid link (e.g. github.com/you)' }))
@@ -89,9 +162,28 @@ export default function PortfolioStep({ draft, update, onNext, onBack }: Props) 
   }
 
   const handleSocialUrlBlur = (i: number, icon: string, url: string) => {
-    if (!validateSocial(icon, url)) {
-      const msg = icon === '📧' ? 'Enter a valid email address' : 'Enter a valid link'
-      setSocialErrors(prev => ({ ...prev, [i]: msg }))
+    const trimmedUrl = url.trim()
+    if (!trimmedUrl) return
+
+    const detected = detectSocialType(trimmedUrl)
+    if (detected && icon === '🌐' && detected.icon !== '🌐') {
+      updateSocial(i, { icon: detected.icon, label: detected.label })
+      return
+    }
+
+    if (!validateSocial(icon, trimmedUrl)) {
+      const detectedLabel = detected?.label
+      const defaultMsg = icon === '📧'
+        ? 'Enter a valid email address'
+        : icon === '💬'
+          ? 'Enter a valid Discord URL or handle'
+          : `Enter a valid ${getSocialOptionByIcon(icon)?.label ?? 'link'}`
+
+      const mismatchMsg = detectedLabel && detectedLabel !== getSocialOptionByIcon(icon)?.label
+        ? `This looks like a ${detectedLabel} link. Change the channel or enter a ${getSocialOptionByIcon(icon)?.label ?? 'correct'} link.`
+        : defaultMsg
+
+      setSocialErrors(prev => ({ ...prev, [i]: mismatchMsg }))
     }
   }
 
