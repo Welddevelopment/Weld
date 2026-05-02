@@ -174,7 +174,7 @@ export default function SwipeCard({
 
         <div className="npc-divider" />
 
-        {profile.bio && <p className="npc-bio">{profile.bio}</p>}
+        <p className="npc-bio">{profile.bio}</p>
 
         {/* Rate pill + skill chips */}
         <div className="npc-rate-skills">
