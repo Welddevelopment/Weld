@@ -75,6 +75,7 @@ export default function SwipeCard({
 }: Props) {
   const skills = profile.skills ?? profile.skillsNeeded ?? []
   const devStats = parseDevStats(profile)
+  const socialLinks = (profile.socials ?? []).filter(s => s.url?.trim())
 
   const activeSkill = rightPanel && typeof rightPanel === 'object' && 'skill' in rightPanel
     ? rightPanel.skill
@@ -97,31 +98,11 @@ export default function SwipeCard({
           </div>
         )}
 
-        {/* Top: avatar + socials + stats */}
+        {/* Top: avatar + stats + socials */}
         <div className="npc-top">
           <Avatar profile={profile} />
 
           <div className="npc-top-right">
-            {profile.socials && profile.socials.length > 0 ? (
-              <div className="npc-socials">
-                {profile.socials.slice(0, 4).map(s => (
-                  <a
-                    key={s.label}
-                    href={s.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="npc-social-btn"
-                    onMouseDown={stopDrag}
-                    title={s.label}
-                  >
-                    {s.icon}
-                  </a>
-                ))}
-              </div>
-            ) : (
-              <div style={{ height: 34 }} />
-            )}
-
             <div className="npc-stats">
               <StatItem
                 icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
@@ -144,6 +125,24 @@ export default function SwipeCard({
                 label="On-time"
               />
             </div>
+
+            {socialLinks.length > 0 && (
+              <div className="npc-socials" style={{ marginTop: 6 }}>
+                {socialLinks.slice(0, 4).map(s => (
+                  <a
+                    key={s.label}
+                    href={s.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="npc-social-btn"
+                    onMouseDown={stopDrag}
+                    title={s.label}
+                  >
+                    {s.icon || s.label[0]}
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
