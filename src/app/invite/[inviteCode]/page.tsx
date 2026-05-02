@@ -1,2 +1,5 @@
-export { dynamic } from "@/dynamic landing page/routes/InvitePage";
-export { default } from "@/dynamic landing page/routes/InvitePage";
+import InvitePage from "@/dynamic landing page/routes/InvitePage";
+
+export const dynamic = "force-dynamic";
+
+export default InvitePage;
