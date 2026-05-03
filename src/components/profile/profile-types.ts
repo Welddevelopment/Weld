@@ -143,7 +143,7 @@ export function profileToDraft(profile: PreviewProfile): ProfileDraft {
     rateMin: profile.rateMin ?? null,
     rateMax: profile.rateMax ?? null,
     rateNote: profile.rateNote ?? '',
-    openRoles: (profile.openRoles ?? []).map(r => ({ skill: r.skill, title: r.title, description: r.description ?? '' })),
+    openRoles: (profile.openRoles ?? []).map(r => ({ skill: r.skill ?? (r as any).icon ?? '', title: r.title, description: r.description ?? '' })),
     about: profile.about ?? '',
     studioStats: profile.studioStats
       ? { yearsBuilding: profile.studioStats.yearsBuilding ?? '', projectsShipped: profile.studioStats.projectsShipped ?? '', totalVisits: profile.studioStats.totalVisits ?? '', onTimeDelivery: profile.studioStats.onTimeDelivery ?? '' }

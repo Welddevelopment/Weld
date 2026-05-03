@@ -30,18 +30,28 @@ import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/bro
 
 const DRAFT_KEY = 'weld_profile_draft'
 
+function migrateRoles(draft: ProfileDraft): ProfileDraft {
+  return {
+    ...draft,
+    openRoles: draft.openRoles.map(r => ({
+      ...r,
+      skill: r.skill ?? (r as any).icon ?? '',
+    })),
+  }
+}
+
 function loadDraft(): ProfileDraft {
   if (typeof window === 'undefined') return createDraft()
   try {
     const raw = localStorage.getItem(DRAFT_KEY)
-    if (raw) return { ...createDraft(), ...JSON.parse(raw) }
+    if (raw) return migrateRoles({ ...createDraft(), ...JSON.parse(raw) })
   } catch {}
   return createDraft()
 }
 
 function mergeDraft(value: unknown): ProfileDraft {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return createDraft()
-  return { ...createDraft(), ...(value as Partial<ProfileDraft>) }
+  return migrateRoles({ ...createDraft(), ...(value as Partial<ProfileDraft>) })
 }
 
 async function loadAccountDraft(accessToken: string) {

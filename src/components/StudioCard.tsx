@@ -20,7 +20,8 @@ function stopDrag(e: React.MouseEvent | React.TouchEvent) {
 }
 
 const SKILL_COLORS = ['#a78bfa', '#34d399', '#fb923c', '#60a5fa', '#f472b6', '#facc15']
-function skillColor(name: string) {
+function skillColor(name: string | undefined) {
+  if (!name) return SKILL_COLORS[0]
   let h = 0
   for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0
   return SKILL_COLORS[h % SKILL_COLORS.length]
@@ -185,7 +186,7 @@ export default function StudioCard({
                   onClick={e => { e.stopPropagation(); onOpenPanel?.({ skill: role.skill }) }}
                 >
                   <span className="sc-role-icon" style={{ width: 14, height: 14, borderRadius: 3, background: `${c}22`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontSize: 7, fontWeight: 800, color: c, lineHeight: 1 }}>{role.skill.slice(0, 3)}</span>
+                    <span style={{ fontSize: 7, fontWeight: 800, color: c, lineHeight: 1 }}>{(role.skill || '???').slice(0, 3)}</span>
                   </span>
                   <span className="sc-role-name">{role.title}</span>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="8" height="8" className="sc-role-chevron"><polyline points="9 18 15 12 9 6"/></svg>
