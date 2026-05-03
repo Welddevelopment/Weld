@@ -37,6 +37,7 @@ export type ProfileDraft = {
   openRoles: Array<{ skill: string; title: string; description: string }>
   about: string
   studioStats: { yearsBuilding: string; projectsShipped: string; totalVisits: string; onTimeDelivery: string }
+  skillDescriptions: Record<string, string>
   // Shared
   selectedSkills: ProfileSkillDraft[]
   portfolioLinks: Array<{ name: string; url: string }>
@@ -72,6 +73,7 @@ export function createDraft(): ProfileDraft {
     openRoles: [],
     about: '',
     studioStats: { yearsBuilding: '', projectsShipped: '', totalVisits: '', onTimeDelivery: '' },
+    skillDescriptions: {},
     selectedSkills: [],
     portfolioLinks: [],
     socials: [],
@@ -148,6 +150,7 @@ export function profileToDraft(profile: PreviewProfile): ProfileDraft {
     studioStats: profile.studioStats
       ? { yearsBuilding: profile.studioStats.yearsBuilding ?? '', projectsShipped: profile.studioStats.projectsShipped ?? '', totalVisits: profile.studioStats.totalVisits ?? '', onTimeDelivery: profile.studioStats.onTimeDelivery ?? '' }
       : { yearsBuilding: '', projectsShipped: '', totalVisits: '', onTimeDelivery: '' },
+    skillDescriptions: Object.fromEntries((profile.skillsNeeded ?? []).map(s => [s.name, s.description]).filter(([, d]) => d)),
     selectedSkills: selectedSkillsFromProfile(profile),
     portfolioLinks: profile.portfolio?.links ?? [],
     socials: profile.socials ?? [],
@@ -204,7 +207,7 @@ export function draftToProfile(draft: ProfileDraft, id: string): PreviewProfile 
     const uniqueSkills = [...new Set(draft.openRoles.map(r => r.skill).filter(Boolean))]
     if (uniqueSkills.length > 0) profile.skillsNeeded = uniqueSkills.map(name => ({
       name,
-      description: draft.selectedSkills.find(s => s.name === name)?.description ?? '',
+      description: draft.skillDescriptions[name] ?? '',
     }))
     if (draft.topGames.length > 0) profile.topGames = draft.topGames
     profile.hiring = draft.hiring

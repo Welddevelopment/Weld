@@ -13,17 +13,10 @@ interface Props {
 export default function StudioSkillsStep({ draft, update, onNext, onBack }: Props) {
   const derivedSkills = [...new Set(draft.openRoles.map(r => r.skill).filter(Boolean))]
 
-  const getDesc = (name: string) =>
-    draft.selectedSkills.find(s => s.name === name)?.description ?? ''
+  const getDesc = (name: string) => draft.skillDescriptions[name] ?? ''
 
-  const setDesc = (name: string, description: string) => {
-    const existing = draft.selectedSkills.find(s => s.name === name)
-    if (existing) {
-      update({ selectedSkills: draft.selectedSkills.map(s => s.name === name ? { ...s, description } : s) })
-    } else {
-      update({ selectedSkills: [...draft.selectedSkills, { name, description }] })
-    }
-  }
+  const setDesc = (name: string, description: string) =>
+    update({ skillDescriptions: { ...draft.skillDescriptions, [name]: description } })
 
   return (
     <div className="ob-screen">

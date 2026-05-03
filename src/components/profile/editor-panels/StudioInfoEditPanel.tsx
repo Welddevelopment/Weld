@@ -34,17 +34,10 @@ export default function StudioInfoEditPanel({ draft, update, onClose }: Props) {
   const ss = draft.studioStats
   const derivedSkills = [...new Set(draft.openRoles.map(r => r.skill).filter(Boolean))]
 
-  const getSkillDesc = (name: string) =>
-    draft.selectedSkills.find(s => s.name === name)?.description ?? ''
+  const getSkillDesc = (name: string) => draft.skillDescriptions[name] ?? ''
 
-  const setSkillDesc = (name: string, description: string) => {
-    const existing = draft.selectedSkills.find(s => s.name === name)
-    if (existing) {
-      update({ selectedSkills: draft.selectedSkills.map(s => s.name === name ? { ...s, description } : s) })
-    } else {
-      update({ selectedSkills: [...draft.selectedSkills, { name, description }] })
-    }
-  }
+  const setSkillDesc = (name: string, description: string) =>
+    update({ skillDescriptions: { ...draft.skillDescriptions, [name]: description } })
 
   return (
     <div className="npc-panel">
