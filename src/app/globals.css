@@ -2074,7 +2074,8 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   color: #444;
   line-height: 1.65;
   margin: 0 0 16px;
-  flex: 1;
+  height: 180px;
+  flex-shrink: 0;
   background: #f8f8ff;
   border: 1px solid #eeeef8;
   border-radius: 12px;
@@ -2085,7 +2086,6 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   white-space: pre-wrap;
   scrollbar-width: thin;
   scrollbar-color: #ddd transparent;
-  min-height: 80px;
 }
 .npc-cat-popup-desc::-webkit-scrollbar { width: 4px; }
 .npc-cat-popup-desc::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
