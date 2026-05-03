@@ -160,7 +160,14 @@ export default function StudioCard({
             <div className="sc-col-heading">Looking For</div>
             <div className="sc-skill-tags">
               {skills.slice(0, 6).map(s => (
-                <span key={s.name} className="sc-skill-tag">{s.name}</span>
+                <button
+                  key={s.name}
+                  className="sc-skill-tag sc-skill-tag--btn"
+                  onMouseDown={stopDrag}
+                  onClick={e => { e.stopPropagation(); onOpenPanel?.({ skill: s.name }) }}
+                >
+                  {s.name}
+                </button>
               ))}
               {skills.length === 0 && <span className="sc-rate-note">Not specified</span>}
             </div>

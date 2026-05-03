@@ -12,6 +12,16 @@ interface Props {
 const ALL_SKILLS = Object.keys(DEV_SKILL_DESCS)
 const MAX_SKILLS = 6
 
+const GRADIENTS = [
+  'linear-gradient(135deg,#E84624,#FF8A5C)',
+  'linear-gradient(135deg,#6C3DE8,#B57BFF)',
+  'linear-gradient(135deg,#1A6BE8,#5BBCFF)',
+  'linear-gradient(135deg,#1AB87A,#5BFFB8)',
+  'linear-gradient(135deg,#E8901A,#FFD05B)',
+  'linear-gradient(135deg,#1A3CE8,#5B7FFF)',
+  'linear-gradient(135deg,#2D2D2D,#666)',
+]
+
 const TEAM_SIZES = [
   { label: '1–2', value: 1 },
   { label: '3–5', value: 3 },
@@ -50,6 +60,36 @@ export default function StudioInfoEditPanel({ draft, update, onClose }: Props) {
       </div>
 
       <div className="npc-panel-body">
+
+        <div style={{ marginBottom: 20 }}>
+          <div className="pb-label" style={{ marginBottom: 8 }}>Logo colour</div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {GRADIENTS.map(g => (
+              <button
+                key={g}
+                type="button"
+                onClick={() => update({ bg: g })}
+                style={{
+                  width: 28, height: 28, borderRadius: 8, background: g, border: 'none',
+                  cursor: 'pointer', flexShrink: 0,
+                  outline: draft.bg === g ? '2.5px solid #111' : '2.5px solid transparent',
+                  outlineOffset: 2,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 20 }}>
+          <div className="pb-label" style={{ marginBottom: 8 }}>About</div>
+          <textarea
+            className="pb-panel-textarea"
+            rows={3}
+            placeholder="Your studio's story, mission, or what makes you different…"
+            value={draft.about}
+            onChange={e => update({ about: e.target.value })}
+          />
+        </div>
 
         <div style={{ marginBottom: 20 }}>
           <div className="pb-label" style={{ marginBottom: 8 }}>Team</div>

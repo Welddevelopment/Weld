@@ -3,9 +3,12 @@
 import { useEffect } from 'react'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 import SwipeCard, { PanelKind } from '@/components/SwipeCard'
+import StudioCard from '@/components/StudioCard'
 import GamesPanel from '@/components/matching-preview/panels/GamesPanel'
+import StudioGamesPanel from '@/components/matching-preview/panels/StudioGamesPanel'
 import WorkPanel from '@/components/matching-preview/panels/WorkPanel'
 import SkillPanel from '@/components/matching-preview/panels/SkillPanel'
+import StudioSkillPanel from '@/components/matching-preview/panels/StudioSkillPanel'
 import { usePanelQueue } from '@/hooks/usePanelQueue'
 
 interface Props {
@@ -14,11 +17,18 @@ interface Props {
 }
 
 function renderPanel(panel: PanelKind, profile: PreviewProfile, onBack: () => void) {
-  if (panel === 'games') return <GamesPanel key="games" profile={profile} onBack={onBack} />
+  if (panel === 'games') {
+    return profile.type === 'studio'
+      ? <StudioGamesPanel key="studio-games" profile={profile} onBack={onBack} />
+      : <GamesPanel key="games" profile={profile} onBack={onBack} />
+  }
   if (panel === 'work') return <WorkPanel key="work" profile={profile} onBack={onBack} />
   if (typeof panel === 'object' && 'skill' in panel) {
-    return <SkillPanel key={`skill-${panel.skill}`} profile={profile} skillName={panel.skill} onBack={onBack} />
+    return profile.type === 'studio'
+      ? <StudioSkillPanel key={`studio-skill-${panel.skill}`} profile={profile} skillName={panel.skill} onBack={onBack} />
+      : <SkillPanel key={`skill-${panel.skill}`} profile={profile} skillName={panel.skill} onBack={onBack} />
   }
+  if (typeof panel === 'object' && 'role' in panel) return null
   return null
 }
 
@@ -55,12 +65,20 @@ export default function OwnProfileModal({ profile, onClose }: Props) {
       <div className="npc-stack-row" style={{ alignItems: 'flex-start' }} onClick={e => e.stopPropagation()}>
         {slot0 && renderPanel(slot0, profile, () => closePanel(0))}
 
-        <SwipeCard
-          profile={profile}
-          leftPanel={leftPanelActive}
-          rightPanel={rightPanelActive}
-          onOpenPanel={openPanel}
-        />
+        {profile.type === 'studio' ? (
+          <StudioCard
+            profile={profile}
+            activePanels={[slot0, slot1].filter((p): p is PanelKind => p !== null)}
+            onOpenPanel={openPanel}
+          />
+        ) : (
+          <SwipeCard
+            profile={profile}
+            leftPanel={leftPanelActive}
+            rightPanel={rightPanelActive}
+            onOpenPanel={openPanel}
+          />
+        )}
 
         {slot1 && renderPanel(slot1, profile, () => closePanel(1))}
       </div>

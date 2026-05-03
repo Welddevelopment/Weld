@@ -3,15 +3,6 @@
 import { ProfileDraft } from './profile-types'
 import { getInitials } from '@/lib/utils'
 
-const GRADIENTS = [
-  'linear-gradient(135deg,#E84624,#FF8A5C)',
-  'linear-gradient(135deg,#6C3DE8,#B57BFF)',
-  'linear-gradient(135deg,#1A6BE8,#5BBCFF)',
-  'linear-gradient(135deg,#1AB87A,#5BFFB8)',
-  'linear-gradient(135deg,#E8901A,#FFD05B)',
-  'linear-gradient(135deg,#1A3CE8,#5B7FFF)',
-  'linear-gradient(135deg,#2D2D2D,#666)',
-]
 
 interface Props {
   draft: ProfileDraft
@@ -23,7 +14,6 @@ interface Props {
   onBack: () => void
   onBackLabel?: string
   onPublish: () => void
-  showScrollActions?: boolean
 }
 
 function rateDisplay(draft: ProfileDraft): string | null {
@@ -51,7 +41,6 @@ export default function StudioEditableCard({
   onBack,
   onBackLabel = '← Back',
   onPublish,
-  showScrollActions = false,
 }: Props) {
   const initials = getInitials(draft.name) || '?'
   const rate = rateDisplay(draft)
@@ -65,37 +54,18 @@ export default function StudioEditableCard({
 
         {/* Top: logo + stats */}
         <div className="npc-top">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center' }}>
-            {/* Square logo */}
-            <div className="npc-avatar-wrap" style={{ borderRadius: 16, position: 'relative' }}>
-              <div className="npc-avatar-bg" style={{ background: draft.bg || '#4444EE', borderRadius: 16 }} />
-              <div className="npc-avatar-initials" style={{ fontSize: 26 }}>{initials}</div>
-              {draft.robloxUserId && (
-                <img
-                  className="npc-avatar-img"
-                  src={`https://www.roblox.com/headshot-thumbnail/image?userId=${draft.robloxUserId}&width=150&height=150&format=png`}
-                  alt={draft.name}
-                  onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
-                />
-              )}
-              <div className="npc-online-dot" />
-            </div>
-            {/* Color swatches */}
-            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 80 }}>
-              {GRADIENTS.map(g => (
-                <button
-                  key={g}
-                  type="button"
-                  onClick={() => update({ bg: g })}
-                  style={{
-                    width: 16, height: 16, borderRadius: 4, background: g, border: 'none',
-                    cursor: 'pointer', flexShrink: 0,
-                    outline: draft.bg === g ? '2px solid #fff' : '2px solid transparent',
-                    outlineOffset: 1,
-                  }}
-                />
-              ))}
-            </div>
+          <div className="npc-avatar-wrap" style={{ borderRadius: 16 }}>
+            <div className="npc-avatar-bg" style={{ background: draft.bg || '#4444EE', borderRadius: 16 }} />
+            <div className="npc-avatar-initials" style={{ fontSize: 26 }}>{initials}</div>
+            {draft.robloxUserId && (
+              <img
+                className="npc-avatar-img"
+                src={`https://www.roblox.com/headshot-thumbnail/image?userId=${draft.robloxUserId}&width=150&height=150&format=png`}
+                alt={draft.name}
+                onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+              />
+            )}
+            <div className="npc-online-dot" />
           </div>
 
           <div className="npc-top-right">
@@ -237,21 +207,6 @@ export default function StudioEditableCard({
           </div>
         </div>
 
-        {/* About */}
-        <div className="sc-about">
-          <div className="sc-about-heading">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="12" height="12"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            About
-          </div>
-          <textarea
-            className="npc-editable-bio"
-            value={draft.about}
-            onChange={e => update({ about: e.target.value })}
-            placeholder="Your studio's story, mission, or what makes you different…"
-            rows={2}
-          />
-        </div>
-
         {/* Entry buttons */}
         <div className="npc-entries" style={{ gridTemplateColumns: '1fr 1fr 1fr', marginTop: 'auto' }}>
           <button
@@ -313,26 +268,14 @@ export default function StudioEditableCard({
         >
           {onBackLabel}
         </button>
-        {showScrollActions && (
-          <button
-            type="button"
-            className="pb-btn pb-btn--primary"
-            style={{ fontSize: 11, padding: '8px 18px' }}
-            onClick={onPublish}
-          >
-            Publish profile
-          </button>
-        )}
-        {!showScrollActions && (
-          <button
-            type="button"
-            className="pb-btn pb-btn--primary"
-            style={{ fontSize: 11, padding: '8px 18px' }}
-            onClick={onPublish}
-          >
-            Publish profile
-          </button>
-        )}
+        <button
+          type="button"
+          className="pb-btn pb-btn--primary"
+          style={{ fontSize: 11, padding: '8px 18px' }}
+          onClick={onPublish}
+        >
+          Publish profile
+        </button>
       </div>
     </div>
   )

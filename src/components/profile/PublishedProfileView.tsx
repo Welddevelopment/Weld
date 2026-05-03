@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import SwipeCard from '@/components/SwipeCard'
+import StudioCard from '@/components/StudioCard'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 
 import OwnProfileModal from './OwnProfileModal'
@@ -104,7 +105,7 @@ export default function PublishedProfileView({ profile, onEdit, onDelete }: Prop
         aria-label="View your full profile"
       >
         <div style={{ pointerEvents: 'none' }}>
-          <SwipeCard profile={profile} />
+          {profile.type === 'studio' ? <StudioCard profile={profile} /> : <SwipeCard profile={profile} />}
         </div>
       </button>
 
