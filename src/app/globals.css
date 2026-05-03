@@ -2038,22 +2038,25 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 14px;
 }
 .npc-cat-popup {
   background: #fff;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 8px 48px rgba(0,0,0,0.2);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.22);
   width: 100%;
+  min-height: 320px;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 .npc-cat-popup-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 26px;
-  height: 26px;
+  top: 14px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: none;
   background: rgba(0,0,0,0.06);
@@ -2065,8 +2068,24 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   justify-content: center;
 }
 .npc-cat-popup-close:hover { background: rgba(0,0,0,0.1); }
-.npc-cat-popup-name { font-size: 18px; font-weight: 800; color: #111; margin-bottom: 10px; padding-right: 32px; }
-.npc-cat-popup-desc { font-size: 13px; color: #444; line-height: 1.65; margin: 0 0 16px; }
+.npc-cat-popup-name { font-size: 20px; font-weight: 800; color: #111; margin-bottom: 12px; padding-right: 36px; }
+.npc-cat-popup-desc {
+  font-size: 13px;
+  color: #444;
+  line-height: 1.65;
+  margin: 0 0 16px;
+  flex: 1;
+  background: #f8f8ff;
+  border: 1px solid #eeeef8;
+  border-radius: 12px;
+  padding: 10px 12px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ddd transparent;
+  min-height: 80px;
+}
+.npc-cat-popup-desc::-webkit-scrollbar { width: 4px; }
+.npc-cat-popup-desc::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
 .npc-cat-popup-stats { display: flex; gap: 10px; }
 .npc-cat-popup-stat {
   flex: 1;
