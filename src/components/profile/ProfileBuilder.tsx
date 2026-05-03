@@ -6,17 +6,26 @@ import { useRouter } from 'next/navigation'
 import type { Session } from '@supabase/supabase-js'
 import { ProfileDraft, createDraft, draftToProfile, profileToDraft } from './profile-types'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
+import TypeStep from './steps/TypeStep'
 import IdentityStep from './steps/IdentityStep'
 import AvailabilityStep from './steps/AvailabilityStep'
 import RoleStep from './steps/RoleStep'
 import PortfolioStep from './steps/PortfolioStep'
 import WorkStep from './steps/WorkStep'
 import SkillsStep from './steps/SkillsStep'
+import StudioInfoStep from './steps/StudioInfoStep'
+import StudioRateStep from './steps/StudioRateStep'
+import StudioRolesStep from './steps/StudioRolesStep'
+import StudioSkillsStep from './steps/StudioSkillsStep'
 import EditableCard from './EditableCard'
+import StudioEditableCard from './StudioEditableCard'
 import SkillsEditPanel from './editor-panels/SkillsEditPanel'
 import SkillDetailEditPanel from './editor-panels/SkillDetailEditPanel'
 import WorkEditPanel from './editor-panels/WorkEditPanel'
 import GamesEditPanel from './editor-panels/GamesEditPanel'
+import StudioGamesEditPanel from './editor-panels/StudioGamesEditPanel'
+import StudioRolesEditPanel from './editor-panels/StudioRolesEditPanel'
+import StudioInfoEditPanel from './editor-panels/StudioInfoEditPanel'
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/browser'
 
 const DRAFT_KEY = 'weld_profile_draft'
@@ -65,7 +74,7 @@ async function saveAccountProfile(
   if (!response.ok) throw new Error('Could not save account profile.')
 }
 
-type Phase = 'identity' | 'availability' | 'rate' | 'work' | 'portfolio' | 'skills' | 'editor' | 'published'
+type Phase = 'type' | 'identity' | 'availability' | 'rate' | 'work' | 'portfolio' | 'skills' | 'studio-info' | 'studio-rate' | 'studio-roles' | 'studio-skills' | 'editor' | 'published'
 type SaveState = 'local' | 'loading' | 'saving' | 'saved' | 'error'
 
 function saveStateLabel(s: SaveState) {
@@ -174,7 +183,7 @@ export default function ProfileBuilder({
   const [draft, setDraft] = useState<ProfileDraft>(createDraft)
   const [phase, setPhase] = useState<Phase>(initialPhase)
   const [leftPanel, setLeftPanel] = useState<null | 'games'>(null)
-  const [rightPanel, setRightPanel] = useState<null | 'work' | 'skills' | 'portfolio' | { skill: string }>(null)
+  const [rightPanel, setRightPanel] = useState<null | 'work' | 'skills' | 'portfolio' | { skill: string } | 'roles' | 'info'>(null)
   const [hydrated, setHydrated] = useState(false)
   const [accountEmail, setAccountEmail] = useState<string | null>(null)
   const [accessToken, setAccessToken] = useState<string | null>(null)
@@ -188,7 +197,7 @@ export default function ProfileBuilder({
 
   useEffect(() => {
     const d = loadDraft()
-    setDraft({ ...d, type: 'dev', badge: d.badge === 'Studio' ? '' : d.badge })
+    setDraft(d)
     setHydrated(true)
   }, [])
 
@@ -209,7 +218,7 @@ export default function ProfileBuilder({
       try {
         const remoteDraft = await loadAccountDraft(session.access_token)
         if (!alive) return
-        if (remoteDraft) setDraft({ ...remoteDraft, type: 'dev', badge: remoteDraft.badge === 'Studio' ? '' : remoteDraft.badge })
+        if (remoteDraft) setDraft(remoteDraft)
         setSaveState('saved')
       } catch {
         if (!alive) return
@@ -245,9 +254,20 @@ export default function ProfileBuilder({
     const hasBio = !!draft.bio.trim()
     const hasSkill = draft.selectedSkills.length > 0
     const hasGame = draft.topGames.length > 0
+    if (draft.type === 'studio') {
+      const hasStats = !!(draft.studioStats.yearsBuilding || draft.studioStats.projectsShipped)
+      const hasRoles = draft.openRoles.length > 0
+      return [
+        { label: 'Fill in your studio name', completed: hasName },
+        { label: 'Write a short bio', completed: hasBio },
+        { label: 'Add skills you\'re looking for', completed: hasSkill },
+        { label: 'Add at least one game', completed: hasGame },
+        { label: 'List open roles', completed: hasRoles },
+        { label: 'Add studio stats', completed: hasStats },
+      ]
+    }
     const hasWork = draft.bestWork.length > 0
     const hasPortfolio = draft.portfolioLinks.some(link => link.url?.trim()) || draft.socials.some(link => link.url?.trim())
-
     return [
       { label: 'Fill in your name', completed: hasName },
       { label: 'Write a short bio', completed: hasBio },
@@ -314,10 +334,20 @@ export default function ProfileBuilder({
   ) : null
 
   // Header shown in all phases
-  const isQuickStep = phase === 'identity' || phase === 'availability' || phase === 'rate' || phase === 'work' || phase === 'portfolio' || phase === 'skills'
-  const quickStepNum = phase === 'identity' ? 1 : phase === 'availability' ? 2 : phase === 'rate' ? 3 : phase === 'work' ? 4 : phase === 'portfolio' ? 5 : 6
-  const quickStepLabel = phase === 'identity' ? 'Roblox' : phase === 'availability' ? 'Availability' : phase === 'rate' ? 'Rate' : phase === 'work' ? 'Work' : phase === 'portfolio' ? 'Portfolio' : 'Skills'
-  const quickStepCount = 6
+  const devPhases = ['identity', 'availability', 'rate', 'work', 'portfolio', 'skills'] as Phase[]
+  const studioPhases = ['identity', 'studio-info', 'studio-rate', 'studio-roles', 'studio-skills'] as Phase[]
+  const isQuickStep = phase === 'type' || devPhases.includes(phase) || studioPhases.includes(phase)
+  const isStudio = draft.type === 'studio'
+
+  const quickStepNum = phase === 'type' ? 0
+    : isStudio
+      ? (phase === 'identity' ? 2 : phase === 'studio-info' ? 3 : phase === 'studio-rate' ? 4 : phase === 'studio-roles' ? 5 : 6)
+      : (phase === 'identity' ? 1 : phase === 'availability' ? 2 : phase === 'rate' ? 3 : phase === 'work' ? 4 : phase === 'portfolio' ? 5 : 6)
+  const quickStepLabel = phase === 'type' ? 'Type'
+    : isStudio
+      ? (phase === 'identity' ? 'Roblox' : phase === 'studio-info' ? 'Studio Info' : phase === 'studio-rate' ? 'Rate' : phase === 'studio-roles' ? 'Roles' : 'Skills')
+      : (phase === 'identity' ? 'Roblox' : phase === 'availability' ? 'Availability' : phase === 'rate' ? 'Rate' : phase === 'work' ? 'Work' : phase === 'portfolio' ? 'Portfolio' : 'Skills')
+  const quickStepCount = isStudio ? 6 : 6
 
   const header = (
     <div className="pb-form-top">
@@ -353,44 +383,97 @@ export default function ProfileBuilder({
     </div>
   )
 
+  const checklist = (
+    <aside className={`pb-checklist-panel${checklistOpen ? '' : ' pb-checklist-panel--collapsed'}`}>
+      <div className="pb-checklist-header">
+        <div>
+          <div className="pb-checklist-title">Builder checklist</div>
+          <div className="pb-checklist-meta">{completedChecklistCount} of {checklistTasks.length} completed</div>
+        </div>
+        <button type="button" className="pb-checklist-toggle" onClick={() => setChecklistOpen(open => !open)}>
+          {checklistOpen ? 'Hide' : 'Show'}
+        </button>
+      </div>
+      <div className="pb-checklist-progress">
+        <div className="pb-checklist-progress-fill" style={{ width: `${(completedChecklistCount / checklistTasks.length) * 100}%` }} />
+      </div>
+      {checklistOpen && (
+        <div className="pb-checklist-tasks">
+          {checklistTasks.map(task => (
+            <div key={task.label} className={`pb-checklist-task${task.completed ? ' pb-checklist-task--done' : ''}`}>
+              <div className="pb-checklist-bullet">{task.completed ? '✓' : '•'}</div>
+              <div className="pb-checklist-task-label">{task.label}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </aside>
+  )
+
   // Editor phase: card + side panel row
   if (phase === 'editor' || phase === 'published') {
+    const backToOnboarding = () => {
+      setLeftPanel(null)
+      setRightPanel(null)
+      if (onCancel) onCancel()
+      else setPhase(isStudio ? 'studio-skills' : 'skills')
+    }
+
     return (
       <div className="pb-form-shell">
         {header}
         <div className="pb-form-body pb-form-body--editor" ref={bodyRef}>
           <div className="npc-stack-row" style={{ alignItems: 'flex-start' }}>
-            {leftPanel === 'games' && (
+
+            {/* Left panel */}
+            {leftPanel === 'games' && isStudio && (
+              <StudioGamesEditPanel draft={draft} update={update} onClose={() => setLeftPanel(null)} />
+            )}
+            {leftPanel === 'games' && !isStudio && (
               <GamesEditPanel draft={draft} update={update} onClose={() => setLeftPanel(null)} />
             )}
-            <EditableCard
-              draft={draft}
-              update={update}
-              leftPanel={leftPanel}
-              rightPanel={rightPanel}
-              onToggleLeft={() => setLeftPanel(p => p === 'games' ? null : 'games')}
-              onToggleRight={p => setRightPanel(prev => {
-                if (typeof p === 'object' && 'skill' in p) {
-                  return prev !== null && typeof prev === 'object' && 'skill' in prev && prev.skill === p.skill ? null : p
-                }
-                return prev === p ? null : p
-              })}
-              onBack={() => {
-                setLeftPanel(null)
-                setRightPanel(null)
-                if (onCancel) onCancel()
-                else setPhase('skills')
-              }}
-              onBackLabel={onCancel ? '← Cancel' : '← Back'}
-              onPublish={handlePublish}
-              showPortfolioButton={true}
-              showExperienceEdit={true}
-              showScrollActions={showScrollActions}
-            />
-            {rightPanel === 'skills' && (
+
+            {/* Card */}
+            {isStudio ? (
+              <StudioEditableCard
+                draft={draft}
+                update={update}
+                leftPanel={leftPanel}
+                rightPanel={rightPanel === 'roles' || rightPanel === 'info' ? rightPanel : null}
+                onToggleLeft={() => setLeftPanel(p => p === 'games' ? null : 'games')}
+                onToggleRight={p => setRightPanel(prev => prev === p ? null : p)}
+                onBack={backToOnboarding}
+                onBackLabel={onCancel ? '← Cancel' : '← Back'}
+                onPublish={handlePublish}
+                showScrollActions={showScrollActions}
+              />
+            ) : (
+              <EditableCard
+                draft={draft}
+                update={update}
+                leftPanel={leftPanel}
+                rightPanel={rightPanel !== 'roles' && rightPanel !== 'info' ? rightPanel : null}
+                onToggleLeft={() => setLeftPanel(p => p === 'games' ? null : 'games')}
+                onToggleRight={p => setRightPanel(prev => {
+                  if (typeof p === 'object' && 'skill' in p) {
+                    return prev !== null && typeof prev === 'object' && 'skill' in prev && prev.skill === p.skill ? null : p
+                  }
+                  return prev === p ? null : p
+                })}
+                onBack={backToOnboarding}
+                onBackLabel={onCancel ? '← Cancel' : '← Back'}
+                onPublish={handlePublish}
+                showPortfolioButton={true}
+                showExperienceEdit={true}
+                showScrollActions={showScrollActions}
+              />
+            )}
+
+            {/* Right panels — dev */}
+            {!isStudio && rightPanel === 'skills' && (
               <SkillsEditPanel draft={draft} update={update} onClose={() => setRightPanel(null)} />
             )}
-            {rightPanel !== null && typeof rightPanel === 'object' && 'skill' in rightPanel && (
+            {!isStudio && rightPanel !== null && typeof rightPanel === 'object' && 'skill' in rightPanel && (
               <SkillDetailEditPanel
                 skillName={rightPanel.skill}
                 draft={draft}
@@ -398,7 +481,7 @@ export default function ProfileBuilder({
                 onBack={() => setRightPanel(null)}
               />
             )}
-            {rightPanel === 'portfolio' && (
+            {!isStudio && rightPanel === 'portfolio' && (
               <PortfolioStep
                 draft={draft}
                 update={update}
@@ -406,35 +489,19 @@ export default function ProfileBuilder({
                 onNext={() => setRightPanel(null)}
               />
             )}
-            {rightPanel === 'work' && (
+            {!isStudio && rightPanel === 'work' && (
               <WorkEditPanel draft={draft} update={update} onClose={() => setRightPanel(null)} />
             )}
-            <aside className={`pb-checklist-panel${checklistOpen ? '' : ' pb-checklist-panel--collapsed'}`}>
-              <div className="pb-checklist-header">
-                <div>
-                  <div className="pb-checklist-title">Builder checklist</div>
-                  <div className="pb-checklist-meta">{completedChecklistCount} of {checklistTasks.length} completed</div>
-                </div>
-                <button type="button" className="pb-checklist-toggle" onClick={() => setChecklistOpen(open => !open)}>
-                  {checklistOpen ? 'Hide' : 'Show'}
-                </button>
-              </div>
-              <div className="pb-checklist-progress">
-                <div className="pb-checklist-progress-fill" style={{ width: `${(completedChecklistCount / checklistTasks.length) * 100}%` }} />
-              </div>
-              {checklistOpen && (
-                <div className="pb-checklist-tasks">
-                  {checklistTasks.map(task => (
-                    <div key={task.label} className={`pb-checklist-task${task.completed ? ' pb-checklist-task--done' : ''}`}>
-                      <div className="pb-checklist-bullet">
-                        {task.completed ? '✓' : '•'}
-                      </div>
-                      <div className="pb-checklist-task-label">{task.label}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </aside>
+
+            {/* Right panels — studio */}
+            {isStudio && rightPanel === 'roles' && (
+              <StudioRolesEditPanel draft={draft} update={update} onClose={() => setRightPanel(null)} />
+            )}
+            {isStudio && rightPanel === 'info' && (
+              <StudioInfoEditPanel draft={draft} update={update} onClose={() => setRightPanel(null)} />
+            )}
+
+            {checklist}
           </div>
         </div>
         {publishedOverlay}
@@ -446,33 +513,45 @@ export default function ProfileBuilder({
   }
 
   // Quick setup steps
-  const stepProps = { draft, update, onBack: () => { if (phase === 'availability') setPhase('identity') }, onNext: () => {} }
-
   return (
     <div className="pb-form-shell">
       {header}
       <div className="pb-form-body">
-        {phase === 'identity' && (
-          <IdentityStep
-            {...stepProps}
-            onNext={() => setPhase('availability')}
+        {phase === 'type' && (
+          <TypeStep
+            draft={draft}
+            onSelect={type => {
+              update({ type })
+              setPhase('identity')
+            }}
           />
         )}
-        {phase === 'availability' && (
+        {phase === 'identity' && (
+          <IdentityStep
+            draft={draft}
+            update={update}
+            onBack={() => setPhase('type')}
+            onNext={() => isStudio ? setPhase('studio-info') : setPhase('availability')}
+          />
+        )}
+        {/* Dev onboarding */}
+        {phase === 'availability' && !isStudio && (
           <AvailabilityStep
-            {...stepProps}
+            draft={draft}
+            update={update}
             onBack={() => setPhase('identity')}
             onNext={() => setPhase('rate')}
           />
         )}
-        {phase === 'rate' && (
+        {phase === 'rate' && !isStudio && (
           <RoleStep
-            {...stepProps}
+            draft={draft}
+            update={update}
             onBack={() => setPhase('availability')}
             onNext={() => setPhase('work')}
           />
         )}
-        {phase === 'work' && (
+        {phase === 'work' && !isStudio && (
           <WorkStep
             draft={draft}
             update={update}
@@ -480,7 +559,7 @@ export default function ProfileBuilder({
             onNext={() => { setLeftPanel(null); setRightPanel(null); setPhase('portfolio') }}
           />
         )}
-        {phase === 'portfolio' && (
+        {phase === 'portfolio' && !isStudio && (
           <PortfolioStep
             draft={draft}
             update={update}
@@ -488,11 +567,44 @@ export default function ProfileBuilder({
             onNext={() => setPhase('skills')}
           />
         )}
-        {phase === 'skills' && (
+        {phase === 'skills' && !isStudio && (
           <SkillsStep
             draft={draft}
             update={update}
             onBack={() => setPhase('portfolio')}
+            onNext={() => { setLeftPanel(null); setRightPanel(null); setPhase('editor') }}
+          />
+        )}
+        {/* Studio onboarding */}
+        {phase === 'studio-info' && isStudio && (
+          <StudioInfoStep
+            draft={draft}
+            update={update}
+            onBack={() => setPhase('identity')}
+            onNext={() => setPhase('studio-rate')}
+          />
+        )}
+        {phase === 'studio-rate' && isStudio && (
+          <StudioRateStep
+            draft={draft}
+            update={update}
+            onBack={() => setPhase('studio-info')}
+            onNext={() => setPhase('studio-roles')}
+          />
+        )}
+        {phase === 'studio-roles' && isStudio && (
+          <StudioRolesStep
+            draft={draft}
+            update={update}
+            onBack={() => setPhase('studio-rate')}
+            onNext={() => setPhase('studio-skills')}
+          />
+        )}
+        {phase === 'studio-skills' && isStudio && (
+          <StudioSkillsStep
+            draft={draft}
+            update={update}
+            onBack={() => setPhase('studio-roles')}
             onNext={() => { setLeftPanel(null); setRightPanel(null); setPhase('editor') }}
           />
         )}

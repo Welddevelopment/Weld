@@ -30,6 +30,13 @@ export type ProfileDraft = {
   budgetType: string | null
   projectValue: string
   details: string
+  hiring: boolean
+  rateMin: number | null
+  rateMax: number | null
+  rateNote: string
+  openRoles: Array<{ icon: string; title: string; description: string }>
+  about: string
+  studioStats: { yearsBuilding: string; projectsShipped: string; totalVisits: string; onTimeDelivery: string }
   // Shared
   selectedSkills: ProfileSkillDraft[]
   portfolioLinks: Array<{ name: string; url: string }>
@@ -58,6 +65,13 @@ export function createDraft(): ProfileDraft {
     budgetType: null,
     projectValue: '',
     details: '',
+    hiring: false,
+    rateMin: null,
+    rateMax: null,
+    rateNote: '',
+    openRoles: [],
+    about: '',
+    studioStats: { yearsBuilding: '', projectsShipped: '', totalVisits: '', onTimeDelivery: '' },
     selectedSkills: [],
     portfolioLinks: [],
     socials: [],
@@ -125,6 +139,15 @@ export function profileToDraft(profile: PreviewProfile): ProfileDraft {
     status: isDev ? null : profile.meta.split(' - ')[0] || null,
     budgetType: isDev ? null : metaValue(profile, 'Budget'),
     details: profile.details ?? '',
+    hiring: profile.hiring ?? false,
+    rateMin: profile.rateMin ?? null,
+    rateMax: profile.rateMax ?? null,
+    rateNote: profile.rateNote ?? '',
+    openRoles: (profile.openRoles ?? []).map(r => ({ icon: r.icon, title: r.title, description: r.description ?? '' })),
+    about: profile.about ?? '',
+    studioStats: profile.studioStats
+      ? { yearsBuilding: profile.studioStats.yearsBuilding ?? '', projectsShipped: profile.studioStats.projectsShipped ?? '', totalVisits: profile.studioStats.totalVisits ?? '', onTimeDelivery: profile.studioStats.onTimeDelivery ?? '' }
+      : { yearsBuilding: '', projectsShipped: '', totalVisits: '', onTimeDelivery: '' },
     selectedSkills: selectedSkillsFromProfile(profile),
     portfolioLinks: profile.portfolio?.links ?? [],
     socials: profile.socials ?? [],
@@ -180,6 +203,15 @@ export function draftToProfile(draft: ProfileDraft, id: string): PreviewProfile 
     if (draft.details) profile.details = draft.details
     if (draft.selectedSkills.length > 0) profile.skillsNeeded = profileSkillsFromDraft(draft.selectedSkills)
     if (draft.topGames.length > 0) profile.topGames = draft.topGames
+    profile.hiring = draft.hiring
+    if (draft.rateMin !== null) profile.rateMin = draft.rateMin
+    if (draft.rateMax !== null) profile.rateMax = draft.rateMax
+    if (draft.rateNote) profile.rateNote = draft.rateNote
+    if (draft.rateType) profile.rateType = draft.rateType
+    if (draft.openRoles.length > 0) profile.openRoles = draft.openRoles
+    if (draft.about) profile.about = draft.about
+    const ss = draft.studioStats
+    if (ss.yearsBuilding || ss.projectsShipped || ss.totalVisits || ss.onTimeDelivery) profile.studioStats = ss
   }
 
   return profile

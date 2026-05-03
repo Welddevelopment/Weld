@@ -97,7 +97,7 @@ export default function ProfilePage() {
         key={builderKey}
         onPublished={handlePublished}
         onDelete={handleDelete}
-        initialPhase={publishedProfile ? 'editor' : 'identity'}
+        initialPhase={publishedProfile ? 'editor' : 'type'}
         onCancel={publishedProfile ? () => setMode('published') : undefined}
       />
     )
