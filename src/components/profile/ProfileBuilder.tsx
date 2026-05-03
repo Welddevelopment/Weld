@@ -445,7 +445,6 @@ export default function ProfileBuilder({
                 onBack={backToOnboarding}
                 onBackLabel={onCancel ? '← Cancel' : '← Back'}
                 onPublish={handlePublish}
-                showScrollActions={showScrollActions}
               />
             ) : (
               <EditableCard
