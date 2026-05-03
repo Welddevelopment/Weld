@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { Session } from '@supabase/supabase-js'
-import { ProfileDraft, createDraft, draftToProfile } from './profile-types'
+import { ProfileDraft, createDraft, draftToProfile, profileToDraft } from './profile-types'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 import IdentityStep from './steps/IdentityStep'
 import AvailabilityStep from './steps/AvailabilityStep'
@@ -41,8 +41,13 @@ async function loadAccountDraft(accessToken: string) {
     cache: 'no-store',
   })
   if (!response.ok) throw new Error('Could not load account profile.')
-  const result = (await response.json()) as { profile?: { draft?: unknown } | null }
-  return result.profile?.draft ? mergeDraft(result.profile.draft) : null
+  const result = (await response.json()) as { profile?: { draft?: unknown; publishedProfile?: unknown } | null }
+  if (result.profile?.draft) return mergeDraft(result.profile.draft)
+  // No draft saved — reconstruct from the published profile if one exists
+  if (result.profile?.publishedProfile && typeof result.profile.publishedProfile === 'object') {
+    return profileToDraft(result.profile.publishedProfile as PreviewProfile)
+  }
+  return null
 }
 
 async function saveAccountProfile(
