@@ -49,7 +49,7 @@ export type PreviewProfile = {
   tags: string[]
   meta: string
   // Dev-only
-  skills?: Array<{ name: string; description: string; experienceMonths?: number; pastWorks?: number; categories?: Array<{ icon?: string; name: string; description: string }>; resources?: Array<{ label: string; url: string }> }>
+  skills?: Array<{ name: string; description: string; experienceMonths?: number; pastWorks?: number; categories?: Array<{ icon?: string; name: string; description: string; detail?: string }>; resources?: Array<{ label: string; url: string }> }>
   portfolio?: { links: Array<{ name: string; url: string }> }
   bestWork?: DevWork[]
   socials?: Array<{ icon: string; label: string; url: string }>

@@ -45,7 +45,7 @@ export default function SkillDetailEditPanel({ skillName, draft, update, onBack 
   const addCap = () =>
     set({ categories: [...caps, { name: '', description: '' }] })
 
-  const updateCap = (idx: number, cap: { name: string; description: string }) =>
+  const updateCap = (idx: number, cap: { name: string; description: string; detail?: string }) =>
     set({ categories: caps.map((c, i) => i === idx ? cap : c) })
 
   const removeCap = (idx: number) =>
@@ -93,24 +93,38 @@ export default function SkillDetailEditPanel({ skillName, draft, update, onBack 
         {/* Capability cards */}
         <div style={LABEL_STYLE}>What you can build with {skillName}</div>
         <div className="ob-cap-grid" style={{ marginBottom: 16 }}>
-          {caps.map((cap, ci) => (
-            <div key={ci} className="ob-cap-card">
-              <button type="button" className="ob-cap-remove" onClick={() => removeCap(ci)}>×</button>
-              <input
-                className="ob-cap-title"
-                placeholder="e.g. Gameplay Systems"
-                value={cap.name}
-                onChange={e => updateCap(ci, { ...cap, name: e.target.value })}
-              />
-              <textarea
-                className="ob-cap-body"
-                placeholder="Short description…"
-                rows={2}
-                value={cap.description}
-                onChange={e => updateCap(ci, { ...cap, description: e.target.value })}
-              />
-            </div>
-          ))}
+          {caps.map((cap, ci) => {
+            const summaryLen = cap.description.length
+            return (
+              <div key={ci} className="ob-cap-card">
+                <button type="button" className="ob-cap-remove" onClick={() => removeCap(ci)}>×</button>
+                <input
+                  className="ob-cap-title"
+                  placeholder="e.g. Gameplay Systems"
+                  value={cap.name}
+                  onChange={e => updateCap(ci, { ...cap, name: e.target.value })}
+                />
+                <div className="ob-cap-section-label">Summary</div>
+                <textarea
+                  className="ob-cap-body"
+                  placeholder="One-line summary…"
+                  rows={2}
+                  maxLength={120}
+                  value={cap.description}
+                  onChange={e => updateCap(ci, { ...cap, description: e.target.value })}
+                />
+                <div className={`ob-cap-char${summaryLen > 110 ? ' ob-cap-char--over' : ''}`}>{summaryLen}/120</div>
+                <div className="ob-cap-section-label">Description</div>
+                <textarea
+                  className="ob-cap-detail"
+                  placeholder="More detail shown in the popup…"
+                  rows={3}
+                  value={cap.detail ?? ''}
+                  onChange={e => updateCap(ci, { ...cap, detail: e.target.value })}
+                />
+              </div>
+            )
+          })}
           {caps.length < MAX_CAPS && (
             <button type="button" className="ob-cap-add" onClick={addCap}>+</button>
           )}

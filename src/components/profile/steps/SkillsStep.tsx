@@ -63,7 +63,7 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
     })
   }
 
-  const updateCap = (skillName: string, idx: number, cap: { name: string; description: string }) => {
+  const updateCap = (skillName: string, idx: number, cap: { name: string; description: string; detail?: string }) => {
     const skill = selected.find(s => s.name === skillName)
     if (!skill) return
     update({ selectedSkills: updateSkillField(selected, skillName, {
@@ -155,24 +155,38 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
               <div className="pb-field" style={{ marginTop: 10, marginBottom: 0 }}>
                 <label className="pb-label">What can you build with {skill.name}?</label>
                 <div className="ob-cap-grid">
-                  {caps.map((cap, ci) => (
-                    <div key={ci} className="ob-cap-card">
-                      <button type="button" className="ob-cap-remove" onClick={() => removeCap(skill.name, ci)}>×</button>
-                      <input
-                        className="ob-cap-title"
-                        placeholder="e.g. Gameplay Systems"
-                        value={cap.name}
-                        onChange={e => updateCap(skill.name, ci, { ...cap, name: e.target.value })}
-                      />
-                      <textarea
-                        className="ob-cap-body"
-                        placeholder="Short description…"
-                        rows={2}
-                        value={cap.description}
-                        onChange={e => updateCap(skill.name, ci, { ...cap, description: e.target.value })}
-                      />
-                    </div>
-                  ))}
+                  {caps.map((cap, ci) => {
+                    const summaryLen = cap.description.length
+                    return (
+                      <div key={ci} className="ob-cap-card">
+                        <button type="button" className="ob-cap-remove" onClick={() => removeCap(skill.name, ci)}>×</button>
+                        <input
+                          className="ob-cap-title"
+                          placeholder="e.g. Gameplay Systems"
+                          value={cap.name}
+                          onChange={e => updateCap(skill.name, ci, { ...cap, name: e.target.value })}
+                        />
+                        <div className="ob-cap-section-label">Summary</div>
+                        <textarea
+                          className="ob-cap-body"
+                          placeholder="One-line summary…"
+                          rows={2}
+                          maxLength={120}
+                          value={cap.description}
+                          onChange={e => updateCap(skill.name, ci, { ...cap, description: e.target.value })}
+                        />
+                        <div className={`ob-cap-char${summaryLen > 110 ? ' ob-cap-char--over' : ''}`}>{summaryLen}/120</div>
+                        <div className="ob-cap-section-label">Description</div>
+                        <textarea
+                          className="ob-cap-detail"
+                          placeholder="More detail shown in the popup…"
+                          rows={3}
+                          value={cap.detail ?? ''}
+                          onChange={e => updateCap(skill.name, ci, { ...cap, detail: e.target.value })}
+                        />
+                      </div>
+                    )
+                  })}
                   {caps.length < MAX_CAPS && (
                     <button type="button" className="ob-cap-add" onClick={() => addCap(skill.name)}>+</button>
                   )}

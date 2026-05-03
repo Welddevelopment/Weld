@@ -5,7 +5,7 @@ export type ProfileSkillDraft = {
   description: string
   experienceMonths?: number
   pastWorks?: number
-  categories?: Array<{ name: string; description: string }>
+  categories?: Array<{ name: string; description: string; detail?: string }>
   resources?: Array<{ label: string; url: string }>
 }
 
