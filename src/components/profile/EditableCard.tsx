@@ -233,6 +233,7 @@ export default function EditableCard({
               </svg>
             </div>
             <div className="npc-entry-title">Games{draft.topGames.length > 0 ? ` (${draft.topGames.length})` : ''}</div>
+            <div className="npc-entry-sub">Games I&apos;ve worked on →</div>
           </button>
 
           <button
@@ -245,6 +246,7 @@ export default function EditableCard({
               </svg>
             </div>
             <div className="npc-entry-title">My Work{draft.bestWork.length > 0 ? ` (${draft.bestWork.length})` : ''}</div>
+            <div className="npc-entry-sub">Projects I&apos;ve built →</div>
           </button>
 
           {showPortfolioButton && (
@@ -258,6 +260,7 @@ export default function EditableCard({
                 </svg>
               </div>
               <div className="npc-entry-title">Portfolio</div>
+              <div className="npc-entry-sub">Links &amp; portfolio →</div>
             </button>
           )}
         </div>
