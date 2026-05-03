@@ -3026,8 +3026,8 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   margin: 0 0 10px;
 }
 .npc-cap-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
   margin-bottom: 16px;
 }
