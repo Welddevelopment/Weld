@@ -2838,6 +2838,10 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   from { opacity: 0; transform: translateX(16px); }
   to   { opacity: 1; transform: translateX(0); }
 }
+/* Narrower panels on laptop-sized screens so two panels + card fit without overflow */
+@media (max-width: 1420px) {
+  .npc-panel { width: 320px; }
+}
 .npc-panel-hd {
   padding: 16px 16px 0;
   flex-shrink: 0;
