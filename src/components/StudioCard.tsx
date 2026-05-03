@@ -183,7 +183,7 @@ export default function StudioCard({
                   key={idx}
                   className={`sc-role-btn${isActive ? ' sc-role-btn--active' : ''}`}
                   onMouseDown={stopDrag}
-                  onClick={e => { e.stopPropagation(); onOpenPanel?.({ skill: role.skill }) }}
+                  onClick={e => { e.stopPropagation(); onOpenPanel?.({ skill: role.skill, role: role.title }) }}
                 >
                   <span className="sc-role-icon" style={{ width: 14, height: 14, borderRadius: 3, background: `${c}22`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
                     <span style={{ fontSize: 7, fontWeight: 800, color: c, lineHeight: 1 }}>{(role.skill || '???').slice(0, 3)}</span>

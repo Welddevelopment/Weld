@@ -1,6 +1,7 @@
 'use client'
 
 import { ProfileDraft } from '../profile-types'
+import { DEV_SKILL_DESCS } from '@/components/matching-preview/preview-data'
 
 interface Props {
   draft: ProfileDraft
@@ -31,6 +32,19 @@ const RATE_TYPES = ['Hourly (USD)', 'Hourly (Robux)', 'Per Project', 'Revenue Sh
 
 export default function StudioInfoEditPanel({ draft, update, onClose }: Props) {
   const ss = draft.studioStats
+  const derivedSkills = [...new Set(draft.openRoles.map(r => r.skill).filter(Boolean))]
+
+  const getSkillDesc = (name: string) =>
+    draft.selectedSkills.find(s => s.name === name)?.description ?? ''
+
+  const setSkillDesc = (name: string, description: string) => {
+    const existing = draft.selectedSkills.find(s => s.name === name)
+    if (existing) {
+      update({ selectedSkills: draft.selectedSkills.map(s => s.name === name ? { ...s, description } : s) })
+    } else {
+      update({ selectedSkills: [...draft.selectedSkills, { name, description }] })
+    }
+  }
 
   return (
     <div className="npc-panel">
@@ -196,8 +210,26 @@ export default function StudioInfoEditPanel({ draft, update, onClose }: Props) {
           </div>
         </div>
 
-        <div style={{ padding: '10px 12px', background: 'rgba(0,0,0,0.04)', borderRadius: 8, fontSize: 12, color: '#888' }}>
-          Skills needed are automatically derived from your open roles. Add roles in the Roles panel to update this.
+        <div style={{ marginBottom: 20 }}>
+          <div className="pb-label" style={{ marginBottom: 8 }}>Skill descriptions</div>
+          <p style={{ fontSize: 11, color: '#999', margin: '0 0 10px' }}>
+            Shown to developers when they tap a skill chip. Leave blank to use the default.
+          </p>
+          {derivedSkills.length === 0 && (
+            <p style={{ fontSize: 12, color: '#bbb' }}>Add open roles first — skills are derived from your roles.</p>
+          )}
+          {derivedSkills.map(name => (
+            <div key={name} style={{ marginBottom: 12 }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: '#444', marginBottom: 4 }}>{name}</div>
+              <textarea
+                className="pb-panel-textarea"
+                rows={2}
+                placeholder={DEV_SKILL_DESCS[name] ?? `Describe what ${name} means for your studio…`}
+                value={getSkillDesc(name)}
+                onChange={e => setSkillDesc(name, e.target.value)}
+              />
+            </div>
+          ))}
         </div>
       </div>
     </div>

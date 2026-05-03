@@ -7,6 +7,7 @@ import { DEV_SKILL_DESCS } from '../preview-data'
 interface Props {
   profile: PreviewProfile
   skillName: string
+  initialRole?: string
   onBack: () => void
 }
 
@@ -18,11 +19,14 @@ function colorForSkill(name: string) {
   return ICON_COLORS[h % ICON_COLORS.length]
 }
 
-export default function StudioSkillPanel({ profile, skillName, onBack }: Props) {
-  const [selectedRole, setSelectedRole] = useState<number | null>(null)
+export default function StudioSkillPanel({ profile, skillName, initialRole, onBack }: Props) {
   const color = colorForSkill(skillName)
-  const desc = DEV_SKILL_DESCS[skillName] ?? ''
   const roles = (profile.openRoles ?? []).filter(r => r.skill === skillName)
+  const initialIdx = initialRole != null ? roles.findIndex(r => r.title === initialRole) : -1
+  const [selectedRole, setSelectedRole] = useState<number | null>(initialIdx >= 0 ? initialIdx : null)
+
+  const customDesc = profile.skillsNeeded?.find(s => s.name === skillName)?.description
+  const desc = (customDesc && customDesc.trim()) ? customDesc : (DEV_SKILL_DESCS[skillName] ?? '')
   const popupRole = selectedRole !== null ? roles[selectedRole] : null
 
   return (
@@ -72,31 +76,33 @@ export default function StudioSkillPanel({ profile, skillName, onBack }: Props) 
             <div style={{ fontSize: 10, fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#999', marginBottom: 10 }}>
               Open roles for this skill
             </div>
-            {roles.map((role, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => setSelectedRole(idx)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 10, width: '100%',
-                  padding: '10px 12px', background: '#f7f7f7', borderRadius: 10,
-                  marginBottom: 8, border: 'none', cursor: 'pointer', textAlign: 'left',
-                }}
-              >
-                <div style={{ width: 28, height: 28, borderRadius: 7, background: `${color}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <span style={{ fontSize: 9, fontWeight: 700, color, letterSpacing: '0.03em' }}>{role.skill.slice(0, 3)}</span>
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#111' }}>{role.title || 'Untitled role'}</div>
-                  {role.description && (
-                    <div style={{ fontSize: 11, color: '#888', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {role.description}
-                    </div>
-                  )}
-                </div>
-                <svg viewBox="0 0 24 24" fill="none" stroke="#bbb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="12" height="12"><polyline points="9 18 15 12 9 6"/></svg>
-              </button>
-            ))}
+            <div style={{ overflowY: 'auto', maxHeight: 220 }}>
+              {roles.map((role, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setSelectedRole(idx)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+                    padding: '10px 12px', background: '#f7f7f7', borderRadius: 10,
+                    marginBottom: 8, border: 'none', cursor: 'pointer', textAlign: 'left',
+                  }}
+                >
+                  <div style={{ width: 28, height: 28, borderRadius: 7, background: `${color}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ fontSize: 9, fontWeight: 700, color, letterSpacing: '0.03em' }}>{(role.skill || '').slice(0, 3)}</span>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#111' }}>{role.title || 'Untitled role'}</div>
+                    {role.description && (
+                      <div style={{ fontSize: 11, color: '#888', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {role.description}
+                      </div>
+                    )}
+                  </div>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#bbb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="12" height="12"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -110,7 +116,7 @@ export default function StudioSkillPanel({ profile, skillName, onBack }: Props) 
         {popupRole && (
           <div
             style={{
-              position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.96)',
+              position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.97)',
               borderRadius: 12, display: 'flex', flexDirection: 'column',
               padding: '16px 18px', zIndex: 10,
             }}
@@ -126,7 +132,7 @@ export default function StudioSkillPanel({ profile, skillName, onBack }: Props) 
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
               <div style={{ width: 40, height: 40, borderRadius: 10, background: `${color}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <span style={{ fontSize: 11, fontWeight: 800, color, letterSpacing: '0.02em' }}>{popupRole.skill.slice(0, 3)}</span>
+                <span style={{ fontSize: 11, fontWeight: 800, color, letterSpacing: '0.02em' }}>{(popupRole.skill || '').slice(0, 3)}</span>
               </div>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 700, color: '#111' }}>{popupRole.title || 'Untitled role'}</div>

@@ -10,18 +10,18 @@ interface Props {
   onBack: () => void
 }
 
-const ALL_SKILLS = Object.keys(DEV_SKILL_DESCS)
-const MAX = 6
-
 export default function StudioSkillsStep({ draft, update, onNext, onBack }: Props) {
-  const selected = draft.selectedSkills
-  const selectedNames = new Set(selected.map(s => s.name))
+  const derivedSkills = [...new Set(draft.openRoles.map(r => r.skill).filter(Boolean))]
 
-  const toggle = (name: string) => {
-    if (selectedNames.has(name)) {
-      update({ selectedSkills: selected.filter(s => s.name !== name) })
-    } else if (selected.length < MAX) {
-      update({ selectedSkills: [...selected, { name, description: '' }] })
+  const getDesc = (name: string) =>
+    draft.selectedSkills.find(s => s.name === name)?.description ?? ''
+
+  const setDesc = (name: string, description: string) => {
+    const existing = draft.selectedSkills.find(s => s.name === name)
+    if (existing) {
+      update({ selectedSkills: draft.selectedSkills.map(s => s.name === name ? { ...s, description } : s) })
+    } else {
+      update({ selectedSkills: [...draft.selectedSkills, { name, description }] })
     }
   }
 
@@ -32,48 +32,46 @@ export default function StudioSkillsStep({ draft, update, onNext, onBack }: Prop
           <span className="ob-mark">*</span>
           <span>weld.</span>
         </div>
-        <h1 className="ob-title ob-title--light">skills<br />needed</h1>
+        <h1 className="ob-title ob-title--light">skill<br />descriptions</h1>
         <p className="ob-copy ob-copy--light">
-          What skills are you looking for in developers? Pick up to {MAX}.
+          Optionally write a short description for each skill you need. Developers see this when they tap a skill chip on your profile.
         </p>
         <div className="ob-note-card">
           <strong>Tip</strong>
-          <span>Developers filter by skill. The more accurate your tags, the better your matches.</span>
+          <span>Leave it blank to use the default description, or write your own to stand out.</span>
         </div>
       </aside>
 
       <section className="ob-main">
         <div className="ob-progress"><span style={{ width: '100%' }} /></div>
         <div className="ob-step-row">
-          <span>Step 6 of 6 — Skills Needed</span>
+          <span>Step 6 of 6 — Skill Descriptions</span>
           <span>6/6</span>
         </div>
 
-        <div className="pb-field">
-          <label className="pb-label">
-            Skills looking for
-            {selected.length > 0 && (
-              <span className="pb-hint-label"> — {selected.length}/{MAX} selected</span>
-            )}
-          </label>
-          <div className="pb-emoji-row" style={{ flexWrap: 'wrap', gap: 6 }}>
-            {ALL_SKILLS.map(name => {
-              const on = selectedNames.has(name)
-              const disabled = !on && selected.length >= MAX
-              return (
-                <button
-                  key={name}
-                  type="button"
-                  className={`pb-emoji-btn${on ? ' pb-emoji-btn--on' : ''}${disabled ? ' pb-emoji-btn--disabled' : ''}`}
-                  onClick={() => toggle(name)}
-                  disabled={disabled}
-                >
-                  {name}
-                </button>
-              )
-            })}
+        {derivedSkills.length === 0 && (
+          <p style={{ color: '#bbb', fontSize: 13, marginTop: 8 }}>
+            No roles added yet — go back and add roles first. Skills are derived from your open roles.
+          </p>
+        )}
+
+        {derivedSkills.map(name => (
+          <div key={name} style={{ marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <span style={{ fontWeight: 600, fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>{name}</span>
+              {!getDesc(name) && (
+                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>using default</span>
+              )}
+            </div>
+            <textarea
+              className="pb-textarea"
+              rows={2}
+              placeholder={DEV_SKILL_DESCS[name] ?? `Describe what ${name} means for your studio…`}
+              value={getDesc(name)}
+              onChange={e => setDesc(name, e.target.value)}
+            />
           </div>
-        </div>
+        ))}
 
         <div className="pb-nav">
           <button className="pb-btn pb-btn--ghost" type="button" onClick={onBack}>Back</button>

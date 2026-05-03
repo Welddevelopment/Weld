@@ -202,7 +202,10 @@ export function draftToProfile(draft: ProfileDraft, id: string): PreviewProfile 
   } else {
     if (draft.details) profile.details = draft.details
     const uniqueSkills = [...new Set(draft.openRoles.map(r => r.skill).filter(Boolean))]
-    if (uniqueSkills.length > 0) profile.skillsNeeded = uniqueSkills.map(name => ({ name, description: '' }))
+    if (uniqueSkills.length > 0) profile.skillsNeeded = uniqueSkills.map(name => ({
+      name,
+      description: draft.selectedSkills.find(s => s.name === name)?.description ?? '',
+    }))
     if (draft.topGames.length > 0) profile.topGames = draft.topGames
     profile.hiring = draft.hiring
     if (draft.rateMin !== null) profile.rateMin = draft.rateMin

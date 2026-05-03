@@ -25,10 +25,9 @@ function renderPanel(panel: PanelKind, profile: PreviewProfile, onBack: () => vo
   if (panel === 'work') return <WorkPanel key="work" profile={profile} onBack={onBack} />
   if (typeof panel === 'object' && 'skill' in panel) {
     return profile.type === 'studio'
-      ? <StudioSkillPanel key={`studio-skill-${panel.skill}`} profile={profile} skillName={panel.skill} onBack={onBack} />
+      ? <StudioSkillPanel key={`studio-skill-${panel.skill}`} profile={profile} skillName={panel.skill} initialRole={panel.role} onBack={onBack} />
       : <SkillPanel key={`skill-${panel.skill}`} profile={profile} skillName={panel.skill} onBack={onBack} />
   }
-  if (typeof panel === 'object' && 'role' in panel) return null
   return null
 }
 

@@ -3,7 +3,7 @@
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 import { getInitials } from '@/lib/utils'
 
-export type PanelKind = 'games' | 'work' | { skill: string } | { role: string }
+export type PanelKind = 'games' | 'work' | { skill: string; role?: string }
 
 interface Props {
   profile: PreviewProfile
