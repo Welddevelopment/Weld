@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import type { PreviewProfile } from '../preview-types'
 
 interface Props {
@@ -7,6 +8,8 @@ interface Props {
   skillName: string
   onBack: () => void
 }
+
+type Category = { icon?: string; name: string; description: string; detail?: string; works?: number; avgPrice?: string; priceType?: 'hourly' | 'commission' }
 
 const ICON_COLORS = ['#a78bfa', '#34d399', '#fb923c', '#60a5fa', '#f472b6', '#facc15']
 
@@ -26,12 +29,16 @@ function formatMonths(months: number): string {
 export default function SkillPanel({ profile, skillName, onBack }: Props) {
   const skill = (profile.skills ?? []).find(s => s.name === skillName)
   const color = colorForSkill(skillName)
-  const categories = skill?.categories ?? []
+  const categories: Category[] = skill?.categories ?? []
   const resources = skill?.resources ?? []
+  const [selectedCat, setSelectedCat] = useState<number | null>(null)
+
+  const blurStyle = selectedCat !== null ? { filter: 'blur(3px)', transition: 'filter 0.15s' } : { transition: 'filter 0.15s' }
 
   return (
     <div className="npc-panel">
-      <div className="npc-panel-hd">
+      {/* Header — blurs when popup is open */}
+      <div className="npc-panel-hd" style={blurStyle}>
         <button className="npc-panel-back" onClick={onBack}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6"/>
@@ -40,7 +47,8 @@ export default function SkillPanel({ profile, skillName, onBack }: Props) {
         </button>
       </div>
 
-      <div className="npc-panel-body">
+      {/* Body — blurs when popup is open */}
+      <div className="npc-panel-body" style={blurStyle}>
         {/* Header: icon + name + category + stats */}
         <div className="npc-skill-hd">
           <div className="npc-skill-icon-box" style={{ background: `${color}33`, color }}>
@@ -52,14 +60,12 @@ export default function SkillPanel({ profile, skillName, onBack }: Props) {
           </div>
         </div>
 
-        {/* Description — full width below icon */}
         {skill?.description && (
           <p style={{ fontSize: 13, color: '#444', lineHeight: 1.6, margin: '0 0 16px' }}>
             {skill.description}
           </p>
         )}
 
-        {/* Reference links */}
         {resources.length > 0 && (
           <div className="npc-skill-refs">
             {resources.map((r: { label: string; url: string }) => (
@@ -74,22 +80,25 @@ export default function SkillPanel({ profile, skillName, onBack }: Props) {
           </div>
         )}
 
-        {/* Capability cards */}
         {categories.length > 0 && (
           <>
             <div className="npc-section-title">What I can build with {skillName}</div>
             <div className="npc-cap-grid">
-              {categories.map((cat: { name: string; description: string }, i: number) => (
-                <div key={i} className="npc-cap-card">
+              {categories.map((cat, i) => (
+                <button
+                  key={i}
+                  className="npc-cap-card"
+                  style={{ cursor: 'pointer', textAlign: 'left' }}
+                  onClick={() => setSelectedCat(i)}
+                >
                   <div className="npc-cap-name">{cat.name}</div>
                   <div className="npc-cap-desc">{cat.description}</div>
-                </div>
+                </button>
               ))}
             </div>
           </>
         )}
 
-        {/* Stats at the bottom */}
         {(skill?.experienceMonths || skill?.pastWorks) && (
           <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
             {!!skill?.experienceMonths && (
@@ -113,6 +122,42 @@ export default function SkillPanel({ profile, skillName, onBack }: Props) {
           </p>
         )}
       </div>
+
+      {/* Category popup — sibling to blurred content, not blurred itself */}
+      {selectedCat !== null && (() => {
+        const cat = categories[selectedCat]
+        const hasStats = cat.works || cat.avgPrice
+        return (
+          <div className="npc-cat-popup-overlay" onClick={() => setSelectedCat(null)}>
+            <div className="npc-cat-popup" onClick={e => e.stopPropagation()}>
+              <button className="npc-cat-popup-close" onClick={() => setSelectedCat(null)}>✕</button>
+              <div className="npc-cat-popup-name">{cat.name}</div>
+              {cat.detail
+                ? <p className="npc-cat-popup-desc">{cat.detail}</p>
+                : cat.description
+                  ? <p className="npc-cat-popup-desc">{cat.description}</p>
+                  : null
+              }
+              {hasStats && (
+                <div className="npc-cat-popup-stats">
+                  {!!cat.works && (
+                    <div className="npc-cat-popup-stat">
+                      <div className="npc-cat-popup-stat-val">{cat.works}</div>
+                      <div className="npc-cat-popup-stat-lbl">Works</div>
+                    </div>
+                  )}
+                  {cat.avgPrice && (
+                    <div className="npc-cat-popup-stat">
+                      <div className="npc-cat-popup-stat-val">{cat.avgPrice}</div>
+                      <div className="npc-cat-popup-stat-lbl">{cat.priceType === 'commission' ? 'Avg commission' : 'Avg hourly'}</div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }

@@ -45,7 +45,7 @@ export default function SkillDetailEditPanel({ skillName, draft, update, onBack 
   const addCap = () =>
     set({ categories: [...caps, { name: '', description: '' }] })
 
-  const updateCap = (idx: number, cap: { name: string; description: string; detail?: string }) =>
+  const updateCap = (idx: number, cap: { name: string; description: string; detail?: string; works?: number; avgPrice?: string; priceType?: 'hourly' | 'commission' }) =>
     set({ categories: caps.map((c, i) => i === idx ? cap : c) })
 
   const removeCap = (idx: number) =>
@@ -122,6 +122,31 @@ export default function SkillDetailEditPanel({ skillName, draft, update, onBack 
                   value={cap.detail ?? ''}
                   onChange={e => updateCap(ci, { ...cap, detail: e.target.value })}
                 />
+                <div className="ob-cap-section-label">Stats</div>
+                <div className="ob-cap-stats-row">
+                  <input
+                    className="ob-cap-stat-input"
+                    type="number"
+                    min={0}
+                    placeholder="# works"
+                    value={cap.works ?? ''}
+                    onChange={e => updateCap(ci, { ...cap, works: e.target.value === '' ? undefined : Number(e.target.value) })}
+                  />
+                  <input
+                    className="ob-cap-stat-input"
+                    type="text"
+                    placeholder="avg price"
+                    value={cap.avgPrice ?? ''}
+                    onChange={e => updateCap(ci, { ...cap, avgPrice: e.target.value || undefined })}
+                  />
+                  <button
+                    type="button"
+                    className="ob-cap-price-toggle"
+                    onClick={() => updateCap(ci, { ...cap, priceType: cap.priceType === 'commission' ? 'hourly' : 'commission' })}
+                  >
+                    {cap.priceType === 'commission' ? 'Comm.' : 'Hourly'}
+                  </button>
+                </div>
               </div>
             )
           })}

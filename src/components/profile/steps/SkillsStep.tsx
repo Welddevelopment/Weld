@@ -63,7 +63,7 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
     })
   }
 
-  const updateCap = (skillName: string, idx: number, cap: { name: string; description: string; detail?: string }) => {
+  const updateCap = (skillName: string, idx: number, cap: { name: string; description: string; detail?: string; works?: number; avgPrice?: string; priceType?: 'hourly' | 'commission' }) => {
     const skill = selected.find(s => s.name === skillName)
     if (!skill) return
     update({ selectedSkills: updateSkillField(selected, skillName, {
@@ -184,6 +184,31 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
                           value={cap.detail ?? ''}
                           onChange={e => updateCap(skill.name, ci, { ...cap, detail: e.target.value })}
                         />
+                        <div className="ob-cap-section-label">Stats</div>
+                        <div className="ob-cap-stats-row">
+                          <input
+                            className="ob-cap-stat-input"
+                            type="number"
+                            min={0}
+                            placeholder="# works"
+                            value={cap.works ?? ''}
+                            onChange={e => updateCap(skill.name, ci, { ...cap, works: e.target.value === '' ? undefined : Number(e.target.value) })}
+                          />
+                          <input
+                            className="ob-cap-stat-input"
+                            type="text"
+                            placeholder="avg price"
+                            value={cap.avgPrice ?? ''}
+                            onChange={e => updateCap(skill.name, ci, { ...cap, avgPrice: e.target.value || undefined })}
+                          />
+                          <button
+                            type="button"
+                            className="ob-cap-price-toggle"
+                            onClick={() => updateCap(skill.name, ci, { ...cap, priceType: cap.priceType === 'commission' ? 'hourly' : 'commission' })}
+                          >
+                            {cap.priceType === 'commission' ? 'Comm.' : 'Hourly'}
+                          </button>
+                        </div>
                       </div>
                     )
                   })}
