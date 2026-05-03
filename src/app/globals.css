@@ -3086,6 +3086,225 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   align-items: flex-start;
 }
 
+/* ── STUDIO CARD ─────────────────────────────────────────────── */
+
+.sc-hiring-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #16a34a;
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+  border-radius: 999px;
+  padding: 3px 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.sc-hiring-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+}
+
+/* 3-column info grid */
+.sc-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1.5px solid #f0f0f0;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 4px 16px 8px;
+  flex-shrink: 0;
+}
+.sc-info-col {
+  padding: 8px 8px 8px 10px;
+  border-right: 1.5px solid #f0f0f0;
+}
+.sc-col-heading {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #bbb;
+  margin-bottom: 5px;
+  font-family: var(--font-geist-mono);
+}
+.sc-rate-range {
+  font-size: 13px;
+  font-weight: 800;
+  color: #111;
+  line-height: 1.1;
+  margin-bottom: 2px;
+}
+.sc-rate-type {
+  font-size: 9px;
+  color: #4444EE;
+  font-weight: 600;
+  margin-bottom: 1px;
+}
+.sc-rate-note { font-size: 9px; color: #999; line-height: 1.4; }
+
+.sc-skill-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+.sc-skill-tag {
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: #eef0ff;
+  color: #4444EE;
+  font-weight: 600;
+}
+
+.sc-role-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 3px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.sc-role-icon { color: #4444EE; display: flex; flex-shrink: 0; }
+.sc-role-name { font-size: 9.5px; font-weight: 600; color: #111; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sc-role-chevron { color: #ccc; flex-shrink: 0; }
+.sc-role-btn--active .sc-role-name { color: #4444EE; }
+.sc-role-btn--active .sc-role-chevron { color: #4444EE; }
+
+/* About section */
+.sc-about {
+  margin: 0 16px 8px;
+  padding: 8px 10px;
+  background: #f9f9ff;
+  border-radius: 10px;
+  border: 1.5px solid #eeeeff;
+  flex-shrink: 0;
+}
+.sc-about-heading {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 4px;
+  color: #4444EE;
+}
+.sc-about-text {
+  font-size: 10px;
+  color: #555;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── STUDIO GAMES PANEL ──────────────────────────────────────── */
+
+.sgp-hd-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sgp-sort {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  color: #999;
+  font-family: var(--font-geist-mono);
+  cursor: default;
+}
+.sgp-subtitle {
+  font-size: 11px;
+  color: #999;
+  margin: 2px 0 0;
+}
+
+/* Game items */
+.sgp-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.sgp-item:last-child { border-bottom: none; }
+
+.sgp-thumb {
+  width: 76px;
+  height: 76px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sgp-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.sgp-info { flex: 1; min-width: 0; }
+.sgp-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 2px;
+}
+.sgp-ext-link { color: #4444EE; display: flex; flex-shrink: 0; }
+.sgp-genre { font-size: 10px; color: #999; margin-bottom: 3px; }
+.sgp-desc {
+  font-size: 10px;
+  color: #666;
+  line-height: 1.45;
+  margin-bottom: 5px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sgp-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+.sgp-tag { font-size: 9px; padding: 2px 7px; border-radius: 99px; font-weight: 600; }
+
+/* Stats column */
+.sgp-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+  flex-shrink: 0;
+  min-width: 52px;
+}
+.sgp-stat { display: flex; flex-direction: column; align-items: flex-end; }
+.sgp-stat-val { font-size: 11px; font-weight: 700; color: #111; line-height: 1.1; }
+.sgp-stat-lbl { font-size: 8px; color: #bbb; text-transform: uppercase; letter-spacing: 0.04em; }
+.sgp-arrow {
+  font-size: 14px;
+  color: #4444EE;
+  text-decoration: none;
+  margin-top: auto;
+  line-height: 1;
+}
+
+/* Footer summary */
+.sgp-footer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 10px 16px;
+  border-top: 1.5px solid #f0f0f0;
+  flex-shrink: 0;
+}
+.sgp-footer-stat { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.sgp-footer-val { font-size: 13px; font-weight: 800; color: #111; line-height: 1; }
+.sgp-footer-lbl { font-size: 8px; color: #bbb; text-transform: uppercase; letter-spacing: 0.04em; text-align: center; }
+
 /* ── PROFILE EDITOR ──────────────────────────────────────────── */
 
 /* Editor body variant — allows wider row */

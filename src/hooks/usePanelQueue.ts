@@ -6,6 +6,7 @@ import type { PanelKind } from '@/components/SwipeCard'
 function panelEquals(a: PanelKind, b: PanelKind): boolean {
   if (typeof a === 'string' && typeof b === 'string') return a === b
   if (typeof a === 'object' && typeof b === 'object' && 'skill' in a && 'skill' in b) return a.skill === b.skill
+  if (typeof a === 'object' && typeof b === 'object' && 'role' in a && 'role' in b) return a.role === b.role
   return false
 }
 

@@ -5,19 +5,27 @@ import Link from 'next/link'
 
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 import GamesPanel from '@/components/matching-preview/panels/GamesPanel'
+import StudioGamesPanel from '@/components/matching-preview/panels/StudioGamesPanel'
 import WorkPanel from '@/components/matching-preview/panels/WorkPanel'
 import SkillPanel from '@/components/matching-preview/panels/SkillPanel'
 import SwipeCard, { type PanelKind } from './SwipeCard'
+import StudioCard from './StudioCard'
 import { usePanelQueue } from '@/hooks/usePanelQueue'
 
 export type SwipeProfile = PreviewProfile & { userId: string }
 
 function renderPanel(panel: PanelKind, profile: PreviewProfile, onBack: () => void) {
-  if (panel === 'games') return <GamesPanel key="games" profile={profile} onBack={onBack} />
+  if (panel === 'games') {
+    return profile.type === 'studio'
+      ? <StudioGamesPanel key="studio-games" profile={profile} onBack={onBack} />
+      : <GamesPanel key="games" profile={profile} onBack={onBack} />
+  }
   if (panel === 'work') return <WorkPanel key="work" profile={profile} onBack={onBack} />
   if (typeof panel === 'object' && 'skill' in panel) {
     return <SkillPanel key={`skill-${panel.skill}`} profile={profile} skillName={panel.skill} onBack={onBack} />
   }
+  // role panel — placeholder until reference is received
+  if (typeof panel === 'object' && 'role' in panel) return null
   return null
 }
 
@@ -226,17 +234,30 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
             onTouchMove={e => { e.preventDefault(); onDragMove(e.touches[0].clientX) }}
             onTouchEnd={onDragEnd}
           >
-            <SwipeCard
-              profile={current}
-              dragOverlay={likeFlash ? 'like' : dragOverlay}
-              dragOpacity={likeFlash ? 1 : dragProgress}
-              leftPanel={leftPanelActive}
-              rightPanel={rightPanelActive}
-              onPass={() => triggerSwipe('left')}
-              onLike={handleCardLike}
-              onMessage={() => onMessage?.(current)}
-              onOpenPanel={openPanel}
-            />
+            {current.type === 'studio' ? (
+              <StudioCard
+                profile={current}
+                dragOverlay={likeFlash ? 'like' : dragOverlay}
+                dragOpacity={likeFlash ? 1 : dragProgress}
+                activePanels={[slot0, slot1].filter((p): p is PanelKind => p !== null)}
+                onPass={() => triggerSwipe('left')}
+                onLike={handleCardLike}
+                onMessage={() => onMessage?.(current)}
+                onOpenPanel={openPanel}
+              />
+            ) : (
+              <SwipeCard
+                profile={current}
+                dragOverlay={likeFlash ? 'like' : dragOverlay}
+                dragOpacity={likeFlash ? 1 : dragProgress}
+                leftPanel={leftPanelActive}
+                rightPanel={rightPanelActive}
+                onPass={() => triggerSwipe('left')}
+                onLike={handleCardLike}
+                onMessage={() => onMessage?.(current)}
+                onOpenPanel={openPanel}
+              />
+            )}
           </div>
         </div>
 

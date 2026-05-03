@@ -21,6 +21,9 @@ export type TopGame = {
   imageUrl?: string
   gameUrl?: string
   skills?: string[]
+  genre?: string
+  likes?: string
+  updatedAgo?: string
 }
 
 export type ProfileStats = {
@@ -59,4 +62,12 @@ export type PreviewProfile = {
   details?: string
   skillsNeeded?: Array<{ name: string; description: string }>
   topGames?: TopGame[]
+  hiring?: boolean
+  rateMin?: number
+  rateMax?: number
+  rateType?: string
+  rateNote?: string
+  openRoles?: Array<{ icon: string; title: string; description?: string }>
+  about?: string
+  studioStats?: { yearsBuilding?: string; projectsShipped?: string; totalVisits?: string; onTimeDelivery?: string }
 }
