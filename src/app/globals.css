@@ -2080,6 +2080,9 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   border-radius: 12px;
   padding: 10px 12px;
   overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  white-space: pre-wrap;
   scrollbar-width: thin;
   scrollbar-color: #ddd transparent;
   min-height: 80px;
