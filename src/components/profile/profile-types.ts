@@ -34,7 +34,7 @@ export type ProfileDraft = {
   rateMin: number | null
   rateMax: number | null
   rateNote: string
-  openRoles: Array<{ icon: string; title: string; description: string }>
+  openRoles: Array<{ skill: string; title: string; description: string }>
   about: string
   studioStats: { yearsBuilding: string; projectsShipped: string; totalVisits: string; onTimeDelivery: string }
   // Shared
@@ -143,7 +143,7 @@ export function profileToDraft(profile: PreviewProfile): ProfileDraft {
     rateMin: profile.rateMin ?? null,
     rateMax: profile.rateMax ?? null,
     rateNote: profile.rateNote ?? '',
-    openRoles: (profile.openRoles ?? []).map(r => ({ icon: r.icon, title: r.title, description: r.description ?? '' })),
+    openRoles: (profile.openRoles ?? []).map(r => ({ skill: r.skill, title: r.title, description: r.description ?? '' })),
     about: profile.about ?? '',
     studioStats: profile.studioStats
       ? { yearsBuilding: profile.studioStats.yearsBuilding ?? '', projectsShipped: profile.studioStats.projectsShipped ?? '', totalVisits: profile.studioStats.totalVisits ?? '', onTimeDelivery: profile.studioStats.onTimeDelivery ?? '' }
@@ -201,7 +201,8 @@ export function draftToProfile(draft: ProfileDraft, id: string): PreviewProfile 
     if (draft.socials.length > 0) profile.socials = draft.socials
   } else {
     if (draft.details) profile.details = draft.details
-    if (draft.selectedSkills.length > 0) profile.skillsNeeded = profileSkillsFromDraft(draft.selectedSkills)
+    const uniqueSkills = [...new Set(draft.openRoles.map(r => r.skill).filter(Boolean))]
+    if (uniqueSkills.length > 0) profile.skillsNeeded = uniqueSkills.map(name => ({ name, description: '' }))
     if (draft.topGames.length > 0) profile.topGames = draft.topGames
     profile.hiring = draft.hiring
     if (draft.rateMin !== null) profile.rateMin = draft.rateMin

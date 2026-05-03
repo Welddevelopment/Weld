@@ -1609,6 +1609,9 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .ob-main .pb-label {
   color: rgba(28,26,23,0.72);
 }
+.npc-panel .pb-label {
+  color: rgba(0,0,0,0.72);
+}
 .ob-main .pb-hint-label {
   color: rgba(28,26,23,0.42);
 }

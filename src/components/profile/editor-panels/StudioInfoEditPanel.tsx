@@ -1,16 +1,12 @@
 'use client'
 
 import { ProfileDraft } from '../profile-types'
-import { DEV_SKILL_DESCS } from '@/components/matching-preview/preview-data'
 
 interface Props {
   draft: ProfileDraft
   update: (patch: Partial<ProfileDraft>) => void
   onClose: () => void
 }
-
-const ALL_SKILLS = Object.keys(DEV_SKILL_DESCS)
-const MAX_SKILLS = 6
 
 const GRADIENTS = [
   'linear-gradient(135deg,#E84624,#FF8A5C)',
@@ -35,16 +31,6 @@ const RATE_TYPES = ['Hourly (USD)', 'Hourly (Robux)', 'Per Project', 'Revenue Sh
 
 export default function StudioInfoEditPanel({ draft, update, onClose }: Props) {
   const ss = draft.studioStats
-  const selected = draft.selectedSkills
-  const selectedNames = new Set(selected.map(s => s.name))
-
-  const toggleSkill = (name: string) => {
-    if (selectedNames.has(name)) {
-      update({ selectedSkills: selected.filter(s => s.name !== name) })
-    } else if (selected.length < MAX_SKILLS) {
-      update({ selectedSkills: [...selected, { name, description: '' }] })
-    }
-  }
 
   return (
     <div className="npc-panel">
@@ -133,7 +119,7 @@ export default function StudioInfoEditPanel({ draft, update, onClose }: Props) {
               onChange={e => update({ hiring: e.target.checked })}
               style={{ width: 16, height: 16, accentColor: '#3DC77A' }}
             />
-            <span style={{ color: 'rgba(255,255,255,0.75)', fontSize: 13 }}>Show &ldquo;Actively Hiring&rdquo; badge</span>
+            <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: 13 }}>Show &ldquo;Actively Hiring&rdquo; badge</span>
           </label>
         </div>
 
@@ -210,28 +196,8 @@ export default function StudioInfoEditPanel({ draft, update, onClose }: Props) {
           </div>
         </div>
 
-        <div>
-          <div className="pb-label" style={{ marginBottom: 8 }}>
-            Skills needed
-            {selected.length > 0 && <span style={{ opacity: 0.5, fontWeight: 400 }}> ({selected.length}/{MAX_SKILLS})</span>}
-          </div>
-          <div className="pb-emoji-row" style={{ flexWrap: 'wrap', gap: 5 }}>
-            {ALL_SKILLS.map(name => {
-              const on = selectedNames.has(name)
-              const disabled = !on && selected.length >= MAX_SKILLS
-              return (
-                <button
-                  key={name}
-                  type="button"
-                  className={`pb-emoji-btn${on ? ' pb-emoji-btn--on' : ''}${disabled ? ' pb-emoji-btn--disabled' : ''}`}
-                  onClick={() => toggleSkill(name)}
-                  disabled={disabled}
-                >
-                  {name}
-                </button>
-              )
-            })}
-          </div>
+        <div style={{ padding: '10px 12px', background: 'rgba(0,0,0,0.04)', borderRadius: 8, fontSize: 12, color: '#888' }}>
+          Skills needed are automatically derived from your open roles. Add roles in the Roles panel to update this.
         </div>
       </div>
     </div>

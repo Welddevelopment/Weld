@@ -1,6 +1,7 @@
 'use client'
 
 import { ProfileDraft } from '../profile-types'
+import { DEV_SKILL_DESCS } from '@/components/matching-preview/preview-data'
 
 interface Props {
   draft: ProfileDraft
@@ -9,19 +10,12 @@ interface Props {
   onBack: () => void
 }
 
-type RoleEntry = { icon: string; title: string; description: string }
+type RoleEntry = { skill: string; title: string; description: string }
 
-const ICON_OPTIONS = [
-  { key: 'code', label: 'Scripter' },
-  { key: 'monitor', label: 'Builder' },
-  { key: 'art', label: 'Artist' },
-  { key: 'gamepad', label: 'Designer' },
-  { key: 'database', label: 'Systems' },
-  { key: 'settings', label: 'Other' },
-]
+const ALL_SKILLS = Object.keys(DEV_SKILL_DESCS)
 
 function emptyRole(): RoleEntry {
-  return { icon: 'code', title: '', description: '' }
+  return { skill: '', title: '', description: '' }
 }
 
 export default function StudioRolesStep({ draft, update, onNext, onBack }: Props) {
@@ -73,18 +67,21 @@ export default function StudioRolesStep({ draft, update, onNext, onBack }: Props
               <button type="button" className="pb-entry-card-remove" onClick={() => remove(i)}>Remove</button>
             </div>
 
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
-              {ICON_OPTIONS.map(opt => (
-                <button
-                  key={opt.key}
-                  type="button"
-                  className={`pb-option-pill${role.icon === opt.key ? ' pb-option-pill--on' : ''}`}
-                  style={{ fontSize: 11 }}
-                  onClick={() => change(i, { icon: opt.key })}
-                >
-                  {opt.label}
-                </button>
-              ))}
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginBottom: 5 }}>Skill type</div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {ALL_SKILLS.map(name => (
+                  <button
+                    key={name}
+                    type="button"
+                    className={`pb-option-pill${role.skill === name ? ' pb-option-pill--on' : ''}`}
+                    style={{ fontSize: 11 }}
+                    onClick={() => change(i, { skill: name })}
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <input
@@ -119,7 +116,7 @@ export default function StudioRolesStep({ draft, update, onNext, onBack }: Props
         <div className="pb-nav">
           <button className="pb-btn pb-btn--ghost" type="button" onClick={onBack}>Back</button>
           <button className="pb-btn pb-btn--primary" type="button" onClick={onNext}>
-            Next: Skills Needed
+            Next →
           </button>
         </div>
       </section>
