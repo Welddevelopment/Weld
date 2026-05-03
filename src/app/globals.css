@@ -2879,10 +2879,10 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   border-bottom: 1px solid #f0f0f0;
 }
 .npc-game-item:last-child { border-bottom: none; }
-/* 16:9 thumbnail — Roblox game screenshots are 768×432 */
+/* Square — Roblox game icons are 512×512 */
 .npc-game-thumb {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 1 / 1;
   border-radius: 10px;
   overflow: hidden;
   display: flex;
