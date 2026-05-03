@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { ProfileDraft } from './profile-types'
 import { getInitials } from '@/lib/utils'
 
@@ -25,7 +26,6 @@ function expLabel(years: number | null): string {
   return `${years}+ yrs`
 }
 
-
 export default function EditableCard({
   draft,
   update,
@@ -40,15 +40,19 @@ export default function EditableCard({
   showExperienceEdit = false,
   showScrollActions = false,
 }: Props) {
+  const [showSkillsPicker, setShowSkillsPicker] = useState(false)
+
   const initials = getInitials(draft.name) || '?'
   const rateDisplay = draft.rateAmount
     ? `${draft.rateAmount} ${draft.rateType ?? ''}`.trim()
     : draft.rateType ?? null
   const socialLinks = draft.socials.filter(s => s.url?.trim())
   const experienceInput = draft.experienceYears === null ? '' : draft.experienceYears.toString()
+  const skills = draft.selectedSkills
+  const multiSkill = skills.length > 1
 
   const removeSkill = (name: string) =>
-    update({ selectedSkills: draft.selectedSkills.filter(s => s.name !== name) })
+    update({ selectedSkills: skills.filter(s => s.name !== name) })
 
   return (
     <div className="npc-wrap">
@@ -85,7 +89,7 @@ export default function EditableCard({
                 <div className="npc-stat-lbl">Games</div>
               </div>
               <div className="npc-stat">
-                <div className="npc-stat-val">{draft.selectedSkills.length > 0 ? draft.selectedSkills.length : '—'}</div>
+                <div className="npc-stat-val">{skills.length > 0 ? skills.length : '—'}</div>
                 <div className="npc-stat-lbl">Skills</div>
               </div>
             </div>
@@ -93,13 +97,7 @@ export default function EditableCard({
             {socialLinks.length > 0 && (
               <div className="npc-socials" style={{ marginTop: 6 }}>
                 {socialLinks.slice(0, 4).map(s => (
-                  <a
-                    key={s.label}
-                    href={s.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="npc-social-btn"
-                  >
+                  <a key={s.label} href={s.url} target="_blank" rel="noreferrer" className="npc-social-btn">
                     {s.icon || s.label[0]}
                   </a>
                 ))}
@@ -120,7 +118,7 @@ export default function EditableCard({
           </div>
         </div>
 
-        {/* Identity: editable name */}
+        {/* Identity */}
         <div className="npc-identity">
           <div className="npc-name-row">
             <input
@@ -152,10 +150,7 @@ export default function EditableCard({
                   min={0}
                   max={30}
                   value={experienceInput}
-                  onChange={e => {
-                    const value = e.target.value
-                    update({ experienceYears: value === '' ? null : Number(value) })
-                  }}
+                  onChange={e => update({ experienceYears: e.target.value === '' ? null : Number(e.target.value) })}
                   placeholder="0"
                 />
               </div>
@@ -165,7 +160,7 @@ export default function EditableCard({
 
         <div className="npc-divider" />
 
-        {/* Bio: editable textarea */}
+        {/* Bio */}
         <textarea
           className="npc-editable-bio"
           value={draft.bio}
@@ -183,26 +178,36 @@ export default function EditableCard({
             </div>
           )}
           <div className="npc-skills-wrap">
-            {draft.selectedSkills.map(s => (
-              <span key={s.name} className="npc-skill-chip npc-skill-chip--edit">
+            {multiSkill ? (
+              <span className="npc-skill-chip npc-skill-chip--edit">
                 <button
                   type="button"
                   className="npc-skill-chip-name"
-                  onClick={() => onToggleRight({ skill: s.name })}
+                  onClick={() => setShowSkillsPicker(true)}
                 >
-                  {s.name}
+                  Skills…
+                </button>
+              </span>
+            ) : skills.length === 1 ? (
+              <span key={skills[0].name} className="npc-skill-chip npc-skill-chip--edit">
+                <button
+                  type="button"
+                  className="npc-skill-chip-name"
+                  onClick={() => onToggleRight({ skill: skills[0].name })}
+                >
+                  {skills[0].name}
                 </button>
                 <button
                   type="button"
                   className="npc-skill-chip-x"
-                  onClick={() => removeSkill(s.name)}
-                  aria-label={`Remove ${s.name}`}
+                  onClick={() => removeSkill(skills[0].name)}
+                  aria-label={`Remove ${skills[0].name}`}
                 >
                   ✕
                 </button>
               </span>
-            ))}
-            {draft.selectedSkills.length < 5 && (
+            ) : null}
+            {skills.length < 5 && (
               <button
                 type="button"
                 className={`npc-skill-chip npc-skill-chip--add${rightPanel === 'skills' ? ' npc-skill-chip--add-active' : ''}`}
@@ -214,8 +219,8 @@ export default function EditableCard({
           </div>
         </div>
 
-        {/* Entry buttons */}
-        <div className="npc-entries">
+        {/* Entry buttons — always 3 columns */}
+        <div className="npc-entries" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
           <button
             className={`npc-entry-btn${leftPanel === 'games' ? ' npc-entry-btn--active' : ''}`}
             onClick={onToggleLeft}
@@ -227,12 +232,7 @@ export default function EditableCard({
                 <line x1="12" y1="22.08" x2="12" y2="12"/>
               </svg>
             </div>
-            <div className="npc-entry-title">
-              Games{draft.topGames.length > 0 ? ` (${draft.topGames.length})` : ''}
-            </div>
-            <div className="npc-entry-sub">
-              {leftPanel === 'games' ? '← Close' : "Add games I've worked on →"}
-            </div>
+            <div className="npc-entry-title">Games{draft.topGames.length > 0 ? ` (${draft.topGames.length})` : ''}</div>
           </button>
 
           <button
@@ -244,12 +244,7 @@ export default function EditableCard({
                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
               </svg>
             </div>
-            <div className="npc-entry-title">
-              My Work{draft.bestWork.length > 0 ? ` (${draft.bestWork.length})` : ''}
-            </div>
-            <div className="npc-entry-sub">
-              {rightPanel === 'work' ? '← Close' : "Add projects I've built →"}
-            </div>
+            <div className="npc-entry-title">My Work{draft.bestWork.length > 0 ? ` (${draft.bestWork.length})` : ''}</div>
           </button>
 
           {showPortfolioButton && (
@@ -259,19 +254,54 @@ export default function EditableCard({
             >
               <div className="npc-entry-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 5v14" />
-                  <path d="M5 12h14" />
+                  <path d="M12 5v14" /><path d="M5 12h14" />
                 </svg>
               </div>
-              <div className="npc-entry-title">
-                Portfolio
-              </div>
-              <div className="npc-entry-sub">
-                {rightPanel === 'portfolio' ? '← Close' : 'Add links & socials →'}
-              </div>
+              <div className="npc-entry-title">Portfolio</div>
             </button>
           )}
         </div>
+
+        {/* Skills picker popup */}
+        {showSkillsPicker && (
+          <div
+            style={{ position: 'absolute', inset: 0, zIndex: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+            onClick={() => setShowSkillsPicker(false)}
+          >
+            <div
+              style={{ background: '#fff', borderRadius: 16, padding: 20, boxShadow: '0 8px 40px rgba(0,0,0,0.18)', width: '100%' }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div style={{ fontWeight: 800, fontSize: 16, color: '#111', marginBottom: 14 }}>Your Skills</div>
+              {skills.map(s => (
+                <div key={s.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #f0f0f0' }}>
+                  <button
+                    type="button"
+                    style={{ fontWeight: 600, fontSize: 14, color: '#111', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                    onClick={() => { setShowSkillsPicker(false); onToggleRight({ skill: s.name }) }}
+                  >
+                    {s.name}
+                  </button>
+                  <button
+                    type="button"
+                    style={{ fontSize: 12, color: 'rgba(232,70,36,0.5)', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px' }}
+                    onClick={() => removeSkill(s.name)}
+                    aria-label={`Remove ${s.name}`}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                style={{ marginTop: 14, width: '100%', padding: '8px 0', borderRadius: 8, border: '1.5px solid #e0e0e0', background: 'none', fontSize: 12, color: '#666', cursor: 'pointer' }}
+                onClick={() => setShowSkillsPicker(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Editor action bar */}
@@ -284,15 +314,9 @@ export default function EditableCard({
         </button>
       </div>
       <div className={`npc-editor-scroll-actions${showScrollActions ? ' npc-editor-scroll-actions--show' : ''}`}>
-        <button type="button" className="npc-action-seg" onClick={onBack}>
-          Back
-        </button>
-        <button type="button" className="npc-action-seg" onClick={onBack}>
-          Save
-        </button>
-        <button type="button" className="npc-action-seg" onClick={onPublish}>
-          Publish
-        </button>
+        <button type="button" className="npc-action-seg" onClick={onBack}>Back</button>
+        <button type="button" className="npc-action-seg" onClick={onBack}>Save</button>
+        <button type="button" className="npc-action-seg" onClick={onPublish}>Publish</button>
       </div>
     </div>
   )
