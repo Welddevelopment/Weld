@@ -2723,6 +2723,9 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   flex: 1;
   min-height: 60px;
   overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  white-space: pre-wrap;
   margin: 0 16px;
   padding: 10px 12px;
   font-size: 13.5px;
