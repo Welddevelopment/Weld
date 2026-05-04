@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import type { BootStatus, WeldRole } from "@/dynamic landing page/lib/WeldPageState";
-import { weldRoles } from "@/dynamic landing page/lib/WeldPageState";
+import type { BootStatus, WeldRole } from "@/dynamic-landing-page/lib/WeldPageState";
+import { weldRoles } from "@/dynamic-landing-page/lib/WeldPageState";
 
 interface FloatingStudioWindowProps {
   bootStatus: BootStatus;

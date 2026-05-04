@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { weldRoles, makeLogId, useWeldDispatch } from "@/dynamic landing page/lib/WeldPageState";
-import type { WeldRole } from "@/dynamic landing page/lib/WeldPageState";
+import { weldRoles, makeLogId, useWeldDispatch } from "@/dynamic-landing-page/lib/WeldPageState";
+import type { WeldRole } from "@/dynamic-landing-page/lib/WeldPageState";
 
 interface ProofVisitCounterProps {
   selectedRole: WeldRole;

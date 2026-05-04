@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { recordInviteShare } from "@/dynamic landing page/lib/service";
+import { recordInviteShare } from "@/dynamic-landing-page/lib/service";
 
 export async function POST(
   request: NextRequest,

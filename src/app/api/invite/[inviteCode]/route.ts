@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { buildInviteProgressSnapshot } from "@/dynamic landing page/lib/service";
+import { buildInviteProgressSnapshot } from "@/dynamic-landing-page/lib/service";
 
 export async function GET(
   _request: NextRequest,

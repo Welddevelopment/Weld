@@ -2245,7 +2245,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 .acct-btn--ghost:hover { background: rgba(255,247,241,0.10); border-color: rgba(255,247,241,0.22); color: #FFF7F1; }
 
-/* Weld dynamic landing page stage surfaces */
+/* Weld dynamic-landing-page stage surfaces */
 .is-selected {
   background: var(--state-selected-fill);
   border-left: 2px solid var(--studio-blue);

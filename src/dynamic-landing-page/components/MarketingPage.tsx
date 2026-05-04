@@ -18,15 +18,15 @@ import {
   persistAudiencePreference,
   submitSignupCapture,
   trackEvent
-} from "@/dynamic landing page/lib/browser";
-import type { SourceVariant } from "@/dynamic landing page/lib/source-variant";
-import type { Audience } from "@/dynamic landing page/lib/types";
-import { useMotionPolicy } from "@/dynamic landing page/lib/useMotionPolicy";
-import { DoodleBubble } from "@/dynamic landing page/components/primitives/DoodleBubble";
-import { DoodleNote } from "@/dynamic landing page/components/primitives/DoodleNote";
-import { MatchMeter } from "@/dynamic landing page/components/primitives/MatchMeter";
-import { Sticker } from "@/dynamic landing page/components/primitives/Sticker";
-import { getLandingCopy, type LandingCopy } from "@/dynamic landing page/lib/copy";
+} from "@/dynamic-landing-page/lib/browser";
+import type { SourceVariant } from "@/dynamic-landing-page/lib/source-variant";
+import type { Audience } from "@/dynamic-landing-page/lib/types";
+import { useMotionPolicy } from "@/dynamic-landing-page/lib/useMotionPolicy";
+import { DoodleBubble } from "@/dynamic-landing-page/components/primitives/DoodleBubble";
+import { DoodleNote } from "@/dynamic-landing-page/components/primitives/DoodleNote";
+import { MatchMeter } from "@/dynamic-landing-page/components/primitives/MatchMeter";
+import { Sticker } from "@/dynamic-landing-page/components/primitives/Sticker";
+import { getLandingCopy, type LandingCopy } from "@/dynamic-landing-page/lib/copy";
 import {
   PROFILES,
   ROLE_LABELS,
@@ -35,7 +35,7 @@ import {
   type DetailKey,
   type RoleKey,
   type TalentProfile
-} from "@/dynamic landing page/lib/role-config";
+} from "@/dynamic-landing-page/lib/role-config";
 
 interface MarketingPageProps {
   initialMode: Audience;

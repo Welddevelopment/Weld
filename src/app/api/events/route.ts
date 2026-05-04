@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { recordAnalyticsEvent } from "@/dynamic landing page/lib/service";
+import { recordAnalyticsEvent } from "@/dynamic-landing-page/lib/service";
 
 export async function POST(request: NextRequest) {
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;

@@ -1,6 +1,6 @@
 "use client";
 
-import type { ScriptTab } from "@/dynamic landing page/lib/WeldPageState";
+import type { ScriptTab } from "@/dynamic-landing-page/lib/WeldPageState";
 
 interface LuauWatermarkLayerProps {
   activeScriptTab: ScriptTab;

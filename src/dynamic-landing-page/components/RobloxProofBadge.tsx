@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { VerificationState } from "@/dynamic landing page/lib/WeldPageState";
+import type { VerificationState } from "@/dynamic-landing-page/lib/WeldPageState";
 
 interface RobloxProofBadgeProps {
   verificationState: VerificationState;

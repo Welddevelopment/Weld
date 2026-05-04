@@ -5,7 +5,7 @@ import {
   buildSearchString,
   getSourceVariantFromRaw,
   getSourceVariantFromSearchParams
-} from "../src/dynamic landing page/lib/source-variant";
+} from "../src/dynamic-landing-page/lib/source-variant";
 
 test("getSourceVariantFromRaw maps known sources", () => {
   assert.equal(getSourceVariantFromRaw("discord"), "discord");

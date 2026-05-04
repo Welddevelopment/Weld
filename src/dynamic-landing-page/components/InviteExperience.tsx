@@ -3,20 +3,20 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { getSessionId, shareInvite, trackEvent } from "@/dynamic landing page/lib/browser";
-import { PROFILE_STEP_ORDER, SITE_URL } from "@/dynamic landing page/lib/constants";
+import { getSessionId, shareInvite, trackEvent } from "@/dynamic-landing-page/lib/browser";
+import { PROFILE_STEP_ORDER, SITE_URL } from "@/dynamic-landing-page/lib/constants";
 import {
   DISCIPLINE_OPTIONS,
   SOURCE_LINES,
   TYPE_COPY
-} from "@/dynamic landing page/lib/sample-data";
-import type { SourceVariant } from "@/dynamic landing page/lib/source-variant";
+} from "@/dynamic-landing-page/lib/sample-data";
+import type { SourceVariant } from "@/dynamic-landing-page/lib/source-variant";
 import type {
   Audience,
   DraftStepKey,
   InviteProgressSnapshot,
   ShareChannel
-} from "@/dynamic landing page/lib/types";
+} from "@/dynamic-landing-page/lib/types";
 
 type InviteFormState = {
   displayName: string;
