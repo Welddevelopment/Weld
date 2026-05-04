@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 import { getSupabaseUserFromRequest } from '@/lib/supabase/server'
 
+export const maxDuration = 10
+
 type ConversationRow = {
   id: string
   initiator_id: string

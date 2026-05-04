@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { getSupabaseUserFromRequest } from '@/lib/supabase/server'
 
+export const maxDuration = 10
+
 export async function POST(request: NextRequest) {
   const auth = await getSupabaseUserFromRequest(request)
   if (!auth.ok) {

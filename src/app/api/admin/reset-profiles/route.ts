@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
+export const maxDuration = 10
+
 // One-time admin route — delete after use.
 // Call: POST /api/admin/reset-profiles
 // Header: x-admin-secret: <value of ADMIN_RESET_SECRET env var>

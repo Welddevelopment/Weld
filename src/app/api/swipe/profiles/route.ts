@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseUserFromRequest } from '@/lib/supabase/server'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 
+export const maxDuration = 10
+
 export async function GET(request: NextRequest) {
   const auth = await getSupabaseUserFromRequest(request)
   if (!auth.ok) {

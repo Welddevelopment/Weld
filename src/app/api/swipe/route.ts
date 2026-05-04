@@ -3,6 +3,8 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 import { getSupabaseUserFromRequest } from '@/lib/supabase/server'
 
+export const maxDuration = 10
+
 function isRecord(v: unknown): v is Record<string, unknown> {
   return Boolean(v && typeof v === 'object' && !Array.isArray(v))
 }

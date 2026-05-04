@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { captureWaitlistSignup } from "@/dynamic-landing-page/lib/service";
 import { normalizeAudience } from "@/dynamic-landing-page/lib/utils";
 
+export const maxDuration = 10
+
 export async function POST(request: NextRequest) {
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
 

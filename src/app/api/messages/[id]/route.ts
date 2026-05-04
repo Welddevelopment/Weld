@@ -3,6 +3,8 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 import { getSupabaseUserFromRequest } from '@/lib/supabase/server'
 
+export const maxDuration = 10
+
 type ConvRow = { id: string; initiator_id: string; recipient_id: string }
 
 async function getConversation(
