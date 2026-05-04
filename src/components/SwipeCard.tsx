@@ -54,9 +54,6 @@ type CardStats = { experience: string; projects: string; scriptsBuilt: string; o
 
 function parseDevStats(profile: PreviewProfile): CardStats {
   const rate = profile.meta.match(/Rate:\s*([^-]+)/)?.[1]?.trim() ?? '—'
-  if (profile.stats) {
-    return { ...profile.stats, rate }
-  }
   const expMatch = profile.role.match(/(\d+)yr/)
   const experience = expMatch ? `${expMatch[1]}+ yrs` : profile.role.includes('<1yr') ? '<1 yr' : '—'
   return { experience, rate, projects: '—', scriptsBuilt: '—', onTime: '—' }
