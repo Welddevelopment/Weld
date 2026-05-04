@@ -3251,7 +3251,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   grid-template-columns: auto auto 1fr;
   align-items: center;
   gap: 18px;
-  width: min(1180px, calc(100% - 32px));
+  width: min(1600px, calc(100% - 32px));
   margin: 14px auto 0;
   padding: 12px 14px;
   border: 2px solid rgba(40, 32, 27, 0.1);
@@ -3364,7 +3364,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   grid-template-columns: minmax(340px, 570px) minmax(320px, 1fr);
   align-items: center;
   gap: clamp(32px, 7vw, 86px);
-  width: min(1180px, 100%);
+  width: min(1600px, 100%);
   margin: 0 auto;
 }
 
@@ -4235,7 +4235,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 
 .playground-section {
-  width: min(1180px, calc(100% - 32px));
+  width: min(1600px, calc(100% - 32px));
   margin: 0 auto;
   padding: 84px 0;
 }
@@ -4479,11 +4479,20 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 .faq-section {
   padding-top: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.faq-section .section-copy {
+  width: 100%;
+  max-width: 850px;
 }
 
 .faq-list {
   display: grid;
   gap: 12px;
+  width: 100%;
   max-width: 850px;
 }
 
@@ -4520,7 +4529,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  width: min(1180px, calc(100% - 32px));
+  width: min(1600px, calc(100% - 32px));
   margin: 0 auto;
   padding: 28px 0 46px;
   color: var(--pg-muted);
@@ -4760,7 +4769,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 /* Weld liquid glass landing */
 .weld-glass-page {
-  --wg-bg: #f6f8fc;
+  --wg-bg: #efeafe;
   --wg-surface: rgba(255, 255, 255, 0.68);
   --wg-surface-strong: rgba(255, 255, 255, 0.84);
   --wg-surface-soft: rgba(255, 255, 255, 0.52);
@@ -4769,24 +4778,61 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   --wg-ink: #0d1220;
   --wg-muted: #53607a;
   --wg-soft: #6f7c95;
-  --wg-accent: #5b6cff;
+  --wg-accent: #6b5cff;
+  --wg-accent-deep: #4f3dff;
+  --wg-purple-soft: #e7e3ff;
+  --wg-purple-tint: rgba(120, 110, 200, 0.14);
+  --wg-spark: #ff7a1a;
+  --wg-spark-soft: #ffe1c4;
+  --wg-like: #ff7ab6;
+  --wg-like-soft: #ffe1ef;
+  --wg-available: #22c55e;
+  --wg-available-soft: #dcfce7;
+  --wg-yellow: #ffd166;
   --wg-success: #149f67;
   --wg-danger: #d84a5d;
-  --wg-shadow-shell: 0 24px 80px rgba(33, 41, 65, 0.12);
-  --wg-shadow-card: 0 18px 50px rgba(33, 41, 65, 0.1);
-  --wg-shadow-press: 0 12px 28px rgba(33, 41, 65, 0.12);
+  --wg-shadow-shell: 0 24px 80px rgba(60, 40, 140, 0.16);
+  --wg-shadow-card: 0 18px 50px rgba(60, 40, 140, 0.13);
+  --wg-shadow-press: 0 12px 28px rgba(60, 40, 140, 0.16);
+  --wg-shadow-purple: 0 30px 70px -25px rgba(85, 65, 200, 0.32);
   --wg-radius-shell: 34px;
   --wg-radius-card: 28px;
   --wg-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --w-ease-pop: cubic-bezier(0.18, 1.35, 0.32, 1);
+  --w-ease-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --w-ease-press: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --w-dur-fast: 120ms;
+  --w-dur-base: 180ms;
+  --w-dur-card: 280ms;
+  --w-dur-swipe: 420ms;
   min-height: 100vh;
   background:
-    radial-gradient(circle at 12% 14%, rgba(117, 146, 255, 0.18), transparent 0 25rem),
-    radial-gradient(circle at 92% 18%, rgba(201, 214, 255, 0.48), transparent 0 24rem),
-    radial-gradient(circle at 82% 78%, rgba(169, 184, 255, 0.2), transparent 0 28rem),
-    linear-gradient(180deg, #f9fbff 0%, #f4f7fc 100%);
+    radial-gradient(circle at 10% 12%, rgba(140, 120, 240, 0.32), transparent 0 28rem),
+    radial-gradient(circle at 90% 16%, rgba(190, 170, 255, 0.58), transparent 0 26rem),
+    radial-gradient(circle at 80% 78%, rgba(160, 140, 240, 0.30), transparent 0 30rem),
+    radial-gradient(circle at 18% 88%, rgba(255, 168, 200, 0.18), transparent 0 26rem),
+    linear-gradient(180deg, #f4f0ff 0%, #ebe3ff 60%, #e2dafb 100%);
   color: var(--wg-ink);
   font-family: var(--font-body), system-ui, sans-serif;
   overflow-x: clip;
+}
+
+@media (min-width: 1440px) {
+  .weld-glass-page {
+    zoom: 1.15;
+  }
+}
+
+@media (min-width: 1920px) {
+  .weld-glass-page {
+    zoom: 1.35;
+  }
+}
+
+@media (min-width: 2560px) {
+  .weld-glass-page {
+    zoom: 1.6;
+  }
 }
 
 .weld-glass-page *,
@@ -4840,7 +4886,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   grid-template-columns: auto auto 1fr;
   align-items: center;
   gap: 18px;
-  width: min(1240px, calc(100% - 32px));
+  width: min(1600px, calc(100% - 32px));
   margin: 16px auto 0;
   padding: 14px 16px;
   border-radius: 999px;
@@ -4994,7 +5040,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 .hero-shell {
   position: relative;
-  width: min(1240px, calc(100% - 32px));
+  width: min(1600px, calc(100% - 32px));
   margin: 30px auto 0;
   padding: 24px;
   border-radius: var(--wg-radius-shell);
@@ -5588,7 +5634,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 .glass-section,
 .glass-footer {
-  width: min(1240px, calc(100% - 32px));
+  width: min(1600px, calc(100% - 48px));
   margin: 24px auto 0;
 }
 
@@ -5755,6 +5801,61 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   display: block;
 }
 
+.discord-mock-card {
+  background-color: #313338;
+  color: #dbdee1;
+  border-radius: 12px;
+  padding: 28px;
+  font-family: "gg sans", "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  border: 1px solid #1e1f22;
+  text-align: left;
+}
+
+.discord-mock-card strong {
+  color: #f2f3f5;
+  font-size: 16px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.discord-mock-card p {
+  color: #dbdee1;
+  font-size: 15px;
+  line-height: 1.4;
+  margin-bottom: 24px;
+}
+
+.discord-mock-card .proof-chip-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #3f4147;
+}
+
+.discord-mock-card .proof-chip-row span {
+  display: inline-flex;
+  align-items: center;
+  background: #2b2d31;
+  color: #00a8fc;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  align-self: flex-start;
+}
+
+.discord-mock-card .proof-chip-row span::before {
+  content: "";
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background: #5865F2;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
 .proof-layout {
   grid-template-columns: 1fr 1fr;
 }
@@ -5872,6 +5973,72 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .waitlist-submit {
   width: max-content;
 }
+
+.comparison-table-wrapper {
+  background: white;
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(14, 18, 29, 0.08);
+  margin-top: 32px;
+}
+
+.comp-table-header, .comp-table-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  align-items: center;
+  padding: 16px 0;
+}
+
+.comp-table-header {
+  border-bottom: 1px solid rgba(14, 18, 29, 0.08);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--wg-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.comp-col-feature { font-weight: 600; color: var(--wg-ink); }
+.comp-col-discord { text-align: center; }
+.comp-col-weld { 
+  text-align: center; 
+  background: linear-gradient(180deg, #f8faff 0%, #fff 100%);
+  border-left: 1px solid #e0e7ff;
+  border-right: 1px solid #e0e7ff;
+}
+
+.comp-table-header .comp-col-weld {
+  border-top: 1px solid #e0e7ff;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  padding-top: 16px;
+  margin-top: -16px;
+}
+
+.comp-table-row { border-bottom: 1px solid rgba(14, 18, 29, 0.04); }
+.comp-table-row:last-child { border-bottom: none; }
+
+.comp-table-row .comp-col-weld {
+  padding: 16px 0;
+}
+
+.comp-table-row:last-child .comp-col-weld {
+  border-bottom: 1px solid #e0e7ff;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.comp-badge {
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.comp-badge-low, .comp-badge-poor, .comp-badge-hard, .comp-badge-long { color: #ef4444; }
+.comp-badge-medium, .comp-badge-limited { color: #f59e0b; }
+.comp-badge-high, .comp-badge-advanced, .comp-badge-easy, .comp-badge-fast, .comp-badge-built-in { color: #10b981; }
+.comp-badge-rare { color: #6b7280; }
 
 .faq-list {
   display: grid;
@@ -6171,24 +6338,25 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 /* Weld liquid glass reference alignment */
 .weld-glass-page {
-  --wg-bg: #f7f9ff;
-  --wg-surface: rgba(255, 255, 255, 0.58);
-  --wg-surface-strong: rgba(255, 255, 255, 0.78);
-  --wg-surface-soft: rgba(255, 255, 255, 0.42);
-  --wg-border: rgba(255, 255, 255, 0.82);
+  --wg-bg: #efeafe;
+  --wg-surface: rgba(255, 255, 255, 0.62);
+  --wg-surface-strong: rgba(255, 255, 255, 0.82);
+  --wg-surface-soft: rgba(255, 255, 255, 0.46);
+  --wg-border: rgba(255, 255, 255, 0.86);
   --wg-border-strong: rgba(21, 27, 45, 0.07);
   --wg-ink: #0a0f1d;
   --wg-muted: #465575;
   --wg-soft: #657392;
-  --wg-shadow-shell: 0 28px 90px rgba(43, 55, 94, 0.13);
-  --wg-shadow-card: 0 20px 58px rgba(43, 55, 94, 0.11);
+  --wg-shadow-shell: 0 30px 90px rgba(70, 50, 160, 0.16);
+  --wg-shadow-card: 0 22px 60px rgba(70, 50, 160, 0.14);
   --wg-radius-shell: 36px;
   --wg-radius-card: 26px;
   background:
-    radial-gradient(circle at 9% 6%, rgba(255, 255, 255, 0.95), transparent 0 18rem),
-    radial-gradient(circle at 87% 23%, rgba(121, 112, 255, 0.22), transparent 0 21rem),
-    radial-gradient(circle at 77% 80%, rgba(196, 167, 255, 0.22), transparent 0 28rem),
-    linear-gradient(180deg, #fbfdff 0%, #f2f6ff 58%, #edf3ff 100%);
+    radial-gradient(circle at 8% 6%, rgba(255, 255, 255, 0.85), transparent 0 18rem),
+    radial-gradient(circle at 86% 18%, rgba(140, 120, 240, 0.34), transparent 0 24rem),
+    radial-gradient(circle at 78% 78%, rgba(190, 160, 250, 0.32), transparent 0 30rem),
+    radial-gradient(circle at 16% 88%, rgba(255, 170, 210, 0.18), transparent 0 26rem),
+    linear-gradient(180deg, #f4eeff 0%, #ece2ff 56%, #e1d6fb 100%);
 }
 
 .weld-glass-page::before {
@@ -6216,21 +6384,22 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .waitlist-shell,
 .glass-footer {
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.46)),
-    rgba(255, 255, 255, 0.42);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.44)),
+    rgba(255, 255, 255, 0.38);
   border: 1px solid rgba(255, 255, 255, 0.86);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.96),
     inset 0 -1px 0 rgba(255, 255, 255, 0.38),
+    0 0 0 1px rgba(120, 110, 200, 0.10),
     var(--wg-shadow-shell);
-  backdrop-filter: blur(26px) saturate(1.16);
-  -webkit-backdrop-filter: blur(26px) saturate(1.16);
+  backdrop-filter: blur(28px) saturate(1.22);
+  -webkit-backdrop-filter: blur(28px) saturate(1.22);
 }
 
 .glass-nav-shell {
-  width: min(1200px, calc(100% - 32px));
+  width: min(1600px, calc(100% - 48px));
   margin-top: 18px;
-  padding: 12px 14px;
+  padding: 14px 18px;
 }
 
 .glass-brand {
@@ -6278,9 +6447,10 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 
 .hero-shell {
-  width: min(1120px, calc(100% - 32px));
-  margin-top: 24px;
-  padding: clamp(22px, 3vw, 34px);
+  width: min(1600px, calc(100% - 48px));
+  margin-top: 28px;
+  padding: clamp(36px, 5.2vw, 72px);
+  min-height: clamp(640px, 88vh, 880px);
 }
 
 .hero-shell::before,
@@ -6297,19 +6467,20 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 
 .hero-shell-bloom {
-  top: 18%;
-  right: -9%;
+  top: 12%;
+  right: -12%;
   bottom: auto;
-  width: 31%;
+  width: 38%;
   background:
-    radial-gradient(circle at 36% 36%, rgba(255, 255, 255, 0.92), transparent 0 24%),
-    radial-gradient(circle at 56% 54%, rgba(113, 104, 255, 0.36), rgba(180, 166, 255, 0.22) 44%, transparent 70%);
-  filter: blur(7px);
+    radial-gradient(circle at 36% 36%, rgba(255, 255, 255, 0.90), transparent 0 22%),
+    radial-gradient(circle at 58% 56%, rgba(120, 100, 240, 0.46), rgba(180, 160, 250, 0.28) 44%, transparent 72%);
+  filter: blur(8px);
 }
 
 .hero-shell-grid {
-  grid-template-columns: minmax(0, 0.57fr) minmax(310px, 0.43fr);
-  gap: clamp(34px, 4.8vw, 64px);
+  grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
+  gap: clamp(48px, 6vw, 96px);
+  align-items: center;
 }
 
 .hero-card-frame {
@@ -6478,27 +6649,38 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 
 .hero-copy-panel h1 {
-  max-width: 8.4ch;
-  font-size: clamp(48px, 5.2vw, 72px);
-  line-height: 0.98;
-  letter-spacing: -0.055em;
+  max-width: 9.2ch;
+  font-size: clamp(60px, 7vw, 108px);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  font-weight: 800;
+  font-family: var(--font-display), "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
 .hero-lead {
-  max-width: 30rem;
-  margin-top: 24px;
-  font-size: 17px;
+  max-width: 32rem;
+  margin-top: 28px;
+  font-size: clamp(17px, 1.3vw, 21px);
   line-height: 1.55;
+  color: var(--wg-muted);
 }
 
 .hero-support {
-  max-width: 32rem;
-  margin-top: 16px;
-  font-size: 13px;
+  max-width: 34rem;
+  margin-top: 18px;
+  font-size: 14px;
+  color: var(--wg-soft);
 }
 
 .hero-button-row {
   margin-top: 28px;
+}
+
+.hero-helper-line {
+  margin-top: 22px;
+  font-size: 13px;
+  color: var(--wg-soft);
+  letter-spacing: 0.01em;
 }
 
 .hero-proof-line {
@@ -6506,7 +6688,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 
 .glass-section {
-  width: min(1200px, calc(100% - 32px));
+  width: min(1600px, calc(100% - 48px));
   margin-top: 28px;
   padding: 30px 0;
 }
@@ -7432,12 +7614,12 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 /* Desktop scale correction: keep full hero card visible in first viewport */
 @media (min-width: 821px) {
   .weld-glass-page .glass-nav-shell {
-    width: min(1040px, calc(100% - 28px));
+    width: min(1600px, calc(100% - 28px));
     margin-top: 10px;
   }
 
   .weld-glass-page .hero-shell {
-    width: min(1040px, calc(100% - 28px));
+    width: min(1600px, calc(100% - 28px));
     margin-top: 8px;
     padding: 22px 24px 20px;
   }
@@ -7635,7 +7817,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 .weld-glass-page .glass-section {
   position: relative;
-  width: min(1180px, calc(100% - 32px));
+  width: min(1600px, calc(100% - 32px));
   margin: clamp(48px, 7vw, 96px) auto 0;
 }
 
@@ -7876,7 +8058,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 
 .weld-glass-page .chat-section {
-  width: min(1240px, calc(100% - 32px));
+  width: min(1600px, calc(100% - 48px));
 }
 
 .weld-glass-page .chat-preview-shell {
@@ -8217,7 +8399,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 
 .weld-glass-page .waitlist-section {
-  width: min(1200px, calc(100% - 32px));
+  width: min(1600px, calc(100% - 48px));
 }
 
 .weld-glass-page .waitlist-shell {
@@ -8600,8 +8782,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 
 .weld-glass-page .profile-creation-section .section-copy,
-.weld-glass-page .chat-section-copy,
-.weld-glass-page .faq-section .section-copy {
+.weld-glass-page .chat-section-copy {
   margin-left: clamp(0px, 3vw, 50px);
 }
 
@@ -8819,5 +9000,1779 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
   .weld-glass-page .how-story-copy h2 {
     font-size: clamp(46px, 13vw, 64px);
+  }
+}
+
+/* ── Stage 3: motion + interaction polish ── */
+
+/* Pressable primitive */
+.weld-glass-page .button-pressable,
+.weld-glass-page .button-primary,
+.weld-glass-page .button-secondary,
+.weld-glass-page .button-nav,
+.weld-glass-page .role-explorer-tabs button,
+.weld-glass-page .hero-action-button,
+.weld-glass-page .faq-trigger,
+.weld-glass-page .mode-toggle button,
+.weld-glass-page .waitlist-submit,
+.weld-glass-page .proof-cta-grid button {
+  transition:
+    transform var(--w-dur-fast, 120ms) var(--w-ease-press, cubic-bezier(0.2, 0.8, 0.2, 1)),
+    box-shadow var(--w-dur-fast, 120ms) var(--w-ease-press, cubic-bezier(0.2, 0.8, 0.2, 1)),
+    background-color var(--w-dur-base, 180ms) var(--w-ease-soft, cubic-bezier(0.16, 1, 0.3, 1));
+  will-change: transform;
+}
+
+.weld-glass-page .button-pressable:active,
+.weld-glass-page .button-primary:active,
+.weld-glass-page .button-secondary:active,
+.weld-glass-page .button-nav:active,
+.weld-glass-page .role-explorer-tabs button:active,
+.weld-glass-page .hero-action-button:active,
+.weld-glass-page .faq-trigger:active,
+.weld-glass-page .waitlist-submit:active,
+.weld-glass-page .proof-cta-grid button:active {
+  transform: translateY(2px) scale(0.97);
+  box-shadow: 0 4px 10px rgba(60, 40, 140, 0.18);
+}
+
+/* Hero card hover lift (desktop pointer only) */
+@media (hover: hover) and (pointer: fine) {
+  .weld-glass-page .hero-talent-card {
+    transition:
+      transform var(--w-dur-card, 280ms) var(--w-ease-soft, cubic-bezier(0.16, 1, 0.3, 1)),
+      box-shadow var(--w-dur-card, 280ms) var(--w-ease-soft, cubic-bezier(0.16, 1, 0.3, 1));
+  }
+
+  .weld-glass-page .hero-talent-card:hover {
+    transform: translateY(-5px) rotate(-0.3deg);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.96),
+      0 30px 78px rgba(70, 50, 160, 0.20);
+  }
+}
+
+/* Role chip → card swap fade */
+.weld-glass-page .how-profile-card,
+.weld-glass-page .hero-talent-card {
+  transition:
+    transform var(--w-dur-card, 280ms) var(--w-ease-soft, cubic-bezier(0.16, 1, 0.3, 1)),
+    box-shadow var(--w-dur-card, 280ms) var(--w-ease-soft, cubic-bezier(0.16, 1, 0.3, 1)),
+    opacity var(--w-dur-base, 180ms) var(--w-ease-soft, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.weld-glass-page .how-profile-card[data-swapping="true"],
+.weld-glass-page .hero-talent-card[data-swapping="true"] {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    transform 120ms ease-out,
+    opacity 120ms ease-out;
+}
+
+/* Swipe action visual states */
+.weld-glass-page .hero-talent-card.is-reject {
+  animation: weldRejectNudge 280ms var(--w-ease-soft, cubic-bezier(0.16, 1, 0.3, 1)) both;
+}
+
+.weld-glass-page .hero-talent-card.is-like {
+  animation: weldLikeBounce 360ms var(--w-ease-pop, cubic-bezier(0.18, 1.35, 0.32, 1)) both;
+}
+
+.weld-glass-page .hero-talent-card.is-spark {
+  animation: weldSparkLift 460ms var(--w-ease-pop, cubic-bezier(0.18, 1.35, 0.32, 1)) both;
+}
+
+@keyframes weldRejectNudge {
+  0% { transform: translateX(0); }
+  35% { transform: translateX(-16px) rotate(-1.2deg); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes weldLikeBounce {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+@keyframes weldSparkLift {
+  0% { transform: translateY(0) scale(1); }
+  40% { transform: translateY(-6px) scale(1.04); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* Spark burst sticker overlay */
+.weld-glass-page .spark-burst-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.weld-glass-page .spark-burst-layer span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--wg-spark, #ff7a1a), #ffb061);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  box-shadow: 0 18px 40px rgba(255, 122, 26, 0.35);
+  animation: weldSparkBurst 520ms var(--w-ease-pop, cubic-bezier(0.18, 1.35, 0.32, 1)) both;
+}
+
+@keyframes weldSparkBurst {
+  0% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+  45% { opacity: 1; transform: scale(1.12) rotate(4deg); }
+  100% { opacity: 0; transform: scale(0.95) translateY(-18px) rotate(0); }
+}
+
+/* Waitlist input states */
+.weld-glass-page .waitlist-form-card.is-error .waitlist-field input {
+  border-color: var(--wg-danger, #d84a5d);
+  box-shadow: 0 0 0 4px rgba(216, 74, 93, 0.16);
+  animation: weldInputShake 260ms ease both;
+}
+
+.weld-glass-page .waitlist-form-card.is-success .waitlist-field input {
+  border-color: var(--wg-available, #22c55e);
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
+}
+
+.weld-glass-page .waitlist-form-card.is-submitting .waitlist-submit {
+  transform: translateY(1px) scale(0.98);
+  opacity: 0.92;
+}
+
+@keyframes weldInputShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-3px); }
+}
+
+/* Section entrance reveal */
+.weld-glass-page [data-reveal="pending"] {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+.weld-glass-page [data-reveal="seen"] {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 320ms var(--w-ease-soft, cubic-bezier(0.16, 1, 0.3, 1)),
+    transform 320ms var(--w-ease-soft, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+/* Reduced motion override — kill all decorative motion */
+@media (prefers-reduced-motion: reduce) {
+  .weld-glass-page *,
+  .weld-glass-page *::before,
+  .weld-glass-page *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .weld-glass-page [data-reveal="pending"] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Stage 4: primitives + new sections ── */
+
+/* MatchMeter horizontal */
+.weld-glass-page .match-meter--horizontal {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 168px;
+  padding: 10px 14px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.42));
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 8px 22px rgba(70, 50, 160, 0.10);
+}
+
+.weld-glass-page .match-meter__head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-display, "Plus Jakarta Sans"), system-ui, sans-serif;
+}
+
+.weld-glass-page .match-meter__head strong {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--wg-ink);
+}
+
+.weld-glass-page .match-meter__head em {
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--wg-soft);
+}
+
+.weld-glass-page .match-meter__track {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(120, 110, 200, 0.18);
+  overflow: hidden;
+}
+
+.weld-glass-page .match-meter__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, var(--wg-accent, #6b5cff), #9c8aff);
+  border-radius: inherit;
+  box-shadow: 0 0 12px rgba(120, 100, 240, 0.35);
+}
+
+/* MatchMeter vertical (reference 4 style) */
+.weld-glass-page .match-meter--vertical {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 6px;
+}
+
+.weld-glass-page .match-meter--vertical .match-meter__track {
+  width: 8px;
+  height: 110px;
+  background: rgba(120, 110, 200, 0.18);
+  border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+}
+
+.weld-glass-page .match-meter--vertical .match-meter__fill {
+  position: absolute;
+  inset: auto 0 0 0;
+  width: 100%;
+  background: linear-gradient(180deg, #9c8aff, var(--wg-accent, #6b5cff));
+}
+
+.weld-glass-page .match-meter--vertical .match-meter__value {
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--wg-ink);
+}
+
+.weld-glass-page .match-meter--vertical .match-meter__label {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--wg-soft);
+}
+
+/* Sticker primitive */
+.weld-glass-page .sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.46));
+  border: 1px solid rgba(255, 255, 255, 0.86);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 12px 28px rgba(70, 50, 160, 0.14);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  font-family: var(--font-display, "Plus Jakarta Sans"), system-ui, sans-serif;
+}
+
+.weld-glass-page .sticker__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+  background: var(--wg-purple-soft, #e7e3ff);
+  color: var(--wg-accent, #6b5cff);
+}
+
+.weld-glass-page .sticker__body {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.weld-glass-page .sticker__body strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--wg-ink);
+  letter-spacing: -0.01em;
+}
+
+.weld-glass-page .sticker__body em {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--wg-soft);
+  line-height: 1.35;
+}
+
+/* Tone variants */
+.weld-glass-page .sticker--available .sticker__icon {
+  background: var(--wg-available-soft, #dcfce7);
+  color: var(--wg-available, #22c55e);
+}
+.weld-glass-page .sticker--spark .sticker__icon {
+  background: var(--wg-spark-soft, #ffe1c4);
+  color: var(--wg-spark, #ff7a1a);
+}
+.weld-glass-page .sticker--like .sticker__icon {
+  background: var(--wg-like-soft, #ffe1ef);
+  color: var(--wg-like, #ff7ab6);
+}
+.weld-glass-page .sticker--info .sticker__icon {
+  background: rgba(120, 180, 255, 0.18);
+  color: #4d7cff;
+}
+.weld-glass-page .sticker--founding .sticker__icon {
+  background: var(--wg-spark-soft, #ffe1c4);
+  color: var(--wg-spark, #ff7a1a);
+}
+.weld-glass-page .sticker--yellow .sticker__icon {
+  background: rgba(255, 209, 102, 0.32);
+  color: #b3892c;
+}
+
+/* Floating trust stickers around hero */
+.weld-glass-page .hero-trust-cluster {
+  position: absolute;
+  top: 18%;
+  right: -2%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.weld-glass-page .hero-trust-cluster .sticker {
+  pointer-events: auto;
+  max-width: 240px;
+}
+
+.weld-glass-page .hero-trust-cluster .sticker:nth-child(1) {
+  transform: translateX(-12%);
+}
+
+.weld-glass-page .hero-trust-cluster .sticker:nth-child(2) {
+  transform: translateX(8%) translateY(40px);
+}
+
+@media (max-width: 980px) {
+  .weld-glass-page .hero-trust-cluster {
+    display: none;
+  }
+}
+
+.weld-glass-page .hero-badge-row,
+.weld-glass-page .proof-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.weld-glass-page .hero-badge-row .sticker,
+.weld-glass-page .proof-badge-row .sticker {
+  padding: 8px 12px;
+}
+
+.weld-glass-page .hero-badge-row .sticker__body em,
+.weld-glass-page .proof-badge-row .sticker__body em {
+  display: none;
+}
+
+/* HowItWorksStrip — 4 numbered glass cards in a row */
+.weld-glass-page .how-strip-section {
+  width: min(1600px, calc(100% - 48px));
+  margin: 36px auto 0;
+}
+
+.weld-glass-page .how-strip-section .glass-card.how-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(16px, 2vw, 28px);
+  align-items: stretch;
+  padding: clamp(24px, 3vw, 36px);
+  border-radius: 36px;
+  position: relative;
+}
+
+.weld-glass-page .how-strip .step-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 22px 24px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 240, 255, 0.72));
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.96), 0 14px 36px rgba(70, 50, 160, 0.10);
+}
+
+.weld-glass-page .how-strip .step-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--wg-accent, #6b5cff);
+  color: #fff;
+  font-weight: 800;
+  font-size: 14px;
+  box-shadow: 0 6px 14px rgba(85, 65, 200, 0.32);
+}
+
+.weld-glass-page .how-strip .step-card h3 {
+  font-family: var(--font-display, "Plus Jakarta Sans"), system-ui, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--wg-ink);
+  margin: 0;
+}
+
+.weld-glass-page .how-strip .step-card p {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--wg-muted);
+  margin: 0;
+}
+
+.weld-glass-page .how-strip .step-arrow {
+  position: absolute;
+  top: 50%;
+  right: -16px;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(120, 110, 200, 0.14);
+  color: var(--wg-accent, #6b5cff);
+  font-size: 14px;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+@media (max-width: 880px) {
+  .weld-glass-page .how-strip-section .glass-card.how-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .weld-glass-page .how-strip .step-arrow {
+    display: none;
+  }
+}
+
+.weld-glass-page .hero-match-meter {
+  display: inline-flex;
+  margin: 0 0 14px;
+}
+
+/* Stage 5 — DoodleNote annotations */
+.weld-glass-page .doodle-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display, "Plus Jakarta Sans"), system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  filter: drop-shadow(0 4px 12px rgba(107, 92, 255, 0.18));
+  z-index: 6;
+}
+
+.weld-glass-page .doodle-note__label {
+  font-style: normal;
+  white-space: nowrap;
+  color: currentColor;
+  background: rgba(255, 255, 255, 0.78);
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 110, 200, 0.18);
+}
+
+.weld-glass-page .doodle-note svg {
+  width: 96px;
+  height: 64px;
+  overflow: visible;
+}
+
+.weld-glass-page .doodle-note--underline svg {
+  width: 120px;
+  height: 18px;
+}
+
+.weld-glass-page .doodle-note--circle svg {
+  width: 120px;
+  height: 80px;
+}
+
+.weld-glass-page .doodle-note--spark svg {
+  width: 36px;
+  height: 36px;
+}
+
+/* Stage 5 — demo-data captions */
+.weld-glass-page .demo-caption {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(80, 70, 140, 0.65);
+  margin-bottom: 6px;
+}
+
+.weld-glass-page .demo-caption::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(107, 92, 255, 0.55);
+}
+
+/* Stage 5 — waitlist success sticker pop */
+.weld-glass-page .waitlist-success-sticker {
+  display: inline-flex;
+  margin-top: 10px;
+  animation: weld-sticker-pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes weld-sticker-pop {
+  0% { transform: scale(0.6) rotate(-6deg); opacity: 0; }
+  60% { transform: scale(1.08) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weld-glass-page .waitlist-success-sticker {
+    animation: none;
+  }
+}
+
+/* Stage 5 — mobile finish: hide decoration <700px, role-chip scroll */
+@media (max-width: 700px) {
+  .weld-glass-page .doodle-note,
+  .weld-glass-page .hero-shell > [aria-hidden="true"][data-decoration],
+  .weld-glass-page .hero-shell > span[aria-hidden="true"] {
+    display: none !important;
+  }
+
+  .weld-glass-page .role-explorer-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 6px;
+    margin: 0 -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .weld-glass-page .role-explorer-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .weld-glass-page .role-explorer-tabs button {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+
+  .weld-glass-page .hero-trust-cluster {
+    position: static;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 16px 0 0;
+  }
+
+  .weld-glass-page .hero-badge-row,
+  .weld-glass-page .proof-badge-row {
+    gap: 8px;
+  }
+}
+
+/* ============================================================
+   CLEAN HERO + CHAT REFRESH (wireframe match)
+   ============================================================ */
+
+/* --- HERO --- */
+
+.weld-glass-page .hero-shell-grid {
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+  align-items: center;
+}
+
+.weld-glass-page .hero-trust-row {
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  align-items: center;
+}
+
+.weld-glass-page .hero-trust-row li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--wg-muted, #2a2754);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.weld-glass-page .hero-trust-row li svg {
+  width: 18px;
+  height: 18px;
+  color: var(--wg-accent, #6c5cff);
+  flex: none;
+}
+
+.weld-glass-page .hero-trust-row li + li {
+  position: relative;
+  padding-left: 22px;
+}
+
+.weld-glass-page .hero-trust-row li + li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 1px;
+  height: 14px;
+  background: rgba(60, 56, 120, 0.2);
+  transform: translateY(-50%);
+}
+
+.weld-glass-page .hero-talent-card.hero-talent-card-clean {
+  position: relative;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  border-radius: 28px;
+  overflow: visible;
+}
+
+.weld-glass-page .hero-talent-card-clean::after {
+  display: none;
+}
+
+.weld-glass-page .hero-card-verified-pill {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(108, 92, 255, 0.18);
+  color: var(--wg-accent, #6c5cff);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 12px rgba(108, 92, 255, 0.08);
+}
+
+.weld-glass-page .hero-card-verified-pill svg {
+  width: 14px;
+  height: 14px;
+}
+
+.weld-glass-page .hero-card-clean-body {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.weld-glass-page .hero-avatar-shell-clean {
+  width: 132px;
+  height: 132px;
+  flex: none;
+  border-radius: 24px;
+  background:
+    repeating-linear-gradient(135deg, rgba(108, 92, 255, 0.18) 0 6px, rgba(108, 92, 255, 0.08) 6px 12px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(238, 234, 255, 0.86));
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 14px 38px rgba(60, 50, 130, 0.12);
+  position: relative;
+  overflow: hidden;
+}
+
+.weld-glass-page .hero-avatar-shell-clean .profile-avatar {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 142px;
+  height: 142px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: translate(-50%, -42%) scale(0.92);
+  transform-origin: 50% 50%;
+}
+
+.weld-glass-page .hero-avatar-shell-clean .profile-avatar::before {
+  display: none;
+}
+
+.weld-glass-page .hero-avatar-shell-clean .avatar-status-dot {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #28d979;
+  box-shadow: 0 0 0 3px #fff;
+  z-index: 2;
+}
+
+.weld-glass-page .hero-card-clean-identity {
+  min-width: 0;
+}
+
+.weld-glass-page .hero-card-clean-identity .hero-card-name-row h2 {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.weld-glass-page .hero-card-clean-identity .hero-card-role {
+  margin: 4px 0 6px;
+  color: var(--wg-accent, #6c5cff);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.weld-glass-page .hero-card-clean-identity .hero-card-availability {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #1f9d62;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.weld-glass-page .hero-card-clean-identity .hero-card-availability span {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #28d979;
+  box-shadow: 0 0 0 4px rgba(40, 217, 121, 0.18);
+}
+
+.weld-glass-page .hero-skill-grid-clean {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.weld-glass-page .hero-skill-grid-clean span {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 4px 14px rgba(60, 50, 130, 0.05);
+  color: #1c1a3d;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@media (max-width: 960px) {
+  .weld-glass-page .hero-shell-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .weld-glass-page .hero-card-clean-body {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .weld-glass-page .hero-avatar-shell-clean {
+    width: 110px;
+    height: 110px;
+  }
+}
+
+/* --- CHAT --- */
+
+.weld-glass-page .chat-preview-shell-clean {
+  padding: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  gap: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(244, 240, 255, 0.7));
+}
+
+.weld-glass-page .chat-preview-shell-clean::after,
+.weld-glass-page .chat-preview-shell-clean::before {
+  display: none;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-window-topbar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.55);
+  border-bottom: 1px solid rgba(108, 92, 255, 0.1);
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-window-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(108, 92, 255, 0.14);
+  color: #1c1a3d;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: default;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-back-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-window-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.weld-glass-page .chat-topbar-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  flex: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.weld-glass-page .chat-topbar-avatar .profile-avatar {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 142px;
+  height: 142px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(238, 234, 255, 0.86));
+  box-shadow: none;
+  transform: translate(-50%, -42%) scale(0.27);
+  transform-origin: 50% 50%;
+}
+
+.weld-glass-page .chat-topbar-avatar .profile-avatar::before {
+  display: none;
+}
+
+.weld-glass-page .chat-topbar-avatar .avatar-status-dot {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #28d979;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-window-identity > div:last-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-window-identity strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--wg-accent, #6c5cff);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-window-identity strong .verified-dot {
+  width: 16px;
+  height: 16px;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-window-identity em {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #1f9d62;
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.online-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #28d979;
+  box-shadow: 0 0 0 3px rgba(40, 217, 121, 0.2);
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-window-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-view-profile-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(108, 92, 255, 0.14);
+  color: #1c1a3d;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: default;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-more-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(108, 92, 255, 0.12);
+  color: #1c1a3d;
+  font-size: 18px;
+  cursor: default;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-profile-panel {
+  padding: 24px 22px;
+  background: rgba(255, 255, 255, 0.45);
+  border-right: 1px solid rgba(108, 92, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  border-radius: 0;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-profile-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.weld-glass-page .chat-profile-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(135deg, rgba(108, 92, 255, 0.16) 0 5px, rgba(108, 92, 255, 0.06) 5px 10px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(238, 234, 255, 0.86));
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 14px 38px rgba(60, 50, 130, 0.14);
+  position: relative;
+  overflow: hidden;
+}
+
+.weld-glass-page .chat-profile-avatar .profile-avatar {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 142px;
+  height: 142px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+  transform: translate(-50%, -42%) scale(0.7);
+  transform-origin: 50% 50%;
+}
+
+.weld-glass-page .chat-profile-avatar .profile-avatar::before {
+  display: none;
+}
+
+.weld-glass-page .chat-profile-avatar .avatar-status-dot {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #28d979;
+  box-shadow: 0 0 0 3px #fff;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-profile-top .hero-card-name-row {
+  justify-content: center;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-profile-top .hero-card-name-row h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--wg-accent, #6c5cff);
+  letter-spacing: -0.01em;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-profile-top .hero-card-role {
+  margin: 0;
+  color: var(--wg-accent, #6c5cff);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-profile-top .hero-card-availability {
+  justify-content: center;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-match-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(108, 92, 255, 0.12);
+  color: var(--wg-accent, #6c5cff);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-match-bar > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-match-bar > span svg {
+  width: 14px;
+  height: 14px;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-match-bar i {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(108, 92, 255, 0.14);
+  position: relative;
+  overflow: hidden;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-match-bar i::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: var(--match-fill, 62%);
+  border-radius: 999px;
+  background: repeating-linear-gradient(135deg, #6c5cff 0 6px, #8a7dff 6px 12px);
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-stat-grid span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(108, 92, 255, 0.1);
+  text-align: center;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-stat-grid span svg {
+  width: 16px;
+  height: 16px;
+  color: var(--wg-accent, #6c5cff);
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-stat-grid strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--wg-accent, #6c5cff);
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-stat-grid em {
+  font-style: normal;
+  font-size: 11px;
+  color: #5a567f;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-profile-summary {
+  margin: 0;
+  color: var(--wg-accent, #6c5cff);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.weld-glass-page .chat-contact-row-clean {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.weld-glass-page .chat-contact-chip {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(108, 92, 255, 0.08);
+}
+
+.weld-glass-page .chat-contact-chip i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--wg-accent, #6c5cff);
+}
+
+.weld-glass-page .chat-contact-chip i svg {
+  width: 16px;
+  height: 16px;
+}
+
+.weld-glass-page .chat-contact-chip strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1c1a3d;
+}
+
+.weld-glass-page .chat-contact-chip em {
+  font-style: normal;
+  font-size: 12px;
+  color: #5a567f;
+  white-space: nowrap;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-professional-note {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(108, 92, 255, 0.08);
+  border: 1px solid rgba(108, 92, 255, 0.14);
+}
+
+.weld-glass-page .chat-professional-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: rgba(108, 92, 255, 0.16);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--wg-accent, #6c5cff);
+  flex: none;
+}
+
+.weld-glass-page .chat-professional-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-professional-note > span:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-professional-note strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--wg-accent, #6c5cff);
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-professional-note em {
+  font-style: normal;
+  font-size: 12px;
+  color: #5a567f;
+  line-height: 1.5;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-thread-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 600px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(244, 240, 255, 0.55));
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-thread-top {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0 8px;
+}
+
+.weld-glass-page .chat-day-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(108, 92, 255, 0.12);
+}
+
+.weld-glass-page .chat-day-pill strong {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--wg-accent, #6c5cff);
+}
+
+.weld-glass-page .chat-day-pill em {
+  font-style: normal;
+  font-size: 12px;
+  color: #5a567f;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-bubble-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 24px;
+  overflow: visible;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-row.is-out {
+  justify-content: flex-end;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-row.is-in {
+  justify-content: flex-start;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-mini-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(135deg, rgba(108, 92, 255, 0.18) 0 4px, rgba(108, 92, 255, 0.08) 4px 8px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(238, 234, 255, 0.86));
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  box-shadow: 0 4px 10px rgba(60, 50, 130, 0.1);
+  flex: none;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-row p {
+  position: relative;
+  margin: 0;
+  padding: 12px 16px 22px;
+  border-radius: 18px;
+  max-width: 78%;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 500;
+  color: var(--wg-accent, #6c5cff);
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(108, 92, 255, 0.1);
+  box-shadow: 0 4px 14px rgba(60, 50, 130, 0.05);
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-row.is-in p {
+  border-bottom-left-radius: 6px;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-row.is-out p {
+  border-bottom-right-radius: 6px;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-row time {
+  position: absolute;
+  bottom: 6px;
+  right: 12px;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 600;
+  color: #8782aa;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-row time svg {
+  width: 12px;
+  height: 9px;
+  color: var(--wg-accent, #6c5cff);
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-composer-clean {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  margin: 8px 18px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(108, 92, 255, 0.12);
+  box-shadow: 0 8px 20px rgba(60, 50, 130, 0.06);
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-composer-clean em {
+  flex: 1;
+  font-style: normal;
+  color: #8782aa;
+  font-size: 14px;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-composer-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c5cff;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-composer-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-send-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #6c5cff, #8a7dff);
+  color: #fff;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 14px rgba(108, 92, 255, 0.32);
+  cursor: default;
+}
+
+.weld-glass-page .chat-preview-shell-clean .chat-send-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 880px) {
+  .weld-glass-page .chat-preview-shell-clean {
+    grid-template-columns: 1fr;
+  }
+  .weld-glass-page .chat-preview-shell-clean .chat-profile-panel {
+    border-right: none;
+    border-bottom: 1px solid rgba(108, 92, 255, 0.08);
+  }
+  .weld-glass-page .chat-preview-shell-clean .chat-thread-panel {
+    min-height: 480px;
+  }
+}
+
+/* ============================================================
+   SPLIT HERO (wireframe #1) — card left, copy right
+   ============================================================ */
+
+.weld-glass-page .hero-shell-split .hero-shell-grid {
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  gap: clamp(28px, 4vw, 56px);
+  align-items: center;
+}
+
+.weld-glass-page .hero-shell-split .hero-shell-bloom {
+  inset: -10% -16% auto auto;
+  width: 38%;
+  opacity: 0.7;
+}
+
+.weld-glass-page .hero-card-column-split {
+  position: relative;
+}
+
+.weld-glass-page .hero-talent-card.hero-talent-card-split {
+  position: relative;
+  padding: 22px 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-radius: 28px;
+  overflow: visible;
+}
+
+.weld-glass-page .hero-talent-card-split::after {
+  display: none;
+}
+
+/* Top row: verified pill + corner icons */
+
+.weld-glass-page .hero-card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.weld-glass-page .hero-card-corner-icons {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.weld-glass-page .hero-card-corner-icons span {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(108, 92, 255, 0.14);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #1c1a3d;
+}
+
+.weld-glass-page .hero-card-corner-icons span svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Identity row */
+
+.weld-glass-page .hero-card-identity-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.weld-glass-page .hero-talent-card-split .hero-avatar-shell-clean {
+  width: 116px;
+  height: 116px;
+  border-radius: 22px;
+}
+
+.weld-glass-page .hero-talent-card-split .hero-card-clean-identity .hero-card-name-row h2 {
+  font-size: 26px;
+}
+
+.weld-glass-page .hero-talent-card-split .hero-card-clean-identity .hero-card-role {
+  font-size: 15px;
+}
+
+/* Stats row (3 chips) */
+
+.weld-glass-page .hero-stat-row-split {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.weld-glass-page .hero-stat-chip-split {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(108, 92, 255, 0.12);
+  box-shadow: 0 4px 14px rgba(60, 50, 130, 0.05);
+}
+
+.weld-glass-page .hero-stat-chip-split > svg {
+  width: 18px;
+  height: 18px;
+  color: var(--wg-accent, #6c5cff);
+  flex: none;
+}
+
+.weld-glass-page .hero-stat-chip-split > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.weld-glass-page .hero-stat-chip-split strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--wg-accent, #6c5cff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.weld-glass-page .hero-stat-chip-split span {
+  font-size: 11px;
+  color: #5a567f;
+  font-weight: 500;
+}
+
+/* Headline */
+
+.weld-glass-page .hero-card-headline-split {
+  margin: 4px 0 2px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1c1a3d;
+  font-weight: 500;
+}
+
+/* Commerce row */
+
+.weld-glass-page .hero-card-commerce-split {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+.weld-glass-page .hero-rate-pill.hero-rate-pill-split {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffe4ee, #ffd0e0);
+  border: 1px solid rgba(255, 130, 170, 0.4);
+  box-shadow: 0 8px 22px rgba(255, 130, 170, 0.18);
+  min-width: 0;
+}
+
+.weld-glass-page .hero-rate-pill.hero-rate-pill-split > span:first-child {
+  font-size: 12px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #b03058 !important;
+  font-weight: 800 !important;
+  line-height: 1;
+  display: block !important;
+  margin-bottom: 2px;
+}
+
+.weld-glass-page .hero-rate-pill.hero-rate-pill-split strong {
+  font-size: 24px !important;
+  font-weight: 700;
+  color: #1c1a3d !important;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.weld-glass-page .hero-rate-pill.hero-rate-pill-split em {
+  font-style: normal;
+  font-size: 11px !important;
+  color: #5a567f !important;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+
+.weld-glass-page .hero-skill-grid-split {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  align-content: center;
+}
+
+.weld-glass-page .hero-skill-grid-split span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(108, 92, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  color: #1c1a3d;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Link grid (4 contact chips) */
+
+.weld-glass-page .hero-link-grid-split {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.weld-glass-page .hero-link-grid-split > div {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 8px;
+  row-gap: 0;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(108, 92, 255, 0.1);
+  align-items: center;
+  min-width: 0;
+}
+
+.weld-glass-page .hero-link-grid-split > div .hero-social-icon {
+  grid-row: 1 / span 2;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(108, 92, 255, 0.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--wg-accent, #6c5cff);
+}
+
+.weld-glass-page .hero-link-grid-split > div .hero-social-icon svg {
+  width: 12px;
+  height: 12px;
+}
+
+.weld-glass-page .hero-link-grid-split > div strong {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1c1a3d;
+}
+
+.weld-glass-page .hero-link-grid-split > div em {
+  font-style: normal;
+  font-size: 11px;
+  color: #5a567f;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Copy panel (split right) */
+
+.weld-glass-page .hero-copy-panel-split {
+  padding: 12px 0;
+}
+
+.weld-glass-page .hero-copy-panel-split .hero-mode-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  margin-bottom: 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(108, 92, 255, 0.14);
+  color: var(--wg-accent, #6c5cff);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.weld-glass-page .hero-copy-panel-split h1 {
+  font-size: clamp(40px, 4.6vw, 60px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  color: #1c1a3d;
+  margin: 0;
+}
+
+.weld-glass-page .hero-copy-panel-split .hero-lead {
+  margin-top: 22px;
+  max-width: 30rem;
+  font-size: 17px;
+  line-height: 1.5;
+  color: #2a2754;
+  font-weight: 500;
+}
+
+.weld-glass-page .hero-copy-panel-split .hero-support {
+  margin-top: 14px;
+  max-width: 32rem;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #5a567f;
+  font-weight: 400;
+}
+
+.weld-glass-page .hero-copy-eyebrow-hidden {
+  display: none;
+}
+
+@media (max-width: 1080px) {
+  .weld-glass-page .hero-shell-split .hero-shell-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .weld-glass-page .hero-card-commerce-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .weld-glass-page .hero-link-grid-split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .weld-glass-page .hero-stat-row-split,
+  .weld-glass-page .hero-skill-grid-split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
