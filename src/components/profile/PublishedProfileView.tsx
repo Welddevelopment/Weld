@@ -4,17 +4,98 @@ import { useState } from 'react'
 
 import SwipeCard, { type PanelKind } from '@/components/SwipeCard'
 import StudioCard from '@/components/StudioCard'
+import GamesPanel from '@/components/matching-preview/panels/GamesPanel'
+import WorkPanel from '@/components/matching-preview/panels/WorkPanel'
+import SkillPanel from '@/components/matching-preview/panels/SkillPanel'
 import StudioGamesPanel from '@/components/matching-preview/panels/StudioGamesPanel'
 import StudioSkillPanel from '@/components/matching-preview/panels/StudioSkillPanel'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
 import { usePanelQueue } from '@/hooks/usePanelQueue'
 
-import OwnProfileModal from './OwnProfileModal'
+type EditStart = 'editor' | 'onboarding'
 
 interface Props {
   profile: PreviewProfile
-  onEdit: () => void
+  onEdit: (start: EditStart) => void
   onDelete: () => Promise<void>
+}
+
+function EditChoiceModal({
+  profileType,
+  onChoose,
+  onCancel,
+}: {
+  profileType: PreviewProfile['type']
+  onChoose: (start: EditStart) => void
+  onCancel: () => void
+}) {
+  return (
+    <div
+      style={{
+        position: 'fixed', inset: 0, zIndex: 480,
+        background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(6px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+      }}
+      onClick={onCancel}
+    >
+      <div
+        style={{
+          width: '100%', maxWidth: 420, borderRadius: 22,
+          border: '1px solid rgba(255,255,255,0.12)',
+          background: '#141211', padding: 24,
+          boxShadow: '0 24px 80px rgba(0,0,0,0.42)',
+        }}
+        onClick={e => e.stopPropagation()}
+      >
+        <p style={{ margin: '0 0 8px', fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.42)' }}>
+          Edit {profileType === 'studio' ? 'studio' : 'developer'} profile
+        </p>
+        <h2 style={{ margin: '0 0 10px', fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 28, color: '#FFF7F1' }}>
+          How do you want to edit?
+        </h2>
+        <p style={{ margin: '0 0 22px', fontSize: 14, lineHeight: 1.65, color: 'rgba(255,255,255,0.52)' }}>
+          Jump into the card editor for quick changes, or walk through onboarding again with your existing answers filled in.
+        </p>
+        <div style={{ display: 'grid', gap: 10 }}>
+          <button
+            type="button"
+            onClick={() => onChoose('editor')}
+            style={{
+              width: '100%', border: '1px solid rgba(232,70,36,0.48)',
+              background: 'rgba(232,70,36,0.14)', color: '#FFB49F',
+              borderRadius: 14, padding: '13px 16px', cursor: 'pointer',
+              fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase',
+            }}
+          >
+            Continue to inline editor
+          </button>
+          <button
+            type="button"
+            onClick={() => onChoose('onboarding')}
+            style={{
+              width: '100%', border: '1px solid rgba(255,255,255,0.12)',
+              background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.76)',
+              borderRadius: 14, padding: '13px 16px', cursor: 'pointer',
+              fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase',
+            }}
+          >
+            Redo onboarding
+          </button>
+          <button
+            type="button"
+            onClick={onCancel}
+            style={{
+              width: '100%', border: 'none', background: 'transparent',
+              color: 'rgba(255,255,255,0.34)', padding: '7px 16px', cursor: 'pointer',
+              fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase',
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 function DeleteWarningModal({
@@ -76,11 +157,26 @@ function DeleteWarningModal({
   )
 }
 
+function renderPanel(panel: PanelKind, profile: PreviewProfile, onBack: () => void) {
+  if (panel === 'games') {
+    return profile.type === 'studio'
+      ? <StudioGamesPanel key="studio-games" profile={profile} onBack={onBack} />
+      : <GamesPanel key="games" profile={profile} onBack={onBack} />
+  }
+  if (panel === 'work') return <WorkPanel key="work" profile={profile} onBack={onBack} />
+  if (typeof panel === 'object' && 'skill' in panel) {
+    return profile.type === 'studio'
+      ? <StudioSkillPanel key={`studio-skill-${panel.skill}`} profile={profile} skillName={panel.skill} initialRole={panel.role} onBack={onBack} />
+      : <SkillPanel key={`skill-${panel.skill}`} profile={profile} skillName={panel.skill} onBack={onBack} />
+  }
+  return null
+}
+
 export default function PublishedProfileView({ profile, onEdit, onDelete }: Props) {
-  const [modalOpen, setModalOpen] = useState(false)
+  const [showEditChoice, setShowEditChoice] = useState(false)
   const [showDeleteWarning, setShowDeleteWarning] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const { slot0, slot1, openPanel, closePanel } = usePanelQueue()
+  const { slot0, slot1, openPanel, closePanel, leftPanelActive, rightPanelActive } = usePanelQueue()
 
   const handleConfirmDelete = async () => {
     setIsDeleting(true)
@@ -91,6 +187,8 @@ export default function PublishedProfileView({ profile, onEdit, onDelete }: Prop
     }
   }
 
+  const activePanels = [slot0, slot1].filter((p): p is PanelKind => p !== null)
+
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-8 py-16">
       <div className="flex items-center gap-2">
@@ -100,49 +198,31 @@ export default function PublishedProfileView({ profile, onEdit, onDelete }: Prop
         </span>
       </div>
 
-      {profile.type === 'studio' ? (
-        <div className="npc-stack-row" style={{ alignItems: 'flex-start' }}>
-          {slot0 && (
-            slot0 === 'games'
-              ? <StudioGamesPanel profile={profile} onBack={() => closePanel(0)} />
-              : typeof slot0 === 'object' && 'skill' in slot0
-                ? <StudioSkillPanel profile={profile} skillName={slot0.skill} initialRole={slot0.role} onBack={() => closePanel(0)} />
-                : null
-          )}
+      <div className="npc-stack-row" style={{ alignItems: 'flex-start' }}>
+        {slot0 && renderPanel(slot0, profile, () => closePanel(0))}
 
+        {profile.type === 'studio' ? (
           <StudioCard
             profile={profile}
-            activePanels={[slot0, slot1].filter((p): p is PanelKind => p !== null)}
+            activePanels={activePanels}
             onOpenPanel={openPanel}
           />
+        ) : (
+          <SwipeCard
+            profile={profile}
+            leftPanel={leftPanelActive}
+            rightPanel={rightPanelActive}
+            onOpenPanel={openPanel}
+          />
+        )}
 
-          {slot1 && (
-            slot1 === 'games'
-              ? <StudioGamesPanel profile={profile} onBack={() => closePanel(1)} />
-              : typeof slot1 === 'object' && 'skill' in slot1
-                ? <StudioSkillPanel profile={profile} skillName={slot1.skill} initialRole={slot1.role} onBack={() => closePanel(1)} />
-                : null
-          )}
-        </div>
-      ) : (
-        /* Card sits in the stack CSS context so its styles apply correctly */
-        <button
-          type="button"
-          onClick={() => setModalOpen(true)}
-          className="focus:outline-none"
-          style={{ background: 'none', border: 'none', padding: 0 }}
-          aria-label="View your full profile"
-        >
-          <div style={{ pointerEvents: 'none' }}>
-            <SwipeCard profile={profile} />
-          </div>
-        </button>
-      )}
+        {slot1 && renderPanel(slot1, profile, () => closePanel(1))}
+      </div>
 
       <div className="flex flex-col items-center gap-3">
         <button
           type="button"
-          onClick={onEdit}
+          onClick={() => setShowEditChoice(true)}
           className="font-mono text-[10px] uppercase tracking-[0.13em] text-white/40 transition hover:text-white/70"
         >
           Edit profile →
@@ -156,8 +236,12 @@ export default function PublishedProfileView({ profile, onEdit, onDelete }: Prop
         </button>
       </div>
 
-      {modalOpen && (
-        <OwnProfileModal profile={profile} onClose={() => setModalOpen(false)} />
+      {showEditChoice && (
+        <EditChoiceModal
+          profileType={profile.type}
+          onChoose={start => { setShowEditChoice(false); onEdit(start) }}
+          onCancel={() => setShowEditChoice(false)}
+        />
       )}
 
       {showDeleteWarning && (
