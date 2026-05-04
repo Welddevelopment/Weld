@@ -21,6 +21,13 @@ function emptyRole(): RoleEntry {
 export default function StudioRolesStep({ draft, update, onNext, onBack }: Props) {
   const roles = draft.openRoles
 
+  const getSkillDesc = (name: string) => draft.skillDescriptions[name] ?? ''
+
+  const setSkillDesc = (name: string, description: string) => {
+    if (!name) return
+    update({ skillDescriptions: { ...draft.skillDescriptions, [name]: description } })
+  }
+
   const add = () => {
     if (roles.length >= 6) return
     update({ openRoles: [...roles, emptyRole()] })
@@ -90,6 +97,16 @@ export default function StudioRolesStep({ draft, update, onNext, onBack }: Props
               value={role.title}
               onChange={e => change(i, { title: e.target.value })}
             />
+            {role.skill && (
+              <textarea
+                className="pb-textarea"
+                style={{ marginTop: 8 }}
+                rows={2}
+                placeholder={`What should developers know about your ${role.skill} needs?`}
+                value={getSkillDesc(role.skill)}
+                onChange={e => setSkillDesc(role.skill, e.target.value)}
+              />
+            )}
             <textarea
               className="pb-textarea"
               style={{ marginTop: 8 }}

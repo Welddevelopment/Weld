@@ -13,6 +13,7 @@ import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/bro
 const DRAFT_KEY = 'weld_profile_draft'
 
 type PageMode = 'loading' | 'unauthed' | 'empty' | 'published' | 'editing'
+type EditStart = 'editor' | 'onboarding'
 
 function hasSavedDraft(value: unknown) {
   return Boolean(
@@ -30,6 +31,7 @@ export default function ProfilePage() {
   const [token, setToken] = useState<string | null>(null)
   const [builderKey, setBuilderKey] = useState(0)
   const [hasDraft, setHasDraft] = useState(false)
+  const [editStart, setEditStart] = useState<EditStart>('editor')
 
   useEffect(() => {
     if (!hasBrowserSupabaseConfig()) {
@@ -90,14 +92,21 @@ export default function ProfilePage() {
     router.push('/home')
   }
 
+  function startPublishedEdit(start: EditStart) {
+    setEditStart(start)
+    setMode('editing')
+  }
+
   // Full-screen editor — hides the nav
   if (mode === 'editing') {
+    const publishedStartPhase = editStart === 'onboarding' ? 'identity' : 'editor'
+
     return (
       <ProfileBuilder
         key={builderKey}
         onPublished={handlePublished}
         onDelete={handleDelete}
-        initialPhase={publishedProfile ? 'editor' : 'type'}
+        initialPhase={publishedProfile ? publishedStartPhase : 'type'}
         onCancel={publishedProfile ? () => setMode('published') : undefined}
       />
     )
@@ -165,7 +174,7 @@ export default function ProfilePage() {
       {mode === 'published' && publishedProfile && (
         <PublishedProfileView
           profile={publishedProfile}
-          onEdit={() => setMode('editing')}
+          onEdit={startPublishedEdit}
           onDelete={handleDelete}
         />
       )}

@@ -25,8 +25,8 @@ export default function StudioSkillPanel({ profile, skillName, initialRole, onBa
   const initialIdx = initialRole != null ? roles.findIndex(r => r.title === initialRole) : -1
   const [selectedRole, setSelectedRole] = useState<number | null>(initialIdx >= 0 ? initialIdx : null)
 
-  const customDesc = profile.skillsNeeded?.find(s => s.name === skillName)?.description
-  const desc = (customDesc && customDesc.trim()) ? customDesc : (DEV_SKILL_DESCS[skillName] ?? '')
+  const customDesc = profile.skillsNeeded?.find(s => s.name === skillName)?.description?.trim()
+  const defaultDesc = DEV_SKILL_DESCS[skillName] ?? ''
   const popupRole = selectedRole !== null ? roles[selectedRole] : null
 
   return (
@@ -56,17 +56,17 @@ export default function StudioSkillPanel({ profile, skillName, initialRole, onBa
             {profile.name} is looking for
           </div>
           <p style={{ fontSize: 13, color: '#333', lineHeight: 1.6, margin: 0 }}>
-            Developers with strong {skillName} experience to join their team.
+            {customDesc || `Developers with strong ${skillName} experience to join their team.`}
           </p>
         </div>
 
-        {desc && (
+        {!customDesc && defaultDesc && (
           <>
             <div style={{ fontSize: 10, fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#999', marginBottom: 8 }}>
               About this skill
             </div>
             <p style={{ fontSize: 13, color: '#444', lineHeight: 1.65, margin: '0 0 20px' }}>
-              {desc}
+              {defaultDesc}
             </p>
           </>
         )}

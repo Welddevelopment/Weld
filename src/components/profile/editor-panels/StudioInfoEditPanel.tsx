@@ -1,7 +1,6 @@
 'use client'
 
 import { ProfileDraft } from '../profile-types'
-import { DEV_SKILL_DESCS } from '@/components/matching-preview/preview-data'
 
 interface Props {
   draft: ProfileDraft
@@ -217,7 +216,7 @@ export default function StudioInfoEditPanel({ draft, update, onClose }: Props) {
               <textarea
                 className="pb-panel-textarea"
                 rows={2}
-                placeholder={DEV_SKILL_DESCS[name] ?? `Describe what ${name} means for your studio…`}
+                placeholder={`What should developers know about your ${name} needs?`}
                 value={getSkillDesc(name)}
                 onChange={e => setSkillDesc(name, e.target.value)}
               />

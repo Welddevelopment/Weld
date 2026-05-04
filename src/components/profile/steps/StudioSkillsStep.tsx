@@ -1,7 +1,6 @@
 'use client'
 
 import { ProfileDraft } from '../profile-types'
-import { DEV_SKILL_DESCS } from '@/components/matching-preview/preview-data'
 
 interface Props {
   draft: ProfileDraft
@@ -59,7 +58,7 @@ export default function StudioSkillsStep({ draft, update, onNext, onBack }: Prop
             <textarea
               className="pb-textarea"
               rows={2}
-              placeholder={DEV_SKILL_DESCS[name] ?? `Describe what ${name} means for your studio…`}
+              placeholder={`What should developers know about your ${name} needs?`}
               value={getDesc(name)}
               onChange={e => setDesc(name, e.target.value)}
             />
