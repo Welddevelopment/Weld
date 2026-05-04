@@ -55,6 +55,7 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
   const [dragOffset, setDragOffset] = useState(0)
   const [sparks, setSparks] = useState(0)
   const [likeFlash, setLikeFlash] = useState(false)
+  const [panelsCollapsing, setPanelsCollapsing] = useState(false)
   const { slot0, slot1, panelOpen, openPanel, closePanel, clearPanels, leftPanelActive, rightPanelActive } = usePanelQueue()
 
   const isDragging = useRef(false)
@@ -99,6 +100,16 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
       setLikeFlash(false)
       triggerSwipe('right')
     }, 600)
+  }
+
+  const collapseAndAct = (action: () => void) => {
+    if (!panelOpen) { action(); return }
+    setPanelsCollapsing(true)
+    setTimeout(() => {
+      clearPanels()
+      setPanelsCollapsing(false)
+      action()
+    }, 200)
   }
 
   useImperativeHandle(ref, () => ({
@@ -195,7 +206,11 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
 
       <div className="npc-stack-row">
         {/* Left panel slot */}
-        {slot0 && renderPanel(slot0, current, () => closePanel(0))}
+        {slot0 && (
+          <div className={panelsCollapsing ? 'npc-panel-slot--out-left' : ''}>
+            {renderPanel(slot0, current, () => closePanel(0))}
+          </div>
+        )}
 
         {/* Card drag container */}
         <div
@@ -241,9 +256,9 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
                 dragOverlay={likeFlash ? 'like' : dragOverlay}
                 dragOpacity={likeFlash ? 1 : dragProgress}
                 activePanels={[slot0, slot1].filter((p): p is PanelKind => p !== null)}
-                onPass={() => triggerSwipe('left')}
-                onLike={handleCardLike}
-                onMessage={() => onMessage?.(current)}
+                onPass={() => collapseAndAct(() => triggerSwipe('left'))}
+                onLike={() => collapseAndAct(handleCardLike)}
+                onMessage={() => collapseAndAct(() => onMessage?.(current))}
                 onOpenPanel={openPanel}
               />
             ) : (
@@ -253,9 +268,9 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
                 dragOpacity={likeFlash ? 1 : dragProgress}
                 leftPanel={leftPanelActive}
                 rightPanel={rightPanelActive}
-                onPass={() => triggerSwipe('left')}
-                onLike={handleCardLike}
-                onMessage={() => onMessage?.(current)}
+                onPass={() => collapseAndAct(() => triggerSwipe('left'))}
+                onLike={() => collapseAndAct(handleCardLike)}
+                onMessage={() => collapseAndAct(() => onMessage?.(current))}
                 onOpenPanel={openPanel}
               />
             )}
@@ -263,7 +278,11 @@ const SwipeStack = forwardRef<SwipeStackHandle, Props>(function SwipeStack(
         </div>
 
         {/* Right panel slot */}
-        {slot1 && renderPanel(slot1, current, () => closePanel(1))}
+        {slot1 && (
+          <div className={panelsCollapsing ? 'npc-panel-slot--out-right' : ''}>
+            {renderPanel(slot1, current, () => closePanel(1))}
+          </div>
+        )}
       </div>
     </div>
   )
