@@ -8,6 +8,7 @@ export type DevWork = {
   time: string
   amount: string
   plays: string
+  imageUrl?: string
 }
 
 export type TopGame = {
@@ -17,6 +18,23 @@ export type TopGame = {
   plays: string
   topCcu: string
   currentCcu: string
+  skills?: string[]
+  imageUrl?: string
+  gameUrl?: string
+}
+
+export type WorkSummary = {
+  totalProjects: string
+  linesOfCode: string
+  totalHours: string
+  commitment: string
+}
+
+export type Skill = {
+  name: string
+  description: string
+  categories?: Array<{ icon: string; name: string; description: string }>
+  resources?: Array<{ label: string; url: string }>
 }
 
 export type PreviewProfile = {
@@ -31,9 +49,10 @@ export type PreviewProfile = {
   tags: string[]
   meta: string
   // Dev-only
-  skills?: Array<{ name: string; description: string }>
+  skills?: Skill[]
   portfolio?: { links: Array<{ name: string; url: string }> }
   bestWork?: DevWork[]
+  workSummary?: WorkSummary
   socials?: Array<{ icon: string; label: string; url: string }>
   // Studio-only
   details?: string

@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 
 export type MotionTier = "full" | "reduced";
 
-export function useMotionPolicy(): MotionTier {
+export type MotionPolicy = {
+  tier: MotionTier;
+  reducedMotion: boolean;
+  allowEntranceStagger: boolean;
+};
+
+export function useMotionPolicy(): MotionPolicy {
   const [tier, setTier] = useState<MotionTier>("full");
 
   useEffect(() => {
@@ -21,5 +27,9 @@ export function useMotionPolicy(): MotionTier {
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  return tier;
+  return {
+    tier,
+    reducedMotion: tier === "reduced",
+    allowEntranceStagger: tier === "full",
+  };
 }

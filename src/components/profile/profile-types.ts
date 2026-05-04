@@ -1,4 +1,4 @@
-import { PreviewProfile, PreviewProfileType, DevWork, TopGame } from '../matching-preview/preview-types'
+import { PreviewProfile, PreviewProfileType, DevWork, TopGame, Skill } from '../matching-preview/preview-types'
 
 export type ProfileDraft = {
   type: PreviewProfileType
@@ -18,7 +18,7 @@ export type ProfileDraft = {
   projectValue: string
   details: string
   // Shared
-  selectedSkills: Array<{ name: string; description: string }>
+  selectedSkills: Skill[]
   portfolioLinks: Array<{ name: string; url: string }>
   socials: Array<{ icon: string; label: string; url: string }>
   bestWork: DevWork[]
@@ -98,4 +98,64 @@ export function draftToProfile(draft: ProfileDraft, id: string): PreviewProfile 
   }
 
   return profile
+}
+
+const RATE_TYPES = ['USD / hr', 'Robux / hr', 'Fixed USD', 'Fixed Robux']
+
+export function profileToDraft(profile: PreviewProfile): ProfileDraft {
+  const isDev = profile.type === 'dev'
+
+  let experienceYears: number | null = null
+  if (isDev) {
+    const match = profile.role.match(/(\d+)yr/)
+    if (match) experienceYears = parseInt(match[1])
+  }
+
+  let teamSize: number | null = null
+  if (!isDev) {
+    const match = profile.role.match(/(\d+) members/)
+    if (match) teamSize = parseInt(match[1])
+  }
+
+  let rateType: string | null = null
+  let rateAmount = ''
+  if (isDev && profile.meta && profile.meta !== 'Rate negotiable') {
+    for (const rt of RATE_TYPES) {
+      if (profile.meta.includes(rt)) {
+        rateType = rt
+        rateAmount = profile.meta.replace(rt, '').trim()
+        break
+      }
+    }
+  }
+
+  let status: string | null = null
+  let budgetType: string | null = null
+  if (!isDev && profile.meta) {
+    const parts = profile.meta.split(' · ')
+    status = parts[0] ?? null
+    budgetType = parts[1] ?? null
+  }
+
+  return {
+    type: profile.type,
+    robloxUserId: profile.robloxUserId,
+    bg: profile.bg,
+    badge: profile.badge,
+    name: profile.name,
+    bio: profile.bio,
+    experienceYears,
+    rateType,
+    rateAmount,
+    teamSize,
+    status,
+    budgetType,
+    projectValue: '',
+    details: profile.details ?? '',
+    selectedSkills: isDev ? (profile.skills ?? []) : (profile.skillsNeeded ?? []),
+    portfolioLinks: profile.portfolio?.links ?? [],
+    socials: profile.socials ?? [],
+    bestWork: profile.bestWork ?? [],
+    topGames: profile.topGames ?? [],
+  }
 }
