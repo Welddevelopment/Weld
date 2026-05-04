@@ -56,7 +56,7 @@ export default function StudioGamesPanel({ profile, onBack }: Props) {
       </div>
 
       {/* Scrollable game list */}
-      <div className="npc-panel-body" style={{ flex: 1 }}>
+      <div className="npc-panel-body sgp-list" style={{ flex: 1 }}>
         {games.length === 0 ? (
           <p style={{ color: '#aaa', fontSize: 13, textAlign: 'center', paddingTop: 40 }}>No games added yet.</p>
         ) : games.map((game, i) => (
@@ -84,13 +84,6 @@ export default function StudioGamesPanel({ profile, onBack }: Props) {
               </div>
               {game.genre && <div className="sgp-genre">{game.genre}</div>}
               {game.desc && <p className="sgp-desc">{game.desc}</p>}
-              {(game.skills?.length ?? 0) > 0 && (
-                <div className="sgp-tags">
-                  {game.skills!.map((tag, ti) => (
-                    <span key={tag} className="sgp-tag" style={{ background: `${tagColor(ti)}18`, color: tagColor(ti) }}>{tag}</span>
-                  ))}
-                </div>
-              )}
             </div>
 
             {/* Stats column */}

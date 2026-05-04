@@ -2,9 +2,12 @@
 
 import { useState } from 'react'
 
-import SwipeCard from '@/components/SwipeCard'
+import SwipeCard, { type PanelKind } from '@/components/SwipeCard'
 import StudioCard from '@/components/StudioCard'
+import StudioGamesPanel from '@/components/matching-preview/panels/StudioGamesPanel'
+import StudioSkillPanel from '@/components/matching-preview/panels/StudioSkillPanel'
 import type { PreviewProfile } from '@/components/matching-preview/preview-types'
+import { usePanelQueue } from '@/hooks/usePanelQueue'
 
 import OwnProfileModal from './OwnProfileModal'
 
@@ -77,6 +80,7 @@ export default function PublishedProfileView({ profile, onEdit, onDelete }: Prop
   const [modalOpen, setModalOpen] = useState(false)
   const [showDeleteWarning, setShowDeleteWarning] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const { slot0, slot1, openPanel, closePanel } = usePanelQueue()
 
   const handleConfirmDelete = async () => {
     setIsDeleting(true)
@@ -96,18 +100,44 @@ export default function PublishedProfileView({ profile, onEdit, onDelete }: Prop
         </span>
       </div>
 
-      {/* Card sits in the stack CSS context so its styles apply correctly */}
-      <button
-        type="button"
-        onClick={() => setModalOpen(true)}
-        className="focus:outline-none"
-        style={{ background: 'none', border: 'none', padding: 0 }}
-        aria-label="View your full profile"
-      >
-        <div style={{ pointerEvents: 'none' }}>
-          {profile.type === 'studio' ? <StudioCard profile={profile} /> : <SwipeCard profile={profile} />}
+      {profile.type === 'studio' ? (
+        <div className="npc-stack-row" style={{ alignItems: 'flex-start' }}>
+          {slot0 && (
+            slot0 === 'games'
+              ? <StudioGamesPanel profile={profile} onBack={() => closePanel(0)} />
+              : typeof slot0 === 'object' && 'skill' in slot0
+                ? <StudioSkillPanel profile={profile} skillName={slot0.skill} initialRole={slot0.role} onBack={() => closePanel(0)} />
+                : null
+          )}
+
+          <StudioCard
+            profile={profile}
+            activePanels={[slot0, slot1].filter((p): p is PanelKind => p !== null)}
+            onOpenPanel={openPanel}
+          />
+
+          {slot1 && (
+            slot1 === 'games'
+              ? <StudioGamesPanel profile={profile} onBack={() => closePanel(1)} />
+              : typeof slot1 === 'object' && 'skill' in slot1
+                ? <StudioSkillPanel profile={profile} skillName={slot1.skill} initialRole={slot1.role} onBack={() => closePanel(1)} />
+                : null
+          )}
         </div>
-      </button>
+      ) : (
+        /* Card sits in the stack CSS context so its styles apply correctly */
+        <button
+          type="button"
+          onClick={() => setModalOpen(true)}
+          className="focus:outline-none"
+          style={{ background: 'none', border: 'none', padding: 0 }}
+          aria-label="View your full profile"
+        >
+          <div style={{ pointerEvents: 'none' }}>
+            <SwipeCard profile={profile} />
+          </div>
+        </button>
+      )}
 
       <div className="flex flex-col items-center gap-3">
         <button

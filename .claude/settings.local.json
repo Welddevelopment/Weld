@@ -17,7 +17,11 @@
       "Bash(python3 -c ' *)",
       "Bash(git commit *)",
       "Bash(git add *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(xargs grep *)",
+      "Bash(grep -v \"^.*:.*{$\")",
+      "Bash(grep -v \"^\\\\s*//\")",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\joelj\\\\OneDrive\\\\Documents\\\\weld-app\\\\src\\\\components\\\\profile\\\\steps\" -Name)"
     ],
     "additionalDirectories": [
       "C:\\Users\\joelj\\OneDrive\\Documents\\weld-app\\src\\components",

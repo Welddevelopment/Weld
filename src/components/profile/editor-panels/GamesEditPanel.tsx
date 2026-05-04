@@ -15,7 +15,7 @@ interface Props {
 }
 
 function emptyGame(): TopGame {
-  return { emoji: 'Game', title: '', desc: '', plays: '', topCcu: '', currentCcu: '', imageUrl: '', gameUrl: '', skills: [], genre: '', likes: '', updatedAgo: '' }
+  return { emoji: 'Game', title: '', desc: '', plays: '', topCcu: '', currentCcu: '', imageUrl: '', gameUrl: '', skills: [] }
 }
 
 export default function GamesEditPanel({ draft, update, onClose }: Props) {
@@ -151,11 +151,6 @@ export default function GamesEditPanel({ draft, update, onClose }: Props) {
               <input className="pb-panel-input" placeholder="Total visits" value={g.plays} onChange={e => change(i, { ...g, plays: e.target.value })} />
               <input className="pb-panel-input" placeholder="Peak CCU" value={g.topCcu} onChange={e => change(i, { ...g, topCcu: e.target.value })} />
               <input className="pb-panel-input" placeholder="Current CCU" value={g.currentCcu} onChange={e => change(i, { ...g, currentCcu: e.target.value })} />
-            </div>
-            <div className="pb-panel-row3">
-              <input className="pb-panel-input" placeholder="Genre (e.g. Adventure RPG)" value={g.genre ?? ''} onChange={e => change(i, { ...g, genre: e.target.value })} />
-              <input className="pb-panel-input" placeholder="Likes % (e.g. 92%)" value={g.likes ?? ''} onChange={e => change(i, { ...g, likes: e.target.value })} />
-              <input className="pb-panel-input" placeholder="Last updated (e.g. 2d ago)" value={g.updatedAgo ?? ''} onChange={e => change(i, { ...g, updatedAgo: e.target.value })} />
             </div>
           </div>
         ))}

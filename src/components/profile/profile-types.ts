@@ -100,6 +100,14 @@ function profileSkillsFromDraft(skills: ProfileSkillDraft[]) {
   }))
 }
 
+function gamesWithoutSkills(games: TopGame[]) {
+  return games.map(game => {
+    const next = { ...game }
+    delete next.skills
+    return next
+  })
+}
+
 function parseExperienceYears(profile: PreviewProfile) {
   if (profile.role.includes('<1yr')) return 0
   const match = profile.role.match(/(\d+)yr/)
@@ -155,7 +163,7 @@ export function profileToDraft(profile: PreviewProfile): ProfileDraft {
     portfolioLinks: profile.portfolio?.links ?? [],
     socials: profile.socials ?? [],
     bestWork: profile.bestWork ?? [],
-    topGames: profile.topGames ?? [],
+    topGames: isDev ? (profile.topGames ?? []) : gamesWithoutSkills(profile.topGames ?? []),
   }
 }
 
@@ -209,7 +217,7 @@ export function draftToProfile(draft: ProfileDraft, id: string): PreviewProfile 
       name,
       description: draft.skillDescriptions[name] ?? '',
     }))
-    if (draft.topGames.length > 0) profile.topGames = draft.topGames
+    if (draft.topGames.length > 0) profile.topGames = gamesWithoutSkills(draft.topGames)
     profile.hiring = draft.hiring
     if (draft.rateMin !== null) profile.rateMin = draft.rateMin
     if (draft.rateMax !== null) profile.rateMax = draft.rateMax

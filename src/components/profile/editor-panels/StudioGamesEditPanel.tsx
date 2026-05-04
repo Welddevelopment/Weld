@@ -1,12 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import { ProfileDraft } from '../profile-types'
 import { TopGame } from '@/components/matching-preview/preview-types'
-import { DEV_SKILL_DESCS } from '@/components/matching-preview/preview-data'
-
-const SKILL_OPTIONS = Object.keys(DEV_SKILL_DESCS)
-const MAX_GAME_SKILLS = 3
 
 interface Props {
   draft: ProfileDraft
@@ -24,7 +19,6 @@ function emptyGame(): TopGame {
     currentCcu: '',
     imageUrl: '',
     gameUrl: '',
-    skills: [],
     genre: '',
     likes: '',
     updatedAgo: '',
@@ -34,46 +28,18 @@ function emptyGame(): TopGame {
 export default function StudioGamesEditPanel({ draft, update, onClose }: Props) {
   const games = draft.topGames
 
-  const [openPicker, setOpenPicker] = useState<Set<number>>(
-    () => new Set(games.length === 0 ? [] : games.map((_, i) => i).filter(i => !games[i].title))
-  )
-
   const add = () => {
-    const nextIdx = games.length
     update({ topGames: [...games, emptyGame()] })
-    setOpenPicker(prev => new Set([...prev, nextIdx]))
   }
 
   const remove = (i: number) => {
     update({ topGames: games.filter((_, idx) => idx !== i) })
-    setOpenPicker(prev => {
-      const next = new Set<number>()
-      prev.forEach(idx => { if (idx < i) next.add(idx); else if (idx > i) next.add(idx - 1) })
-      return next
-    })
   }
 
   const change = (i: number, g: TopGame) => {
-    const next = [...games]; next[i] = g; update({ topGames: next })
-  }
-
-  const toggleSkill = (i: number, g: TopGame, skill: string) => {
-    const current = g.skills ?? []
-    const hasSkill = current.includes(skill)
-    const nextSkills = hasSkill
-      ? current.filter(name => name !== skill)
-      : current.length < MAX_GAME_SKILLS
-        ? [...current, skill]
-        : current
-    change(i, { ...g, skills: nextSkills, emoji: nextSkills[0] ?? g.emoji })
-  }
-
-  const togglePicker = (i: number) => {
-    setOpenPicker(prev => {
-      const next = new Set(prev)
-      if (next.has(i)) next.delete(i); else next.add(i)
-      return next
-    })
+    const next = [...games]
+    next[i] = g
+    update({ topGames: next })
   }
 
   return (
@@ -94,37 +60,8 @@ export default function StudioGamesEditPanel({ draft, update, onClose }: Props) 
           <div key={i} className="pb-entry-card">
             <div className="pb-entry-card-header">
               <span className="pb-entry-card-label">Game {i + 1}</span>
-              <button
-                type="button"
-                className="pb-category-pill"
-                onClick={() => togglePicker(i)}
-                title="Edit game skills"
-              >
-                {(g.skills && g.skills.length > 0) ? g.skills.join(', ') : 'Add skills'}
-                <span className="pb-category-pill-dots">···</span>
-              </button>
               <button type="button" className="pb-entry-card-remove" onClick={() => remove(i)}>Remove</button>
             </div>
-
-            {openPicker.has(i) && (
-              <div className="pb-emoji-row">
-                {SKILL_OPTIONS.map(skill => {
-                  const selected = g.skills?.includes(skill)
-                  const disabled = !selected && (g.skills?.length ?? 0) >= MAX_GAME_SKILLS
-                  return (
-                    <button
-                      key={skill}
-                      type="button"
-                      className={`pb-emoji-btn${selected ? ' pb-emoji-btn--on' : ''}${disabled ? ' pb-emoji-btn--disabled' : ''}`}
-                      onClick={() => toggleSkill(i, g, skill)}
-                      disabled={disabled}
-                    >
-                      {skill}
-                    </button>
-                  )
-                })}
-              </div>
-            )}
 
             <div className="pb-image-row">
               {g.imageUrl && (
