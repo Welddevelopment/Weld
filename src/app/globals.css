@@ -2943,21 +2943,23 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .npc-game-item {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 16px 0;
-  border-bottom: 1px solid #f0f0f0;
+  height: 250px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  border: 1px solid #ebebeb;
+  background: #fff;
+  overflow: hidden;
+  margin-bottom: 10px;
 }
-.npc-game-item:last-child { border-bottom: none; }
-/* Square — Roblox game icons are 512×512 */
+.npc-game-item:last-child { margin-bottom: 0; }
 .npc-game-thumb {
   width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 10px;
+  height: 88px;
+  flex-shrink: 0;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
 .npc-game-thumb img { width: 100%; height: 100%; object-fit: cover; }
 .npc-game-thumb-cat {
@@ -2965,8 +2967,14 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   font-weight: 700;
   letter-spacing: 0.05em;
 }
-.npc-game-copy { min-width: 0; }
-.npc-game-title { font-size: 16px; font-weight: 800; color: #111; margin: 0 0 3px; line-height: 1.2; }
+.npc-game-copy {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px 12px 12px;
+}
+.npc-game-copy::-webkit-scrollbar { display: none; }
+.npc-game-title { font-size: 14px; font-weight: 800; color: #111; margin: 0 0 3px; line-height: 1.2; }
 .npc-game-url {
   font-size: 11px;
   color: #4444EE;
@@ -2984,9 +2992,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .npc-game-stat { display: flex; flex-direction: column; gap: 1px; }
 .npc-game-stat-val { font-size: 13px; font-weight: 800; color: #111; line-height: 1; }
 .npc-game-stat-lbl { font-size: 9px; color: #bbb; text-transform: uppercase; letter-spacing: 0.04em; }
-.npc-game-tags { display: flex; gap: 5px; flex-wrap: wrap; }
-.npc-game-tag { font-size: 10px; padding: 3px 10px; border-radius: 999px; font-weight: 600; }
-.npc-game-desc { font-size: 11px; color: #888; margin: 6px 0 0; line-height: 1.5; }
+.npc-game-desc { font-size: 11px; color: #888; margin: 4px 0 0; line-height: 1.5; }
 
 /* Work panel items */
 .npc-work-item {

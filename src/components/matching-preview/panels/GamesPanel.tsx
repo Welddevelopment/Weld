@@ -39,7 +39,6 @@ export default function GamesPanel({ profile, onBack }: Props) {
           const color = CATEGORY_COLOR[label] ?? '#818cf8'
           return (
             <div key={i} className="npc-game-item">
-              {/* 16:9 thumbnail — Roblox screenshots are 768×432 */}
               <div className="npc-game-thumb" style={{ background: `${color}18` }}>
                 {game.imageUrl
                   ? <img src={game.imageUrl} alt={game.title} />
@@ -83,18 +82,6 @@ export default function GamesPanel({ profile, onBack }: Props) {
                     )}
                   </div>
                 )}
-
-                <div className="npc-game-tags">
-                  {game.skills?.length ? game.skills.map(skill => (
-                    <span key={skill} className="npc-game-tag" style={{ background: `${color}18`, color }}>
-                      {skill}
-                    </span>
-                  )) : game.emoji && (
-                    <span className="npc-game-tag" style={{ background: `${color}18`, color }}>
-                      {game.emoji}
-                    </span>
-                  )}
-                </div>
 
                 {game.desc && (
                   <p className="npc-game-desc">{game.desc}</p>
