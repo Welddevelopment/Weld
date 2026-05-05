@@ -10441,9 +10441,10 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
    ============================================================ */
 
 .weld-glass-page .hero-shell-split .hero-shell-grid {
-  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
-  gap: clamp(28px, 4vw, 56px);
+  grid-template-columns: minmax(0, 500px) minmax(0, 420px);
+  gap: clamp(28px, 3vw, 48px);
   align-items: start;
+  justify-content: center;
 }
 
 .weld-glass-page .hero-shell-split .hero-shell-bloom {
@@ -10454,6 +10455,10 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 .weld-glass-page .hero-card-column-split {
   position: relative;
+}
+
+.weld-glass-page .hero-card-column-split .npc-hero-preview-container {
+  margin-inline: 0;
 }
 
 .weld-glass-page .hero-talent-card.hero-talent-card-split {
