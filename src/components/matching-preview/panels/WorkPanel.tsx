@@ -36,7 +36,7 @@ export default function WorkPanel({ profile, onBack }: Props) {
             const color = ICON_COLORS[i % ICON_COLORS.length]
             return (
               <div key={i} className="npc-work-item">
-                <div className="npc-work-icon" style={{ background: `${color}22`, color }}>
+                <div className="npc-work-icon" style={{ background: `${color}22`, color, aspectRatio: '16/9' }}>
                   {item.imageUrl ? (
                     <img src={item.imageUrl} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 10 }} />
                   ) : (

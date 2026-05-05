@@ -77,24 +77,40 @@ const GAME_MARKS = ['RBX', 'TOP', 'WIN', 'EXP', 'PVP', 'HIT']
 const GENRES = ['adventure', 'battler', 'social', 'sim', 'racing']
 
 const GAMES = [
-  { title: 'Jailbreak', placeId: 606849621, url: 'https://www.roblox.com/games/606849621/Jailbreak' },
-  { title: 'Adopt Me!', placeId: 920587237, url: 'https://www.roblox.com/games/920587237/Adopt-Me' },
-  { title: 'Arsenal', placeId: 286090429, url: 'https://www.roblox.com/games/286090429/Arsenal' },
   { title: 'Blox Fruits', placeId: 2753915549, url: 'https://www.roblox.com/games/2753915549/Blox-Fruits' },
+  { title: 'Jailbreak', placeId: 606849621, url: 'https://www.roblox.com/games/606849621/Jailbreak' },
+  { title: 'Arsenal', placeId: 286090429, url: 'https://www.roblox.com/games/286090429/Arsenal' },
+  { title: 'Adopt Me!', placeId: 920587237, url: 'https://www.roblox.com/games/920587237/Adopt-Me' },
   { title: 'Brookhaven 🏡RP', placeId: 185655149, url: 'https://www.roblox.com/games/185655149/Brookhaven-RP' },
+  { title: 'Slap Battles', placeId: 6403373529, url: 'https://www.roblox.com/games/6403373529/Slap-Battles' },
+  { title: 'Build a Boat for Treasure', placeId: 537413528, url: 'https://www.roblox.com/games/537413528/Build-a-Boat-for-Treasure' },
+  { title: 'Fishing Simulator', placeId: 1623582750, url: 'https://www.roblox.com/games/1623582750/Fishing-Simulator' },
+  { title: 'Lumber Tycoon 2', placeId: 207517599, url: 'https://www.roblox.com/games/207517599/Lumber-Tycoon-2' },
   { title: 'Murder Mystery 2', placeId: 142823291, url: 'https://www.roblox.com/games/142823291/Murder-Mystery-2' },
-  { title: 'Pet Simulator X', placeId: 6284583030, url: 'https://www.roblox.com/games/6284583030/Pet-Simulator-X' },
   { title: 'Royale High', placeId: 735030788, url: 'https://www.roblox.com/games/735030788/Royale-High' },
-  { title: 'Work at a Pizza Place', placeId: 192800, url: 'https://www.roblox.com/games/192800/Work-at-a-Pizza-Place' },
-  { title: 'MeepCity', placeId: 370731277, url: 'https://www.roblox.com/games/370731277/MeepCity' },
-  { title: 'Tower of Hell', placeId: 1962086868, url: 'https://www.roblox.com/games/1962086868/Tower-of-Hell' },
-  { title: 'Tower Defense Simulator', placeId: 3260590327, url: 'https://www.roblox.com/games/3260590327/Tower-Defense-Simulator' },
+  { title: 'Natural Disaster Survival', placeId: 189707, url: 'https://www.roblox.com/games/189707/Natural-Disaster-Survival' },
+]
+
+const WORK_GAME_IDS = [
+  2753915549,  // Blox Fruits - combat systems
+  606849621,   // Jailbreak - heist gameplay
+  286090429,   // Arsenal - action/competitive
+  920587237,   // Adopt Me - social systems
+  185655149,   // Brookhaven - roleplay
+  6403373529,  // Slap Battles - minigame/competitive
+  537413528,   // Build a Boat - building
+  1623582750,  // Fishing Simulator - systems
+  207517599,   // Lumber Tycoon 2 - economy
+  142823291,   // Murder Mystery 2 - game design
+  735030788,   // Royale High - UI/UX
+  189707,      // Natural Disaster - effects/systems
 ]
 
 function devWork(tags: string[], idx: number) {
   return tags.slice(0, 3).map((tag, offset) => {
     const sp = SKILL_PORTFOLIO[tag]
     const ti = (idx + offset) % 3
+    const gameId = WORK_GAME_IDS[(idx + offset) % WORK_GAME_IDS.length]
     return {
       emoji: WORK_MARKS[(idx + offset) % WORK_MARKS.length],
       title: sp ? sp.titles[ti] : `${tag} commission`,
@@ -103,6 +119,7 @@ function devWork(tags: string[], idx: number) {
       time:  `${2 + ((idx + offset) % 5)} weeks`,
       amount: `${700 + (idx + offset) * 250}`,
       plays: `${4 + ((idx * 13 + offset * 9) % 42)}M`,
+      imageUrl: `https://www.roblox.com/asset-thumbnail/image?assetId=${gameId}&width=432&height=243&format=png`,
     }
   })
 }
