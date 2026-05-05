@@ -10959,22 +10959,27 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .npc-social-btn {
   width: 34px;
   height: 34px;
-  border-radius: 50%;
+  border-radius: 8px;
   background: #f5f5f5;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, color 0.15s;
   flex-shrink: 0;
   text-decoration: none;
   color: #444;
-  font-size: 13px;
-  font-weight: 700;
 }
 
-.npc-social-btn:hover { background: #ebebeb; }
+.npc-social-roblox { color: #e02020; }
+.npc-social-discord { color: #5865f2; }
+.npc-social-x { color: #000; }
+
+.npc-social-btn:hover { background: #e8e8e8; }
+.npc-social-roblox:hover { background: #fde8e8; }
+.npc-social-discord:hover { background: #eaebfd; }
+.npc-social-x:hover { background: #e8e8e8; }
 
 .npc-portfolio-top-link {
   display: flex;
