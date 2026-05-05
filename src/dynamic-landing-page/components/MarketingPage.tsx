@@ -36,6 +36,7 @@ import {
   type RoleKey,
   type TalentProfile
 } from "@/dynamic-landing-page/lib/role-config";
+import SwipeCard from "@/components/matching-preview/SwipeCard";
 
 interface MarketingPageProps {
   initialMode: Audience;
@@ -86,6 +87,7 @@ function WeldLandingPage({
   const [captureStatus, setCaptureStatus] = useState("");
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [isSwapping, setIsSwapping] = useState(false);
+  const [swipeModalOpen, setSwipeModalOpen] = useState(false);
   const captureRef = useRef<HTMLDivElement | null>(null);
   const pageShellRef = useRef<HTMLDivElement | null>(null);
 
@@ -298,13 +300,40 @@ function WeldLandingPage({
         onJoinClick={() => handleJoinIntent("nav")}
       />
 
+      {swipeModalOpen && (
+        <div
+          className="swipe-modal-overlay"
+          onClick={(e) => { if (e.target === e.currentTarget) setSwipeModalOpen(false); }}
+        >
+          <div className="swipe-modal-inner">
+            <button
+              className="swipe-modal-close"
+              onClick={() => setSwipeModalOpen(false)}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+            <SwipeCard />
+          </div>
+        </div>
+      )}
+
       <main className="weld-glass-main">
         <HeroShell>
-          <HeroTalentCard
-            profile={activeProfile}
-            swipeState={swipeState}
-            isSwapping={isSwapping}
-          />
+          <div className="hero-card-column hero-card-column-split">
+            <div className="npc-hero-preview-container">
+              <div className="npc-hero-preview-card" aria-hidden="true">
+                <SwipeCard />
+              </div>
+              <button
+                className="npc-hero-preview-trigger"
+                onClick={() => setSwipeModalOpen(true)}
+                aria-label="Open interactive profile card"
+              >
+                <span className="npc-hero-preview-hint">Tap to interact →</span>
+              </button>
+            </div>
+          </div>
           <HeroCopyPanel copy={modeCopy} />
         </HeroShell>
 

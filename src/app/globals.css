@@ -10779,3 +10779,697 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* ── Swipe card (npc-*) component ──────────────────────────────────────────── */
+
+.npc-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  user-select: none;
+}
+
+.npc-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.npc-sparks-count {
+  color: #4ade80;
+  font-weight: 700;
+}
+
+.mock-card-shell {
+  width: 380px;
+  height: 628px;
+  position: relative;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.mock-card-shell.like-flash .npc-overlay--like,
+.mock-card-shell.nope-flash .npc-overlay--nope {
+  display: flex;
+  opacity: 1;
+}
+
+.mock-card-shell.fly-right {
+  transform: translateX(200px) rotate(12deg);
+  opacity: 0;
+}
+
+.mock-card-shell.fly-left {
+  transform: translateX(-200px) rotate(-12deg);
+  opacity: 0;
+}
+
+.npc-wrap {
+  width: 380px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.npc-card {
+  background: #ffffff;
+  border-radius: 20px 20px 0 0;
+  overflow: hidden;
+  height: 560px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.npc-action-bar {
+  display: flex;
+  background: #ffffff;
+  border-radius: 0 0 20px 20px;
+  border-top: 1px solid #f0f0f0;
+  height: 68px;
+  flex-shrink: 0;
+}
+
+.npc-action-seg {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+  padding: 0;
+}
+
+.npc-action-seg:hover { background: rgba(0,0,0,0.04); }
+.npc-action-seg:first-child { border-radius: 0 0 0 20px; }
+.npc-action-seg:last-child { border-radius: 0 0 20px 0; }
+
+.npc-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  border-radius: 20px 20px 0 0;
+  align-items: flex-start;
+  padding: 20px;
+  pointer-events: none;
+}
+
+.npc-overlay--like { justify-content: flex-end; background: rgba(61,199,122,0.10); }
+.npc-overlay--nope { justify-content: flex-start; background: rgba(232,70,36,0.10); }
+
+.npc-stamp {
+  border-width: 3px;
+  border-style: solid;
+  font-weight: 900;
+  font-size: 20px;
+  padding: 4px 16px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-family: var(--font-geist-mono);
+}
+
+.npc-stamp--like { border-color: #3DC77A; color: #3DC77A; transform: rotate(-15deg); }
+.npc-stamp--nope { border-color: #E84624; color: #E84624; transform: rotate(15deg); }
+
+.npc-top { display: flex; gap: 12px; padding: 16px 16px 0; align-items: flex-start; }
+
+.npc-avatar-wrap {
+  width: 110px;
+  height: 110px;
+  border-radius: 14px;
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.npc-avatar-bg { position: absolute; inset: 0; }
+
+.npc-avatar-initials {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+}
+
+.npc-avatar-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+.npc-online-dot {
+  position: absolute;
+  bottom: 7px;
+  right: 7px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #3DC77A;
+  border: 2.5px solid #fff;
+  z-index: 2;
+}
+
+.npc-top-right { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; align-items: flex-start; }
+
+.npc-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: #f6f6f6;
+  border-radius: 10px;
+  padding: 8px 2px;
+  gap: 0;
+  width: 100%;
+}
+
+.npc-stat { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 0 2px; }
+.npc-stat-icon { color: #4444EE; display: flex; align-items: center; justify-content: center; }
+.npc-stat-icon svg { width: 13px; height: 13px; }
+.npc-stat-val { font-size: 12px; font-weight: 800; color: #111; line-height: 1; text-align: center; }
+.npc-stat-lbl { font-size: 9px; color: #999; text-align: center; line-height: 1.2; }
+
+.npc-socials { display: flex; gap: 7px; margin-top: 6px; }
+
+.npc-social-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+  text-decoration: none;
+  color: #444;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.npc-social-btn:hover { background: #ebebeb; }
+
+.npc-portfolio-top-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 10px;
+  font-family: var(--font-geist-mono);
+  font-weight: 600;
+  color: #4444EE;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.npc-portfolio-top-link:hover { text-decoration: underline; }
+
+.npc-identity { padding: 12px 16px 0; }
+.npc-name-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.npc-name { font-size: 26px; font-weight: 800; color: #111; margin: 0; line-height: 1.1; }
+.npc-verified { color: #4444EE; display: flex; align-items: center; flex-shrink: 0; }
+.npc-verified svg { width: 20px; height: 20px; }
+.npc-role { font-size: 15px; color: #4444EE; font-weight: 500; margin: 0; }
+
+.npc-divider { height: 1px; background: #f0f0f0; margin: 12px 16px; }
+
+.npc-bio {
+  flex: 1;
+  min-height: 60px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  margin: 0 16px;
+  padding: 10px 12px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #333;
+  background: #f8f8ff;
+  border: 1px solid #eeeef8;
+  border-radius: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: #ddd transparent;
+}
+
+.npc-bio::-webkit-scrollbar { width: 4px; }
+.npc-bio::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+
+.npc-rate-skills { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px 0; flex-shrink: 0; }
+
+.npc-rate-pill {
+  background: rgba(100,80,255,0.09);
+  border-radius: 12px;
+  padding: 10px 14px;
+  flex-shrink: 0;
+  min-width: 108px;
+}
+
+.npc-rate-amount { font-size: 17px; font-weight: 800; color: #111; line-height: 1; }
+.npc-rate-type { font-size: 10px; color: #888; margin-top: 4px; line-height: 1.3; }
+
+.npc-skills-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.npc-skill-chip {
+  font-size: 11px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1.5px solid #e0e0e0;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.npc-skill-chip:hover,
+.npc-skill-chip--active {
+  border-color: #4444EE;
+  color: #4444EE;
+  background: rgba(68,68,238,0.05);
+}
+
+.npc-entries {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  padding: 12px 16px 16px;
+  flex-shrink: 0;
+}
+
+.npc-entry-btn {
+  background: #f7f7ff;
+  border: 1.5px solid #e8e8f5;
+  border-radius: 14px;
+  padding: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.npc-entry-btn:hover { background: #eeeeff; border-color: #c0c0f0; }
+.npc-entry-btn--active { border-color: rgba(68,68,238,0.35); background: rgba(68,68,238,0.05); }
+.npc-entry-btn--active .npc-entry-icon,
+.npc-entry-btn--active .npc-entry-title { color: #4444EE; }
+
+.npc-entry-icon { color: #4444EE; margin-bottom: 8px; display: flex; }
+.npc-entry-icon svg { width: 22px; height: 22px; }
+.npc-entry-title { font-size: 13px; font-weight: 700; color: #111; margin-bottom: 2px; }
+.npc-entry-sub { font-size: 10px; color: #4444EE; display: flex; align-items: center; gap: 3px; }
+
+.npc-stack-row { display: flex; gap: 16px; align-items: flex-start; }
+
+.npc-panel {
+  width: 380px;
+  height: 628px;
+  background: #ffffff;
+  color: #111;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+  animation: npc-panel-in 0.22s ease-out;
+}
+
+.npc-panel--relative { position: relative; }
+
+@keyframes npc-panel-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.npc-panel-hd { padding: 16px 16px 0; flex-shrink: 0; }
+
+.npc-panel-back {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 10px;
+}
+
+.npc-panel-back svg { width: 14px; height: 14px; }
+.npc-panel-title { font-size: 20px; font-weight: 800; color: #111; margin: 0 0 2px; }
+.npc-panel-sub { font-size: 12px; color: #999; margin: 0 0 12px; }
+
+.npc-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px 16px;
+  scrollbar-width: none;
+}
+
+.npc-panel-body::-webkit-scrollbar { display: none; }
+
+.npc-game-item {
+  display: flex;
+  flex-direction: column;
+  height: 250px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  border: 1px solid #ebebeb;
+  background: #fff;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.npc-game-item:last-child { margin-bottom: 0; }
+
+.npc-game-thumb {
+  width: 100%;
+  height: 88px;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.npc-game-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.npc-game-thumb-cat { font-size: 13px; font-weight: 700; letter-spacing: 0.05em; }
+
+.npc-game-copy { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 12px 12px; }
+.npc-game-copy::-webkit-scrollbar { display: none; }
+
+.npc-game-title { font-size: 14px; font-weight: 800; color: #111; margin: 0 0 3px; line-height: 1.2; }
+
+.npc-game-url {
+  font-size: 11px;
+  color: #4444EE;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.npc-game-url svg { width: 10px; height: 10px; flex-shrink: 0; }
+.npc-game-stats { display: flex; gap: 16px; margin-bottom: 8px; }
+.npc-game-stat { display: flex; flex-direction: column; gap: 1px; }
+.npc-game-stat-val { font-size: 13px; font-weight: 800; color: #111; line-height: 1; }
+.npc-game-stat-lbl { font-size: 9px; color: #bbb; text-transform: uppercase; letter-spacing: 0.04em; }
+.npc-game-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+.npc-game-tag { font-size: 10px; padding: 3px 9px; border-radius: 999px; font-weight: 600; }
+.npc-game-desc { font-size: 11px; color: #888; margin: 4px 0 0; line-height: 1.5; }
+
+.npc-skill-hd { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+
+.npc-skill-icon-box {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.npc-skill-hd-copy { flex: 1; }
+.npc-skill-hd-name { font-size: 22px; font-weight: 800; color: #111; margin: 0 0 2px; }
+.npc-skill-hd-cat { font-size: 13px; color: #4444EE; font-weight: 500; margin-bottom: 6px; }
+
+.npc-skill-refs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+
+.npc-skill-ref-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #4444EE;
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: #f0f0ff;
+  border: 1px solid #ddddf5;
+  cursor: pointer;
+}
+
+.npc-skill-ref-link svg { width: 12px; height: 12px; }
+
+.npc-section-title { font-size: 13px; font-weight: 700; color: #111; margin: 0 0 10px; }
+.npc-cap-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+
+.npc-cap-card {
+  background: #f7f7ff;
+  border: 1.5px solid #e8e8f5;
+  border-radius: 12px;
+  padding: 12px;
+  min-height: 88px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.npc-cap-card:hover { background: #eeeeff; border-color: #c0c0f0; }
+.npc-cap-name { font-size: 13px; font-weight: 700; color: #111; margin-bottom: 5px; }
+.npc-cap-desc { font-size: 11.5px; color: #666; line-height: 1.5; }
+
+.npc-stat-box {
+  flex: 1;
+  background: #f7f7ff;
+  border: 1.5px solid #e8e8f5;
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.npc-stat-box-val { font-size: 15px; font-weight: 700; color: #111; }
+.npc-stat-box-lbl { font-size: 10px; color: #999; margin-top: 2px; }
+
+.npc-cat-popup-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  background: rgba(0,0,0,0.12);
+}
+
+.npc-cat-popup {
+  background: #fff;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.22);
+  width: 100%;
+  min-height: 320px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.npc-cat-popup-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.06);
+  color: #666;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.npc-cat-popup-close:hover { background: rgba(0,0,0,0.1); }
+.npc-cat-popup-name { font-size: 20px; font-weight: 800; color: #111; margin-bottom: 12px; padding-right: 36px; }
+
+.npc-cat-popup-desc {
+  font-size: 13px;
+  color: #444;
+  line-height: 1.65;
+  margin: 0 0 16px;
+  height: 180px;
+  flex-shrink: 0;
+  background: #f8f8ff;
+  border: 1px solid #eeeef8;
+  border-radius: 12px;
+  padding: 10px 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  scrollbar-width: thin;
+  scrollbar-color: #ddd transparent;
+}
+
+.npc-cat-popup-stats { display: flex; gap: 10px; }
+
+.npc-cat-popup-stat {
+  flex: 1;
+  background: #f7f7ff;
+  border: 1.5px solid #e8e8f5;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.npc-cat-popup-stat-val { font-size: 17px; font-weight: 700; color: #111; }
+.npc-cat-popup-stat-lbl { font-size: 10px; color: #999; margin-top: 2px; }
+
+/* Toast */
+.npc-preview-toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30,30,30,0.92);
+  color: #fff;
+  font-size: 13px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 9999;
+  white-space: nowrap;
+  animation: npc-toast-in 0.18s ease-out;
+}
+
+@keyframes npc-toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Modal overlay */
+.swipe-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: auto;
+}
+
+.swipe-modal-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.swipe-modal-close {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  z-index: 1001;
+}
+
+.swipe-modal-close:hover { background: rgba(255,255,255,0.22); }
+
+/* Hero swipe preview — constrain card width inside the glass hero column */
+.weld-glass-page .npc-hero-preview-container,
+.weld-glass-page .npc-hero-preview-container .mock-card-shell,
+.weld-glass-page .npc-hero-preview-container .npc-wrap,
+.weld-glass-page .npc-hero-preview-container .npc-panel {
+  max-width: 100%;
+}
+
+.weld-glass-page .npc-hero-preview-container {
+  overflow: hidden;
+  border-radius: 20px;
+}
+.npc-hero-preview-container {
+  position: relative;
+  width: 380px;
+}
+
+.npc-hero-preview-card {
+  pointer-events: none;
+}
+
+.npc-hero-preview-trigger {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 80px;
+  transition: background 0.18s;
+}
+
+.npc-hero-preview-trigger:hover {
+  background: rgba(68,68,238,0.04);
+}
+
+.npc-hero-preview-trigger:focus-visible {
+  outline: 3px solid #4444EE;
+  outline-offset: 4px;
+}
+
+.npc-hero-preview-hint {
+  background: #4444EE;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 18px;
+  border-radius: 999px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.18s;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(68,68,238,0.4);
+}
+
+.npc-hero-preview-trigger:hover .npc-hero-preview-hint,
+.npc-hero-preview-trigger:focus-visible .npc-hero-preview-hint {
+  opacity: 1;
+}
