@@ -116,7 +116,7 @@ const SKILLS: Skill[] = [
   },
 ]
 
-// Wide game thumbnails (480×270) — Blox Fruits, Arsenal, Adopt Me
+// Wide game thumbnails (16:9) — Popular Roblox games
 const TOP_GAMES = [
   {
     title: "Blox Fruits",
@@ -128,26 +128,26 @@ const TOP_GAMES = [
     skills: ["Scripting", "DataStore"],
   },
   {
-    title: "Arsenal",
-    desc: "Competitive shooter with responsive UI, replicated hit indicators, and polished weapon feedback.",
-    plays: "11M",
-    topCcu: "9K",
-    currentCcu: "1.9K",
+    title: "Jailbreak",
+    desc: "Action-packed prison break game with cops & robbers gameplay, vehicles, and dynamic heists.",
+    plays: "8.9M",
+    topCcu: "12K",
+    currentCcu: "3.2K",
     thumbnailUrl: "https://tr.rbxcdn.com/180DAY-72e3bf7380cc3afa336d930623036561/768/432/Image/Png/noFilter",
-    skills: ["UI Design", "Scripting"],
+    skills: ["Scripting", "VFX"],
   },
   {
     title: "Adopt Me!",
-    desc: "Social simulation with a thriving live economy, pet progression, and engaging onboarding flows.",
+    desc: "Social simulation with thriving live economy, pet progression, and engaging discovery flows.",
     plays: "8M",
     topCcu: "6K",
     currentCcu: "1.2K",
     thumbnailUrl: "https://tr.rbxcdn.com/180DAY-2d1bce8a7bbdcdd0e6dc378c7b6f566c/768/432/Image/Png/noFilter",
-    skills: ["VFX", "Scripting"],
+    skills: ["UI Design", "Scripting"],
   },
 ]
 
-// Wide work thumbnails (768×432) used as work-item thumbnails — Blox Fruits, Arsenal, Adopt Me
+// Wide work thumbnails (16:9) — showcase projects with full 16:9 aspect ratio
 const BEST_WORK = [
   {
     title: "Combat system & DataStore",
