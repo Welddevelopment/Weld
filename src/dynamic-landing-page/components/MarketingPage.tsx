@@ -334,7 +334,16 @@ function WeldLandingPage({
               </button>
             </div>
           </div>
-          <HeroCopyPanel copy={modeCopy} />
+          <HeroCopyPanel
+            copy={modeCopy}
+            mode={mode}
+            pending={isPending}
+            onModeChange={handleModeChange}
+            email={email}
+            capturePhase={capturePhase}
+            onEmailChange={setEmail}
+            onSubmit={() => void handleCapture()}
+          />
         </HeroShell>
 
         <HowItWorksStrip copy={modeCopy} />
@@ -449,10 +458,31 @@ function HeroShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function HeroCopyPanel({ copy }: { copy: LandingCopy }) {
+function HeroCopyPanel({
+  copy,
+  mode,
+  pending,
+  onModeChange,
+  email,
+  capturePhase,
+  onEmailChange,
+  onSubmit
+}: {
+  copy: LandingCopy;
+  mode: Audience;
+  pending?: boolean;
+  onModeChange: (mode: Audience) => void;
+  email: string;
+  capturePhase: CapturePhase;
+  onEmailChange: (v: string) => void;
+  onSubmit: () => void;
+}) {
+  const isSubmitting = capturePhase === "submitting";
+  const isSuccess = capturePhase === "success";
+
   return (
     <div className="hero-copy-panel hero-copy-panel-split">
-      <span className="hero-mode-pill">I&apos;m a developer</span>
+      <ModeToggle mode={mode} disabled={pending} onChange={onModeChange} />
       <h1>The talent network for Roblox.</h1>
       <p className="hero-lead">
         Link your games, set your rate, and match with studios that actually ship.
@@ -461,6 +491,25 @@ function HeroCopyPanel({ copy }: { copy: LandingCopy }) {
         weld. turns shipped work, rates, availability, links, and proof into swipeable talent
         cards studios can trust.
       </p>
+      <div className="hero-capture-row">
+        <input
+          className="hero-capture-input"
+          type="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={(e) => onEmailChange(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && onSubmit()}
+          disabled={isSubmitting || isSuccess}
+          aria-label="Email address"
+        />
+        <button
+          className="hero-capture-btn button-primary"
+          onClick={onSubmit}
+          disabled={isSubmitting || isSuccess}
+        >
+          {isSuccess ? "You're in ✓" : isSubmitting ? "Joining…" : "Join the beta"}
+        </button>
+      </div>
       <span className="hero-copy-eyebrow-hidden" aria-hidden="true">
         {copy.hero.eyebrow}
       </span>
