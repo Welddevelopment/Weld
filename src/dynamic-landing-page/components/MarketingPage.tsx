@@ -320,6 +320,13 @@ function WeldLandingPage({
 
       <main className="weld-glass-main">
         <HeroShell>
+          <HeroCopyPanel
+            copy={modeCopy}
+            email={email}
+            capturePhase={capturePhase}
+            onEmailChange={setEmail}
+            onSubmit={() => void handleCapture()}
+          />
           <div className="hero-card-column hero-card-column-split">
             <div className="npc-hero-preview-container">
               <div className="npc-hero-preview-card" aria-hidden="true">
@@ -334,16 +341,6 @@ function WeldLandingPage({
               </button>
             </div>
           </div>
-          <HeroCopyPanel
-            copy={modeCopy}
-            mode={mode}
-            pending={isPending}
-            onModeChange={handleModeChange}
-            email={email}
-            capturePhase={capturePhase}
-            onEmailChange={setEmail}
-            onSubmit={() => void handleCapture()}
-          />
         </HeroShell>
 
         <HowItWorksStrip copy={modeCopy} />
@@ -460,18 +457,12 @@ function HeroShell({ children }: { children: React.ReactNode }) {
 
 function HeroCopyPanel({
   copy,
-  mode,
-  pending,
-  onModeChange,
   email,
   capturePhase,
   onEmailChange,
   onSubmit
 }: {
   copy: LandingCopy;
-  mode: Audience;
-  pending?: boolean;
-  onModeChange: (mode: Audience) => void;
   email: string;
   capturePhase: CapturePhase;
   onEmailChange: (v: string) => void;
@@ -482,7 +473,6 @@ function HeroCopyPanel({
 
   return (
     <div className="hero-copy-panel hero-copy-panel-split">
-      <ModeToggle mode={mode} disabled={pending} onChange={onModeChange} />
       <h1>The talent network for Roblox.</h1>
       <p className="hero-lead">
         Link your games, set your rate, and match with studios that actually ship.

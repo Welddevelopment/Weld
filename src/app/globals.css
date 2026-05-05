@@ -10719,9 +10719,6 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   align-items: flex-start;
 }
 
-.weld-glass-page .hero-copy-panel-split .mode-toggle {
-  margin-bottom: 28px;
-}
 
 .weld-glass-page .hero-capture-row {
   display: flex;
