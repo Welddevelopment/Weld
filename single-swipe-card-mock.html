@@ -1,0 +1,946 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Weld Swipe Card - Single Hardcoded Profile</title>
+  <style>
+    :root {
+      --font-geist-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --font-geist-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0E0C09;
+      font-family: var(--font-geist-sans);
+      user-select: none;
+      overflow-x: auto;
+    }
+    button, a { font: inherit; }
+    .mock-stage { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 28px; }
+    .mock-count { display: flex; align-items: center; gap: 10px; color: #6b7280; font-size: 12px; }
+    .mock-sparks { color: #4ade80; font-weight: 700; }
+    .mock-card-shell { width: 380px; height: 628px; position: relative; transition: transform 0.2s ease, opacity 0.2s ease; }
+    .mock-card-shell.like-flash .npc-overlay--like,
+    .mock-card-shell.nope-flash .npc-overlay--nope { display: flex; opacity: 1; }
+    .mock-card-shell.fly-right { transform: translateX(200px) rotate(12deg); opacity: 0; }
+    .mock-card-shell.fly-left { transform: translateX(-200px) rotate(-12deg); opacity: 0; }
+
+    .npc-wrap { width: 380px; display: flex; flex-direction: column; flex-shrink: 0; }
+    .npc-card {
+      background: #ffffff;
+      border-radius: 20px 20px 0 0;
+      overflow: hidden;
+      height: 560px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .npc-action-bar {
+      display: flex;
+      background: #ffffff;
+      border-radius: 0 0 20px 20px;
+      border-top: 1px solid #f0f0f0;
+      height: 68px;
+      flex-shrink: 0;
+    }
+    .npc-action-seg {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s;
+      padding: 0;
+    }
+    .npc-action-seg:hover { background: rgba(0,0,0,0.04); }
+    .npc-action-seg:first-child { border-radius: 0 0 0 20px; }
+    .npc-action-seg:last-child { border-radius: 0 0 20px 0; }
+    .npc-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      border-radius: 20px 20px 0 0;
+      align-items: flex-start;
+      padding: 20px;
+      pointer-events: none;
+    }
+    .npc-overlay--like { justify-content: flex-end; background: rgba(61,199,122,0.10); }
+    .npc-overlay--nope { justify-content: flex-start; background: rgba(232,70,36,0.10); }
+    .npc-stamp {
+      border-width: 3px;
+      border-style: solid;
+      font-weight: 900;
+      font-size: 20px;
+      padding: 4px 16px;
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-family: var(--font-geist-mono);
+    }
+    .npc-stamp--like { border-color: #3DC77A; color: #3DC77A; transform: rotate(-15deg); }
+    .npc-stamp--nope { border-color: #E84624; color: #E84624; transform: rotate(15deg); }
+    .npc-top { display: flex; gap: 12px; padding: 16px 16px 0; align-items: flex-start; }
+    .npc-avatar-wrap {
+      width: 110px;
+      height: 110px;
+      border-radius: 14px;
+      position: relative;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .npc-avatar-bg { position: absolute; inset: 0; }
+    .npc-avatar-initials {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.9);
+    }
+    .npc-avatar-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .npc-online-dot {
+      position: absolute;
+      bottom: 7px;
+      right: 7px;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #3DC77A;
+      border: 2.5px solid #fff;
+      z-index: 2;
+    }
+    .npc-top-right { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; align-items: flex-start; }
+    .npc-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: #f6f6f6;
+      border-radius: 10px;
+      padding: 8px 2px;
+      gap: 0;
+      width: 100%;
+    }
+    .npc-stat { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 0 2px; }
+    .npc-stat-icon { color: #4444EE; display: flex; align-items: center; justify-content: center; }
+    .npc-stat-icon svg { width: 13px; height: 13px; }
+    .npc-stat-val { font-size: 12px; font-weight: 800; color: #111; line-height: 1; text-align: center; }
+    .npc-stat-lbl { font-size: 9px; color: #999; text-align: center; line-height: 1.2; }
+    .npc-socials { display: flex; gap: 7px; margin-top: 6px; }
+    .npc-social-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #f5f5f5;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s;
+      flex-shrink: 0;
+      text-decoration: none;
+      color: #444;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .npc-social-btn:hover { background: #ebebeb; }
+    .npc-portfolio-top-link {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+      font-size: 10px;
+      font-family: var(--font-geist-mono);
+      font-weight: 600;
+      color: #4444EE;
+      text-decoration: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
+    }
+    .npc-portfolio-top-link:hover { text-decoration: underline; }
+    .npc-identity { padding: 12px 16px 0; }
+    .npc-name-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .npc-name { font-size: 26px; font-weight: 800; color: #111; margin: 0; line-height: 1.1; }
+    .npc-verified { color: #4444EE; display: flex; align-items: center; flex-shrink: 0; }
+    .npc-verified svg { width: 20px; height: 20px; }
+    .npc-role { font-size: 15px; color: #4444EE; font-weight: 500; margin: 0; }
+    .npc-divider { height: 1px; background: #f0f0f0; margin: 12px 16px; }
+    .npc-bio {
+      flex: 1;
+      min-height: 60px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      margin: 0 16px;
+      padding: 10px 12px;
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: #333;
+      background: #f8f8ff;
+      border: 1px solid #eeeef8;
+      border-radius: 12px;
+      scrollbar-width: thin;
+      scrollbar-color: #ddd transparent;
+    }
+    .npc-bio::-webkit-scrollbar { width: 4px; }
+    .npc-bio::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+    .npc-rate-skills { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px 0; flex-shrink: 0; }
+    .npc-rate-pill { background: rgba(100,80,255,0.09); border-radius: 12px; padding: 10px 14px; flex-shrink: 0; min-width: 108px; }
+    .npc-rate-amount { font-size: 17px; font-weight: 800; color: #111; line-height: 1; }
+    .npc-rate-type { font-size: 10px; color: #888; margin-top: 4px; line-height: 1.3; }
+    .npc-skills-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+    .npc-skill-chip {
+      font-size: 11px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      border: 1.5px solid #e0e0e0;
+      background: #fff;
+      color: #333;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .npc-skill-chip:hover, .npc-skill-chip--active {
+      border-color: #4444EE;
+      color: #4444EE;
+      background: rgba(68,68,238,0.05);
+    }
+    .npc-entries {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      padding: 12px 16px 16px;
+      flex-shrink: 0;
+    }
+    .npc-entry-btn {
+      background: #f7f7ff;
+      border: 1.5px solid #e8e8f5;
+      border-radius: 14px;
+      padding: 12px;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s, border-color 0.15s;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .npc-entry-btn:hover { background: #eeeeff; border-color: #c0c0f0; }
+    .npc-entry-btn--active { border-color: rgba(68,68,238,0.35); background: rgba(68,68,238,0.05); }
+    .npc-entry-btn--active .npc-entry-icon, .npc-entry-btn--active .npc-entry-title { color: #4444EE; }
+    .npc-entry-icon { color: #4444EE; margin-bottom: 8px; display: flex; }
+    .npc-entry-icon svg { width: 22px; height: 22px; }
+    .npc-entry-title { font-size: 13px; font-weight: 700; color: #111; margin-bottom: 2px; }
+    .npc-entry-sub { font-size: 10px; color: #4444EE; display: flex; align-items: center; gap: 3px; }
+    .npc-stack-row { display: flex; gap: 16px; align-items: flex-start; }
+    .npc-panel {
+      width: 380px;
+      height: 628px;
+      background: #ffffff;
+      color: #111;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+      animation: npc-panel-in 0.22s ease-out;
+      position: relative;
+    }
+    @keyframes npc-panel-in { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+    .npc-panel-hd { padding: 16px 16px 0; flex-shrink: 0; }
+    .npc-panel-back {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #555;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 10px;
+    }
+    .npc-panel-back svg { width: 14px; height: 14px; }
+    .npc-panel-title { font-size: 20px; font-weight: 800; color: #111; margin: 0 0 2px; }
+    .npc-panel-sub { font-size: 12px; color: #999; margin: 0 0 12px; }
+    .npc-panel-body { flex: 1; overflow-y: auto; padding: 0 16px 16px; scrollbar-width: none; }
+    .npc-panel-body::-webkit-scrollbar { display: none; }
+    .npc-game-item {
+      display: flex;
+      flex-direction: column;
+      height: 250px;
+      flex-shrink: 0;
+      border-radius: 14px;
+      border: 1px solid #ebebeb;
+      background: #fff;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .npc-game-item:last-child { margin-bottom: 0; }
+    .npc-game-thumb { width: 100%; height: 88px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .npc-game-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .npc-game-thumb-cat { font-size: 13px; font-weight: 700; letter-spacing: 0.05em; }
+    .npc-game-copy { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 12px 12px; }
+    .npc-game-copy::-webkit-scrollbar { display: none; }
+    .npc-game-title { font-size: 14px; font-weight: 800; color: #111; margin: 0 0 3px; line-height: 1.2; }
+    .npc-game-url {
+      font-size: 11px;
+      color: #4444EE;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .npc-game-url svg { width: 10px; height: 10px; flex-shrink: 0; }
+    .npc-game-stats { display: flex; gap: 16px; margin-bottom: 8px; }
+    .npc-game-stat { display: flex; flex-direction: column; gap: 1px; }
+    .npc-game-stat-val { font-size: 13px; font-weight: 800; color: #111; line-height: 1; }
+    .npc-game-stat-lbl { font-size: 9px; color: #bbb; text-transform: uppercase; letter-spacing: 0.04em; }
+    .npc-game-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+    .npc-game-tag { font-size: 10px; padding: 3px 9px; border-radius: 999px; font-weight: 600; }
+    .npc-game-desc { font-size: 11px; color: #888; margin: 4px 0 0; line-height: 1.5; }
+    .npc-skill-hd { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+    .npc-skill-icon-box {
+      width: 64px;
+      height: 64px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .npc-skill-hd-copy { flex: 1; }
+    .npc-skill-hd-name { font-size: 22px; font-weight: 800; color: #111; margin: 0 0 2px; }
+    .npc-skill-hd-cat { font-size: 13px; color: #4444EE; font-weight: 500; margin-bottom: 6px; }
+    .npc-skill-refs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .npc-skill-ref-link {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: #4444EE;
+      text-decoration: none;
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: #f0f0ff;
+      border: 1px solid #ddddf5;
+    }
+    .npc-skill-ref-link svg { width: 12px; height: 12px; }
+    .npc-section-title { font-size: 13px; font-weight: 700; color: #111; margin: 0 0 10px; }
+    .npc-cap-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .npc-cap-card {
+      background: #f7f7ff;
+      border: 1.5px solid #e8e8f5;
+      border-radius: 12px;
+      padding: 12px;
+      min-height: 88px;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      text-align: left;
+    }
+    .npc-cap-name { font-size: 13px; font-weight: 700; color: #111; margin-bottom: 5px; }
+    .npc-cap-desc { font-size: 11.5px; color: #666; line-height: 1.5; }
+    .npc-cat-popup-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      background: rgba(255,255,255,0.08);
+    }
+    .npc-cat-popup {
+      background: #fff;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 8px 48px rgba(0,0,0,0.22);
+      width: 100%;
+      min-height: 320px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .npc-cat-popup-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.06);
+      color: #666;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .npc-cat-popup-close:hover { background: rgba(0,0,0,0.1); }
+    .npc-cat-popup-name { font-size: 20px; font-weight: 800; color: #111; margin-bottom: 12px; padding-right: 36px; }
+    .npc-cat-popup-desc {
+      font-size: 13px;
+      color: #444;
+      line-height: 1.65;
+      margin: 0 0 16px;
+      height: 180px;
+      flex-shrink: 0;
+      background: #f8f8ff;
+      border: 1px solid #eeeef8;
+      border-radius: 12px;
+      padding: 10px 12px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      scrollbar-width: thin;
+      scrollbar-color: #ddd transparent;
+    }
+    .npc-cat-popup-stats { display: flex; gap: 10px; }
+    .npc-cat-popup-stat { flex: 1; background: #f7f7ff; border: 1.5px solid #e8e8f5; border-radius: 10px; padding: 10px 12px; }
+    .npc-cat-popup-stat-val { font-size: 17px; font-weight: 700; color: #111; }
+    .npc-cat-popup-stat-lbl { font-size: 10px; color: #999; font-family: var(--font-geist-mono); margin-top: 2px; }
+    @media (max-width: 900px) {
+      body { align-items: flex-start; justify-content: flex-start; }
+      .mock-stage { align-items: flex-start; }
+      .npc-stack-row { gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="mock-stage">
+    <div class="mock-count">
+      <span>1 of 1</span>
+      <span>|</span>
+      <span class="mock-sparks" id="sparkCount">0 sparks</span>
+    </div>
+
+    <section class="npc-stack-row" id="stackRow" aria-label="Expanded swipe stack">
+      <aside class="npc-panel" id="leftPanel" style="display: none;" aria-label="Games side panel">
+        <div class="npc-panel-hd">
+          <button class="npc-panel-back" data-close-panel="left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Back
+          </button>
+          <h2 class="npc-panel-title">My Games</h2>
+          <p class="npc-panel-sub">A collection of games I've worked on.</p>
+        </div>
+        <div class="npc-panel-body" id="gamesPanelBody"></div>
+      </aside>
+
+      <div class="mock-card-shell" id="cardShell">
+        <article class="npc-wrap" id="profileCard">
+          <div class="npc-card">
+            <div class="npc-overlay npc-overlay--like"><span class="npc-stamp npc-stamp--like">LIKE</span></div>
+            <div class="npc-overlay npc-overlay--nope"><span class="npc-stamp npc-stamp--nope">NOPE</span></div>
+
+            <div class="npc-top">
+              <div class="npc-avatar-wrap">
+                <div class="npc-avatar-bg" style="background: linear-gradient(135deg,#E84624,#FF8A5C);"></div>
+                <div class="npc-avatar-initials">DD</div>
+                <img class="npc-avatar-img" src="https://www.roblox.com/headshot-thumbnail/image?userId=2837719&amp;width=150&amp;height=150&amp;format=png" alt="DevDave" onerror="this.style.display='none'">
+                <div class="npc-online-dot"></div>
+              </div>
+
+              <div class="npc-top-right">
+                <div class="npc-stats">
+                  <div class="npc-stat">
+                    <div class="npc-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
+                    <div class="npc-stat-val">4+ yrs</div>
+                    <div class="npc-stat-lbl">Experience</div>
+                  </div>
+                  <div class="npc-stat">
+                    <div class="npc-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8M12 17v4"></path></svg></div>
+                    <div class="npc-stat-val">38</div>
+                    <div class="npc-stat-lbl">Projects</div>
+                  </div>
+                  <div class="npc-stat">
+                    <div class="npc-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></div>
+                    <div class="npc-stat-val">120+</div>
+                    <div class="npc-stat-lbl">Scripts</div>
+                  </div>
+                  <div class="npc-stat">
+                    <div class="npc-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg></div>
+                    <div class="npc-stat-val">4</div>
+                    <div class="npc-stat-lbl">Skills</div>
+                  </div>
+                </div>
+
+                <div class="npc-socials">
+                  <a href="#" class="npc-social-btn" title="Roblox">RBX</a>
+                  <a href="#" class="npc-social-btn" title="Discord">DIS</a>
+                  <a href="#" class="npc-social-btn" title="Twitter">X</a>
+                </div>
+                <a href="https://roblox.com/users/2837719/profile" target="_blank" rel="noreferrer" class="npc-portfolio-top-link">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  Roblox Profile
+                </a>
+                <a href="https://github.com/devdave" target="_blank" rel="noreferrer" class="npc-portfolio-top-link">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  GitHub
+                </a>
+              </div>
+            </div>
+
+            <div class="npc-identity">
+              <div class="npc-name-row">
+                <h2 class="npc-name">DevDave</h2>
+                <span class="npc-verified" title="Pro Developer"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg></span>
+              </div>
+              <p class="npc-role">4yr experience</p>
+            </div>
+
+            <div class="npc-divider"></div>
+            <p class="npc-bio">I've been building Roblox games professionally for four years, shipping everything from solo indie projects to large-team live titles. My strength is owning full verticals - I can design the DataStore schema, write the server-client combat logic, wire up the UI, and layer VFX on top, all within a single project. I write clean, documented OOP Luau that the next developer on the team can actually maintain.</p>
+
+            <div class="npc-rate-skills">
+              <div class="npc-rate-pill">
+                <div class="npc-rate-amount">USD</div>
+                <div class="npc-rate-type">Hourly or milestone</div>
+              </div>
+              <div class="npc-skills-wrap">
+                <button class="npc-skill-chip" data-open-skill="Scripting">Scripting</button>
+                <button class="npc-skill-chip" data-open-skill="UI Design">UI Design</button>
+                <button class="npc-skill-chip" data-open-skill="VFX">VFX</button>
+                <button class="npc-skill-chip" data-open-skill="DataStore">DataStore</button>
+              </div>
+            </div>
+
+            <div class="npc-entries">
+              <button class="npc-entry-btn" id="gamesButton" data-open-panel="games">
+                <div class="npc-entry-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 2 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></div>
+                <div class="npc-entry-title">Games</div>
+                <div class="npc-entry-sub">See games I've worked on -></div>
+              </button>
+              <button class="npc-entry-btn" id="workButton" data-open-panel="work">
+                <div class="npc-entry-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></div>
+                <div class="npc-entry-title">My Work</div>
+                <div class="npc-entry-sub">View projects I've built -></div>
+              </button>
+            </div>
+          </div>
+
+          <div class="npc-action-bar">
+            <button class="npc-action-seg" id="passButton" aria-label="Pass"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E84624" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+            <button class="npc-action-seg" id="messageButton" aria-label="Message"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></button>
+            <button class="npc-action-seg" id="likeButton" aria-label="Like"><svg width="22" height="22" viewBox="0 0 24 24" fill="#3DC77A" stroke="#3DC77A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
+          </div>
+        </article>
+      </div>
+
+      <aside class="npc-panel" id="rightPanel" style="display: none;" aria-label="Work or skill side panel">
+        <div class="npc-panel-hd" id="rightPanelHeader"></div>
+        <div class="npc-panel-body" id="rightPanelBody"></div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const mockProfile = {
+      id: "dev1",
+      userId: "mock-user-devdave",
+      type: "dev",
+      robloxUserId: 2837719,
+      bg: "linear-gradient(135deg,#E84624,#FF8A5C)",
+      badge: "Pro Developer",
+      name: "DevDave",
+      role: "Developer - 4yr experience",
+      bio: "I've been building Roblox games professionally for four years, shipping everything from solo indie projects to large-team live titles. My strength is owning full verticals - I can design the DataStore schema, write the server-client combat logic, wire up the UI, and layer VFX on top, all within a single project. I write clean, documented OOP Luau that the next developer on the team can actually maintain.",
+      tags: ["Scripting", "UI Design", "VFX", "DataStore"],
+      meta: "Available Now - Rate: USD",
+      stats: { experience: "4+ yrs", projects: "38", scriptsBuilt: "120+", onTime: "96%" },
+      skills: [
+        {
+          name: "Scripting",
+          description: "Multi-year experience building game systems in Luau - DataStores, remote events, server-client architecture, and combat frameworks. Writes readable, documented code that is built to be maintained long-term.",
+          experienceMonths: 48,
+          pastWorks: 38,
+          resources: [
+            { label: "GitHub", url: "https://github.com/devdave" },
+            { label: "Portfolio", url: "https://devdave.dev" }
+          ],
+          categories: [
+            {
+              name: "Combat Frameworks",
+              description: "Server-authoritative hitboxes, cooldowns, combo routing, weapon state, and replicated combat feedback.",
+              detail: "I build combat frameworks with strict server validation, predictable client prediction, animation-safe state changes, and clean module boundaries. Typical delivery includes damage resolution, knockback, cooldowns, ability metadata, and debugging tools for designers.",
+              works: 14,
+              avgPrice: "$1.8K",
+              priceType: "commission"
+            },
+            {
+              name: "DataStore Systems",
+              description: "Persistent player data, retry logic, backups, and ProfileService-style session locking.",
+              detail: "I design persistent data schemas for XP, inventory, currency, settings, unlocks, cosmetics, and seasonal progression. The implementation includes migrations, cache layers, session locking, retry handling, and simple admin inspection commands.",
+              works: 11,
+              avgPrice: "$95",
+              priceType: "hourly"
+            }
+          ]
+        },
+        {
+          name: "UI Design",
+          description: "Designs reactive UI from Figma wireframes to finished Roblox builds. Smooth tweening, mobile-responsive layouts, and UX flows that eliminate friction at every screen.",
+          experienceMonths: 36,
+          pastWorks: 24,
+          resources: [{ label: "UI reel", url: "https://devdave.dev/ui" }],
+          categories: [
+            {
+              name: "HUD Systems",
+              description: "Combat HUDs, inventory surfaces, ability bars, and responsive mobile-safe layouts.",
+              detail: "I can take a Figma file or loose gameplay spec and turn it into responsive Roblox UI with constraints, animations, button states, and readable component hierarchy.",
+              works: 9,
+              avgPrice: "$1.2K",
+              priceType: "commission"
+            }
+          ]
+        },
+        {
+          name: "VFX",
+          description: "Creates visual effects for combat feedback, spells, portals, and environmental ambience while keeping performance under control.",
+          experienceMonths: 30,
+          pastWorks: 18,
+          categories: [
+            {
+              name: "Ability Effects",
+              description: "Particles, beams, trails, shockwaves, hit sparks, and readable timing for combat abilities.",
+              detail: "Effects are tuned for readability first: players should know what happened, where it happened, and what state the fight is in without visual noise.",
+              works: 12,
+              avgPrice: "$850",
+              priceType: "commission"
+            }
+          ]
+        },
+        {
+          name: "DataStore",
+          description: "Implements persistent player data - XP, inventory, currency, settings - with safe retry logic, backup pipelines, and clean API design.",
+          experienceMonths: 42,
+          pastWorks: 16,
+          categories: [
+            {
+              name: "Progression Saves",
+              description: "XP, level, battle pass, inventory, settings, currencies, and unlock history.",
+              detail: "I build save systems with schema clarity and operational safety, including migrations and emergency recovery paths when a live game changes direction.",
+              works: 16,
+              avgPrice: "$110",
+              priceType: "hourly"
+            }
+          ]
+        }
+      ],
+      portfolio: {
+        links: [
+          { name: "Roblox Profile", url: "roblox.com/users/2837719/profile" },
+          { name: "GitHub", url: "github.com/devdave" },
+          { name: "Portfolio Site", url: "devdave.dev" }
+        ]
+      },
+      socials: [
+        { icon: "RBX", label: "Roblox", url: "#" },
+        { icon: "DIS", label: "Discord", url: "#" },
+        { icon: "X", label: "Twitter", url: "#" }
+      ],
+      topGames: [
+        {
+          emoji: "Game",
+          title: "Rift Raiders",
+          desc: "Co-op dungeon battler with server-authoritative encounters, ability cooldowns, seasonal progression, and a lightweight lobby flow.",
+          plays: "18M",
+          topCcu: "14K",
+          currentCcu: "3.8K",
+          gameUrl: "https://www.roblox.com/games/123456/Rift-Raiders",
+          skills: ["Scripting", "DataStore"]
+        },
+        {
+          emoji: "UI",
+          title: "Mecha Mayhem",
+          desc: "Competitive arena project where I built the combat HUD, loadout UI, and replicated cooldown indicators.",
+          plays: "11M",
+          topCcu: "9K",
+          currentCcu: "1.9K",
+          gameUrl: "https://www.roblox.com/games/234567/Mecha-Mayhem",
+          skills: ["UI Design", "Scripting"]
+        },
+        {
+          emoji: "VFX",
+          title: "Elemental Clash",
+          desc: "Ability-heavy battler with layered spell feedback, hit confirms, elemental status effects, and optimized particle budgets.",
+          plays: "8M",
+          topCcu: "6K",
+          currentCcu: "1.2K",
+          gameUrl: "https://www.roblox.com/games/345678/Elemental-Clash",
+          skills: ["VFX", "Scripting"]
+        }
+      ],
+      bestWork: [
+        {
+          emoji: "SC",
+          title: "Combat system & DataStore",
+          desc: "Full server-client combat framework with hitboxes, knockback, persistent stats, and clean OOP Luau documented for handoff.",
+          tools: "Luau, DataStore2, Roblox Studio",
+          time: "2 weeks",
+          amount: "$900",
+          plays: "18M"
+        },
+        {
+          emoji: "UI",
+          title: "Multiplayer lobby system",
+          desc: "Party and lobby flow with matchmaking, private servers, voting, queue status, and server-side validation throughout.",
+          tools: "Luau, TeleportService, Roblox Studio",
+          time: "3 weeks",
+          amount: "$1,200",
+          plays: "11M"
+        },
+        {
+          emoji: "FX",
+          title: "Ability FX integration",
+          desc: "Synced ability VFX, hit sparks, cooldown events, and animation timing hooks for a fast combat prototype.",
+          tools: "ParticleEmitter, TweenService, Luau",
+          time: "4 weeks",
+          amount: "$1,500",
+          plays: "8M"
+        }
+      ]
+    };
+
+    let sparks = 0;
+    let openLeft = null;
+    let openRight = null;
+
+    const leftPanel = document.getElementById("leftPanel");
+    const rightPanel = document.getElementById("rightPanel");
+    const gamesPanelBody = document.getElementById("gamesPanelBody");
+    const rightPanelHeader = document.getElementById("rightPanelHeader");
+    const rightPanelBody = document.getElementById("rightPanelBody");
+    const cardShell = document.getElementById("cardShell");
+    const sparkCount = document.getElementById("sparkCount");
+    const gamesButton = document.getElementById("gamesButton");
+    const workButton = document.getElementById("workButton");
+
+    function externalIcon() {
+      return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>';
+    }
+
+    function renderGamesPanel() {
+      gamesPanelBody.innerHTML = mockProfile.topGames.map(game => `
+        <div class="npc-game-item">
+          <div class="npc-game-thumb" style="background:#818cf818;">
+            <span class="npc-game-thumb-cat" style="color:#818cf8;">${game.skills[0]}</span>
+          </div>
+          <div class="npc-game-copy">
+            <div class="npc-game-title">${game.title}</div>
+            <a href="${game.gameUrl}" target="_blank" rel="noreferrer" class="npc-game-url">${game.gameUrl.replace(/^https?:\/\/(www\.)?/, "")}${externalIcon()}</a>
+            <div class="npc-game-stats">
+              <div class="npc-game-stat"><span class="npc-game-stat-val">${game.plays}</span><span class="npc-game-stat-lbl">Visits</span></div>
+              <div class="npc-game-stat"><span class="npc-game-stat-val">${game.currentCcu}</span><span class="npc-game-stat-lbl">Players</span></div>
+              <div class="npc-game-stat"><span class="npc-game-stat-val">${game.topCcu}</span><span class="npc-game-stat-lbl">Peak CCU</span></div>
+            </div>
+            <p class="npc-game-desc">${game.desc}</p>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderWorkPanel() {
+      rightPanelHeader.innerHTML = `
+        <button class="npc-panel-back" data-close-panel="right">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          Back
+        </button>
+        <h2 class="npc-panel-title">My Work</h2>
+        <p class="npc-panel-sub">A collection of projects, systems, and tools I've built.</p>
+      `;
+      const colors = ["#a78bfa", "#34d399", "#fb923c"];
+      rightPanelBody.innerHTML = mockProfile.bestWork.map((item, i) => {
+        const color = colors[i % colors.length];
+        const tags = item.tools.split(",").map(t => `<span class="npc-game-tag" style="background:${color}18;color:${color};">${t.trim()}</span>`).join("");
+        return `
+          <div class="npc-game-item">
+            <div class="npc-game-thumb" style="background:${color}18;"><span class="npc-game-thumb-cat" style="color:${color};">${item.emoji}</span></div>
+            <div class="npc-game-copy">
+              <div class="npc-game-title">${item.title}</div>
+              <div class="npc-game-stats">
+                <div class="npc-game-stat"><span class="npc-game-stat-val">${item.time}</span><span class="npc-game-stat-lbl">Time</span></div>
+                <div class="npc-game-stat"><span class="npc-game-stat-val">${item.amount}</span><span class="npc-game-stat-lbl">Paid</span></div>
+                <div class="npc-game-stat"><span class="npc-game-stat-val">${item.plays}</span><span class="npc-game-stat-lbl">Date</span></div>
+              </div>
+              <div class="npc-game-tags">${tags}</div>
+              <p class="npc-game-desc">${item.desc}</p>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function formatMonths(months) {
+      if (months < 12) return `${months} mo`;
+      const yrs = months / 12;
+      return Number.isInteger(yrs) ? `${yrs} yrs` : `${Math.floor(yrs)}.5 yrs`;
+    }
+
+    function colorForSkill(name) {
+      const colors = ["#a78bfa", "#34d399", "#fb923c", "#60a5fa", "#f472b6", "#facc15"];
+      let h = 0;
+      for (let i = 0; i < name.length; i += 1) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+      return colors[h % colors.length];
+    }
+
+    function renderSkillPanel(skillName) {
+      const skill = mockProfile.skills.find(s => s.name === skillName);
+      const color = colorForSkill(skillName);
+      rightPanelHeader.innerHTML = `
+        <button class="npc-panel-back" data-close-panel="right">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          Back
+        </button>
+      `;
+      rightPanelBody.innerHTML = `
+        <div class="npc-skill-hd">
+          <div class="npc-skill-icon-box" style="background:${color}33;color:${color};">${skill.name.slice(0, 3)}</div>
+          <div class="npc-skill-hd-copy">
+            <div class="npc-skill-hd-name">${skill.name}</div>
+            <div class="npc-skill-hd-cat">Development Skill</div>
+          </div>
+        </div>
+        <p style="font-size:13px;color:#444;line-height:1.6;margin:0 0 16px;">${skill.description}</p>
+        <div class="npc-skill-refs">
+          ${(skill.resources || []).map(r => `<a href="${r.url}" target="_blank" rel="noreferrer" class="npc-skill-ref-link">${externalIcon()}${r.label}</a>`).join("")}
+        </div>
+        <div class="npc-section-title">What I can build with ${skill.name}</div>
+        <div class="npc-cap-grid">
+          ${(skill.categories || []).map((cat, i) => `
+            <button class="npc-cap-card" data-cat-index="${i}">
+              <div class="npc-cap-name">${cat.name}</div>
+              <div class="npc-cap-desc">${cat.description}</div>
+            </button>
+          `).join("")}
+        </div>
+        <div style="display:flex;gap:10px;margin-top:4px;">
+          <div style="flex:1;background:#f7f7ff;border:1.5px solid #e8e8f5;border-radius:10px;padding:8px 12px;">
+            <div style="font-size:15px;font-weight:700;color:#111;">${formatMonths(skill.experienceMonths)}</div>
+            <div style="font-size:10px;color:#999;font-family:var(--font-geist-mono);margin-top:2px;">Experience</div>
+          </div>
+          <div style="flex:1;background:#f7f7ff;border:1.5px solid #e8e8f5;border-radius:10px;padding:8px 12px;">
+            <div style="font-size:15px;font-weight:700;color:#111;">${skill.pastWorks}</div>
+            <div style="font-size:10px;color:#999;font-family:var(--font-geist-mono);margin-top:2px;">Past works</div>
+          </div>
+        </div>
+      `;
+      rightPanelBody.querySelectorAll("[data-cat-index]").forEach(button => {
+        button.addEventListener("click", () => showCategoryPopup(skill, Number(button.dataset.catIndex)));
+      });
+    }
+
+    function showCategoryPopup(skill, index) {
+      const cat = skill.categories[index];
+      const overlay = document.createElement("div");
+      overlay.className = "npc-cat-popup-overlay";
+      overlay.innerHTML = `
+        <div class="npc-cat-popup">
+          <button class="npc-cat-popup-close" aria-label="Close">x</button>
+          <div class="npc-cat-popup-name">${cat.name}</div>
+          <p class="npc-cat-popup-desc">${cat.detail || cat.description}</p>
+          <div class="npc-cat-popup-stats">
+            <div class="npc-cat-popup-stat"><div class="npc-cat-popup-stat-val">${cat.works}</div><div class="npc-cat-popup-stat-lbl">Works</div></div>
+            <div class="npc-cat-popup-stat"><div class="npc-cat-popup-stat-val">${cat.avgPrice}</div><div class="npc-cat-popup-stat-lbl">${cat.priceType === "commission" ? "Avg commission" : "Avg hourly"}</div></div>
+          </div>
+        </div>
+      `;
+      overlay.addEventListener("click", event => {
+        if (event.target === overlay || event.target.classList.contains("npc-cat-popup-close")) overlay.remove();
+      });
+      rightPanel.appendChild(overlay);
+    }
+
+    function openPanel(kind) {
+      if (kind === "games") {
+        openLeft = "games";
+        leftPanel.style.display = "";
+        gamesButton.classList.add("npc-entry-btn--active");
+        renderGamesPanel();
+        return;
+      }
+      openRight = kind;
+      rightPanel.style.display = "";
+      workButton.classList.toggle("npc-entry-btn--active", kind === "work");
+      document.querySelectorAll(".npc-skill-chip").forEach(chip => {
+        chip.classList.toggle("npc-skill-chip--active", chip.dataset.openSkill === kind);
+      });
+      if (kind === "work") renderWorkPanel();
+      else renderSkillPanel(kind);
+    }
+
+    function closePanel(side) {
+      if (side === "left") {
+        openLeft = null;
+        leftPanel.style.display = "none";
+        gamesButton.classList.remove("npc-entry-btn--active");
+      } else {
+        openRight = null;
+        rightPanel.style.display = "none";
+        workButton.classList.remove("npc-entry-btn--active");
+        document.querySelectorAll(".npc-skill-chip").forEach(chip => chip.classList.remove("npc-skill-chip--active"));
+      }
+    }
+
+    function clearPanels() {
+      closePanel("left");
+      closePanel("right");
+    }
+
+    function flashSwipe(direction) {
+      clearPanels();
+      const cls = direction === "right" ? "like-flash" : "nope-flash";
+      const fly = direction === "right" ? "fly-right" : "fly-left";
+      cardShell.classList.add(cls);
+      window.setTimeout(() => cardShell.classList.add(fly), 450);
+      window.setTimeout(() => {
+        cardShell.classList.remove(cls, fly);
+        if (direction === "right") {
+          sparks += 1;
+          sparkCount.textContent = `${sparks} spark${sparks === 1 ? "" : "s"}`;
+        }
+      }, 900);
+    }
+
+    document.querySelectorAll("[data-open-panel='games']").forEach(button => button.addEventListener("click", () => openPanel("games")));
+    document.querySelectorAll("[data-open-panel='work']").forEach(button => button.addEventListener("click", () => openPanel("work")));
+    document.querySelectorAll("[data-open-skill]").forEach(button => button.addEventListener("click", () => openPanel(button.dataset.openSkill)));
+    document.addEventListener("click", event => {
+      const closeButton = event.target.closest("[data-close-panel]");
+      if (closeButton) closePanel(closeButton.dataset.closePanel);
+    });
+    document.getElementById("passButton").addEventListener("click", () => flashSwipe("left"));
+    document.getElementById("likeButton").addEventListener("click", () => flashSwipe("right"));
+    document.getElementById("messageButton").addEventListener("click", () => openPanel("work"));
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") clearPanels();
+      if (event.key === "ArrowLeft") flashSwipe("left");
+      if (event.key === "ArrowRight") flashSwipe("right");
+    });
+  </script>
+</body>
+</html>
