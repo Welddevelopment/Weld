@@ -32,7 +32,8 @@ export default function AppNav() {
   }, [])
 
   return (
-    <nav className="sticky top-0 z-50 flex items-center justify-between border-b border-white/10 bg-[rgba(12,14,15,0.92)] px-6 py-4 backdrop-blur-[12px]">
+    <>
+    <nav className="fixed inset-x-0 top-0 z-50 flex items-center justify-between border-b border-white/10 bg-[rgba(12,14,15,0.92)] px-6 py-4 backdrop-blur-[12px]">
       <div className="flex flex-col">
         <Link
           href="/home"
@@ -64,5 +65,7 @@ export default function AppNav() {
         })}
       </div>
     </nav>
+    <div aria-hidden="true" className="h-[65px] shrink-0" />
+    </>
   )
 }
