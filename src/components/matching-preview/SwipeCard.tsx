@@ -119,8 +119,8 @@ const SKILLS: Skill[] = [
 // Wide game thumbnails (480×270) — Blox Fruits, Arsenal, Adopt Me
 const TOP_GAMES = [
   {
-    title: "Rift Raiders",
-    desc: "Co-op dungeon battler with server-authoritative encounters, ability cooldowns, seasonal progression, and a lightweight lobby flow.",
+    title: "Blox Fruits",
+    desc: "Live co-op adventure with seasonal events, ability systems, and fast-paced combat interfaces.",
     plays: "18M",
     topCcu: "14K",
     currentCcu: "3.8K",
@@ -128,8 +128,8 @@ const TOP_GAMES = [
     skills: ["Scripting", "DataStore"],
   },
   {
-    title: "Mecha Mayhem",
-    desc: "Competitive arena project where I built the combat HUD, loadout UI, and replicated cooldown indicators.",
+    title: "Arsenal",
+    desc: "Competitive shooter with responsive UI, replicated hit indicators, and polished weapon feedback.",
     plays: "11M",
     topCcu: "9K",
     currentCcu: "1.9K",
@@ -137,8 +137,8 @@ const TOP_GAMES = [
     skills: ["UI Design", "Scripting"],
   },
   {
-    title: "Elemental Clash",
-    desc: "Ability-heavy battler with layered spell feedback, hit confirms, elemental status effects, and optimized particle budgets.",
+    title: "Adopt Me!",
+    desc: "Social simulation with a thriving live economy, pet progression, and engaging onboarding flows.",
     plays: "8M",
     topCcu: "6K",
     currentCcu: "1.2K",
@@ -147,7 +147,7 @@ const TOP_GAMES = [
   },
 ]
 
-// Square game icons (512×512) used as work-item thumbnails — Blox Fruits, Arsenal, Adopt Me
+// Wide work thumbnails (768×432) used as work-item thumbnails — Blox Fruits, Arsenal, Adopt Me
 const BEST_WORK = [
   {
     title: "Combat system & DataStore",
@@ -156,7 +156,7 @@ const BEST_WORK = [
     time: "2 weeks",
     amount: "$900",
     reach: "18M plays",
-    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-a64f70da20fc1e80ee76fe5d49c1be0a/512/512/Image/Png/noFilter",
+    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-a64f70da20fc1e80ee76fe5d49c1be0a/768/432/Image/Png/noFilter",
   },
   {
     title: "Multiplayer lobby system",
@@ -165,7 +165,7 @@ const BEST_WORK = [
     time: "3 weeks",
     amount: "$1,200",
     reach: "11M plays",
-    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-2c691f8c1278352cc98e30afef3c3a4e/512/512/Image/Png/noFilter",
+    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-2c691f8c1278352cc98e30afef3c3a4e/768/432/Image/Png/noFilter",
   },
   {
     title: "Ability FX integration",
@@ -174,7 +174,7 @@ const BEST_WORK = [
     time: "4 weeks",
     amount: "$1,500",
     reach: "8M plays",
-    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-df50e75b674122af9bb3bf8ee17f61bd/512/512/Image/Png/noFilter",
+    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-df50e75b674122af9bb3bf8ee17f61bd/768/432/Image/Png/noFilter",
   },
 ]
 
