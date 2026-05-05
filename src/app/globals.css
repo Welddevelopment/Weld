@@ -4814,7 +4814,6 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
     linear-gradient(180deg, #f4f0ff 0%, #ebe3ff 60%, #e2dafb 100%);
   color: var(--wg-ink);
   font-family: var(--font-body), system-ui, sans-serif;
-  overflow-x: clip;
 }
 
 @media (min-width: 1440px) {
@@ -4875,6 +4874,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 
 .weld-glass-main {
+  overflow-x: clip;
   padding-bottom: 48px;
 }
 
