@@ -123,7 +123,7 @@ const TOP_GAMES = [
     plays: "18M",
     topCcu: "14K",
     currentCcu: "3.8K",
-    placeId: 2753915549,
+    thumbnailUrl: "https://picsum.photos/seed/rift-raiders/380/100",
     skills: ["Scripting", "DataStore"],
   },
   {
@@ -132,7 +132,7 @@ const TOP_GAMES = [
     plays: "11M",
     topCcu: "9K",
     currentCcu: "1.9K",
-    placeId: 286090429,
+    thumbnailUrl: "https://picsum.photos/seed/mecha-mayhem/380/100",
     skills: ["UI Design", "Scripting"],
   },
   {
@@ -141,7 +141,7 @@ const TOP_GAMES = [
     plays: "8M",
     topCcu: "6K",
     currentCcu: "1.2K",
-    placeId: 920587237,
+    thumbnailUrl: "https://picsum.photos/seed/elemental-clash/380/100",
     skills: ["VFX", "Scripting"],
   },
 ]
@@ -232,23 +232,8 @@ export default function SwipeCard() {
   const [swipeFlash, setSwipeFlash] = useState<"like" | "nope" | null>(null)
   const [flying, setFlying] = useState<"left" | "right" | null>(null)
   const [sparks, setSparks] = useState(0)
-  const [thumbs, setThumbs] = useState<Record<number, string>>({})
   const [toast, setToast] = useState(false)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(() => {
-    const ids = TOP_GAMES.map((g) => g.placeId).join(",")
-    fetch(`/api/roblox-proxy?path=v1/places/gameicons?placeIds=${ids}`)
-      .then((r) => r.json())
-      .then((d: { data?: Array<{ targetId: number; imageUrl: string }> }) => {
-        const map: Record<number, string> = {}
-        d.data?.forEach((item) => {
-          map[item.targetId] = item.imageUrl
-        })
-        setThumbs(map)
-      })
-      .catch(() => {})
-  }, [])
 
   function showToast() {
     setToast(true)
@@ -323,13 +308,8 @@ export default function SwipeCard() {
               {TOP_GAMES.map((game) => (
                 <div key={game.title} className="npc-game-item">
                   <div className="npc-game-thumb" style={{ background: "#818cf818" }}>
-                    {thumbs[game.placeId] ? (
-                      <img src={thumbs[game.placeId]} alt={game.title} />
-                    ) : (
-                      <span className="npc-game-thumb-cat" style={{ color: "#818cf8" }}>
-                        {game.skills[0]}
-                      </span>
-                    )}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={game.thumbnailUrl} alt={game.title} />
                   </div>
                   <div className="npc-game-copy">
                     <div className="npc-game-title">{game.title}</div>
@@ -379,7 +359,7 @@ export default function SwipeCard() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     className="npc-avatar-img"
-                    src="https://www.roblox.com/headshot-thumbnail/image?userId=2837719&width=150&height=150&format=png"
+                    src="https://api.dicebear.com/9.x/pixel-art/png?seed=DevDave&size=150"
                     alt="DevDave"
                     onError={(e) => {
                       ;(e.target as HTMLImageElement).style.display = "none"
