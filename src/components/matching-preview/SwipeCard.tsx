@@ -116,7 +116,7 @@ const SKILLS: Skill[] = [
   },
 ]
 
-// Wide 16:9 game screenshots — Blox Fruits, Tower of Hell, Adopt Me
+// Wide 16:9 game screenshots — Blox Fruits, Brookhaven RP, Jailbreak
 const TOP_GAMES = [
   {
     title: "Blox Fruits",
@@ -124,30 +124,30 @@ const TOP_GAMES = [
     plays: "18M",
     topCcu: "14K",
     currentCcu: "3.8K",
-    thumbnailUrl: "https://t7.rbxcdn.com/180DAY-57443971b3b446cb6440e98718617428",
+    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-e1ce51abae5188805c3fee78ec7f4d08/768/432/Image/Png/noFilter",
     skills: ["Scripting", "DataStore"],
   },
   {
-    title: "Tower of Hell",
-    desc: "Skill-based obby with procedurally assembled obstacle courses, ranked modes, and live leaderboards.",
-    plays: "9.2M",
-    topCcu: "12K",
-    currentCcu: "3.2K",
-    thumbnailUrl: "https://t3.rbxcdn.com/180DAY-58d59bfe7584647d43085d18c3e9d679",
-    skills: ["Scripting", "VFX"],
+    title: "Brookhaven RP",
+    desc: "Open-world roleplay with house ownership, vehicle systems, dynamic social spaces, and live events.",
+    plays: "22M",
+    topCcu: "18K",
+    currentCcu: "4.1K",
+    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-1431ab1aa3fdc21c55a144b2616339fa/768/432/Image/Png/noFilter",
+    skills: ["Scripting", "UI Design"],
   },
   {
-    title: "Adopt Me!",
-    desc: "Social simulation with thriving live economy, pet progression, and engaging discovery flows.",
-    plays: "8M",
-    topCcu: "6K",
-    currentCcu: "1.2K",
-    thumbnailUrl: "https://t5.rbxcdn.com/180DAY-2d1bce8a7bbdcdd0e6dc378c7b6f566c",
-    skills: ["UI Design", "Scripting"],
+    title: "Jailbreak",
+    desc: "Cops-and-robbers open world with heists, pursuits, economy systems, and seasonal cosmetic drops.",
+    plays: "11M",
+    topCcu: "9K",
+    currentCcu: "2.5K",
+    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-fef285ce1b8ac805b17da2a4f998ccec/768/432/Image/Png/noFilter",
+    skills: ["Scripting", "VFX"],
   },
 ]
 
-// Wide 16:9 game screenshots — Arsenal, Murder Mystery 2, Pet Simulator X
+// Wide 16:9 game screenshots — Murder Mystery 2, Tower of Hell, Adopt Me!
 const BEST_WORK = [
   {
     title: "Combat system & DataStore",
@@ -156,7 +156,7 @@ const BEST_WORK = [
     time: "2 weeks",
     amount: "$900",
     reach: "18M plays",
-    thumbnailUrl: "https://t1.rbxcdn.com/180DAY-72e3bf7380cc3afa336d930623036561",
+    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-fe7335c3ad752e84323cd81ae38de69a/768/432/Image/Png/noFilter",
   },
   {
     title: "Multiplayer lobby system",
@@ -165,7 +165,7 @@ const BEST_WORK = [
     time: "3 weeks",
     amount: "$1,200",
     reach: "11M plays",
-    thumbnailUrl: "https://t3.rbxcdn.com/180DAY-3b2ec062707376a89a223ea44c20d408",
+    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-20a372111085c33de1e64004e4dca1d8/768/432/Image/Png/noFilter",
   },
   {
     title: "Ability FX integration",
@@ -174,7 +174,7 @@ const BEST_WORK = [
     time: "4 weeks",
     amount: "$1,500",
     reach: "8M plays",
-    thumbnailUrl: "https://t6.rbxcdn.com/180DAY-3de571ed1175636497776c44426b9765",
+    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-a688d1dffa1a69836e659d95e7c3e20c/768/432/Image/Png/noFilter",
   },
 ]
 
