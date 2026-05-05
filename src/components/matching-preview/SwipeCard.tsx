@@ -124,7 +124,7 @@ const TOP_GAMES = [
     plays: "18M",
     topCcu: "14K",
     currentCcu: "3.8K",
-    thumbnailUrl: "https://t7.rbxcdn.com/180DAY-57443971b3b446cb6440e98718617428",
+    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-57443971b3b446cb6440e98718617428/768/432/Image/Png/noFilter",
     skills: ["Scripting", "DataStore"],
   },
   {
@@ -133,7 +133,7 @@ const TOP_GAMES = [
     plays: "11M",
     topCcu: "9K",
     currentCcu: "1.9K",
-    thumbnailUrl: "https://t1.rbxcdn.com/180DAY-72e3bf7380cc3afa336d930623036561",
+    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-72e3bf7380cc3afa336d930623036561/768/432/Image/Png/noFilter",
     skills: ["UI Design", "Scripting"],
   },
   {
@@ -142,7 +142,7 @@ const TOP_GAMES = [
     plays: "8M",
     topCcu: "6K",
     currentCcu: "1.2K",
-    thumbnailUrl: "https://t5.rbxcdn.com/180DAY-2d1bce8a7bbdcdd0e6dc378c7b6f566c",
+    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-2d1bce8a7bbdcdd0e6dc378c7b6f566c/768/432/Image/Png/noFilter",
     skills: ["VFX", "Scripting"],
   },
 ]
@@ -324,7 +324,7 @@ export default function SwipeCard() {
             <div className="npc-panel-body">
               {TOP_GAMES.map((game) => (
                 <div key={game.title} className="npc-game-item">
-                  <div className="npc-game-thumb" style={{ background: "#818cf818" }}>
+                  <div className="npc-game-thumb npc-thumb-wide" style={{ background: "#818cf818" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={game.thumbnailUrl} alt={game.title} />
                   </div>
@@ -549,7 +549,7 @@ export default function SwipeCard() {
                   {BEST_WORK.map((item) => {
                     return (
                       <div key={item.title} className="npc-game-item">
-                        <div className="npc-game-thumb">
+                        <div className="npc-game-thumb npc-thumb-wide">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={item.thumbnailUrl} alt={item.title} />
                         </div>
