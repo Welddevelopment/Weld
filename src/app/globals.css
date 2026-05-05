@@ -10439,8 +10439,12 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
    SPLIT HERO (wireframe #1) — card left, copy right
    ============================================================ */
 
+.weld-glass-page .hero-shell-split {
+  width: min(1120px, calc(100% - 48px));
+}
+
 .weld-glass-page .hero-shell-split .hero-shell-grid {
-  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: clamp(28px, 4vw, 56px);
   align-items: center;
 }

@@ -326,13 +326,6 @@ export default function SwipeCard() {
 
   return (
     <div className="npc-root">
-      <div className="npc-meta-row">
-        <span>Preview card</span>
-        <span>|</span>
-        <span className="npc-sparks-count">
-          {sparks} spark{sparks !== 1 ? "s" : ""}
-        </span>
-      </div>
 
       <div className="npc-stack-row">
         {/* Left panel — Games */}
