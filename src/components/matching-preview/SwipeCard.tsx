@@ -116,7 +116,7 @@ const SKILLS: Skill[] = [
   },
 ]
 
-// Wide game thumbnails (16:9) — Popular Roblox games
+// Wide 16:9 game screenshots — Blox Fruits, Tower of Hell, Adopt Me
 const TOP_GAMES = [
   {
     title: "Blox Fruits",
@@ -124,16 +124,16 @@ const TOP_GAMES = [
     plays: "18M",
     topCcu: "14K",
     currentCcu: "3.8K",
-    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-57443971b3b446cb6440e98718617428/768/432/Image/Png/noFilter",
+    thumbnailUrl: "https://t7.rbxcdn.com/180DAY-57443971b3b446cb6440e98718617428",
     skills: ["Scripting", "DataStore"],
   },
   {
-    title: "Jailbreak",
-    desc: "Action-packed prison break game with cops & robbers gameplay, vehicles, and dynamic heists.",
-    plays: "8.9M",
+    title: "Tower of Hell",
+    desc: "Skill-based obby with procedurally assembled obstacle courses, ranked modes, and live leaderboards.",
+    plays: "9.2M",
     topCcu: "12K",
     currentCcu: "3.2K",
-    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-72e3bf7380cc3afa336d930623036561/768/432/Image/Png/noFilter",
+    thumbnailUrl: "https://t3.rbxcdn.com/180DAY-58d59bfe7584647d43085d18c3e9d679",
     skills: ["Scripting", "VFX"],
   },
   {
@@ -142,12 +142,12 @@ const TOP_GAMES = [
     plays: "8M",
     topCcu: "6K",
     currentCcu: "1.2K",
-    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-2d1bce8a7bbdcdd0e6dc378c7b6f566c/768/432/Image/Png/noFilter",
+    thumbnailUrl: "https://t5.rbxcdn.com/180DAY-2d1bce8a7bbdcdd0e6dc378c7b6f566c",
     skills: ["UI Design", "Scripting"],
   },
 ]
 
-// Wide work thumbnails (16:9) — showcase projects with full 16:9 aspect ratio
+// Wide 16:9 game screenshots — Arsenal, Murder Mystery 2, Pet Simulator X
 const BEST_WORK = [
   {
     title: "Combat system & DataStore",
@@ -156,7 +156,7 @@ const BEST_WORK = [
     time: "2 weeks",
     amount: "$900",
     reach: "18M plays",
-    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-a64f70da20fc1e80ee76fe5d49c1be0a/768/432/Image/Png/noFilter",
+    thumbnailUrl: "https://t1.rbxcdn.com/180DAY-72e3bf7380cc3afa336d930623036561",
   },
   {
     title: "Multiplayer lobby system",
@@ -165,7 +165,7 @@ const BEST_WORK = [
     time: "3 weeks",
     amount: "$1,200",
     reach: "11M plays",
-    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-2c691f8c1278352cc98e30afef3c3a4e/768/432/Image/Png/noFilter",
+    thumbnailUrl: "https://t3.rbxcdn.com/180DAY-3b2ec062707376a89a223ea44c20d408",
   },
   {
     title: "Ability FX integration",
@@ -174,7 +174,7 @@ const BEST_WORK = [
     time: "4 weeks",
     amount: "$1,500",
     reach: "8M plays",
-    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-df50e75b674122af9bb3bf8ee17f61bd/768/432/Image/Png/noFilter",
+    thumbnailUrl: "https://t6.rbxcdn.com/180DAY-3de571ed1175636497776c44426b9765",
   },
 ]
 
