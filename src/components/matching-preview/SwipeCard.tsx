@@ -116,6 +116,7 @@ const SKILLS: Skill[] = [
   },
 ]
 
+// Wide game thumbnails (480×270) — Blox Fruits, Arsenal, Adopt Me
 const TOP_GAMES = [
   {
     title: "Rift Raiders",
@@ -123,7 +124,7 @@ const TOP_GAMES = [
     plays: "18M",
     topCcu: "14K",
     currentCcu: "3.8K",
-    thumbnailUrl: "https://picsum.photos/seed/rift-raiders/380/100",
+    thumbnailUrl: "https://t7.rbxcdn.com/180DAY-57443971b3b446cb6440e98718617428",
     skills: ["Scripting", "DataStore"],
   },
   {
@@ -132,7 +133,7 @@ const TOP_GAMES = [
     plays: "11M",
     topCcu: "9K",
     currentCcu: "1.9K",
-    thumbnailUrl: "https://picsum.photos/seed/mecha-mayhem/380/100",
+    thumbnailUrl: "https://t1.rbxcdn.com/180DAY-72e3bf7380cc3afa336d930623036561",
     skills: ["UI Design", "Scripting"],
   },
   {
@@ -141,38 +142,39 @@ const TOP_GAMES = [
     plays: "8M",
     topCcu: "6K",
     currentCcu: "1.2K",
-    thumbnailUrl: "https://picsum.photos/seed/elemental-clash/380/100",
+    thumbnailUrl: "https://t5.rbxcdn.com/180DAY-2d1bce8a7bbdcdd0e6dc378c7b6f566c",
     skills: ["VFX", "Scripting"],
   },
 ]
 
+// Square game icons (512×512) used as work-item thumbnails — Blox Fruits, Arsenal, Adopt Me
 const BEST_WORK = [
   {
-    emoji: "SC",
     title: "Combat system & DataStore",
     desc: "Full server-client combat framework with hitboxes, knockback, persistent stats, and clean OOP Luau documented for handoff.",
     tools: "Luau, DataStore2, Roblox Studio",
     time: "2 weeks",
     amount: "$900",
     reach: "18M plays",
+    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-a64f70da20fc1e80ee76fe5d49c1be0a/512/512/Image/Png/noFilter",
   },
   {
-    emoji: "UI",
     title: "Multiplayer lobby system",
     desc: "Party and lobby flow with matchmaking, private servers, voting, queue status, and server-side validation throughout.",
     tools: "Luau, TeleportService, Roblox Studio",
     time: "3 weeks",
     amount: "$1,200",
     reach: "11M plays",
+    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-2c691f8c1278352cc98e30afef3c3a4e/512/512/Image/Png/noFilter",
   },
   {
-    emoji: "FX",
     title: "Ability FX integration",
     desc: "Synced ability VFX, hit sparks, cooldown events, and animation timing hooks for a fast combat prototype.",
     tools: "ParticleEmitter, TweenService, Luau",
     time: "4 weeks",
     amount: "$1,500",
     reach: "8M plays",
+    thumbnailUrl: "https://tr.rbxcdn.com/180DAY-df50e75b674122af9bb3bf8ee17f61bd/512/512/Image/Png/noFilter",
   },
 ]
 
@@ -233,7 +235,22 @@ export default function SwipeCard() {
   const [flying, setFlying] = useState<"left" | "right" | null>(null)
   const [sparks, setSparks] = useState(0)
   const [toast, setToast] = useState(false)
+  const [avatarUrl, setAvatarUrl] = useState(
+    "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E3EC434BF92DD2F46E81D91592065FD9-Png/150/150/AvatarHeadshot/Png/noFilter"
+  )
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    fetch(
+      "/api/roblox-proxy?path=v1/users/avatar-headshot?userIds=2837719&size=150x150&format=Png&isCircular=false"
+    )
+      .then((r) => r.json())
+      .then((d: { data?: Array<{ imageUrl: string }> }) => {
+        const url = d.data?.[0]?.imageUrl
+        if (url) setAvatarUrl(url)
+      })
+      .catch(() => {})
+  }, [])
 
   function showToast() {
     setToast(true)
@@ -359,7 +376,7 @@ export default function SwipeCard() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     className="npc-avatar-img"
-                    src="https://api.dicebear.com/9.x/pixel-art/png?seed=DevDave&size=150"
+                    src={avatarUrl}
                     alt="DevDave"
                     onError={(e) => {
                       ;(e.target as HTMLImageElement).style.display = "none"
@@ -529,13 +546,12 @@ export default function SwipeCard() {
                   <p className="npc-panel-sub">Projects, systems, and tools I&apos;ve built.</p>
                 </div>
                 <div className="npc-panel-body">
-                  {BEST_WORK.map((item, i) => {
-                    const colors = ["#a78bfa", "#34d399", "#fb923c"]
-                    const c = colors[i % colors.length]
+                  {BEST_WORK.map((item) => {
                     return (
                       <div key={item.title} className="npc-game-item">
-                        <div className="npc-game-thumb" style={{ background: `${c}18` }}>
-                          <span className="npc-game-thumb-cat" style={{ color: c }}>{item.emoji}</span>
+                        <div className="npc-game-thumb">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={item.thumbnailUrl} alt={item.title} />
                         </div>
                         <div className="npc-game-copy">
                           <div className="npc-game-title">{item.title}</div>
@@ -555,7 +571,7 @@ export default function SwipeCard() {
                           </div>
                           <div className="npc-game-tags">
                             {item.tools.split(",").map((t) => (
-                              <span key={t} className="npc-game-tag" style={{ background: `${c}18`, color: c }}>
+                              <span key={t} className="npc-game-tag" style={{ background: "#e8e8f5", color: "#555" }}>
                                 {t.trim()}
                               </span>
                             ))}
