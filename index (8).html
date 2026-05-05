@@ -2718,7 +2718,7 @@ body.modal-open > :not(#modal) {
 .showcase-rows { padding: 0 18px 8px; display: flex; flex-direction: column; gap: 12px; }
 .showcase-row { display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: 16px; border: 1px solid #FFD4CC; background: linear-gradient(135deg,rgba(255,255,255,0.6),rgba(255,240,232,0.5)); transition: box-shadow 0.15s, transform 0.15s; }
 .showcase-row:hover { box-shadow: 0 4px 16px rgba(224,58,30,0.1); transform: translateY(-1px); }
-.showcase-icon { width: 102px; height: 80px; border-radius: 18px; display: block; flex-shrink: 0; overflow: hidden; border: 1px solid rgba(255,212,204,0.92); box-shadow: 0 10px 24px rgba(224,58,30,0.12); background: #FAD4C8; }
+.showcase-icon { width: 140px; aspect-ratio: 16 / 9; border-radius: 18px; display: block; flex-shrink: 0; overflow: hidden; border: 1px solid rgba(255,212,204,0.92); box-shadow: 0 10px 24px rgba(224,58,30,0.12); background: #FAD4C8; }
 .showcase-thumb-btn {
   display: block;
   width: 100%;
@@ -2937,17 +2937,16 @@ body.modal-open > :not(#modal) {
 }
 .aux-work-item {
   display: grid;
-  grid-template-columns: 112px minmax(0,1fr);
+  grid-template-columns: minmax(0, 176px) minmax(0,1fr);
   gap: 14px;
   padding: 18px;
   border-radius: 20px;
   border: 1px solid rgba(220,160,120,0.24);
   background: rgba(255,255,255,0.96);
-  min-height: 160px;
 }
 .aux-work-thumb {
-  width: 112px;
-  height: 112px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
   padding: 0;
   border: none;
   border-radius: 18px;
@@ -7098,30 +7097,18 @@ document.querySelectorAll('.why-grid, .for-grid').forEach(el => revealObserver.o
   }
 
   const ROBLOX_GAME_IDS = [
-    { name: 'Escape Protocol', placeId: 606849621 },
-    { name: 'Shadowed Suspects', placeId: 142823291 },
-    { name: 'Ascent Challenge', placeId: 1962086868 },
-    { name: 'Creature Companions', placeId: 920587237 },
-    { name: 'Rogue Seas', placeId: 2753915549 },
-    { name: 'Rapid Strike', placeId: 286090429 },
-    { name: 'Meadowville Life', placeId: 4924922222 },
-    { name: 'Pet Realm', placeId: 6284583030 },
-    { name: 'Vault Runners', placeId: 2414851778 },
-    { name: 'Hive Empire', placeId: 1537690962 },
-    { name: 'Prestige Academy', placeId: 735030788 },
-    { name: 'Disaster Protocol', placeId: 189707 },
-    { name: 'Neon District', placeId: 4623386862 },
-    { name: 'Suburbia RP', placeId: 185655149 },
-    { name: 'City Social', placeId: 370731277 },
-    { name: 'Pizza Rush', placeId: 192800 },
-    { name: 'Street Kings', placeId: 3351674303 },
-    { name: 'Thrill Park', placeId: 69184822 },
-    { name: 'Combat Arena', placeId: 292439477 },
-    { name: 'Shadow Trials', placeId: 893973440 },
-    { name: 'Anime Legends', placeId: 5715703846 },
-    { name: 'Anime Clash', placeId: 8612629918 },
-    { name: 'Blox Valley', placeId: 2320491278 },
-    { name: 'Ocean Empire', placeId: 7345818711 },
+    { name: 'Jailbreak', placeId: 606849621 },
+    { name: 'Tower of Hell', placeId: 1962086868 },
+    { name: 'Adopt Me!', placeId: 920587237 },
+    { name: 'Arsenal', placeId: 286090429 },
+    { name: 'Blox Fruits', placeId: 2753915549 },
+    { name: 'Brookhaven 🏡RP', placeId: 185655149 },
+    { name: 'Murder Mystery 2', placeId: 142823291 },
+    { name: 'Pet Simulator X', placeId: 6284583030 },
+    { name: 'Piggy', placeId: 301549746 },
+    { name: 'Work at a Pizza Place', placeId: 192800 },
+    { name: 'Bubble Gum Simulator', placeId: 2475267637 },
+    { name: 'Royale High', placeId: 735030788 },
   ];
 
   function createShowcaseImage(title, subtitle, seed) {

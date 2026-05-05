@@ -11149,6 +11149,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .npc-game-item {
   display: flex;
   flex-direction: column;
+  height: 250px;
   flex-shrink: 0;
   border-radius: 14px;
   border: 1px solid #ebebeb;
@@ -11161,8 +11162,8 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 .npc-game-thumb {
   width: 100%;
-  aspect-ratio: 16 / 9;
-  min-height: 0;
+  height: 88px;
+  flex-shrink: 0;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -11306,20 +11307,29 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   position: relative;
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  padding-top: 4px;
 }
+.sgp-item {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  height: 112px;
+  padding: 10px;
+  border: 1px solid #ededed;
+  border-radius: 22px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 8px 18px rgba(17,17,17,0.04);
+}
+.sgp-item:last-child { border-bottom: 1px solid #ededed; }
 
-.npc-cat-popup-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(0,0,0,0.06);
-  color: #666;
-  font-size: 13px;
-  cursor: pointer;
+.sgp-thumb {
+  width: 76px;
+  height: 76px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;

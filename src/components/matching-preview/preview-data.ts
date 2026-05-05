@@ -77,9 +77,18 @@ const GAME_MARKS = ['RBX', 'TOP', 'WIN', 'EXP', 'PVP', 'HIT']
 const GENRES = ['adventure', 'battler', 'social', 'sim', 'racing']
 
 const GAMES = [
-  'Escape Protocol', 'Shadowed Suspects', 'Ascent Challenge', 'Creature Companions',
-  'Rogue Seas', 'Rapid Strike', 'Meadowville Life', 'Pet Realm', 'Vault Runners',
-  'Hive Empire', 'Prestige Academy', 'Neon District', 'Suburbia RP', 'City Social',
+  { title: 'Jailbreak', placeId: 606849621, url: 'https://www.roblox.com/games/606849621/Jailbreak' },
+  { title: 'Adopt Me!', placeId: 920587237, url: 'https://www.roblox.com/games/920587237/Adopt-Me' },
+  { title: 'Arsenal', placeId: 286090429, url: 'https://www.roblox.com/games/286090429/Arsenal' },
+  { title: 'Blox Fruits', placeId: 2753915549, url: 'https://www.roblox.com/games/2753915549/Blox-Fruits' },
+  { title: 'Brookhaven 🏡RP', placeId: 185655149, url: 'https://www.roblox.com/games/185655149/Brookhaven-RP' },
+  { title: 'Murder Mystery 2', placeId: 142823291, url: 'https://www.roblox.com/games/142823291/Murder-Mystery-2' },
+  { title: 'Pet Simulator X', placeId: 6284583030, url: 'https://www.roblox.com/games/6284583030/Pet-Simulator-X' },
+  { title: 'Royale High', placeId: 735030788, url: 'https://www.roblox.com/games/735030788/Royale-High' },
+  { title: 'Work at a Pizza Place', placeId: 192800, url: 'https://www.roblox.com/games/192800/Work-at-a-Pizza-Place' },
+  { title: 'MeepCity', placeId: 370731277, url: 'https://www.roblox.com/games/370731277/MeepCity' },
+  { title: 'Tower of Hell', placeId: 1962086868, url: 'https://www.roblox.com/games/1962086868/Tower-of-Hell' },
+  { title: 'Tower Defense Simulator', placeId: 3260590327, url: 'https://www.roblox.com/games/3260590327/Tower-Defense-Simulator' },
 ]
 
 function devWork(tags: string[], idx: number) {
@@ -103,13 +112,16 @@ function studioGames(studioIdx: number, gameOffset: number) {
     const seed = studioIdx + offset + 1
     const base = 6 + (seed % 18)
     const currentBase = Math.max(1, Math.floor(base / 3))
+    const game = GAMES[(gameOffset + offset) % GAMES.length]
     return {
       emoji: GAME_MARKS[(studioIdx + offset) % GAME_MARKS.length],
-      title: GAMES[(gameOffset + offset) % GAMES.length],
-      desc:  `${GAMES[(gameOffset + offset) % GAMES.length]} is a polished Roblox ${GENRES[offset % 5]} title with daily events, badge progression, and an active live economy built for strong player retention.`,
+      title: game.title,
+      desc:  `${game.title} is a polished Roblox ${GENRES[offset % 5]} title with daily events, badge progression, and an active live economy built for strong player retention.`,
       plays: `${base + 2}M`,
       topCcu: `${base}K`,
       currentCcu: `${currentBase}.${seed % 9}K`,
+      gameUrl: game.url,
+      imageUrl: `https://www.roblox.com/asset-thumbnail/image?assetId=${game.placeId}&width=768&height=432&format=png`,
     }
   })
 }
