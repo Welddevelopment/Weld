@@ -387,7 +387,7 @@ export default function SwipeCard() {
                 <div className="npc-avatar-wrap">
                   <div
                     className="npc-avatar-bg"
-                    style={{ background: "linear-gradient(135deg,#E84624,#FF8A5C)" }}
+                    style={{ background: "#f5ede0" }}
                   />
                   <div className="npc-avatar-initials">DD</div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}

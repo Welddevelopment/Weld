@@ -500,6 +500,10 @@ function HeroCopyPanel({
           {isSuccess ? "You're in ✓" : isSubmitting ? "Joining…" : "Join the beta"}
         </button>
       </div>
+      <p className="hero-proof-line">
+        <div aria-hidden="true" style={{width:7,height:7,borderRadius:"50%",background:"#22c55e",flexShrink:0,boxShadow:"0 0 0 2px rgba(34,197,94,0.22)"}} />
+        over <strong>40</strong> developers in the beta cohort
+      </p>
       <span className="hero-copy-eyebrow-hidden" aria-hidden="true">
         {copy.hero.eyebrow}
       </span>

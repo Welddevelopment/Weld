@@ -7087,8 +7087,8 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 .weld-glass-page .hero-shell {
   width: min(980px, calc(100% - 28px));
-  margin-top: 14px;
-  padding: 24px 26px 22px;
+  margin-top: 28px;
+  padding: 36px 26px 28px;
   border-radius: 31px;
   border-color: rgba(255, 255, 255, 0.96);
   background:
@@ -7624,8 +7624,8 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
   .weld-glass-page .hero-shell {
     width: min(1600px, calc(100% - 28px));
-    margin-top: 8px;
-    padding: 22px 24px 20px;
+    margin-top: 24px;
+    padding: 36px 24px 28px;
   }
 
   .weld-glass-page .hero-shell-grid {
@@ -10459,6 +10459,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 .weld-glass-page .hero-card-column-split .npc-hero-preview-container {
   margin-inline: 0;
+  zoom: 0.76;
 }
 
 .weld-glass-page .hero-talent-card.hero-talent-card-split {
@@ -10718,10 +10719,11 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 /* Copy panel (split right) */
 
 .weld-glass-page .hero-copy-panel-split {
-  padding: 12px 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  align-self: start;
 }
 
 
@@ -10765,7 +10767,28 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   font-size: 15px;
   font-weight: 600;
   flex-shrink: 0;
+  background: #6c5ce7;
+  color: #fff;
+  border: none;
 }
+
+.weld-glass-page .hero-capture-btn:hover:not(:disabled) {
+  background: #5a4bd1;
+}
+
+.weld-glass-page .hero-proof-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 14px;
+  color: #374151;
+}
+
+.weld-glass-page .hero-proof-line strong {
+  font-weight: 700;
+}
+
 
 .weld-glass-page .hero-copy-panel-split .hero-mode-pill {
   display: inline-flex;

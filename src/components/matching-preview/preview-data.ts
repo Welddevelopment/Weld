@@ -1,14 +1,14 @@
 import { PreviewProfile } from './preview-types'
 
 export const BG = [
-  'linear-gradient(135deg,#E84624,#FF8A5C)',
-  'linear-gradient(135deg,#FFF5F0,#FF8A5C)',
-  'linear-gradient(135deg,#FFB5A7,#E84624)',
-  'linear-gradient(135deg,#5DCAA5,#1D9E75)',
-  'linear-gradient(135deg,#534AB7,#7F77DD)',
-  'linear-gradient(135deg,#378ADD,#85B7EB)',
-  'linear-gradient(135deg,#FF6B6B,#FFB5A7)',
-  'linear-gradient(135deg,#2D2D2D,#555)',
+  '#f5ede0',
+  '#f5ede0',
+  '#f5ede0',
+  '#f5ede0',
+  '#f5ede0',
+  '#f5ede0',
+  '#f5ede0',
+  '#f5ede0',
 ]
 
 // Real Roblox creator IDs — recognisable avatars
