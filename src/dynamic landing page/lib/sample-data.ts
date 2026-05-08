@@ -422,6 +422,7 @@ export const DISCIPLINE_OPTIONS = [
   "Scripter",
   "UI",
   "VFX",
+  "SFX",
   "Builder",
   "Animator",
   "Designer",
