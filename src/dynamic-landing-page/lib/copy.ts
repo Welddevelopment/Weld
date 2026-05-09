@@ -6,7 +6,6 @@ export interface LandingCopy {
     modeToggleStudio: string;
     cta: string;
     links: ReadonlyArray<{ href: string; label: string }>;
-    logIn: string;
   };
   hero: {
     eyebrow: string;
@@ -104,9 +103,8 @@ export interface LandingCopy {
 
 const NAV_LINKS = [
   { href: "#how", label: "What it does" },
-  { href: "#profile", label: "Profile" },
   { href: "#chat", label: "Chat" },
-  { href: "#proof", label: "Proof" },
+  { href: "#compare", label: "Compare" },
   { href: "#faq", label: "FAQ" }
 ] as const;
 
@@ -116,8 +114,7 @@ const COPY: Record<Audience, LandingCopy> = {
       modeToggleDeveloper: "I'm a developer",
       modeToggleStudio: "I'm a studio",
       cta: "Join as a developer",
-      links: NAV_LINKS,
-      logIn: "Log in"
+      links: NAV_LINKS
     },
     hero: {
       eyebrow: "Built for Roblox devs",
@@ -137,10 +134,9 @@ const COPY: Record<Audience, LandingCopy> = {
       support:
         "Switch roles and watch the same card adapt. Proof, links, and pricing stay honest across every preview.",
       steps: [
-        ["1", "Build your card", "Add role, rate, skills, links, proof, and shipped projects."],
-        ["2", "We verify proof", "Linked work, projects, and activity get checked so studios can trust your card."],
-        ["3", "Studios match & Spark", "Studios swipe, match, and Spark the talent worth hiring."],
-        ["4", "You get hired", "Chat, agree, build, and get paid with clear context."]
+        ["01", "Build your card", "Add role, rate, skills, links, proof, and shipped projects."],
+        ["02", "Studios swipe", "Studios browse by role, scan your proof, and Spark the right fit."],
+        ["03", "You get hired", "Chat, agree on scope, build it, and get paid."]
       ]
     },
     profileCreation: {
@@ -204,9 +200,9 @@ const COPY: Record<Audience, LandingCopy> = {
       title: "Get early access to Weld.",
       body: "Join the developer beta to shape proof-first talent cards before public launch.",
       benefits: [
-        ["Verified talent", "Stand out with Roblox experience and proof.", "user"],
-        ["Matched with right work", "Connect with projects that fit your skills and goals.", "code"],
-        ["Get paid securely", "Transparent rates, milestones, and on-time payouts.", "folder"]
+        ["Founding member badge", "Locked in early with a badge that proves it.", "shield"],
+        ["Lower fee, locked in", "Beta members get the reduced rate. Forever.", "code"],
+        ["Direct line to founders", "Shape the product while we're still building it.", "user"]
       ],
       button: "Join as a developer",
       placeholder: "you@example.com",
@@ -226,6 +222,11 @@ const COPY: Record<Audience, LandingCopy> = {
       kicker: "FAQ",
       title: "A few plain answers.",
       items: [
+        {
+          question: "Is this official Roblox?",
+          answer:
+            "No. Weld is independent. We use Roblox-talent-specific language, not Roblox logos or official verification marks."
+        },
         {
           question: "What is Weld?",
           answer:
@@ -247,11 +248,6 @@ const COPY: Record<Audience, LandingCopy> = {
             "No. Card content is illustrative product demo data showing how Weld packages proof, links, rate, and availability."
         },
         {
-          question: "Is this official Roblox?",
-          answer:
-            "No. Weld is independent. We use Roblox-talent-specific language, not Roblox logos or official verification marks."
-        },
-        {
           question: "When will access open?",
           answer:
             "Invite-first beta. We'll send the next step to your email when developer access opens."
@@ -270,8 +266,7 @@ const COPY: Record<Audience, LandingCopy> = {
       modeToggleDeveloper: "I'm a developer",
       modeToggleStudio: "I'm a studio",
       cta: "Get hiring access",
-      links: NAV_LINKS,
-      logIn: "Log in"
+      links: NAV_LINKS
     },
     hero: {
       eyebrow: "Built for Roblox studios",
@@ -291,10 +286,9 @@ const COPY: Record<Audience, LandingCopy> = {
       support:
         "Same card shape across every role, so your team compares fit fast instead of digging through Discord.",
       steps: [
-        ["1", "Browse by role", "Filter Scripters, Builders, UI, VFX, Animators, and Systems devs."],
-        ["2", "Read verified proof", "Linked work, projects, and activity are checked before the card shows."],
-        ["3", "Spark the right fit", "Like, shortlist, and Spark talent that matches scope, rate, and availability."],
-        ["4", "Start a real chat", "First message lands with proof, scope, and availability beside the thread."]
+        ["01", "Browse by role", "Filter Scripters, Builders, UI, VFX, Animators, and Systems devs."],
+        ["02", "Spark the fit", "Scan verified proof, rate, and availability. Spark talent that matches your scope."],
+        ["03", "Start the hire", "First message lands with proof, scope, and availability beside the thread."]
       ]
     },
     profileCreation: {
@@ -357,9 +351,9 @@ const COPY: Record<Audience, LandingCopy> = {
       title: "Get hiring access to Weld.",
       body: "Join the studio beta to shape faster scouting, clearer proof, and better first conversations.",
       benefits: [
-        ["Trust & proof", "Verified talent and secure collaboration.", "shield"],
-        ["Built for Roblox", "Role-first cards with experience that matters.", "code"],
-        ["Matches that work", "Smart matching connects you with the right people.", "user"]
+        ["Founding studio badge", "Locked in early as a verified hiring studio.", "shield"],
+        ["Lower fee, locked in", "Beta studios get the reduced rate. Forever.", "code"],
+        ["Direct line to founders", "Shape the product while we're still building it.", "user"]
       ],
       button: "Get hiring access",
       placeholder: "studio@example.com",
@@ -380,6 +374,11 @@ const COPY: Record<Audience, LandingCopy> = {
       title: "A few plain answers.",
       items: [
         {
+          question: "Is this official Roblox?",
+          answer:
+            "No. Weld is independent. We use Roblox-talent-specific language, not Roblox logos or official verification marks."
+        },
+        {
           question: "What is Weld?",
           answer:
             "Weld is a Roblox talent network. Studios scan role-first cards with proof, rate, availability, and shipped work in one place."
@@ -398,11 +397,6 @@ const COPY: Record<Audience, LandingCopy> = {
           question: "Are these real marketplace stats?",
           answer:
             "No. Card content is illustrative product demo data showing how Weld packages proof, links, rate, and availability."
-        },
-        {
-          question: "Is this official Roblox?",
-          answer:
-            "No. Weld is independent. We use Roblox-talent-specific language, not Roblox logos or official verification marks."
         },
         {
           question: "When will access open?",

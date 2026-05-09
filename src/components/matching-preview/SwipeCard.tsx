@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import type { MarqueeProfile } from "@/data/marqueeProfiles"
 
 type RightPanel = null | "work" | string
 
@@ -251,7 +252,7 @@ function IconBack() {
   )
 }
 
-export default function SwipeCard() {
+export default function SwipeCard({ profile }: { profile?: MarqueeProfile }) {
   const [leftOpen, setLeftOpen] = useState(false)
   const [rightPanel, setRightPanel] = useState<RightPanel>(null)
   const [catPopup, setCatPopup] = useState<{ skill: Skill; idx: number } | null>(null)
@@ -262,9 +263,28 @@ export default function SwipeCard() {
   const [avatarUrl, setAvatarUrl] = useState(
     "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E3EC434BF92DD2F46E81D91592065FD9-Png/150/150/AvatarHeadshot/Png/noFilter"
   )
+
+  const p = profile
+  const displayName = p?.displayName ?? "DevDave"
+  const initial = p?.initial ?? "DD"
+  const avatarColor = p?.avatarColor ?? "#f5ede0"
+  const verified = p?.verified ?? true
+  const online = p?.online ?? true
+  const bio = p?.bio ?? "I've been building Roblox games professionally for four years, shipping everything from solo indie projects to large-team live titles. My strength is owning full verticals — I can design the DataStore schema, write the server-client combat logic, wire up the UI, and layer VFX on top, all within a single project. I write clean, documented OOP Luau that the next developer on the team can actually maintain."
+  const hourlyRate = p?.hourlyRate ?? 65
+  const rateMode = p?.rateMode ?? "Hourly or milestone"
+  const skills = p?.skills ?? SKILLS.map(s => s.name)
+  const primaryRole = p?.primaryRole ?? "4yr experience"
+  const externalLinks = p?.externalLinks ?? [{ label: "Roblox Profile", url: "#" }, { label: "GitHub", url: "#" }]
+  const socials = p?.socials ?? ["roblox", "discord", "x"] as MarqueeProfile["socials"]
+  const yearsExp = p ? (p.yearsExperience === 1 ? "1 yr" : `${p.yearsExperience}+ yrs`) : "4+ yrs"
+  const projectsShipped = p?.projectsShipped ?? 38
+  const scriptsCount = p?.scriptsCount ?? "120+"
+  const skillCount = p?.skillCount ?? 4
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
+    if (profile) return
     fetch(
       "/api/roblox-proxy?path=v1/users/avatar-headshot?userIds=2837719&size=150x150&format=Png&isCircular=false"
     )
@@ -274,7 +294,7 @@ export default function SwipeCard() {
         if (url) setAvatarUrl(url)
       })
       .catch(() => {})
-  }, [])
+  }, [profile])
 
   function showToast() {
     setToast(true)
@@ -387,19 +407,21 @@ export default function SwipeCard() {
                 <div className="npc-avatar-wrap">
                   <div
                     className="npc-avatar-bg"
-                    style={{ background: "#f5ede0" }}
+                    style={{ background: avatarColor }}
                   />
-                  <div className="npc-avatar-initials">DD</div>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    className="npc-avatar-img"
-                    src={avatarUrl}
-                    alt="DevDave"
-                    onError={(e) => {
-                      ;(e.target as HTMLImageElement).style.display = "none"
-                    }}
-                  />
-                  <div className="npc-online-dot" />
+                  <div className="npc-avatar-initials">{initial}</div>
+                  {!profile && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      className="npc-avatar-img"
+                      src={avatarUrl}
+                      alt={displayName}
+                      onError={(e) => {
+                        ;(e.target as HTMLImageElement).style.display = "none"
+                      }}
+                    />
+                  )}
+                  {online && <div className="npc-online-dot" />}
                 </div>
 
                 <div className="npc-top-right">
@@ -411,7 +433,7 @@ export default function SwipeCard() {
                           <circle cx="12" cy="7" r="4" />
                         </svg>
                       </div>
-                      <div className="npc-stat-val">4+ yrs</div>
+                      <div className="npc-stat-val">{yearsExp}</div>
                       <div className="npc-stat-lbl">Experience</div>
                     </div>
                     <div className="npc-stat">
@@ -421,7 +443,7 @@ export default function SwipeCard() {
                           <path d="M8 21h8M12 17v4" />
                         </svg>
                       </div>
-                      <div className="npc-stat-val">38</div>
+                      <div className="npc-stat-val">{projectsShipped}</div>
                       <div className="npc-stat-lbl">Projects</div>
                     </div>
                     <div className="npc-stat">
@@ -431,7 +453,7 @@ export default function SwipeCard() {
                           <polyline points="8 6 2 12 8 18" />
                         </svg>
                       </div>
-                      <div className="npc-stat-val">120+</div>
+                      <div className="npc-stat-val">{scriptsCount}</div>
                       <div className="npc-stat-lbl">Scripts</div>
                     </div>
                     <div className="npc-stat">
@@ -441,59 +463,56 @@ export default function SwipeCard() {
                           <line x1="7" y1="7" x2="7.01" y2="7" />
                         </svg>
                       </div>
-                      <div className="npc-stat-val">4</div>
+                      <div className="npc-stat-val">{skillCount}</div>
                       <div className="npc-stat-lbl">Skills</div>
                     </div>
                   </div>
                   <div className="npc-socials">
-                    <a href="#" className="npc-social-btn npc-social-roblox" title="Roblox" onClick={preventLink}><IconRoblox /></a>
-                    <a href="#" className="npc-social-btn npc-social-discord" title="Discord" onClick={preventLink}><IconDiscord /></a>
-                    <a href="#" className="npc-social-btn npc-social-x" title="X" onClick={preventLink}><IconX /></a>
+                    {socials.includes("roblox") && <a href="#" className="npc-social-btn npc-social-roblox" title="Roblox" onClick={preventLink}><IconRoblox /></a>}
+                    {socials.includes("discord") && <a href="#" className="npc-social-btn npc-social-discord" title="Discord" onClick={preventLink}><IconDiscord /></a>}
+                    {socials.includes("x") && <a href="#" className="npc-social-btn npc-social-x" title="X" onClick={preventLink}><IconX /></a>}
+                    {socials.includes("github") && <a href="#" className="npc-social-btn npc-social-x" title="GitHub" onClick={preventLink}><IconExternal /></a>}
+                    {socials.includes("youtube") && <a href="#" className="npc-social-btn npc-social-x" title="YouTube" onClick={preventLink}><IconExternal /></a>}
                   </div>
-                  <a href="#" className="npc-portfolio-top-link" onClick={preventLink}>
-                    <IconExternal /> Roblox Profile
-                  </a>
-                  <a href="#" className="npc-portfolio-top-link" onClick={preventLink}>
-                    <IconExternal /> GitHub
-                  </a>
+                  {externalLinks.map((link) => (
+                    <a key={link.label} href="#" className="npc-portfolio-top-link" onClick={preventLink}>
+                      <IconExternal /> {link.label}
+                    </a>
+                  ))}
                 </div>
               </div>
 
               <div className="npc-identity">
                 <div className="npc-name-row">
-                  <h2 className="npc-name">DevDave</h2>
-                  <span className="npc-verified" title="Pro Developer">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                    </svg>
-                  </span>
+                  <h2 className="npc-name">{displayName}</h2>
+                  {verified && (
+                    <span className="npc-verified" title="Pro Developer">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                      </svg>
+                    </span>
+                  )}
                 </div>
-                <p className="npc-role">4yr experience</p>
+                <p className="npc-role">{primaryRole}</p>
               </div>
 
               <div className="npc-divider" />
 
-              <p className="npc-bio">
-                I&apos;ve been building Roblox games professionally for four years, shipping everything from solo
-                indie projects to large-team live titles. My strength is owning full verticals — I can design the
-                DataStore schema, write the server-client combat logic, wire up the UI, and layer VFX on top, all
-                within a single project. I write clean, documented OOP Luau that the next developer on the team can
-                actually maintain.
-              </p>
+              <p className="npc-bio">{bio}</p>
 
               <div className="npc-rate-skills">
                 <div className="npc-rate-pill">
-                  <div className="npc-rate-amount">$65 / hr</div>
-                  <div className="npc-rate-type">Hourly or milestone</div>
+                  <div className="npc-rate-amount">${hourlyRate} / hr</div>
+                  <div className="npc-rate-type">{rateMode}</div>
                 </div>
                 <div className="npc-skills-wrap">
-                  {SKILLS.map((sk) => (
+                  {skills.map((sk) => (
                     <button
-                      key={sk.name}
-                      className={`npc-skill-chip${rightPanel === sk.name ? " npc-skill-chip--active" : ""}`}
-                      onClick={() => setRightPanel((v) => (v === sk.name ? null : sk.name))}
+                      key={sk}
+                      className={`npc-skill-chip${rightPanel === sk ? " npc-skill-chip--active" : ""}`}
+                      onClick={() => setRightPanel((v) => (v === sk ? null : sk))}
                     >
-                      {sk.name}
+                      {sk}
                     </button>
                   ))}
                 </div>

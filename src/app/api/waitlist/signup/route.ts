@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       inviteCode: snapshot.lead.inviteCode,
-      inviteUrl: `${request.nextUrl.origin}/invite/${snapshot.lead.inviteCode}`,
+      inviteUrl: `/invite/${snapshot.lead.inviteCode}`,
       shareUrl: snapshot.lead.shareUrl,
       rewardTier: snapshot.rewardTier.slug,
       waveLabel: snapshot.waveLabel

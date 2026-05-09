@@ -16,27 +16,22 @@ import {
 import {
   captureAttributionFromLocation,
   persistAudiencePreference,
-  submitSignupCapture,
   trackEvent
 } from "@/dynamic-landing-page/lib/browser";
 import type { SourceVariant } from "@/dynamic-landing-page/lib/source-variant";
 import type { Audience } from "@/dynamic-landing-page/lib/types";
 import { useMotionPolicy } from "@/dynamic-landing-page/lib/useMotionPolicy";
-import { DoodleBubble } from "@/dynamic-landing-page/components/primitives/DoodleBubble";
-import { DoodleNote } from "@/dynamic-landing-page/components/primitives/DoodleNote";
-import { MatchMeter } from "@/dynamic-landing-page/components/primitives/MatchMeter";
 import { Sticker } from "@/dynamic-landing-page/components/primitives/Sticker";
 import { getLandingCopy, type LandingCopy } from "@/dynamic-landing-page/lib/copy";
 import {
   PROFILES,
   ROLE_LABELS,
   ROLE_ORDER,
-  nextRole,
-  type DetailKey,
   type RoleKey,
   type TalentProfile
 } from "@/dynamic-landing-page/lib/role-config";
 import SwipeCard from "@/components/matching-preview/SwipeCard";
+import { MARQUEE_PROFILES } from "@/data/marqueeProfiles";
 
 interface MarketingPageProps {
   initialMode: Audience;
@@ -44,11 +39,253 @@ interface MarketingPageProps {
   page: "landing" | "studios";
 }
 
-type SwipeState = "idle" | "reject" | "like" | "spark";
 type CapturePhase = "idle" | "submitting" | "success" | "error";
+type HiringAnim = "idle" | "spark" | "skip";
 
 const WAITLIST_URL = "https://weldroblox.com";
 
+const HIRING_PANELS: Record<RoleKey, Array<{
+  studio: string;
+  credibility: string;
+  role: string;
+  rate: string;
+  scope: string;
+  chips: string[];
+  social: string;
+}>> = {
+  scripter: [
+    {
+      studio: "Eclipse Studios",
+      credibility: "12 shipped · 4M plays/mo",
+      role: "Combat scripter (3 mo contract)",
+      rate: "$60–85 / hr · paid weekly",
+      scope: "Build the ability + dodge system for our combat update. Existing codebase.",
+      chips: ["Lua", "Combat systems", "EU/US TZ"],
+      social: "Reply rate: 84% · avg 6h"
+    },
+    {
+      studio: "Zenith Games",
+      credibility: "8 shipped · 2.1M plays/mo",
+      role: "Anti-cheat developer (ongoing)",
+      rate: "$70 / hr · milestone",
+      scope: "Retrofit our FPS title with server-side validation. Solo codebase.",
+      chips: ["Server Lua", "Anti-cheat", "FPS experience"],
+      social: "Trusted by 7 devs on Weld"
+    },
+    {
+      studio: "Phantom Works",
+      credibility: "5 shipped · 900k plays/mo",
+      role: "Backend systems engineer (6 mo)",
+      rate: "$8k flat · 3 milestones",
+      scope: "DataStore rewrite + live-ops tooling for our RPG. Well-documented codebase.",
+      chips: ["DataStore", "OOP Lua", "RPG systems"],
+      social: "Reply rate: 91% · avg 4h"
+    }
+  ],
+  builder: [
+    {
+      studio: "NovaBuild Co.",
+      credibility: "15 shipped · 6M plays/mo",
+      role: "Hub builder (2 mo contract)",
+      rate: "$50 / hr · milestone",
+      scope: "Design and build a central social hub. Style guide and reference assets provided.",
+      chips: ["Terrain", "Props", "Social hubs"],
+      social: "Trusted by 9 devs on Weld"
+    },
+    {
+      studio: "Orbit Interactive",
+      credibility: "6 shipped · 1.5M plays/mo",
+      role: "Map artist (ongoing)",
+      rate: "$45–55 / hr · paid weekly",
+      scope: "Ongoing environment work for our open-world RPG. Biomes + POI design.",
+      chips: ["Open world", "Biomes", "Terrain sculpt"],
+      social: "Reply rate: 79% · avg 8h"
+    },
+    {
+      studio: "Solstice Studio",
+      credibility: "4 shipped · 700k plays/mo",
+      role: "Environment lead (3 mo)",
+      rate: "$6k flat · 2 milestones",
+      scope: "Lead the environment team for a new horror title. Own the visual language.",
+      chips: ["Team lead", "Horror", "Atmosphere design"],
+      social: "Reply rate: 88% · avg 3h"
+    }
+  ],
+  ui: [
+    {
+      studio: "Eclipse Studios",
+      credibility: "12 shipped · 4M plays/mo",
+      role: "HUD designer (6 wk contract)",
+      rate: "$55–70 / hr · milestone",
+      scope: "Redesign our combat HUD. Health, abilities, minimap. Figma specs provided.",
+      chips: ["HUD", "Figma handoff", "Combat UI"],
+      social: "Reply rate: 84% · avg 6h"
+    },
+    {
+      studio: "Cascade Labs",
+      credibility: "3 shipped · 400k plays/mo",
+      role: "Onboarding flow UI (1 mo)",
+      rate: "$3.5k flat",
+      scope: "New player tutorial UI. Clear, mobile-friendly, low friction. Brand kit included.",
+      chips: ["Onboarding", "Mobile", "Tutorial UX"],
+      social: "Trusted by 4 devs on Weld"
+    },
+    {
+      studio: "Zenith Games",
+      credibility: "8 shipped · 2.1M plays/mo",
+      role: "Shop interface designer (ongoing)",
+      rate: "$60 / hr · paid weekly",
+      scope: "Design and build our in-game shop. Cart, bundles, promotions. High traffic.",
+      chips: ["Shop UI", "Monetisation", "High polish"],
+      social: "Reply rate: 77% · avg 10h"
+    }
+  ],
+  vfx: [
+    {
+      studio: "Phantom Works",
+      credibility: "5 shipped · 900k plays/mo",
+      role: "Combat VFX artist (2 mo)",
+      rate: "$50–65 / hr · milestone",
+      scope: "Ability FX for 12 combat skills. Style ref provided. Integrate into existing rig.",
+      chips: ["Beam", "ParticleEmitter", "Combat FX"],
+      social: "Reply rate: 91% · avg 4h"
+    },
+    {
+      studio: "Orbit Interactive",
+      credibility: "6 shipped · 1.5M plays/mo",
+      role: "Ambient world FX (ongoing)",
+      rate: "$45 / hr · paid weekly",
+      scope: "Weather, foliage, water effects across 6 biomes. Perf budget is strict.",
+      chips: ["Environment FX", "Optimisation", "Open world"],
+      social: "Trusted by 6 devs on Weld"
+    },
+    {
+      studio: "Solstice Studio",
+      credibility: "4 shipped · 700k plays/mo",
+      role: "UI motion designer (6 wk)",
+      rate: "$3k flat",
+      scope: "Menu transitions, feedback pulses, and HUD animations for a horror title.",
+      chips: ["UI motion", "TweenService", "Horror tone"],
+      social: "Reply rate: 88% · avg 3h"
+    }
+  ],
+  animator: [
+    {
+      studio: "NovaBuild Co.",
+      credibility: "15 shipped · 6M plays/mo",
+      role: "Character animator (3 mo)",
+      rate: "$60 / hr · milestone",
+      scope: "Full locomotion set + 8 emotes for new character lineup. Rig provided.",
+      chips: ["Locomotion", "Emotes", "Character"],
+      social: "Trusted by 11 devs on Weld"
+    },
+    {
+      studio: "Eclipse Studios",
+      credibility: "12 shipped · 4M plays/mo",
+      role: "Cinematic animator (2 mo)",
+      rate: "$55–70 / hr · paid weekly",
+      scope: "Cutscene animations for story mode. 14 scenes, mixed lengths, mocap reference.",
+      chips: ["Cinematics", "Story mode", "Mocap ref"],
+      social: "Reply rate: 84% · avg 6h"
+    },
+    {
+      studio: "Cascade Labs",
+      credibility: "3 shipped · 400k plays/mo",
+      role: "Procedural rigging (1 mo)",
+      rate: "$4k flat",
+      scope: "Procedural IK rig for creature movement. Lua + animation pipeline experience needed.",
+      chips: ["IK rig", "Procedural", "Creature"],
+      social: "Reply rate: 72% · avg 12h"
+    }
+  ],
+  designer: [
+    {
+      studio: "Orbit Interactive",
+      credibility: "6 shipped · 1.5M plays/mo",
+      role: "Game designer (3 mo contract)",
+      rate: "$65 / hr · milestone",
+      scope: "Design core loop, progression, and economy for our upcoming RPG. Design docs provided.",
+      chips: ["Core loops", "Economy", "Progression"],
+      social: "Reply rate: 79% · avg 8h"
+    },
+    {
+      studio: "Eclipse Studios",
+      credibility: "12 shipped · 4M plays/mo",
+      role: "Systems designer (6 wk)",
+      rate: "$60–75 / hr · milestone",
+      scope: "Balance our combat system and reward loop. Data exports and telemetry provided.",
+      chips: ["Balancing", "Combat", "Data-driven"],
+      social: "Reply rate: 84% · avg 6h"
+    },
+    {
+      studio: "Cascade Labs",
+      credibility: "3 shipped · 400k plays/mo",
+      role: "UX game designer (1 mo)",
+      rate: "$4k flat",
+      scope: "Improve new player onboarding flow. Reduce drop-off in first 5 minutes.",
+      chips: ["Onboarding", "Retention", "UX thinking"],
+      social: "Trusted by 4 devs on Weld"
+    }
+  ],
+  systems: [
+    {
+      studio: "Zenith Games",
+      credibility: "8 shipped · 2.1M plays/mo",
+      role: "DataStore architect (ongoing)",
+      rate: "$75 / hr · paid weekly",
+      scope: "Rebuild our DataStore layer for scale. 500k+ DAU. Existing schema docs provided.",
+      chips: ["DataStore", "Scale", "500k+ DAU"],
+      social: "Reply rate: 77% · avg 10h"
+    },
+    {
+      studio: "Phantom Works",
+      credibility: "5 shipped · 900k plays/mo",
+      role: "Economy systems (3 mo)",
+      rate: "$70–85 / hr · milestone",
+      scope: "Design + build virtual economy: currency, shops, sinks, sources. Solo scope.",
+      chips: ["Economy design", "Balancing", "Virtual currency"],
+      social: "Reply rate: 91% · avg 4h"
+    },
+    {
+      studio: "NovaBuild Co.",
+      credibility: "15 shipped · 6M plays/mo",
+      role: "Live-ops tooling (2 mo)",
+      rate: "$6k flat · 3 milestones",
+      scope: "Admin dashboard for live events. Real-time config, flag overrides, basic analytics.",
+      chips: ["Live-ops", "Admin tools", "Real-time config"],
+      social: "Trusted by 9 devs on Weld"
+    }
+  ]
+};
+
+const MARQUEE_CARDS = [
+  { name: "NovaDev", role: "Scripter", rate: "$65/hr", badge: "Verified", accent: "#4F6EF7" },
+  { name: "PixelBuild", role: "Builder", rate: "$45/hr", badge: "Top 5%", accent: "#10B981" },
+  { name: "FluxVFX", role: "VFX", rate: "$55/hr", badge: "Verified", accent: "#F59E0B" },
+  { name: "UIcraft", role: "UI", rate: "$60/hr", badge: "Fast replies", accent: "#8B5CF6" },
+  { name: "ArcSystems", role: "Systems", rate: "$75/hr", badge: "Verified", accent: "#EF4444" },
+  { name: "MotionMike", role: "Animator", rate: "$50/hr", badge: "New", accent: "#06B6D4" },
+  { name: "LuaKing", role: "Scripter", rate: "$80/hr", badge: "Top 5%", accent: "#F97316" },
+  { name: "TerrainCo", role: "Builder", rate: "$40/hr", badge: "Verified", accent: "#84CC16" },
+  { name: "FlareFX", role: "VFX", rate: "$65/hr", badge: "Fast replies", accent: "#EC4899" },
+  { name: "ShopUI_Dev", role: "UI", rate: "$70/hr", badge: "Verified", accent: "#6366F1" },
+  { name: "DataLord", role: "Systems", rate: "$85/hr", badge: "Top 5%", accent: "#0EA5E9" },
+  { name: "AnimStudio", role: "Animator", rate: "$55/hr", badge: "Verified", accent: "#A855F7" },
+  { name: "CombatDev", role: "Scripter", rate: "$70/hr", badge: "Fast replies", accent: "#14B8A6" },
+  { name: "MapMaker", role: "Builder", rate: "$48/hr", badge: "New", accent: "#F59E0B" },
+  { name: "NeonVFX", role: "VFX", rate: "$60/hr", badge: "Verified", accent: "#EF4444" },
+  { name: "HudPro", role: "UI", rate: "$58/hr", badge: "Top 5%", accent: "#22C55E" }
+];
+
+const STUDIO_STRIP = [
+  { name: "Eclipse Studios", hiring: 3, plays: "4M plays/mo", verified: true, accent: "#4F6EF7" },
+  { name: "NovaBuild Co.", hiring: 5, plays: "6M plays/mo", verified: true, accent: "#10B981" },
+  { name: "Zenith Games", hiring: 2, plays: "2.1M plays/mo", verified: true, accent: "#F59E0B" },
+  { name: "Phantom Works", hiring: 4, plays: "900k plays/mo", verified: true, accent: "#8B5CF6" },
+  { name: "Orbit Interactive", hiring: 2, plays: "1.5M plays/mo", verified: false, accent: "#EF4444" },
+  { name: "Solstice Studio", hiring: 1, plays: "700k plays/mo", verified: true, accent: "#06B6D4" },
+  { name: "Cascade Labs", hiring: 3, plays: "400k plays/mo", verified: false, accent: "#F97316" }
+];
 
 function joinHref(mode: Audience, search: string) {
   const base = mode === "studio" ? "/studios" : "/";
@@ -56,10 +293,7 @@ function joinHref(mode: Audience, search: string) {
 }
 
 function scrollToId(id: string) {
-  if (typeof window === "undefined") {
-    return;
-  }
-
+  if (typeof window === "undefined") return;
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -80,20 +314,19 @@ function WeldLandingPage({
   const [isPending, startTransition] = useTransition();
   const [mode, setMode] = useState<Audience>(initialMode);
   const [role, setRole] = useState<RoleKey>("scripter");
-  const [swipeState, setSwipeState] = useState<SwipeState>("idle");
-  const [detailKey, setDetailKey] = useState<DetailKey | null>(null);
   const [email, setEmail] = useState("");
   const [capturePhase, setCapturePhase] = useState<CapturePhase>("idle");
   const [captureStatus, setCaptureStatus] = useState("");
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [isSwapping, setIsSwapping] = useState(false);
   const [swipeModalOpen, setSwipeModalOpen] = useState(false);
+  const [hiringPanel, setHiringPanel] = useState(0);
+  const [hiringAnim, setHiringAnim] = useState<HiringAnim>("idle");
   const captureRef = useRef<HTMLDivElement | null>(null);
   const pageShellRef = useRef<HTMLDivElement | null>(null);
 
   const activeProfile = PROFILES[role];
   const modeCopy = getLandingCopy(mode);
-  const activeDetail = detailKey ? activeProfile.proofDetails[detailKey] : null;
 
   useEffect(() => {
     captureAttributionFromLocation();
@@ -101,9 +334,7 @@ function WeldLandingPage({
 
   useEffect(() => {
     const root = pageShellRef.current;
-    if (!root) {
-      return;
-    }
+    if (!root) return;
     if (motion.reducedMotion || typeof IntersectionObserver === "undefined") {
       root
         .querySelectorAll<HTMLElement>("[data-reveal]")
@@ -112,9 +343,7 @@ function WeldLandingPage({
     }
 
     const targets = root.querySelectorAll<HTMLElement>('[data-reveal="pending"]');
-    if (targets.length === 0) {
-      return;
-    }
+    if (targets.length === 0) return;
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry, index) => {
@@ -145,10 +374,7 @@ function WeldLandingPage({
   }, [mode, page, sourceVariant]);
 
   function handleModeChange(nextMode: Audience) {
-    if (nextMode === mode) {
-      return;
-    }
-
+    if (nextMode === mode) return;
     setMode(nextMode);
     persistAudiencePreference(nextMode);
     setCaptureStatus("");
@@ -167,20 +393,18 @@ function WeldLandingPage({
   }
 
   function handleRoleChange(nextRoleKey: RoleKey) {
-    if (nextRoleKey === role) {
-      return;
-    }
+    if (nextRoleKey === role) return;
 
     if (motion.reducedMotion) {
       setRole(nextRoleKey);
-      setSwipeState("idle");
-      setDetailKey(null);
+      setHiringPanel(0);
+      setHiringAnim("idle");
     } else {
       setIsSwapping(true);
       window.setTimeout(() => {
         setRole(nextRoleKey);
-        setSwipeState("idle");
-        setDetailKey(null);
+        setHiringPanel(0);
+        setHiringAnim("idle");
         setIsSwapping(false);
       }, 120);
     }
@@ -200,54 +424,35 @@ function WeldLandingPage({
       audience: mode,
       payload: { source, variant: sourceVariant }
     });
-
     scrollToId("join");
-  }
-
-  function handleLearnMore() {
-    void trackEvent({
-      eventName: "landing_learn_more_clicked",
-      page,
-      audience: mode,
-      payload: { role }
-    });
-
-    scrollToId("how");
-  }
-
-  function handleSwipe(nextState: Exclude<SwipeState, "idle">) {
-    setSwipeState(nextState);
-    setDetailKey(null);
-
-    void trackEvent({
-      eventName: "landing_card_action",
-      page,
-      audience: mode,
-      payload: { role, action: nextState }
-    });
-
-    if (nextState === "reject") {
-      window.setTimeout(
-        () => {
-          setRole((current) => nextRole(current));
-          setSwipeState("idle");
-        },
-        motionTier === "reduced" ? 80 : 340
-      );
-      return;
-    }
-
-    if (nextState === "spark") {
-      window.setTimeout(() => scrollToId("join"), motionTier === "reduced" ? 0 : 180);
-    }
-
     window.setTimeout(
-      () => setSwipeState("idle"),
-      motionTier === "reduced" ? 600 : 1100
+      () => captureRef.current?.querySelector("input")?.focus(),
+      motionTier === "reduced" ? 0 : 450
     );
   }
 
-  async function handleCapture() {
+  function handleHiringAction(action: "spark" | "skip") {
+    const panels = HIRING_PANELS[role];
+    setHiringAnim(action);
+
+    void trackEvent({
+      eventName: "landing_hiring_action",
+      page,
+      audience: mode,
+      payload: { role, action, panel: hiringPanel }
+    });
+
+    if (action === "spark") {
+      window.setTimeout(() => scrollToId("join"), motionTier === "reduced" ? 0 : 180);
+    }
+
+    window.setTimeout(() => {
+      setHiringPanel((current) => (current + 1) % panels.length);
+      setHiringAnim("idle");
+    }, motionTier === "reduced" ? 80 : 360);
+  }
+
+  function openSignupForm() {
     if (!email.trim()) {
       setCapturePhase("error");
       setCaptureStatus("Add your email to join early access.");
@@ -255,28 +460,24 @@ function WeldLandingPage({
       return;
     }
 
+    void trackEvent({
+      eventName: "landing_signup_form_opened",
+      page,
+      audience: mode,
+      payload: { variant: sourceVariant }
+    });
+
     setCapturePhase("submitting");
-    setCaptureStatus("Joining...");
+    setCaptureStatus("Opening your signup form...");
 
-    try {
-      const response = await submitSignupCapture({
-        email,
-        audience: mode,
-        source: "final",
-        page,
-        variant: sourceVariant
-      });
+    const signupParams = new URLSearchParams({
+      email: email.trim(),
+      type: mode
+    });
 
-      setCapturePhase("success");
-      setCaptureStatus("You're on list. Opening your invite...");
-
-      window.setTimeout(() => {
-        router.push(response.inviteUrl || `/invite/${response.inviteCode}`);
-      }, motionTier === "reduced" ? 0 : 500);
-    } catch {
-      setCapturePhase("error");
-      setCaptureStatus("Something went wrong. Try again in a moment.");
-    }
+    window.setTimeout(() => {
+      router.push(`/signup?${signupParams.toString()}`);
+    }, motionTier === "reduced" ? 0 : 180);
   }
 
   return (
@@ -319,13 +520,15 @@ function WeldLandingPage({
       )}
 
       <main className="weld-glass-main">
+
+        {/* 1. Hero — untouched */}
         <HeroShell>
           <HeroCopyPanel
             copy={modeCopy}
             email={email}
             capturePhase={capturePhase}
             onEmailChange={setEmail}
-            onSubmit={() => void handleCapture()}
+            onSubmit={openSignupForm}
           />
           <div className="hero-card-column hero-card-column-split">
             <div className="npc-hero-preview-container">
@@ -343,35 +546,36 @@ function WeldLandingPage({
           </div>
         </HeroShell>
 
+        {/* 2. How it works — 3-step row */}
         <HowItWorksStrip copy={modeCopy} />
 
+        {/* 3. Live talent marquee */}
+        <TalentMarqueeSection />
+
+        {/* 4. Role switching — POV-flips per audience */}
         <RoleTalentExplorer
+          mode={mode}
           copy={modeCopy}
           role={role}
           profile={activeProfile}
           isSwapping={isSwapping}
+          hiringPanel={hiringPanel}
+          hiringAnim={hiringAnim}
           onRoleChange={handleRoleChange}
+          onHiringAction={handleHiringAction}
         />
 
-        <ProfileCreationSection copy={modeCopy} profile={activeProfile} />
+        {/* 5. And here's who's looking */}
+        <OtherSideSection mode={mode} />
 
-        <ChatPreviewSection copy={modeCopy} profile={activeProfile} />
+        {/* 6. Chat — POV-flips per audience */}
+        <ChatPreviewSection copy={modeCopy} profile={activeProfile} mode={mode} />
 
-        <AntiDiscordSection copy={modeCopy} />
-
-        <ProofTrustSection
-          copy={modeCopy}
-          profile={activeProfile}
-          swipeState={swipeState}
-          onDetailToggle={setDetailKey}
-          onSwipe={handleSwipe}
-        />
-
+        {/* 7. Comparison table — dot scale */}
         <ComparisonTableSection />
 
-        <StudioScoutSection copy={modeCopy} />
-
-        <WaitlistSignupSection
+        {/* 8. Get early access — combined CTA */}
+        <EarlyAccessSection
           mode={mode}
           copy={modeCopy}
           email={email}
@@ -379,21 +583,13 @@ function WeldLandingPage({
           status={captureStatus}
           captureRef={captureRef}
           onEmailChange={setEmail}
-          onSubmit={() => void handleCapture()}
+          onSubmit={openSignupForm}
         />
 
         <FriendlyFAQ copy={modeCopy} openFaq={openFaq} onToggle={setOpenFaq} />
       </main>
 
       <FooterCTA copy={modeCopy} />
-
-      {activeDetail ? (
-        <ProofDetailDialog
-          title={activeDetail.title}
-          body={activeDetail.body}
-          onClose={() => setDetailKey(null)}
-        />
-      ) : null}
     </div>
   );
 }
@@ -430,7 +626,6 @@ function GlassNav({
             {item.label}
           </a>
         ))}
-        <Link href="/login">{copy.nav.logIn}</Link>
         <a
           href="#join"
           className="button-primary button-nav"
@@ -493,6 +688,7 @@ function HeroCopyPanel({
           aria-label="Email address"
         />
         <button
+          type="button"
           className="hero-capture-btn button-primary"
           onClick={onSubmit}
           disabled={isSubmitting || isSuccess}
@@ -500,10 +696,10 @@ function HeroCopyPanel({
           {isSuccess ? "You're in ✓" : isSubmitting ? "Joining…" : "Join the beta"}
         </button>
       </div>
-      <p className="hero-proof-line">
+      <div className="hero-proof-line">
         <div aria-hidden="true" style={{width:7,height:7,borderRadius:"50%",background:"#22c55e",flexShrink:0,boxShadow:"0 0 0 2px rgba(34,197,94,0.22)"}} />
-        over <strong>40</strong> developers in the beta cohort
-      </p>
+        over <strong>30</strong> studio signups
+      </div>
       <span className="hero-copy-eyebrow-hidden" aria-hidden="true">
         {copy.hero.eyebrow}
       </span>
@@ -511,111 +707,10 @@ function HeroCopyPanel({
   );
 }
 
-function HeroTalentCard({
-  profile,
-  swipeState,
-  isSwapping
-}: {
-  profile: TalentProfile;
-  swipeState: SwipeState;
-  isSwapping: boolean;
-}) {
-  const stats: Array<{ icon: ReactNode; label: string; value: string }> = [
-    { icon: <UserIcon />, label: profile.years, value: "Experience" },
-    { icon: <FolderIcon />, label: profile.projects, value: "Projects" },
-    { icon: <ClockIcon />, label: profile.reliability, value: "Reliability" }
-  ];
-
-  return (
-    <div className="hero-card-column hero-card-column-split">
-      <article
-        className={`hero-talent-card hero-talent-card-split is-${swipeState}`}
-        data-swapping={isSwapping ? "true" : "false"}
-      >
-        <div className="hero-card-top-row">
-          <span className="hero-card-verified-pill">
-            <ShieldIcon />
-            Verified
-          </span>
-          <div className="hero-card-corner-icons" aria-hidden="true">
-            <span><GithubIcon /></span>
-            <span><LinkedInIcon /></span>
-          </div>
-        </div>
-
-        <div className="hero-card-identity-row">
-          <div className="profile-avatar-shell hero-avatar-shell-clean">
-            <div className="profile-avatar">
-              <span className="avatar-hair" />
-              <span className="avatar-face">
-                <span className="avatar-mouth" />
-              </span>
-              <span className="avatar-hoodie" />
-            </div>
-            <span className="avatar-status-dot" />
-          </div>
-          <div className="hero-card-clean-identity">
-            <div className="hero-card-name-row">
-              <h2>{profile.name}</h2>
-              <span className="verified-dot is-active" aria-hidden="true">
-                <CheckIcon />
-              </span>
-            </div>
-            <p className="hero-card-role">{profile.label}</p>
-            <p className="hero-card-availability">
-              <span />
-              {profile.availability}
-            </p>
-          </div>
-        </div>
-
-        <div className="hero-stat-row-split" aria-label="Profile proof stats">
-          {stats.map((stat) => (
-            <div key={stat.value} className="hero-stat-chip-split">
-              {stat.icon}
-              <div>
-                <strong>{stat.label}</strong>
-                <span>{stat.value}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <p className="hero-card-headline hero-card-headline-split">{profile.headline}</p>
-
-        <div className="hero-card-commerce-row hero-card-commerce-split">
-          <div className="hero-rate-pill hero-rate-pill-split">
-            <span>Rate</span>
-            <strong>{profile.rate}</strong>
-            <em>{profile.payment}</em>
-          </div>
-          <div className="hero-skill-grid hero-skill-grid-split" aria-label="Services">
-            {profile.services.map((service) => (
-              <span key={service}>{service}</span>
-            ))}
-          </div>
-        </div>
-
-        <div className="hero-link-grid hero-link-grid-split" aria-label="Profile links">
-          {profile.links.map((link) => (
-            <div key={link.label}>
-              <span className={`hero-social-icon is-${socialIconKey(link.label)}`} aria-hidden="true">
-                <SocialIcon label={link.label} />
-              </span>
-              <strong>{link.label}</strong>
-              <em>{link.value}</em>
-            </div>
-          ))}
-        </div>
-      </article>
-    </div>
-  );
-}
-
 function HowItWorksStrip({ copy }: { copy: LandingCopy }) {
   const steps = copy.howItWorks.steps;
   return (
-    <section data-reveal="pending" className="how-strip-section" aria-label={copy.howItWorks.title}>
+    <section data-reveal="pending" className="how-strip-section" id="how" aria-label={copy.howItWorks.title}>
       <div className="glass-card how-strip">
         {steps.map(([number, title, body], index) => (
           <article key={title} className="step-card">
@@ -630,20 +725,48 @@ function HowItWorksStrip({ copy }: { copy: LandingCopy }) {
   );
 }
 
+function TalentMarqueeSection() {
+  const doubled = [...MARQUEE_PROFILES, ...MARQUEE_PROFILES];
+  return (
+    <section className="marquee-section" aria-label="Talent on Weld" aria-hidden="true">
+      <div className="marquee-track">
+        <div className="marquee-inner">
+          {doubled.map((profile, i) => (
+            <div key={`${profile.id}-${i}`} className="marquee-card-wrap">
+              <div className="npc-hero-preview-card">
+                <SwipeCard profile={profile} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function RoleTalentExplorer({
+  mode,
   copy,
   role,
   profile,
   isSwapping,
-  onRoleChange
+  hiringPanel,
+  hiringAnim,
+  onRoleChange,
+  onHiringAction
 }: {
+  mode: Audience;
   copy: LandingCopy;
   role: RoleKey;
   profile: TalentProfile;
   isSwapping: boolean;
+  hiringPanel: number;
+  hiringAnim: HiringAnim;
   onRoleChange: (role: RoleKey) => void;
+  onHiringAction: (action: "spark" | "skip") => void;
 }) {
   const buttonRefs = useRef<Partial<Record<RoleKey, HTMLButtonElement | null>>>({});
+  const panels = HIRING_PANELS[role];
 
   function handleKeyDown(event: KeyboardEvent<HTMLButtonElement>, currentRole: RoleKey) {
     const currentIndex = ROLE_ORDER.indexOf(currentRole);
@@ -671,22 +794,26 @@ function RoleTalentExplorer({
     buttonRefs.current[next]?.focus();
   }
 
+  const isDev = mode === "developer";
+  const headline = isDev ? "Pick what you do. See who's hiring." : copy.howItWorks.title;
+  const lead = isDev
+    ? "Real open roles. Real rates. Spark to apply."
+    : copy.howItWorks.lead;
+
   return (
-    <section data-reveal="pending" className="glass-section how-story-section" id="how">
+    <section data-reveal="pending" className="glass-section how-story-section" id="roles">
       <div className="how-story-grid">
         <div className="section-copy how-story-copy">
-          <span className="section-kicker">{copy.howItWorks.kicker}</span>
-          <h2>{copy.howItWorks.title}</h2>
-          <p>{copy.howItWorks.lead}</p>
-          <p>{copy.howItWorks.support}</p>
+          <span className="section-kicker">{isDev ? "FOR DEVELOPERS" : copy.howItWorks.kicker}</span>
+          <h2>{headline}</h2>
+          <p>{lead}</p>
+          {!isDev && <p>{copy.howItWorks.support}</p>}
 
           <div className="role-explorer-tabs" role="radiogroup" aria-label="Choose a Roblox talent role">
             {ROLE_ORDER.map((entry) => (
               <button
                 key={entry}
-                ref={(node) => {
-                  buttonRefs.current[entry] = node;
-                }}
+                ref={(node) => { buttonRefs.current[entry] = node; }}
                 type="button"
                 role="radio"
                 aria-checked={role === entry}
@@ -700,94 +827,172 @@ function RoleTalentExplorer({
           </div>
         </div>
 
-        <article
-          className="glass-card how-profile-card"
-          data-swapping={isSwapping ? "true" : "false"}
-        >
-          <div className="how-profile-top">
-            <div className="profile-avatar-shell">
-              <div className="profile-avatar">
-                <span className="avatar-hair" />
-                <span className="avatar-face">
-                  <span className="avatar-mouth" />
-                </span>
-                <span className="avatar-hoodie" />
+        {isDev ? (
+          <HiringPanelStack
+            panels={panels}
+            activeIndex={hiringPanel}
+            anim={hiringAnim}
+            isSwapping={isSwapping}
+            onAction={onHiringAction}
+          />
+        ) : (
+          <article
+            className="glass-card how-profile-card"
+            data-swapping={isSwapping ? "true" : "false"}
+          >
+            <div className="how-profile-top">
+              <div className="profile-avatar-shell">
+                <div className="profile-avatar">
+                  <span className="avatar-hair" />
+                  <span className="avatar-face">
+                    <span className="avatar-mouth" />
+                  </span>
+                  <span className="avatar-hoodie" />
+                </div>
+                <span className="avatar-status-dot" />
               </div>
-              <span className="avatar-status-dot" />
-            </div>
-
-            <div>
-              <div className="hero-card-name-row">
-                <h3>{profile.name}</h3>
-                <span className="verified-dot"><CheckIcon /></span>
+              <div>
+                <div className="hero-card-name-row">
+                  <h3>{profile.name}</h3>
+                  <span className="verified-dot"><CheckIcon /></span>
+                </div>
+                <p>{profile.label}</p>
+                <p className="hero-card-availability"><span />{profile.availability}</p>
               </div>
-              <p>{profile.label}</p>
-              <p className="hero-card-availability"><span />{profile.availability}</p>
             </div>
-          </div>
-          <span className="demo-caption">{copy.demo.latestProjectCaption}</span>
-          <p>{profile.latestProject.summary}</p>
-          <div className="how-proof-list">
-            {profile.latestProject.bullets.map((bullet) => (
-              <span key={bullet}><SparkIcon />{bullet}</span>
-            ))}
-          </div>
-          <p className="demo-caption" style={{ marginTop: "12px" }}>
-            {copy.demo.feedbackCaption}
-          </p>
-        </article>
+            <span className="demo-caption">{copy.demo.latestProjectCaption}</span>
+            <p>{profile.latestProject.summary}</p>
+            <div className="how-proof-list">
+              {profile.latestProject.bullets.map((bullet) => (
+                <span key={bullet}><SparkIcon />{bullet}</span>
+              ))}
+            </div>
+            <p className="demo-caption" style={{ marginTop: "12px" }}>
+              {copy.demo.feedbackCaption}
+            </p>
+          </article>
+        )}
       </div>
     </section>
   );
 }
 
-function ProfileCreationSection({
-  copy,
-  profile
+function HiringPanelStack({
+  panels,
+  activeIndex,
+  anim,
+  isSwapping,
+  onAction
 }: {
-  copy: LandingCopy;
-  profile: TalentProfile;
+  panels: (typeof HIRING_PANELS)[RoleKey];
+  activeIndex: number;
+  anim: HiringAnim;
+  isSwapping: boolean;
+  onAction: (action: "spark" | "skip") => void;
 }) {
-  const items: ReadonlyArray<readonly [string, string]> = [
-    ["Role", profile.label],
-    ["Rate", profile.rate],
-    ["Availability", profile.availability],
-    ["Payment", profile.payment],
-    ["Proof links", copy.profileCreation.proofLinksValue],
-    ["Latest project", profile.latestProject.name],
-    copy.profileCreation.cardShapeNote
-  ];
+  const active = panels[activeIndex];
+  const behind1 = panels[(activeIndex + 1) % panels.length];
+  const behind2 = panels[(activeIndex + 2) % panels.length];
 
   return (
-    <section data-reveal="pending" className="glass-section profile-section profile-creation-section" id="profile">
-      <div className="section-copy">
-        <span className="section-kicker">{copy.profileCreation.kicker}</span>
-        <h2>{copy.profileCreation.title}</h2>
-        <p>{copy.profileCreation.body}</p>
-      </div>
-
-      <div className="glass-card profile-board">
-        <div className="profile-board-avatar">
-          <div className="profile-avatar-shell">
-            <div className="profile-avatar">
-              <span className="avatar-hair" />
-              <span className="avatar-face">
-                <span className="avatar-mouth" />
-              </span>
-              <span className="avatar-hoodie" />
+    <div className="hiring-stack-wrapper" data-swapping={isSwapping ? "true" : "false"}>
+      <div className={`hiring-panel-stack is-${anim}`}>
+        <div className="hiring-panel-behind hiring-panel-behind-2">
+          <span className="hiring-panel-stub-label">{behind2.studio}</span>
+        </div>
+        <div className="hiring-panel-behind hiring-panel-behind-1">
+          <span className="hiring-panel-stub-label">{behind1.studio}</span>
+        </div>
+        <article className="glass-card hiring-panel-active">
+          <div className="hiring-panel-header">
+            <div className="hiring-studio-logo">
+              {active.studio.charAt(0)}
             </div>
-            <span className="avatar-status-dot" />
+            <div className="hiring-studio-meta">
+              <strong>
+                {active.studio}
+                <span className="verified-dot is-active" aria-hidden="true">
+                  <CheckIcon />
+                </span>
+              </strong>
+              <em>{active.credibility}</em>
+            </div>
           </div>
-        </div>
+          <h3 className="hiring-panel-role">{active.role}</h3>
+          <div className="hiring-panel-rate">{active.rate}</div>
+          <p className="hiring-panel-scope">{active.scope}</p>
+          <div className="hiring-panel-chips">
+            {active.chips.map((chip) => (
+              <span key={chip} className="hiring-chip">{chip}</span>
+            ))}
+          </div>
+          <div className="hiring-panel-social">{active.social}</div>
+          <div className="hiring-panel-actions">
+            <button
+              type="button"
+              className="hiring-action-skip"
+              onClick={() => onAction("skip")}
+            >
+              Skip
+            </button>
+            <button
+              type="button"
+              className="hiring-action-spark"
+              onClick={() => onAction("spark")}
+            >
+              <SparkIcon /> Spark to apply →
+            </button>
+          </div>
+        </article>
+      </div>
+      <p className="hiring-stack-counter">+ {panels.length - 1} more roles like this</p>
+    </div>
+  );
+}
 
-        <div className="profile-detail-grid">
-          {items.map(([label, value]) => (
-            <article key={label} className={`glass-card detail-card ${label === copy.profileCreation.cardShapeNote[0] ? "profile-detail-note" : ""}`}>
-              <span>{label}</span>
-              <strong>{value}</strong>
-            </article>
-          ))}
-        </div>
+function OtherSideSection({ mode }: { mode: Audience }) {
+  const isDev = mode === "developer";
+  return (
+    <section data-reveal="pending" className="glass-section other-side-section">
+      <div className="section-copy other-side-copy">
+        <h2>And here&rsquo;s who&rsquo;s looking.</h2>
+        <p>
+          {isDev
+            ? "Studios put themselves on cards too. Verified studio. Active projects. What they pay."
+            : "Dev cards are just as scannable as studio cards. Role, rate, and proof — same format."}
+        </p>
+      </div>
+      <div className="other-side-strip">
+        {isDev
+          ? STUDIO_STRIP.map((studio) => (
+              <div key={studio.name} className="glass-card studio-strip-card">
+                <div className="studio-strip-logo" style={{ background: studio.accent }}>
+                  {studio.name.charAt(0)}
+                </div>
+                <div className="studio-strip-body">
+                  <strong>
+                    {studio.name}
+                    {studio.verified && (
+                      <span className="verified-dot is-active" aria-hidden="true">
+                        <CheckIcon />
+                      </span>
+                    )}
+                  </strong>
+                  <span>Hiring {studio.hiring} · {studio.plays}</span>
+                </div>
+              </div>
+            ))
+          : MARQUEE_CARDS.slice(0, 7).map((card) => (
+              <div key={card.name} className="glass-card studio-strip-card">
+                <div className="studio-strip-logo" style={{ background: card.accent }}>
+                  {card.name.charAt(0)}
+                </div>
+                <div className="studio-strip-body">
+                  <strong>{card.name}</strong>
+                  <span>{card.role} · {card.rate}</span>
+                </div>
+              </div>
+            ))}
       </div>
     </section>
   );
@@ -795,35 +1000,38 @@ function ProfileCreationSection({
 
 function ChatPreviewSection({
   copy,
-  profile
+  profile,
+  mode
 }: {
   copy: LandingCopy;
   profile: TalentProfile;
+  mode: Audience;
 }) {
-  const messages: ReadonlyArray<{ side: "out" | "in"; text: string; time: string }> = [
-    { side: "out", text: "Hey Eclipse!", time: "2:34 PM" },
-    { side: "out", text: "I'd love to ask about your availability for a project.", time: "2:34 PM" },
-    { side: "out", text: "Could you give me a quick overview of your process and timeline?", time: "2:35 PM" },
-    { side: "in", text: "Hey! Thanks for reaching out.", time: "2:36 PM" },
-    { side: "in", text: "Happy to help. I can share more about the scope and how I usually work.", time: "2:36 PM" },
-    {
-      side: "out",
-      text:
-        "Sounds great! The project is a combat system with custom abilities and UI integration. Could you share the expected delivery time and pricing?",
-      time: "2:37 PM"
-    },
-    {
-      side: "in",
-      text: "Got it! Thanks for the details. I can deliver a high-quality solution within the discussed timeframe.",
-      time: "2:38 PM"
-    }
+  const isDev = mode === "developer";
+
+  const devMessages: ReadonlyArray<{ side: "out" | "in"; text: string; time: string }> = [
+    { side: "in", text: "Hey! Sparked on your combat card — love the scope breakdown.", time: "3:12 PM" },
+    { side: "out", text: "Thanks! Free from next Monday. $65/hr or happy to scope a milestone.", time: "3:14 PM" },
+    { side: "in", text: "Works for us. 6-week scope: combat + dodge system. Existing codebase.", time: "3:15 PM" },
+    { side: "out", text: "That works. Can we jump on a quick 15-min call?", time: "3:16 PM" },
+    { side: "in", text: "Call booked. Tuesday at 3pm. Sending details now.", time: "3:17 PM" }
   ];
 
-  const handle = profile.name.toLowerCase();
+  const studioMessages: ReadonlyArray<{ side: "out" | "in"; text: string; time: string }> = [
+    { side: "out", text: "Hey! Sparked on your combat card — love the scope breakdown.", time: "3:12 PM" },
+    { side: "in", text: "Thanks! Free from next Monday. $65/hr or happy to scope a milestone.", time: "3:14 PM" },
+    { side: "out", text: "Works for us. 6-week scope: combat + dodge system. Existing codebase.", time: "3:15 PM" },
+    { side: "in", text: "That works. Can we jump on a quick 15-min call?", time: "3:16 PM" },
+    { side: "out", text: "Call booked. Tuesday at 3pm. Sending details now.", time: "3:17 PM" }
+  ];
+
+  const messages = isDev ? devMessages : studioMessages;
+  const contactName = isDev ? "eclipse studios" : profile.name.toLowerCase();
+
   const contacts = [
-    { icon: <RobloxIcon />, label: "Roblox", value: "/eclipseDev" },
-    { icon: <DiscordIcon />, label: "Discord", value: "eclipse.dev" },
-    { icon: <GithubIcon />, label: "GitHub", value: "eclipsedevx" }
+    { icon: <RobloxIcon />, label: "Roblox", value: isDev ? "/EclipseStudios" : `/` + profile.name },
+    { icon: <DiscordIcon />, label: "Discord", value: isDev ? "eclipse.studios" : profile.name.toLowerCase() + ".dev" },
+    { icon: <GithubIcon />, label: "GitHub", value: isDev ? "eclipsestudios" : profile.name.toLowerCase() + "x" }
   ];
 
   return (
@@ -854,7 +1062,7 @@ function ChatPreviewSection({
               </div>
               <div>
                 <strong>
-                  {handle}
+                  {contactName}
                   <span className="verified-dot is-active" aria-hidden="true">
                     <CheckIcon />
                   </span>
@@ -885,11 +1093,11 @@ function ChatPreviewSection({
             </div>
             <div>
               <div className="hero-card-name-row">
-                <h3>{handle}</h3>
+                <h3>{contactName}</h3>
                 <span className="verified-dot is-active" aria-hidden="true"><CheckIcon /></span>
               </div>
-              <p className="hero-card-role">{profile.label}</p>
-              <p className="hero-card-availability"><span />{profile.availability}</p>
+              <p className="hero-card-role">{isDev ? "Roblox studio" : profile.label}</p>
+              <p className="hero-card-availability"><span />{isDev ? "Hiring now" : profile.availability}</p>
             </div>
           </div>
 
@@ -899,12 +1107,16 @@ function ChatPreviewSection({
           </div>
 
           <div className="chat-stat-grid">
-            <span><UserIcon /><strong>{profile.years}</strong><em>Experience</em></span>
+            <span><UserIcon /><strong>{isDev ? "12 shipped" : profile.years}</strong><em>{isDev ? "Games" : "Experience"}</em></span>
             <span><ShieldIcon /><strong>98%</strong><em>Match</em></span>
             <span><ClockIcon /><strong>Replies</strong><em>Usually 1hr</em></span>
           </div>
 
-          <p className="chat-profile-summary">{profile.headline}</p>
+          <p className="chat-profile-summary">
+            {isDev
+              ? "Eclipse Studios ships combat-focused games. 4M plays/mo. Rate: $60–85/hr. Scope explained upfront."
+              : profile.headline}
+          </p>
 
           <div className="chat-contact-row chat-contact-row-clean">
             {contacts.map((contact) => (
@@ -929,7 +1141,7 @@ function ChatPreviewSection({
           <div className="chat-thread-top">
             <span className="chat-day-pill">
               <strong>{copy.chatPreview.threadLabel}</strong>
-              <em>2:39 PM</em>
+              <em>3:17 PM</em>
             </span>
           </div>
 
@@ -954,7 +1166,7 @@ function ChatPreviewSection({
 
           <div className="chat-composer chat-composer-clean" aria-label="Decorative message composer">
             <span className="chat-composer-icon" aria-hidden="true"><PaperclipIcon /></span>
-            <em>{copy.chatPreview.composerHint(handle)}</em>
+            <em>{copy.chatPreview.composerHint(contactName)}</em>
             <span className="chat-composer-icon" aria-hidden="true"><EmojiIcon /></span>
             <button type="button" className="chat-send-btn" aria-label="Decorative send button">
               <SendIcon />
@@ -966,51 +1178,39 @@ function ChatPreviewSection({
   );
 }
 
-function AntiDiscordSection({ copy }: { copy: LandingCopy }) {
+function DotScale({ level }: { level: 1 | 2 | 3 }) {
   return (
-    <section data-reveal="pending" className="glass-section anti-discord-section">
-      <div className="glass-card anti-discord-shell">
-        <div className="section-copy">
-          <span className="section-kicker">{copy.antiDiscord.kicker}</span>
-          <h2>{copy.antiDiscord.headline}</h2>
-          <p>{copy.antiDiscord.intro}</p>
-        </div>
-
-        <div className="comparison-grid">
-          <article>
-            <span>{copy.antiDiscord.beforeLabel}</span>
-            {copy.antiDiscord.before.map((item) => <p key={item}>{item}</p>)}
-          </article>
-          <article>
-            <span>{copy.antiDiscord.afterLabel}</span>
-            {copy.antiDiscord.after.map((item) => <p key={item}>{item}</p>)}
-          </article>
-        </div>
-      </div>
-    </section>
+    <span
+      className="dot-scale"
+      aria-label={level === 1 ? "Low" : level === 2 ? "Medium" : "High"}
+    >
+      <span className={`dot${level >= 1 ? " filled" : ""}`} />
+      <span className={`dot${level >= 2 ? " filled" : ""}`} />
+      <span className={`dot${level >= 3 ? " filled" : ""}`} />
+    </span>
   );
 }
 
 function ComparisonTableSection() {
-  const features = [
-    { name: "Role clarity", s: "Low", c: "Medium", w: "High" },
-    { name: "Verified identity", s: "Low", c: "Low", w: "High" },
-    { name: "Trust signal", s: "Low", c: "Medium", w: "High" },
-    { name: "Scannability", s: "Low", c: "Medium", w: "High" },
-    { name: "Search & filters", s: "Poor", c: "Limited", w: "Advanced" },
-    { name: "Noise level", s: "High", c: "Medium", w: "Low" },
-    { name: "Direct outreach", s: "Hard", c: "Hard", w: "Easy" },
-    { name: "Hiring control", s: "Low", c: "Low", w: "High" },
-    { name: "Client proof", s: "Rare", c: "Rare", w: "Built-in" },
-    { name: "Time to hire", s: "Long", c: "Medium", w: "Fast" },
+  const features: Array<{ name: string; s: 1 | 2 | 3; c: 1 | 2 | 3; w: 1 | 2 | 3 }> = [
+    { name: "Role clarity",     s: 1, c: 2, w: 3 },
+    { name: "Verified identity", s: 1, c: 1, w: 3 },
+    { name: "Trust signal",     s: 1, c: 2, w: 3 },
+    { name: "Scannability",     s: 1, c: 2, w: 3 },
+    { name: "Search & filters", s: 1, c: 2, w: 3 },
+    { name: "Noise level",      s: 3, c: 2, w: 1 },
+    { name: "Direct outreach",  s: 1, c: 1, w: 3 },
+    { name: "Hiring control",   s: 1, c: 1, w: 3 },
+    { name: "Client proof",     s: 1, c: 1, w: 3 },
+    { name: "Time to hire",     s: 1, c: 2, w: 3 }
   ];
 
   return (
-    <section className="glass-section comparison-table-section">
+    <section className="glass-section comparison-table-section" id="compare">
       <div className="section-copy">
         <span className="section-kicker">IMPROVED VISIBILITY</span>
-        <h2>Hiring channels compared.<br/>Cards that prove it.</h2>
-        <p>See how Discord servers and channels stack up against Weld — then swipe through real developer and client cards.</p>
+        <h2>How hiring channels compare.</h2>
+        <p>Discord servers, Discord channels, and Weld — side by side.</p>
       </div>
 
       <div className="comparison-table-wrapper">
@@ -1027,15 +1227,9 @@ function ComparisonTableSection() {
             {features.map((f, i) => (
               <div key={i} className="comp-table-row">
                 <div className="comp-col-feature">{f.name}</div>
-                <div className="comp-col-discord">
-                  <span className={`comp-badge comp-badge-${f.s.toLowerCase()}`}>{f.s}</span>
-                </div>
-                <div className="comp-col-discord">
-                  <span className={`comp-badge comp-badge-${f.c.toLowerCase()}`}>{f.c}</span>
-                </div>
-                <div className="comp-col-weld">
-                  <span className={`comp-badge comp-badge-${f.w.toLowerCase()}`}>{f.w}</span>
-                </div>
+                <div className="comp-col-discord"><DotScale level={f.s} /></div>
+                <div className="comp-col-discord"><DotScale level={f.c} /></div>
+                <div className="comp-col-weld"><DotScale level={f.w} /></div>
               </div>
             ))}
           </div>
@@ -1045,114 +1239,7 @@ function ComparisonTableSection() {
   );
 }
 
-function ProofTrustSection({
-  copy,
-  profile,
-  swipeState,
-  onDetailToggle,
-  onSwipe
-}: {
-  copy: LandingCopy;
-  profile: TalentProfile;
-  swipeState: SwipeState;
-  onDetailToggle: (key: DetailKey | null) => void;
-  onSwipe: (state: Exclude<SwipeState, "idle">) => void;
-}) {
-  return (
-    <section data-reveal="pending" className="glass-section proof-section" id="proof">
-      <div className="section-copy">
-        <span className="section-kicker">{copy.proof.kicker}</span>
-        <h2>{copy.proof.title}</h2>
-        <p>{copy.proof.lead}</p>
-      </div>
-
-      <div className="proof-layout">
-        <article className="discord-mock-card proof-before-card">
-          <strong>{copy.proof.beforeStrong}</strong>
-          <p>{copy.proof.beforeBody}</p>
-          <div className="proof-chip-row">
-            {copy.proof.beforeChips.map((chip) => (
-              <span key={chip}>{chip}</span>
-            ))}
-          </div>
-        </article>
-
-        <article className="glass-card proof-after-card">
-          <strong>{copy.proof.afterStrong}</strong>
-          <p>{copy.proof.afterBody}</p>
-          <span className="demo-caption">{copy.demo.feedbackCaption}</span>
-          <div className="proof-badge-row" aria-label="Proof badges">
-            <Sticker tone="founding" icon={<SparkIcon />} label="Founding member" />
-            <Sticker tone="info" icon={<FolderIcon />} label="Linked work" />
-            <Sticker tone="like" icon={<HeartIcon />} label="Studio favorite" />
-          </div>
-          <div className="proof-cta-grid">
-            <button type="button" onClick={() => onDetailToggle("verified")}>
-              <span>Verified</span>
-              <ArrowUpRightIcon />
-            </button>
-            <button type="button" onClick={() => onDetailToggle("latest")}>
-              <span>{profile.latestProject.name}</span>
-              <ArrowUpRightIcon />
-            </button>
-            <button type="button" onClick={() => onDetailToggle("feedback")}>
-              <span>{profile.feedback.label}</span>
-              <ArrowUpRightIcon />
-            </button>
-          </div>
-          <div className={`proof-card-actions is-${swipeState}`} aria-label="Card actions" style={{ position: "relative" }}>
-            <DoodleNote
-              variant="arrow"
-              tone="spark"
-              label="tap Spark to send"
-              rotation={12}
-              style={{ top: "-44px", right: "-12px", width: "140px" }}
-            />
-            <button type="button" className="hero-action-button reject" onClick={() => onSwipe("reject")} aria-label={copy.proof.rejectLabel}>
-              <CloseIcon />
-              <span>{copy.proof.rejectLabel}</span>
-            </button>
-            <button type="button" className="hero-action-button like" onClick={() => onSwipe("like")} aria-label={copy.proof.likeLabel}>
-              <HeartIcon />
-              <span>{copy.proof.likeLabel}</span>
-            </button>
-            <button type="button" className="hero-action-button spark" onClick={() => onSwipe("spark")} aria-label={copy.proof.sparkLabel}>
-              <SparkIcon />
-              <span>{copy.proof.sparkLabel}</span>
-            </button>
-          </div>
-        </article>
-      </div>
-    </section>
-  );
-}
-
-function StudioScoutSection({
-  copy
-}: {
-  copy: LandingCopy;
-}) {
-  return (
-    <section data-reveal="pending" className="glass-section scout-section">
-      <div className="glass-card scout-copy-card">
-        <span className="section-kicker">{copy.studioScout.kicker}</span>
-        <h2>{copy.studioScout.title}</h2>
-        <p>{copy.studioScout.body}</p>
-      </div>
-
-      <div className="scout-rail">
-        {copy.studioScout.rail.map(([title, body]) => (
-          <article key={title} className="glass-card scout-rail-card">
-            <strong>{title}</strong>
-            <p>{body}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function WaitlistSignupSection({
+function EarlyAccessSection({
   mode,
   copy,
   email,
@@ -1190,7 +1277,7 @@ function WaitlistSignupSection({
       <div className="waitlist-shell">
         <div className="section-copy waitlist-copy">
           <span className="section-kicker">{copy.waitlist.kicker}</span>
-          <h2>{copy.waitlist.headline}</h2>
+          <h2>{mode === "developer" ? "Join the developer beta." : "Get studio access."}</h2>
           <p>{copy.waitlist.subhead}</p>
           <div className="waitlist-benefits">
             {copy.waitlist.benefits.map(([title, body, iconKey]) => (
@@ -1203,6 +1290,7 @@ function WaitlistSignupSection({
               </span>
             ))}
           </div>
+          <p className="waitlist-privacy">{copy.waitlist.privacy}</p>
         </div>
 
         <div
@@ -1233,8 +1321,6 @@ function WaitlistSignupSection({
           >
             {buttonLabel}
           </button>
-
-          <p className="waitlist-privacy">{copy.waitlist.privacy}</p>
 
           {phase === "success" ? (
             <Sticker
@@ -1346,91 +1432,22 @@ function ModeToggle({
   );
 }
 
-function ProofBadge({
-  detailKey,
-  label,
-  value,
-  active,
-  onToggle
-}: {
-  detailKey: DetailKey;
-  label: string;
-  value?: string;
-  active: boolean;
-  onToggle: (key: DetailKey | null) => void;
-}) {
-  return (
-    <button
-      type="button"
-      className={`proof-badge ${active ? "is-active" : ""}`}
-      aria-expanded={active}
-      onClick={() => onToggle(active ? null : detailKey)}
-    >
-      <strong>{label}</strong>
-      {value ? <span>{value}</span> : null}
-    </button>
-  );
-}
-
-function ProofDetailDialog({
-  title,
-  body,
-  onClose
-}: {
-  title: string;
-  body: string;
-  onClose: () => void;
-}) {
-  return (
-    <div className="proof-dialog-backdrop" onClick={onClose}>
-      <div
-        className="proof-dialog"
-        role="dialog"
-        aria-modal="false"
-        aria-labelledby="proof-dialog-title"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <button type="button" className="proof-dialog-close" onClick={onClose} aria-label="Close proof detail">
-          <CloseIcon />
-        </button>
-        <strong id="proof-dialog-title">{title}</strong>
-        <p>{body}</p>
-      </div>
-    </div>
-  );
-}
-
 function socialIconKey(label: string) {
   const normalized = label.toLowerCase();
-
-  if (normalized === "x") {
-    return "linkedin";
-  }
-
+  if (normalized === "x") return "linkedin";
   return normalized.replace(/[^a-z0-9]+/g, "-");
 }
 
 function SocialIcon({ label }: { label: string }) {
   const key = socialIconKey(label);
-
-  if (key === "roblox") {
-    return <RobloxIcon />;
-  }
-
-  if (key === "discord") {
-    return <DiscordIcon />;
-  }
-
-  if (key === "github") {
-    return <GithubIcon />;
-  }
-
-  if (key === "linkedin") {
-    return <LinkedInIcon />;
-  }
-
+  if (key === "roblox") return <RobloxIcon />;
+  if (key === "discord") return <DiscordIcon />;
+  if (key === "github") return <GithubIcon />;
+  if (key === "linkedin") return <LinkedInIcon />;
   return <ArrowUpRightIcon />;
 }
+
+// ─── Icons ───────────────────────────────────────────────────────────────────
 
 function CheckIcon() {
   return (
@@ -1514,16 +1531,6 @@ function LinkedInIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M6.8 8.9h3.1v10H6.8v-10Zm1.6-4.8a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Zm3.5 4.8h3v1.4h.1c.4-.8 1.5-1.7 3-1.7 3.2 0 3.8 2.1 3.8 4.8v5.5h-3.1V14c0-1.2 0-2.7-1.7-2.7s-1.9 1.3-1.9 2.6v5h-3.1v-10Z" />
-    </svg>
-  );
-}
-
-function GamepadIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M7.7 9.1h8.6c2.5 0 4.1 1.8 4.4 4.6l.2 1.8c.3 2.4-1.9 3.9-3.7 2.4l-1.6-1.4H8.4l-1.6 1.4c-1.8 1.5-4-.1-3.7-2.4l.2-1.8c.3-2.8 1.9-4.6 4.4-4.6Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-      <path d="M7.7 12.7h3.2M9.3 11.1v3.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M15.7 12.6h.1M18 14.2h.1" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
     </svg>
   );
 }

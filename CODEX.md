@@ -5,19 +5,22 @@ Landing page for **weld.** — a Roblox talent marketplace where developers buil
 
 ## Stack
 - **Next.js 14 App Router**, TypeScript
+- `/signup` is the developer/studio Google Sheets waitlist signup form recovered from the old static landing page.
 - **Single CSS file**: `src/app/globals.css` (~11 000 lines). All styles live here — no CSS modules, no Tailwind utility classes in components.
-- No backend in this repo — it's the marketing/landing site. API calls go to the separate weld-app.
+- No full product app in this repo — it's the marketing/landing and waitlist site. Keep authenticated app surfaces like profile building, matching, messaging, account, and login out of this codebase.
 
 ## Key files
 
 | File | Role |
 |---|---|
+| `src/app/signup/page.tsx` | Developer/studio Google Sheets waitlist signup form |
 | `src/app/page.tsx` | Entry — re-exports from HomePage |
 | `src/dynamic-landing-page/routes/HomePage.tsx` | Route wrapper, renders `<MarketingPage>` |
 | `src/dynamic-landing-page/components/MarketingPage.tsx` | **Main landing page component** — navbar, hero, all sections |
 | `src/components/matching-preview/SwipeCard.tsx` | The interactive swipe card shown in the hero |
 | `src/app/globals.css` | All CSS. Sections are commented with `/* ── Name ── */` |
 | `src/app/layout.tsx` | Root layout — just fonts + globals.css import, bare `<body>` |
+| `src/app/api/waitlist/*`, `src/app/api/events`, `src/app/api/invite/*`, `src/app/api/profile-draft` | Waitlist/invite capture only |
 
 ## CSS architecture
 
@@ -38,6 +41,7 @@ The landing page wraps everything in `<div class="weld-glass-page">`. The design
 
 ## Known gotchas
 
+- This repo intentionally does **not** contain `/login`, `/account`, `/home`, `/profile`, `/preview`, `/swipe`, `/messages`, or the authenticated app API routes. If those appear again, treat them as app-code drift unless the project scope has changed.
 - **`overflow-x: hidden` on `html`/`body` breaks `position: sticky`** — always use `overflow-x: clip` instead. The globals.css has been fixed to use `clip` on html, body, and the mobile `@media (max-width: 639px)` rule.
 - The CSS file has **multiple cascade blocks** for the same classes (`.weld-glass-page` appears many times as the design was layered). Later rules win on equal specificity. When adding styles, put them near the end or in the most specific existing block.
 - `zoom` on any ancestor of a sticky element breaks sticky in Chromium — that's why zoom lives on `.weld-glass-main`, not `.weld-glass-page`.
