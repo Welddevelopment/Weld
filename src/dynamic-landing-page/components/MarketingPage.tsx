@@ -21,7 +21,7 @@ import type { SourceVariant } from "@/dynamic-landing-page/lib/source-variant";
 import type { Audience } from "@/dynamic-landing-page/lib/types";
 import { useMotionPolicy } from "@/dynamic-landing-page/lib/useMotionPolicy";
 import { Sticker } from "@/dynamic-landing-page/components/primitives/Sticker";
-import { getLandingCopy, type LandingCopy } from "@/dynamic-landing-page/lib/copy";
+import { getLandingCopy, type HowItWorksIcon, type LandingCopy } from "@/dynamic-landing-page/lib/copy";
 import {
   PROFILES,
   ROLE_LABELS,
@@ -965,12 +965,21 @@ function HowItWorksStrip({ copy }: { copy: LandingCopy }) {
   return (
     <section data-reveal="pending" className="how-strip-section" id="how" aria-label={copy.howItWorks.title}>
       <div className="glass-card how-strip">
-        {steps.map(([number, title, body], index) => (
-          <article key={title} className="step-card">
-            <span className="step-index">{number}</span>
-            <h3>{title}</h3>
-            <p>{body}</p>
-            {index < steps.length - 1 ? <span className="step-arrow" aria-hidden="true">→</span> : null}
+        {steps.map((step, index) => (
+          <article key={step.title} className="step-card">
+            <div className="step-card-copy">
+              <span className="step-index">{step.number}</span>
+              <h3>{step.title}</h3>
+              <p>{step.body}</p>
+            </div>
+            <span className="step-illustration" aria-hidden="true">
+              <HowStepIcon icon={step.icon} />
+            </span>
+            {index < steps.length - 1 ? (
+              <span className="step-arrow" aria-hidden="true">
+                <HowStepArrowIcon />
+              </span>
+            ) : null}
           </article>
         ))}
       </div>
@@ -1283,6 +1292,8 @@ function ChatPreviewSection({
 
   const messages = isDev ? devMessages : studioMessages;
   const contactName = isDev ? "eclipse studios" : profile.name.toLowerCase();
+  const chatAvatarUrl =
+    "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E3EC434BF92DD2F46E81D91592065FD9-Png/150/150/AvatarHeadshot/Png/noFilter";
 
   const contacts = [
     { icon: <RobloxIcon />, label: "Roblox", value: isDev ? "/EclipseStudios" : `/` + profile.name },
@@ -1309,7 +1320,7 @@ function ChatPreviewSection({
             <div className="chat-window-identity">
               <div className="chat-topbar-avatar chat-roblox-avatar" aria-hidden="true">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E3EC434BF92DD2F46E81D91592065FD9-Png/150/150/AvatarHeadshot/Png/noFilter" alt="" />
+                <img src={chatAvatarUrl} alt="" />
                 <span className="avatar-status-dot" />
               </div>
               <div>
@@ -1335,7 +1346,7 @@ function ChatPreviewSection({
           <div className="chat-profile-top">
             <div className="chat-profile-avatar chat-roblox-avatar">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E3EC434BF92DD2F46E81D91592065FD9-Png/150/150/AvatarHeadshot/Png/noFilter" alt="" />
+              <img src={chatAvatarUrl} alt="" />
               <span className="avatar-status-dot" />
             </div>
             <div>
@@ -1346,6 +1357,11 @@ function ChatPreviewSection({
               <p className="hero-card-role">{isDev ? "Roblox studio" : profile.label}</p>
               <p className="hero-card-availability"><span />{isDev ? "Hiring now" : profile.availability}</p>
             </div>
+          </div>
+
+          <div className="chat-match-bar" aria-hidden="true">
+            <span><ShieldIcon />98% Match</span>
+            <i style={{ "--match-fill": "92%" } as CSSProperties} />
           </div>
 
           <div className="chat-stat-grid">
@@ -1370,6 +1386,13 @@ function ChatPreviewSection({
             ))}
           </div>
 
+          <div className="chat-professional-note">
+            <span className="chat-professional-icon" aria-hidden="true"><HandRaisedIcon /></span>
+            <span>
+              <strong>{copy.chatPreview.professionalNote[0]}</strong>
+              <em>{copy.chatPreview.professionalNote[1]}</em>
+            </span>
+          </div>
         </aside>
 
         <div className="chat-thread-panel">
@@ -1385,7 +1408,9 @@ function ChatPreviewSection({
               <div key={`${index}-${message.time}`} className={`chat-row is-${message.side}`}>
                 {message.side === "in" ? (
                   <div className="chat-mini-avatar" aria-hidden="true">
-                    <span />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={chatAvatarUrl} alt="" />
+                    <span className="avatar-status-dot" />
                   </div>
                 ) : null}
                 <p>
@@ -1816,6 +1841,84 @@ function HeartIcon() {
         strokeWidth="1.6"
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+function HowStepIcon({ icon }: { icon: HowItWorksIcon }) {
+  if (icon === "card") return <CardProofIcon />;
+  if (icon === "shield") return <ShieldCheckIcon />;
+  if (icon === "spark") return <StepSparkIcon />;
+  if (icon === "search") return <SearchRoleIcon />;
+  if (icon === "message") return <MessageProofIcon />;
+  return <HandshakeIcon />;
+}
+
+function HowStepArrowIcon() {
+  return (
+    <svg viewBox="0 0 28 18" fill="none" aria-hidden="true">
+      <path d="M2 9h22" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="m18 3 6 6-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CardProofIcon() {
+  return (
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <rect x="12" y="8" width="24" height="32" rx="5" fill="rgba(255, 255, 255, 0.72)" stroke="currentColor" strokeWidth="2" />
+      <path d="M18 18h12M18 25h9M18 32h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="34" cy="33" r="7" fill="rgba(255, 214, 102, 0.42)" stroke="currentColor" strokeWidth="2" />
+      <path d="m31.5 33.1 1.8 1.8 3.4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ShieldCheckIcon() {
+  return (
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <path d="M24 6 38 11v10c0 9.3-5.8 16.8-14 20-8.2-3.2-14-10.7-14-20V11l14-5Z" fill="rgba(111, 231, 168, 0.24)" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <circle cx="24" cy="23" r="8" fill="rgba(63, 211, 139, 0.46)" stroke="currentColor" strokeWidth="2" />
+      <path d="m20.5 23.1 2.4 2.4 5-5.6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function StepSparkIcon() {
+  return (
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <path d="m27 4-15 23h11l-3 17 16-24H25l2-16Z" fill="rgba(255, 211, 87, 0.5)" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M11 12h6M34 34h5M8 35h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function HandshakeIcon() {
+  return (
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <path d="M18 27 28.5 16.5c2.2-2.2 5.7-2.2 7.9 0l2.4 2.4-12 12" fill="rgba(119, 207, 231, 0.26)" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M30 29.5 20.5 20c-2-2-5.2-2-7.2 0l-4.1 4.1 12.1 12.1c1.7 1.7 4.5 1.7 6.2 0l4.9-4.9c.9-.9.9-2.4 0-3.3-.9-.9-2.4-.9-3.3 0l-4.4 4.4" fill="rgba(255, 214, 102, 0.3)" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function SearchRoleIcon() {
+  return (
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <rect x="9" y="10" width="25" height="25" rx="6" fill="rgba(255, 255, 255, 0.68)" stroke="currentColor" strokeWidth="2" />
+      <path d="M16 18h11M16 24h8M16 30h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="32" cy="31" r="6" fill="rgba(120, 112, 255, 0.22)" stroke="currentColor" strokeWidth="2" />
+      <path d="m36.5 35.5 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function MessageProofIcon() {
+  return (
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <path d="M10 13h28a5 5 0 0 1 5 5v12a5 5 0 0 1-5 5H25l-8 6v-6h-7a5 5 0 0 1-5-5V18a5 5 0 0 1 5-5Z" fill="rgba(255, 255, 255, 0.7)" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M16 22h16M16 28h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="m32 28 2.2 2.2 4.3-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

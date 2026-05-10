@@ -1,5 +1,7 @@
 import type { Audience } from "./types";
 
+export type HowItWorksIcon = "card" | "shield" | "spark" | "hire" | "search" | "message";
+
 export interface LandingCopy {
   nav: {
     modeToggleDeveloper: string;
@@ -22,7 +24,12 @@ export interface LandingCopy {
     title: string;
     lead: string;
     support: string;
-    steps: ReadonlyArray<readonly [string, string, string]>;
+    steps: ReadonlyArray<{
+      number: string;
+      title: string;
+      body: string;
+      icon: HowItWorksIcon;
+    }>;
   };
   profileCreation: {
     kicker: string;
@@ -134,9 +141,30 @@ const COPY: Record<Audience, LandingCopy> = {
       support:
         "Switch roles and watch the same card adapt. Proof, links, and pricing stay honest across every preview.",
       steps: [
-        ["01", "Build your card", "Add role, rate, skills, links, proof, and shipped projects."],
-        ["02", "Studios swipe", "Studios browse by role, scan your proof, and Spark the right fit."],
-        ["03", "You get hired", "Chat, agree on scope, build it, and get paid."]
+        {
+          number: "1",
+          title: "Build your card",
+          body: "Add role, rate, skills, links, proof, and projects.",
+          icon: "card"
+        },
+        {
+          number: "2",
+          title: "We verify proof",
+          body: "We check links, projects, and activity so studios can trust your card.",
+          icon: "shield"
+        },
+        {
+          number: "3",
+          title: "Studios match & Spark",
+          body: "Studios swipe, match, and Spark the talent they want to hire.",
+          icon: "spark"
+        },
+        {
+          number: "4",
+          title: "You get hired",
+          body: "Chat, agree on scope, build awesome games, and get paid.",
+          icon: "hire"
+        }
       ]
     },
     profileCreation: {
@@ -286,9 +314,30 @@ const COPY: Record<Audience, LandingCopy> = {
       support:
         "Same card shape across every role, so your team compares fit fast instead of digging through Discord.",
       steps: [
-        ["01", "Browse by role", "Filter Scripters, Builders, UI, VFX, Animators, and Systems devs."],
-        ["02", "Spark the fit", "Scan verified proof, rate, and availability. Spark talent that matches your scope."],
-        ["03", "Start the hire", "First message lands with proof, scope, and availability beside the thread."]
+        {
+          number: "1",
+          title: "Browse by role",
+          body: "Filter scripters, builders, UI, VFX, animators, and systems devs.",
+          icon: "search"
+        },
+        {
+          number: "2",
+          title: "Review proof",
+          body: "Check links, projects, and activity before your first message.",
+          icon: "shield"
+        },
+        {
+          number: "3",
+          title: "Spark the fit",
+          body: "Match with talent whose rate, proof, and availability fit your scope.",
+          icon: "spark"
+        },
+        {
+          number: "4",
+          title: "Start the hire",
+          body: "Open a focused thread with proof, scope, and availability beside it.",
+          icon: "message"
+        }
       ]
     },
     profileCreation: {
