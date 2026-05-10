@@ -2,12 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   useEffect,
   useRef,
   useState,
-  useTransition,
   type CSSProperties,
   type KeyboardEvent,
   type ReactNode
@@ -22,7 +21,7 @@ import type { SourceVariant } from "@/dynamic-landing-page/lib/source-variant";
 import type { Audience } from "@/dynamic-landing-page/lib/types";
 import { useMotionPolicy } from "@/dynamic-landing-page/lib/useMotionPolicy";
 import { Sticker } from "@/dynamic-landing-page/components/primitives/Sticker";
-import { getLandingCopy, type LandingCopy } from "@/dynamic-landing-page/lib/copy";
+import { getLandingCopy, type HowItWorksIcon, type LandingCopy } from "@/dynamic-landing-page/lib/copy";
 import {
   PROFILES,
   ROLE_LABELS,
@@ -508,9 +507,10 @@ const STUDIO_STRIP = [
   { name: "Cascade Labs", hiring: 3, plays: "400k plays/mo", verified: false, accent: "#F97316" }
 ];
 
-function joinHref(mode: Audience, search: string) {
+function joinHref(mode: Audience, search: string, hash = "") {
   const base = mode === "studio" ? "/studios" : "/";
-  return search ? `${base}?${search}` : base;
+  const query = search ? `?${search}` : "";
+  return `${base}${query}${hash}`;
 }
 
 function scrollToId(id: string) {
@@ -528,17 +528,16 @@ function WeldLandingPage({
   page
 }: MarketingPageProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const searchString = searchParams.toString();
   const motion = useMotionPolicy();
   const motionTier = motion.tier;
-  const [isPending, startTransition] = useTransition();
   const [mode, setMode] = useState<Audience>(initialMode);
   const [role, setRole] = useState<RoleKey>("scripting");
   const [email, setEmail] = useState("");
   const [capturePhase, setCapturePhase] = useState<CapturePhase>("idle");
   const [captureStatus, setCaptureStatus] = useState("");
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [isSwapping, setIsSwapping] = useState(false);
   const [swipeModalOpen, setSwipeModalOpen] = useState(false);
   useEffect(() => {
@@ -603,6 +602,13 @@ function WeldLandingPage({
   }, [initialMode]);
 
   useEffect(() => {
+    const expectedPath = mode === "studio" ? "/studios" : "/";
+    if (pathname === expectedPath) return;
+
+    router.replace(joinHref(mode, searchString, window.location.hash), { scroll: false });
+  }, [mode, pathname, router, searchString]);
+
+  useEffect(() => {
     const MULTIPLIER = 0.70;
     function onWheel(e: WheelEvent) {
       if (e.ctrlKey) return; // allow pinch-to-zoom
@@ -639,9 +645,7 @@ function WeldLandingPage({
       payload: { from: mode, to: nextMode }
     });
 
-    startTransition(() => {
-      router.push(joinHref(nextMode, searchString));
-    });
+    router.push(joinHref(nextMode, searchString, window.location.hash), { scroll: false });
   }
 
   function handleRoleChange(nextRoleKey: RoleKey) {
@@ -748,7 +752,6 @@ function WeldLandingPage({
         mode={mode}
         copy={modeCopy}
         searchString={searchString}
-        pending={isPending}
         onModeChange={handleModeChange}
         onJoinClick={() => handleJoinIntent("nav")}
       />
@@ -802,14 +805,13 @@ function WeldLandingPage({
         <HowItWorksStrip copy={modeCopy} />
 
         {/* 3. Live talent marquee */}
+        <TalentMarqueeSection />
         {mode === "studio" ? <OtherSideSection mode={mode} primary /> : <TalentMarqueeSection mode={mode} primary />}
 
         {/* 4. Role switching — POV-flips per audience */}
         <RoleTalentExplorer
           mode={mode}
-          copy={modeCopy}
           role={role}
-          profile={activeProfile}
           isSwapping={isSwapping}
           hiringPanel={hiringPanel}
           hiringAnim={hiringAnim}
@@ -818,7 +820,7 @@ function WeldLandingPage({
         />
 
         {/* 5. And here's who's looking */}
-        {mode === "studio" ? <TalentMarqueeSection mode={mode} /> : <OtherSideSection mode={mode} />}
+        {mode === "studio" ? <TalentMarqueeSection /> : <OtherSideSection mode={mode} />}
 
         {/* 6. Chat — POV-flips per audience */}
         <ChatPreviewSection copy={modeCopy} profile={activeProfile} mode={mode} />
@@ -838,7 +840,7 @@ function WeldLandingPage({
           onSubmit={openSignupForm}
         />
 
-        <FriendlyFAQ copy={modeCopy} openFaq={openFaq} onToggle={setOpenFaq} />
+        <FriendlyFAQ copy={modeCopy} />
       </main>
 
       <FooterCTA copy={modeCopy} />
@@ -850,14 +852,12 @@ function GlassNav({
   mode,
   copy,
   searchString,
-  pending,
   onModeChange,
   onJoinClick
 }: {
   mode: Audience;
   copy: LandingCopy;
   searchString: string;
-  pending?: boolean;
   onModeChange: (mode: Audience) => void;
   onJoinClick: () => void;
 }) {
@@ -870,7 +870,7 @@ function GlassNav({
         <span>weld.</span>
       </Link>
 
-      <ModeToggle mode={mode} disabled={pending} onChange={onModeChange} />
+      <ModeToggle mode={mode} onChange={onModeChange} />
 
       <nav className="glass-nav-links" aria-label="Primary">
         {copy.nav.links.map((item) => (
@@ -964,12 +964,21 @@ function HowItWorksStrip({ copy }: { copy: LandingCopy }) {
   return (
     <section data-reveal="pending" className="how-strip-section" id="how" aria-label={copy.howItWorks.title}>
       <div className="glass-card how-strip">
-        {steps.map(([number, title, body], index) => (
-          <article key={title} className="step-card">
-            <span className="step-index">{number}</span>
-            <h3>{title}</h3>
-            <p>{body}</p>
-            {index < steps.length - 1 ? <span className="step-arrow" aria-hidden="true">→</span> : null}
+        {steps.map((step, index) => (
+          <article key={step.title} className="step-card">
+            <div className="step-card-copy">
+              <span className="step-index">{step.number}</span>
+              <h3>{step.title}</h3>
+              <p>{step.body}</p>
+            </div>
+            <span className="step-illustration" aria-hidden="true">
+              <HowStepIcon icon={step.icon} />
+            </span>
+            {index < steps.length - 1 ? (
+              <span className="step-arrow" aria-hidden="true">
+                <HowStepArrowIcon />
+              </span>
+            ) : null}
           </article>
         ))}
       </div>
@@ -1019,9 +1028,7 @@ function TalentMarqueeSection({ mode, primary }: { mode?: Audience; primary?: bo
 
 function RoleTalentExplorer({
   mode,
-  copy,
   role,
-  profile,
   isSwapping,
   hiringPanel,
   hiringAnim,
@@ -1029,9 +1036,7 @@ function RoleTalentExplorer({
   onHiringAction
 }: {
   mode: Audience;
-  copy: LandingCopy;
   role: RoleKey;
-  profile: TalentProfile;
   isSwapping: boolean;
   hiringPanel: number;
   hiringAnim: HiringAnim;
@@ -1068,19 +1073,18 @@ function RoleTalentExplorer({
   }
 
   const isDev = mode === "developer";
-  const headline = isDev ? "Pick what you do. See who's hiring." : copy.howItWorks.title;
+  const headline = "Pick what you do. See who's hiring.";
   const lead = isDev
     ? "Real open roles. Real rates. Spark to apply."
-    : copy.howItWorks.lead;
+    : "Preview role demand, rates, and scope the same way talent sees hiring cards.";
 
   return (
     <section data-reveal="pending" className="glass-section how-story-section" id="roles">
       <div className="how-story-grid">
         <div className="section-copy how-story-copy">
-          <span className="section-kicker">{isDev ? "FOR DEVELOPERS" : copy.howItWorks.kicker}</span>
+          <span className="section-kicker">{isDev ? "FOR DEVELOPERS" : "FOR STUDIOS"}</span>
           <h2>{headline}</h2>
           <p>{lead}</p>
-          {!isDev && <p>{copy.howItWorks.support}</p>}
 
           <div className="role-explorer-tabs" role="radiogroup" aria-label="Choose a Roblox talent role">
             {ROLE_ORDER.map((entry) => (
@@ -1100,52 +1104,14 @@ function RoleTalentExplorer({
           </div>
         </div>
 
-        {isDev ? (
-          <HiringPanelStack
-            panels={panels}
-            role={role}
-            activeIndex={hiringPanel}
-            anim={hiringAnim}
-            isSwapping={isSwapping}
-            onAction={onHiringAction}
-          />
-        ) : (
-          <article
-            className="glass-card how-profile-card"
-            data-swapping={isSwapping ? "true" : "false"}
-          >
-            <div className="how-profile-top">
-              <div className="profile-avatar-shell">
-                <div className="profile-avatar">
-                  <span className="avatar-hair" />
-                  <span className="avatar-face">
-                    <span className="avatar-mouth" />
-                  </span>
-                  <span className="avatar-hoodie" />
-                </div>
-                <span className="avatar-status-dot" />
-              </div>
-              <div>
-                <div className="hero-card-name-row">
-                  <h3>{profile.name}</h3>
-                  <span className="verified-dot"><CheckIcon /></span>
-                </div>
-                <p>{profile.label}</p>
-                <p className="hero-card-availability"><span />{profile.availability}</p>
-              </div>
-            </div>
-            <span className="demo-caption">{copy.demo.latestProjectCaption}</span>
-            <p>{profile.latestProject.summary}</p>
-            <div className="how-proof-list">
-              {profile.latestProject.bullets.map((bullet) => (
-                <span key={bullet}><SparkIcon />{bullet}</span>
-              ))}
-            </div>
-            <p className="demo-caption" style={{ marginTop: "12px" }}>
-              {copy.demo.feedbackCaption}
-            </p>
-          </article>
-        )}
+        <HiringPanelStack
+          panels={panels}
+          role={role}
+          activeIndex={hiringPanel}
+          anim={hiringAnim}
+          isSwapping={isSwapping}
+          onAction={onHiringAction}
+        />
       </div>
     </section>
   );
@@ -1307,6 +1273,8 @@ function ChatPreviewSection({
 
   const messages = isDev ? devMessages : studioMessages;
   const contactName = isDev ? "eclipse studios" : profile.name.toLowerCase();
+  const chatAvatarUrl =
+    "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E3EC434BF92DD2F46E81D91592065FD9-Png/150/150/AvatarHeadshot/Png/noFilter";
 
   const contacts = [
     { icon: <RobloxIcon />, label: "Roblox", value: isDev ? "/EclipseStudios" : `/` + profile.name },
@@ -1333,7 +1301,7 @@ function ChatPreviewSection({
             <div className="chat-window-identity">
               <div className="chat-topbar-avatar chat-roblox-avatar" aria-hidden="true">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E3EC434BF92DD2F46E81D91592065FD9-Png/150/150/AvatarHeadshot/Png/noFilter" alt="" />
+                <img src={chatAvatarUrl} alt="" />
                 <span className="avatar-status-dot" />
               </div>
               <div>
@@ -1359,7 +1327,7 @@ function ChatPreviewSection({
           <div className="chat-profile-top">
             <div className="chat-profile-avatar chat-roblox-avatar">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E3EC434BF92DD2F46E81D91592065FD9-Png/150/150/AvatarHeadshot/Png/noFilter" alt="" />
+              <img src={chatAvatarUrl} alt="" />
               <span className="avatar-status-dot" />
             </div>
             <div>
@@ -1370,6 +1338,11 @@ function ChatPreviewSection({
               <p className="hero-card-role">{isDev ? "Roblox studio" : profile.label}</p>
               <p className="hero-card-availability"><span />{isDev ? "Hiring now" : profile.availability}</p>
             </div>
+          </div>
+
+          <div className="chat-match-bar" aria-hidden="true">
+            <span><ShieldIcon />98% Match</span>
+            <i style={{ "--match-fill": "92%" } as CSSProperties} />
           </div>
 
           <div className="chat-stat-grid">
@@ -1394,6 +1367,13 @@ function ChatPreviewSection({
             ))}
           </div>
 
+          <div className="chat-professional-note">
+            <span className="chat-professional-icon" aria-hidden="true"><HandRaisedIcon /></span>
+            <span>
+              <strong>{copy.chatPreview.professionalNote[0]}</strong>
+              <em>{copy.chatPreview.professionalNote[1]}</em>
+            </span>
+          </div>
         </aside>
 
         <div className="chat-thread-panel">
@@ -1409,7 +1389,9 @@ function ChatPreviewSection({
               <div key={`${index}-${message.time}`} className={`chat-row is-${message.side}`}>
                 {message.side === "in" ? (
                   <div className="chat-mini-avatar" aria-hidden="true">
-                    <span />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={chatAvatarUrl} alt="" />
+                    <span className="avatar-status-dot" />
                   </div>
                 ) : null}
                 <p>
@@ -1452,17 +1434,37 @@ function DotScale({ level }: { level: 1 | 2 | 3 }) {
 }
 
 function ComparisonTableSection() {
-  const features: Array<{ name: string; s: 1 | 2 | 3; c: 1 | 2 | 3; w: 1 | 2 | 3 }> = [
-    { name: "Role clarity",     s: 1, c: 2, w: 3 },
-    { name: "Verified identity", s: 1, c: 1, w: 3 },
-    { name: "Trust signal",     s: 1, c: 2, w: 3 },
-    { name: "Scannability",     s: 1, c: 2, w: 3 },
-    { name: "Search & filters", s: 1, c: 2, w: 3 },
-    { name: "Noise level",      s: 3, c: 2, w: 1 },
-    { name: "Direct outreach",  s: 1, c: 1, w: 3 },
-    { name: "Hiring control",   s: 1, c: 1, w: 3 },
-    { name: "Client proof",     s: 1, c: 1, w: 3 },
-    { name: "Time to hire",     s: 1, c: 2, w: 3 }
+  const channels = [
+    {
+      title: "Discord servers",
+      label: "Scattered reach",
+      tone: "servers",
+      score: "Low signal",
+      scoreValue: "34%",
+      icon: <DiscordIcon />,
+      body: "Big rooms create reach, but role, proof, rate, and availability get buried quickly.",
+      points: ["Role clarity buried", "Identity varies", "High noise"]
+    },
+    {
+      title: "Discord channels",
+      label: "Partial structure",
+      tone: "channels",
+      score: "Mixed signal",
+      scoreValue: "58%",
+      icon: <FolderIcon />,
+      body: "Dedicated channels help sorting, but hiring context still depends on links and manual scanning.",
+      points: ["Some role sorting", "Proof link-hopping", "Threads drift"]
+    },
+    {
+      title: "Weld",
+      label: "Proof-first cards",
+      tone: "weld",
+      score: "Strong signal",
+      scoreValue: "92%",
+      icon: <ShieldIcon />,
+      body: "Cards package role, proof, rate, availability, and first-message context in one scannable surface.",
+      points: ["Role-first cards", "Proof upfront", "Focused outreach"]
+    }
   ];
 
   return (
@@ -1473,27 +1475,32 @@ function ComparisonTableSection() {
         <p>Discord servers, Discord channels, and Weld — side by side.</p>
       </div>
 
-      <div className="comparison-table-wrapper">
-        <div className="comparison-table">
-          <div className="comp-table-header">
-            <div className="comp-col-feature">FEATURE</div>
-            <div className="comp-col-discord">DISCORD SERVERS</div>
-            <div className="comp-col-discord">DISCORD CHANNELS</div>
-            <div className="comp-col-weld">
-              <Image src="/Assets/weld-logo-official.svg" alt="Weld" width={72} height={20} />
+      <div className="comparison-visual-wrapper" aria-label="Hiring channel comparison">
+        {channels.map((channel) => (
+          <article key={channel.title} className={`comparison-lane is-${channel.tone}`}>
+            <div className="comparison-lane-top">
+              <span className="comparison-lane-label">{channel.label}</span>
+              <span className="comparison-lane-icon" aria-hidden="true">
+                {channel.icon}
+              </span>
             </div>
-          </div>
-          <div className="comp-table-body">
-            {features.map((f, i) => (
-              <div key={i} className="comp-table-row">
-                <div className="comp-col-feature">{f.name}</div>
-                <div className="comp-col-discord"><DotScale level={f.s} /></div>
-                <div className="comp-col-discord"><DotScale level={f.c} /></div>
-                <div className="comp-col-weld"><DotScale level={f.w} /></div>
-              </div>
-            ))}
-          </div>
-        </div>
+            <h3>{channel.title}</h3>
+            <p>{channel.body}</p>
+            <div className="comparison-signal">
+              <span>{channel.score}</span>
+              <strong>{channel.scoreValue}</strong>
+              <i aria-hidden="true" style={{ "--signal-fill": channel.scoreValue } as CSSProperties} />
+            </div>
+            <div className="comparison-chip-list">
+              {channel.points.map((point) => (
+                <span key={point}>
+                  <CheckIcon />
+                  {point}
+                </span>
+              ))}
+            </div>
+          </article>
+        ))}
       </div>
     </section>
   );
@@ -1533,12 +1540,18 @@ function EarlyAccessSection({
   };
 
   return (
-    <section data-reveal="pending" className="glass-section waitlist-section" id="join">
+    <section
+      data-reveal="pending"
+      className="glass-section waitlist-section"
+      id="join"
+      data-mode={mode}
+    >
       <div className="waitlist-shell">
         <div className="section-copy waitlist-copy">
           <span className="section-kicker">{copy.waitlist.kicker}</span>
-          <h2>{mode === "developer" ? "Join the developer beta." : "Get studio access."}</h2>
+          <h2>{copy.waitlist.headline}</h2>
           <p>{copy.waitlist.subhead}</p>
+
           <div className="waitlist-benefits">
             {copy.waitlist.benefits.map(([title, body, iconKey]) => (
               <span key={title}>
@@ -1550,7 +1563,7 @@ function EarlyAccessSection({
               </span>
             ))}
           </div>
-          <p className="waitlist-privacy">{copy.waitlist.privacy}</p>
+
         </div>
 
         <div
@@ -1562,25 +1575,27 @@ function EarlyAccessSection({
             <p>{copy.waitlist.body}</p>
           </div>
 
-          <label className="waitlist-field">
-            <span>{copy.waitlist.fieldLabel}</span>
-            <input
-              type="email"
-              value={email}
-              placeholder={copy.waitlist.placeholder}
-              onChange={(event) => onEmailChange(event.target.value)}
-              aria-describedby={status ? `waitlist-status-${mode}` : undefined}
-            />
-          </label>
+          <div className="waitlist-capture-row">
+            <label className="waitlist-field">
+              <span>{copy.waitlist.fieldLabel}</span>
+              <input
+                type="email"
+                value={email}
+                placeholder={copy.waitlist.placeholder}
+                onChange={(event) => onEmailChange(event.target.value)}
+                aria-describedby={status ? `waitlist-status-${mode}` : undefined}
+              />
+            </label>
 
-          <button
-            type="button"
-            className="button-primary waitlist-submit"
-            onClick={onSubmit}
-            disabled={phase === "submitting"}
-          >
-            {buttonLabel}
-          </button>
+            <button
+              type="button"
+              className="button-primary waitlist-submit"
+              onClick={onSubmit}
+              disabled={phase === "submitting"}
+            >
+              {buttonLabel}
+            </button>
+          </div>
 
           {phase === "success" ? (
             <Sticker
@@ -1602,15 +1617,9 @@ function EarlyAccessSection({
   );
 }
 
-function FriendlyFAQ({
-  copy,
-  openFaq,
-  onToggle
-}: {
-  copy: LandingCopy;
-  openFaq: number | null;
-  onToggle: (index: number | null) => void;
-}) {
+function FriendlyFAQ({ copy }: { copy: LandingCopy }) {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
   return (
     <section data-reveal="pending" className="glass-section faq-section" id="faq">
       <div className="section-copy">
@@ -1628,12 +1637,19 @@ function FriendlyFAQ({
                 type="button"
                 className="faq-trigger"
                 aria-expanded={isOpen}
-                onClick={() => onToggle(isOpen ? null : index)}
+                aria-controls={`faq-answer-${index}`}
+                onClick={() => setOpenFaq(isOpen ? null : index)}
               >
                 <span>{faq.question}</span>
-                <ChevronDownIcon className={isOpen ? "is-open" : ""} />
+                <span className={`faq-icon${isOpen ? " is-open" : ""}`} aria-hidden="true">
+                  <ChevronDownIcon />
+                </span>
               </button>
-              {isOpen ? <p>{faq.answer}</p> : null}
+              {isOpen ? (
+                <p id={`faq-answer-${index}`} className="faq-response">
+                  {faq.answer}
+                </p>
+              ) : null}
             </article>
           );
         })}
@@ -1660,11 +1676,9 @@ function FooterCTA({ copy }: { copy: LandingCopy }) {
 
 function ModeToggle({
   mode,
-  disabled,
   onChange
 }: {
   mode: Audience;
-  disabled?: boolean;
   onChange: (mode: Audience) => void;
 }) {
   return (
@@ -1674,7 +1688,6 @@ function ModeToggle({
         type="button"
         role="radio"
         aria-checked={mode === "developer"}
-        disabled={disabled}
         onClick={() => onChange("developer")}
       >
         I'm a developer
@@ -1683,7 +1696,6 @@ function ModeToggle({
         type="button"
         role="radio"
         aria-checked={mode === "studio"}
-        disabled={disabled}
         onClick={() => onChange("studio")}
       >
         I'm a studio
@@ -1831,6 +1843,84 @@ function HeartIcon() {
         strokeWidth="1.6"
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+function HowStepIcon({ icon }: { icon: HowItWorksIcon }) {
+  if (icon === "card") return <CardProofIcon />;
+  if (icon === "shield") return <ShieldCheckIcon />;
+  if (icon === "spark") return <StepSparkIcon />;
+  if (icon === "search") return <SearchRoleIcon />;
+  if (icon === "message") return <MessageProofIcon />;
+  return <HandshakeIcon />;
+}
+
+function HowStepArrowIcon() {
+  return (
+    <svg viewBox="0 0 28 18" fill="none" aria-hidden="true">
+      <path d="M2 9h22" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="m18 3 6 6-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CardProofIcon() {
+  return (
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <rect x="12" y="8" width="24" height="32" rx="5" fill="rgba(255, 255, 255, 0.72)" stroke="currentColor" strokeWidth="2" />
+      <path d="M18 18h12M18 25h9M18 32h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="34" cy="33" r="7" fill="rgba(255, 214, 102, 0.42)" stroke="currentColor" strokeWidth="2" />
+      <path d="m31.5 33.1 1.8 1.8 3.4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ShieldCheckIcon() {
+  return (
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <path d="M24 6 38 11v10c0 9.3-5.8 16.8-14 20-8.2-3.2-14-10.7-14-20V11l14-5Z" fill="rgba(111, 231, 168, 0.24)" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <circle cx="24" cy="23" r="8" fill="rgba(63, 211, 139, 0.46)" stroke="currentColor" strokeWidth="2" />
+      <path d="m20.5 23.1 2.4 2.4 5-5.6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function StepSparkIcon() {
+  return (
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <path d="m27 4-15 23h11l-3 17 16-24H25l2-16Z" fill="rgba(255, 211, 87, 0.5)" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M11 12h6M34 34h5M8 35h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function HandshakeIcon() {
+  return (
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <path d="M18 27 28.5 16.5c2.2-2.2 5.7-2.2 7.9 0l2.4 2.4-12 12" fill="rgba(119, 207, 231, 0.26)" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M30 29.5 20.5 20c-2-2-5.2-2-7.2 0l-4.1 4.1 12.1 12.1c1.7 1.7 4.5 1.7 6.2 0l4.9-4.9c.9-.9.9-2.4 0-3.3-.9-.9-2.4-.9-3.3 0l-4.4 4.4" fill="rgba(255, 214, 102, 0.3)" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function SearchRoleIcon() {
+  return (
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <rect x="9" y="10" width="25" height="25" rx="6" fill="rgba(255, 255, 255, 0.68)" stroke="currentColor" strokeWidth="2" />
+      <path d="M16 18h11M16 24h8M16 30h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="32" cy="31" r="6" fill="rgba(120, 112, 255, 0.22)" stroke="currentColor" strokeWidth="2" />
+      <path d="m36.5 35.5 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function MessageProofIcon() {
+  return (
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <path d="M10 13h28a5 5 0 0 1 5 5v12a5 5 0 0 1-5 5H25l-8 6v-6h-7a5 5 0 0 1-5-5V18a5 5 0 0 1 5-5Z" fill="rgba(255, 255, 255, 0.7)" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M16 22h16M16 28h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="m32 28 2.2 2.2 4.3-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
