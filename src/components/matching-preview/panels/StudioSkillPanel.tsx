@@ -160,6 +160,17 @@ export default function StudioSkillPanel({ profile, skillName, initialRole, onBa
               </div>
             </div>
 
+            {customDesc && (
+              <>
+                <div style={{ fontSize: 10, fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#999', marginBottom: 6 }}>
+                  What they&apos;re looking for
+                </div>
+                <p style={{ fontSize: 13, color: '#444', lineHeight: 1.65, margin: '0 0 14px' }}>
+                  {customDesc}
+                </p>
+              </>
+            )}
+
             {popupRole.payType && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 14, padding: '7px 11px', background: 'rgba(61,199,122,0.07)', borderRadius: 8, border: '1px solid rgba(61,199,122,0.18)' }}>
                 <div style={{ fontSize: 9, fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#3DC77A' }}>Pay</div>
