@@ -31,7 +31,9 @@ import {
   type TalentProfile
 } from "@/dynamic-landing-page/lib/role-config";
 import SwipeCard from "@/components/matching-preview/SwipeCard";
+import StudioCard from "@/components/matching-preview/StudioCard";
 import { MARQUEE_PROFILES } from "@/data/marqueeProfiles";
+import { MARQUEE_STUDIOS } from "@/data/marqueeStudios";
 
 interface MarketingPageProps {
   initialMode: Audience;
@@ -47,213 +49,432 @@ const WAITLIST_URL = "https://weldroblox.com";
 const HIRING_PANELS: Record<RoleKey, Array<{
   studio: string;
   credibility: string;
-  role: string;
-  rate: string;
-  scope: string;
-  chips: string[];
-  social: string;
+  roleTitle: string;
+  roleCategory: string;
+  roleChip: string;
+  chipBg: string;
+  chipColor: string;
+  whatLookingFor: string;
+  payType: string;
+  payRange: string;
+  roleDescription: string;
 }>> = {
-  scripter: [
+  scripting: [
     {
       studio: "Eclipse Studios",
       credibility: "12 shipped · 4M plays/mo",
-      role: "Combat scripter (3 mo contract)",
-      rate: "$60–85 / hr · paid weekly",
-      scope: "Build the ability + dodge system for our combat update. Existing codebase.",
-      chips: ["Lua", "Combat systems", "EU/US TZ"],
-      social: "Reply rate: 84% · avg 6h"
+      roleTitle: "Lead scripter",
+      roleCategory: "Scripting",
+      roleChip: "Sc",
+      chipBg: "#dcfce7", chipColor: "#15803d",
+      whatLookingFor: "Looking for an experienced lead scripter to lead a team of multiple scripters. Needs to be confident in independently developing code for combat systems. Experience building anime RP games is preferred but not required — make sure to let us know what your role was at studios you've previously worked for. We're open to both a seasoned lead or a talented junior who's ready to step up.",
+      payType: "Hourly (USD)",
+      payRange: "$25 – $60",
+      roleDescription: "You will lead a team of 3–5 scripters and help us build at an insanely fast rate. Pay will depend heavily on results — we reward hard work. The game is in a very early stage and you will be responsible for overseeing much of its development."
     },
     {
       studio: "Zenith Games",
       credibility: "8 shipped · 2.1M plays/mo",
-      role: "Anti-cheat developer (ongoing)",
-      rate: "$70 / hr · milestone",
-      scope: "Retrofit our FPS title with server-side validation. Solo codebase.",
-      chips: ["Server Lua", "Anti-cheat", "FPS experience"],
-      social: "Trusted by 7 devs on Weld"
+      roleTitle: "Anti-cheat developer",
+      roleCategory: "Scripting",
+      roleChip: "Sc",
+      chipBg: "#dcfce7", chipColor: "#15803d",
+      whatLookingFor: "Looking for a developer with hands-on experience implementing server-side validation and anti-cheat systems. Must have shipped at least one FPS or competitive title. Show us a specific example of an exploit you caught and patched — we want to see your approach, not just your resume.",
+      payType: "Hourly (USD)",
+      payRange: "$70 – $90",
+      roleDescription: "Retrofit our existing FPS title with server-side hit validation and basic anti-cheat logic. You'll be working solo on a well-documented codebase with full repository access. Ongoing retainer available after the initial scope is complete."
     },
     {
       studio: "Phantom Works",
       credibility: "5 shipped · 900k plays/mo",
-      role: "Backend systems engineer (6 mo)",
-      rate: "$8k flat · 3 milestones",
-      scope: "DataStore rewrite + live-ops tooling for our RPG. Well-documented codebase.",
-      chips: ["DataStore", "OOP Lua", "RPG systems"],
-      social: "Reply rate: 91% · avg 4h"
-    }
-  ],
-  builder: [
-    {
-      studio: "NovaBuild Co.",
-      credibility: "15 shipped · 6M plays/mo",
-      role: "Hub builder (2 mo contract)",
-      rate: "$50 / hr · milestone",
-      scope: "Design and build a central social hub. Style guide and reference assets provided.",
-      chips: ["Terrain", "Props", "Social hubs"],
-      social: "Trusted by 9 devs on Weld"
-    },
-    {
-      studio: "Orbit Interactive",
-      credibility: "6 shipped · 1.5M plays/mo",
-      role: "Map artist (ongoing)",
-      rate: "$45–55 / hr · paid weekly",
-      scope: "Ongoing environment work for our open-world RPG. Biomes + POI design.",
-      chips: ["Open world", "Biomes", "Terrain sculpt"],
-      social: "Reply rate: 79% · avg 8h"
-    },
-    {
-      studio: "Solstice Studio",
-      credibility: "4 shipped · 700k plays/mo",
-      role: "Environment lead (3 mo)",
-      rate: "$6k flat · 2 milestones",
-      scope: "Lead the environment team for a new horror title. Own the visual language.",
-      chips: ["Team lead", "Horror", "Atmosphere design"],
-      social: "Reply rate: 88% · avg 3h"
+      roleTitle: "Backend engineer",
+      roleCategory: "Scripting",
+      roleChip: "Sc",
+      chipBg: "#dcfce7", chipColor: "#15803d",
+      whatLookingFor: "We need an experienced backend engineer to overhaul our DataStore layer across four data profiles. Must be comfortable with OOP Lua, profile migration, and live-ops tooling. RPG systems experience is a strong plus. Please link previous DataStore or backend work.",
+      payType: "Milestone (USD)",
+      payRange: "$8,000 flat",
+      roleDescription: "Full DataStore rewrite plus live-ops dashboards for our content team. Well-documented existing codebase. Delivered across three milestones with clear gate criteria. Timeline is flexible for the right person."
     }
   ],
   ui: [
     {
       studio: "Eclipse Studios",
       credibility: "12 shipped · 4M plays/mo",
-      role: "HUD designer (6 wk contract)",
-      rate: "$55–70 / hr · milestone",
-      scope: "Redesign our combat HUD. Health, abilities, minimap. Figma specs provided.",
-      chips: ["HUD", "Figma handoff", "Combat UI"],
-      social: "Reply rate: 84% · avg 6h"
+      roleTitle: "HUD designer",
+      roleCategory: "UI Design",
+      roleChip: "UI",
+      chipBg: "#fce7f3", chipColor: "#be185d",
+      whatLookingFor: "Looking for a UI designer who can redesign our combat HUD from scratch. Must have experience with health bars, ability cooldown indicators, and minimaps. Figma specs and brand kit will be provided. Show us shipped HUD work — we want to see real in-game screens, not mockups.",
+      payType: "Milestone (USD)",
+      payRange: "$55 – $70 / hr",
+      roleDescription: "Redesign the full combat HUD covering health, abilities, minimap, and death screen. Implementation support required. Figma handoff to our lead scripter at completion. 6-week contract with potential extension."
     },
     {
       studio: "Cascade Labs",
       credibility: "3 shipped · 400k plays/mo",
-      role: "Onboarding flow UI (1 mo)",
-      rate: "$3.5k flat",
-      scope: "New player tutorial UI. Clear, mobile-friendly, low friction. Brand kit included.",
-      chips: ["Onboarding", "Mobile", "Tutorial UX"],
-      social: "Trusted by 4 devs on Weld"
+      roleTitle: "Onboarding UI designer",
+      roleCategory: "UI Design",
+      roleChip: "UI",
+      chipBg: "#fce7f3", chipColor: "#be185d",
+      whatLookingFor: "We're looking for a UI designer to own the new player tutorial experience. Must understand mobile constraints and low-friction onboarding principles. Brand kit and UX brief are ready. Experience shipping onboarding flows in live Roblox games is essential.",
+      payType: "Flat (USD)",
+      payRange: "$3,500",
+      roleDescription: "Design the full new player tutorial UI — welcome screen, objective cards, reward pop-ups, and exit flow. Mobile-first. Two rounds of revisions included. Handoff to our scripter at completion."
     },
     {
       studio: "Zenith Games",
       credibility: "8 shipped · 2.1M plays/mo",
-      role: "Shop interface designer (ongoing)",
-      rate: "$60 / hr · paid weekly",
-      scope: "Design and build our in-game shop. Cart, bundles, promotions. High traffic.",
-      chips: ["Shop UI", "Monetisation", "High polish"],
-      social: "Reply rate: 77% · avg 10h"
+      roleTitle: "Shop interface designer",
+      roleCategory: "UI Design",
+      roleChip: "UI",
+      chipBg: "#fce7f3", chipColor: "#be185d",
+      whatLookingFor: "Looking for a UI designer to design and build our in-game shop. High traffic — this screen needs to convert. Must have shipped shop or monetisation UI before. Cart flow, bundle cards, promotional banners, and limited-time offer states all required.",
+      payType: "Hourly (USD)",
+      payRange: "$55 – $70",
+      roleDescription: "Design and implement the full in-game shop: item grid, cart, bundle detail, purchase confirmation, and promo banner states. Work directly with our lead scripter for implementation. Ongoing engagement after initial scope."
+    }
+  ],
+  graphics: [
+    {
+      studio: "NovaBuild Co.",
+      credibility: "15 shipped · 6M plays/mo",
+      roleTitle: "Thumbnail artist",
+      roleCategory: "Graphics",
+      roleChip: "Gr",
+      chipBg: "#f3e8ff", chipColor: "#7e22ce",
+      whatLookingFor: "We need a thumbnail artist who consistently produces click-worthy results. Must have a portfolio showing Roblox thumbnails with visible CTR improvement data. Our current thumbnail CTR is 4.2% — we want to break 7%. Show us your approach, not just your art.",
+      payType: "Per thumbnail (USD)",
+      payRange: "$80 – $150",
+      roleDescription: "Produce thumbnails for our main game and seasonal update campaigns. Brief and character assets provided for each commission. Fast turnaround expected — typically 2–3 days per thumbnail. Ongoing relationship for the right artist."
+    },
+    {
+      studio: "Phantom Works",
+      credibility: "5 shipped · 900k plays/mo",
+      roleTitle: "Marketing graphic designer",
+      roleCategory: "Graphics",
+      roleChip: "Gr",
+      chipBg: "#f3e8ff", chipColor: "#7e22ce",
+      whatLookingFor: "Looking for a graphic designer to own our visual marketing presence — social posts, Discord banners, game store art, and seasonal campaigns. Must understand Roblox's aesthetic and player base. Show us social content you've made that drove real engagement.",
+      payType: "Flat (USD)",
+      payRange: "$2,000",
+      roleDescription: "Four-week contract covering rebranded store art, a launch-week social kit (8 posts), and Discord server graphics. Brand guidelines provided. Future retainer arrangement on the table after delivery."
+    },
+    {
+      studio: "Orbit Interactive",
+      credibility: "6 shipped · 1.5M plays/mo",
+      roleTitle: "UI graphic asset artist",
+      roleCategory: "Graphics",
+      roleChip: "Gr",
+      chipBg: "#f3e8ff", chipColor: "#7e22ce",
+      whatLookingFor: "We need a graphic artist to produce UI-ready assets for our RPG — icons, frames, borders, and decorative elements that match our existing visual style. Must be able to work from a style guide and deliver layered files. Roblox UI integration experience preferred.",
+      payType: "Hourly (USD)",
+      payRange: "$40 – $55",
+      roleDescription: "Produce a full icon set (60+ items), UI frame templates, and decorative borders for our RPG interface. Style guide and reference assets provided. Layered PSDs required at delivery. Ongoing batches available."
+    }
+  ],
+  art2d: [
+    {
+      studio: "Cascade Labs",
+      credibility: "3 shipped · 400k plays/mo",
+      roleTitle: "Character concept artist",
+      roleCategory: "2D Art",
+      roleChip: "2D",
+      chipBg: "#ffe4e6", chipColor: "#be123c",
+      whatLookingFor: "Looking for a 2D character concept artist who can define the visual style for our new title. Must be comfortable with anime-adjacent aesthetics. We'll provide lore and personality briefs for each character — you bring them to life. Show us a range of character styles in your portfolio.",
+      payType: "Hourly (USD)",
+      payRange: "$45 – $65",
+      roleDescription: "Concept and finalise 8 hero characters with full expression sheets and outfit variants. Lore briefs and mood boards provided. Two revision rounds per character. Final files in layered PSD format."
+    },
+    {
+      studio: "Eclipse Studios",
+      credibility: "12 shipped · 4M plays/mo",
+      roleTitle: "Item icon artist",
+      roleCategory: "2D Art",
+      roleChip: "2D",
+      chipBg: "#ffe4e6", chipColor: "#be123c",
+      whatLookingFor: "We need a 2D artist to produce high-quality item icons for our combat RPG. Weapons, armour, consumables, and accessories — around 80 icons in the first batch. Must be able to maintain a consistent style across a large volume. Speed and consistency matter as much as quality.",
+      payType: "Per batch (USD)",
+      payRange: "$500 – $800",
+      roleDescription: "First batch: 80 icons across four categories with consistent lighting and perspective. Style guide provided. Delivered in 512×512 PNG. Ongoing batches likely — this is a long-running project with regular content drops."
+    },
+    {
+      studio: "NovaBuild Co.",
+      credibility: "15 shipped · 6M plays/mo",
+      roleTitle: "Environment concept artist",
+      roleCategory: "2D Art",
+      roleChip: "2D",
+      chipBg: "#ffe4e6", chipColor: "#be123c",
+      whatLookingFor: "Looking for an environment concept artist to define the visual direction for four distinct biomes in our open-world game. Must have experience with landscape and architectural concepts. We want painterly style with strong colour palette work — show us environment pieces, not characters.",
+      payType: "Hourly (USD)",
+      payRange: "$50 – $70",
+      roleDescription: "Concept four biomes — each with a hero establishing shot and two detail studies. Mood board collaboration upfront. Revisions included at each biome checkpoint. Finals used directly by our builder team."
+    }
+  ],
+  building: [
+    {
+      studio: "NovaBuild Co.",
+      credibility: "15 shipped · 6M plays/mo",
+      roleTitle: "Social hub builder",
+      roleCategory: "Building",
+      roleChip: "Bu",
+      chipBg: "#fef3c7", chipColor: "#b45309",
+      whatLookingFor: "Looking for an experienced builder to design and construct a central social hub — the main gathering space for our game. Must have shipped a social space or lobby before. Style guide and reference assets will be provided. We want modularity and low drawcall discipline baked in from the start.",
+      payType: "Milestone (USD)",
+      payRange: "$50 / hr",
+      roleDescription: "Design and build the full social hub: main plaza, shop building exteriors, event stage, and NPC placement zones. Style kit provided. Optimisation benchmarks required at delivery. Two-month contract with handoff to our QA team."
+    },
+    {
+      studio: "Orbit Interactive",
+      credibility: "6 shipped · 1.5M plays/mo",
+      roleTitle: "Map artist",
+      roleCategory: "Building",
+      roleChip: "Bu",
+      chipBg: "#fef3c7", chipColor: "#b45309",
+      whatLookingFor: "We need a skilled map artist for ongoing environment work on our open-world RPG. Biome design, POI construction, and terrain sculpting. Must have shipped open-world or exploration games before. Show us a map you're proud of and tell us your drawcall approach.",
+      payType: "Hourly (USD)",
+      payRange: "$45 – $55",
+      roleDescription: "Ongoing biome and POI work across a 6-biome open world. Weekly deliverable check-ins. Terrain sculpting, asset placement, and atmospheric lighting all in scope. Collaboration with our VFX artist on ambient effects."
+    },
+    {
+      studio: "Solstice Studio",
+      credibility: "4 shipped · 700k plays/mo",
+      roleTitle: "Environment lead",
+      roleCategory: "Building",
+      roleChip: "Bu",
+      chipBg: "#fef3c7", chipColor: "#b45309",
+      whatLookingFor: "Looking for an environment lead to own the visual language of our new horror title. This is a leadership role — you'll manage one junior builder and set the aesthetic direction. Must have led a build team or owned a full environment before. Show us horror or atmospheric work.",
+      payType: "Flat (USD)",
+      payRange: "$6,000",
+      roleDescription: "Lead environment development for the full game across two milestones. Manage one junior builder. Own style decisions, lighting, and atmospheric consistency. Direct line to creative director throughout. Three-month contract."
     }
   ],
   vfx: [
     {
       studio: "Phantom Works",
       credibility: "5 shipped · 900k plays/mo",
-      role: "Combat VFX artist (2 mo)",
-      rate: "$50–65 / hr · milestone",
-      scope: "Ability FX for 12 combat skills. Style ref provided. Integrate into existing rig.",
-      chips: ["Beam", "ParticleEmitter", "Combat FX"],
-      social: "Reply rate: 91% · avg 4h"
+      roleTitle: "Combat VFX artist",
+      roleCategory: "VFX",
+      roleChip: "FX",
+      chipBg: "#ecfdf5", chipColor: "#059669",
+      whatLookingFor: "Looking for a VFX artist to create ability effects for 12 combat skills. Style references provided — think fast, readable, and impact-clear. Must have shipped combat FX in Roblox before. Show us hit confirms and ability bursts from live games. Integration into existing rig required.",
+      payType: "Milestone (USD)",
+      payRange: "$50 – $65 / hr",
+      roleDescription: "Create and integrate FX for 12 combat abilities: cast, projectile, impact, and cooldown states per skill. Style ref and rig provided. Two revision rounds per ability. Two-month contract, potential extension for additional skills."
     },
     {
       studio: "Orbit Interactive",
       credibility: "6 shipped · 1.5M plays/mo",
-      role: "Ambient world FX (ongoing)",
-      rate: "$45 / hr · paid weekly",
-      scope: "Weather, foliage, water effects across 6 biomes. Perf budget is strict.",
-      chips: ["Environment FX", "Optimisation", "Open world"],
-      social: "Trusted by 6 devs on Weld"
+      roleTitle: "World ambient FX artist",
+      roleCategory: "VFX",
+      roleChip: "FX",
+      chipBg: "#ecfdf5", chipColor: "#059669",
+      whatLookingFor: "We need a VFX artist for ongoing world ambience work across our open-world RPG. Weather effects, foliage movement, water surfaces, and atmospheric particles. Performance budget is strict — we run on mobile. Must show optimised open-world FX in your portfolio.",
+      payType: "Hourly (USD)",
+      payRange: "$40 – $55",
+      roleDescription: "Ongoing FX work across 6 biomes: rain, wind, dust, water ripples, and firefly particles. Performance-budget sign-off required at each biome. Collaboration with the builder team for placement. Weekly deliverables."
     },
     {
       studio: "Solstice Studio",
       credibility: "4 shipped · 700k plays/mo",
-      role: "UI motion designer (6 wk)",
-      rate: "$3k flat",
-      scope: "Menu transitions, feedback pulses, and HUD animations for a horror title.",
-      chips: ["UI motion", "TweenService", "Horror tone"],
-      social: "Reply rate: 88% · avg 3h"
+      roleTitle: "UI motion designer",
+      roleCategory: "VFX",
+      roleChip: "FX",
+      chipBg: "#ecfdf5", chipColor: "#059669",
+      whatLookingFor: "Looking for a motion designer to bring our horror title's UI to life. Menu transitions, tension-building feedback pulses, and HUD animations. Must understand TweenService deeply. Show us UI motion from a shipped game — ideally something atmospheric or dark in tone.",
+      payType: "Flat (USD)",
+      payRange: "$3,000",
+      roleDescription: "Design and implement UI motion across main menu, HUD, and inventory screens. TweenService implementation required — no third-party plugins. Horror tone throughout. Six-week contract. Handoff documentation included."
     }
   ],
-  animator: [
+  animation: [
     {
       studio: "NovaBuild Co.",
       credibility: "15 shipped · 6M plays/mo",
-      role: "Character animator (3 mo)",
-      rate: "$60 / hr · milestone",
-      scope: "Full locomotion set + 8 emotes for new character lineup. Rig provided.",
-      chips: ["Locomotion", "Emotes", "Character"],
-      social: "Trusted by 11 devs on Weld"
+      roleTitle: "Character animator",
+      roleCategory: "Animation",
+      roleChip: "An",
+      chipBg: "#fff7ed", chipColor: "#c2410c",
+      whatLookingFor: "Looking for a character animator to deliver a full locomotion set plus 8 emotes for our new character lineup. Must have shipped locomotion in Roblox before — walk, run, jump, fall, idle at minimum. Rig will be provided. Show us a movement reel with timing notes.",
+      payType: "Milestone (USD)",
+      payRange: "$60 / hr",
+      roleDescription: "Full locomotion set (8 states) plus 8 emotes with loop points and export manifests. Rig and style references provided. Checkpoints at locomotion complete and emotes complete. Three-month contract."
     },
     {
       studio: "Eclipse Studios",
       credibility: "12 shipped · 4M plays/mo",
-      role: "Cinematic animator (2 mo)",
-      rate: "$55–70 / hr · paid weekly",
-      scope: "Cutscene animations for story mode. 14 scenes, mixed lengths, mocap reference.",
-      chips: ["Cinematics", "Story mode", "Mocap ref"],
-      social: "Reply rate: 84% · avg 6h"
+      roleTitle: "Cinematic animator",
+      roleCategory: "Animation",
+      roleChip: "An",
+      chipBg: "#fff7ed", chipColor: "#c2410c",
+      whatLookingFor: "We need an animator to produce cutscene animations for our story mode. 14 scenes of mixed length — dialogue exchanges, action beats, and emotional moments. Mocap reference provided for the action scenes. Must have cinematic or cutscene work in your portfolio.",
+      payType: "Hourly (USD)",
+      payRange: "$55 – $70",
+      roleDescription: "Animate 14 cutscenes using provided mocap reference and storyboards. Scene lengths range from 8 to 45 seconds. Two revision rounds per scene. Delivery in batches of four scenes. Two-month contract."
     },
     {
       studio: "Cascade Labs",
       credibility: "3 shipped · 400k plays/mo",
-      role: "Procedural rigging (1 mo)",
-      rate: "$4k flat",
-      scope: "Procedural IK rig for creature movement. Lua + animation pipeline experience needed.",
-      chips: ["IK rig", "Procedural", "Creature"],
-      social: "Reply rate: 72% · avg 12h"
+      roleTitle: "Procedural rigger",
+      roleCategory: "Animation",
+      roleChip: "An",
+      chipBg: "#fff7ed", chipColor: "#c2410c",
+      whatLookingFor: "Looking for an animator with procedural rigging experience to build an IK rig for creature movement. Must be comfortable with Lua-driven animation logic. Creature reference designs and movement briefs provided. Show us procedural or IK work — ideally creature-based.",
+      payType: "Flat (USD)",
+      payRange: "$4,000",
+      roleDescription: "Build a full IK rig for a quadruped creature: spine, limbs, head-tracking, and ground adaptation. Lua animation driver included. One-month contract with one revision milestone. Documentation required at delivery."
     }
   ],
-  designer: [
+  modeling3d: [
     {
       studio: "Orbit Interactive",
       credibility: "6 shipped · 1.5M plays/mo",
-      role: "Game designer (3 mo contract)",
-      rate: "$65 / hr · milestone",
-      scope: "Design core loop, progression, and economy for our upcoming RPG. Design docs provided.",
-      chips: ["Core loops", "Economy", "Progression"],
-      social: "Reply rate: 79% · avg 8h"
-    },
-    {
-      studio: "Eclipse Studios",
-      credibility: "12 shipped · 4M plays/mo",
-      role: "Systems designer (6 wk)",
-      rate: "$60–75 / hr · milestone",
-      scope: "Balance our combat system and reward loop. Data exports and telemetry provided.",
-      chips: ["Balancing", "Combat", "Data-driven"],
-      social: "Reply rate: 84% · avg 6h"
-    },
-    {
-      studio: "Cascade Labs",
-      credibility: "3 shipped · 400k plays/mo",
-      role: "UX game designer (1 mo)",
-      rate: "$4k flat",
-      scope: "Improve new player onboarding flow. Reduce drop-off in first 5 minutes.",
-      chips: ["Onboarding", "Retention", "UX thinking"],
-      social: "Trusted by 4 devs on Weld"
-    }
-  ],
-  systems: [
-    {
-      studio: "Zenith Games",
-      credibility: "8 shipped · 2.1M plays/mo",
-      role: "DataStore architect (ongoing)",
-      rate: "$75 / hr · paid weekly",
-      scope: "Rebuild our DataStore layer for scale. 500k+ DAU. Existing schema docs provided.",
-      chips: ["DataStore", "Scale", "500k+ DAU"],
-      social: "Reply rate: 77% · avg 10h"
+      roleTitle: "Character modeler",
+      roleCategory: "3D Modeling",
+      roleChip: "3D",
+      chipBg: "#fef9c3", chipColor: "#854d0e",
+      whatLookingFor: "Looking for a character modeler to produce 6 hero characters with LODs and weapon attachment rigs. Must be comfortable with Roblox's polygon constraints and UV mapping. Style guide provided — semi-realistic with clean silhouettes. Show us character models with poly count notes.",
+      payType: "Hourly (USD)",
+      payRange: "$55 – $75",
+      roleDescription: "Model 6 hero characters: base mesh, two LOD levels, UV unwrap, and weapon attachment points. Style guide and concept art provided. Delivery in pairs across three milestones. Three-month contract."
     },
     {
       studio: "Phantom Works",
       credibility: "5 shipped · 900k plays/mo",
-      role: "Economy systems (3 mo)",
-      rate: "$70–85 / hr · milestone",
-      scope: "Design + build virtual economy: currency, shops, sinks, sources. Solo scope.",
-      chips: ["Economy design", "Balancing", "Virtual currency"],
-      social: "Reply rate: 91% · avg 4h"
+      roleTitle: "Prop artist",
+      roleCategory: "3D Modeling",
+      roleChip: "3D",
+      chipBg: "#fef9c3", chipColor: "#854d0e",
+      whatLookingFor: "We need a prop artist for ongoing asset production on our RPG. Weapons, furniture, containers, and interactive objects. Must be fast — we're shipping content updates monthly. Show us a prop pack with consistent style and polygon discipline across all assets.",
+      payType: "Per asset (USD)",
+      payRange: "$100 – $300",
+      roleDescription: "Ongoing prop production across weapon, furniture, and interactive categories. Style sheet provided. Deliverables in FBX with LODs. Turnaround of 3–5 days per prop. Ongoing engagement — first batch is 20 props."
     },
+    {
+      studio: "Solstice Studio",
+      credibility: "4 shipped · 700k plays/mo",
+      roleTitle: "Environment modeler",
+      roleCategory: "3D Modeling",
+      roleChip: "3D",
+      chipBg: "#fef9c3", chipColor: "#854d0e",
+      whatLookingFor: "Looking for an environment modeler to produce modular building and ruin assets for our horror title. Must understand modular design principles and tileable textures. Dark and detailed aesthetic — show us atmospheric or horror environment work from your portfolio.",
+      payType: "Hourly (USD)",
+      payRange: "$50 – $65",
+      roleDescription: "Produce a modular building kit: walls, floors, ceilings, doors, windows, and ruin variants. Style references and UV atlas template provided. Tileable textures included in scope. Two-month contract with bi-weekly delivery checkpoints."
+    }
+  ],
+  gamedesign: [
+    {
+      studio: "Orbit Interactive",
+      credibility: "6 shipped · 1.5M plays/mo",
+      roleTitle: "Core loop designer",
+      roleCategory: "Game Design",
+      roleChip: "GD",
+      chipBg: "#f0fdf4", chipColor: "#15803d",
+      whatLookingFor: "We need a game designer to own the core loop, progression system, and economy design for our upcoming RPG. Must have shipped a game with a functional economy before. Design doc experience required — we use Notion. Show us a progression system you designed and what the retention data looked like.",
+      payType: "Milestone (USD)",
+      payRange: "$65 / hr",
+      roleDescription: "Design core gameplay loop, XP curve, item economy, and seasonal content framework. Design docs in Notion. Work directly with our lead scripter and producer. Three-month contract across two milestones."
+    },
+    {
+      studio: "Eclipse Studios",
+      credibility: "12 shipped · 4M plays/mo",
+      roleTitle: "Systems designer",
+      roleCategory: "Game Design",
+      roleChip: "GD",
+      chipBg: "#f0fdf4", chipColor: "#15803d",
+      whatLookingFor: "Looking for a systems designer to balance our combat system and reward loop. Must be data-comfortable — we provide full telemetry exports. Ability to write clear balance changelogs required. Show us a combat system you balanced and the reasoning behind your decisions.",
+      payType: "Milestone (USD)",
+      payRange: "$60 – $75 / hr",
+      roleDescription: "Balance combat abilities, weapon stats, and reward loop pacing across a 6-week sprint. Telemetry data and player retention reports provided. Weekly design review with the lead. Deliverables: balance changelog, tuning sheet, and post-sprint summary."
+    },
+    {
+      studio: "Cascade Labs",
+      credibility: "3 shipped · 400k plays/mo",
+      roleTitle: "UX game designer",
+      roleCategory: "Game Design",
+      roleChip: "GD",
+      chipBg: "#f0fdf4", chipColor: "#15803d",
+      whatLookingFor: "We need a UX-focused game designer to reduce first-five-minute drop-off in our game. Must understand onboarding flow design and have experience improving retention metrics. Show us a before-and-after where your UX decisions moved the numbers.",
+      payType: "Flat (USD)",
+      payRange: "$4,000",
+      roleDescription: "Audit current new player experience, redesign the first 5 minutes, and brief the UI designer and scripter on implementation. Deliverables: UX audit, redesign doc, and implementation brief. One-month contract."
+    }
+  ],
+  sounddesign: [
     {
       studio: "NovaBuild Co.",
       credibility: "15 shipped · 6M plays/mo",
-      role: "Live-ops tooling (2 mo)",
-      rate: "$6k flat · 3 milestones",
-      scope: "Admin dashboard for live events. Real-time config, flag overrides, basic analytics.",
-      chips: ["Live-ops", "Admin tools", "Real-time config"],
-      social: "Trusted by 9 devs on Weld"
+      roleTitle: "Ambient sound designer",
+      roleCategory: "Sound Design",
+      roleChip: "SD",
+      chipBg: "#eff6ff", chipColor: "#1d4ed8",
+      whatLookingFor: "Looking for a sound designer to create atmospheric soundscapes for four distinct biomes in our open-world game. Must have shipped ambient audio for games before — ideally open-world or exploration titles. Show us a soundscape demo and describe your layering approach.",
+      payType: "Hourly (USD)",
+      payRange: "$40 – $60",
+      roleDescription: "Design ambient soundscapes for four biomes with day and night variants. Each biome: base layer, dynamic weather layer, and proximity audio triggers. Delivered as loopable WAV files with an integration guide for our scripter. Four-month contract."
+    },
+    {
+      studio: "Zenith Games",
+      credibility: "8 shipped · 2.1M plays/mo",
+      roleTitle: "Audio director",
+      roleCategory: "Sound Design",
+      roleChip: "SD",
+      chipBg: "#eff6ff", chipColor: "#1d4ed8",
+      whatLookingFor: "We're looking for an audio director to take ownership of our entire game's audio — music, SFX, ambient, and UI sounds. Must have directed audio for a shipped Roblox or Unity/Godot title. We want someone who can set the sonic identity, not just execute briefs.",
+      payType: "Hourly (USD)",
+      payRange: "$65 – $80",
+      roleDescription: "Own all audio direction: brief and manage freelance SFX and music artists, set style guides, and implement key audio yourself. Weekly review with the producer. Ongoing engagement — target launch in 5 months."
+    },
+    {
+      studio: "Phantom Works",
+      credibility: "5 shipped · 900k plays/mo",
+      roleTitle: "Music composer",
+      roleCategory: "Sound Design",
+      roleChip: "SD",
+      chipBg: "#eff6ff", chipColor: "#1d4ed8",
+      whatLookingFor: "Looking for a composer to score our horror RPG. Dark orchestral with electronic undertones — think tension over jump scares. Must have shipped music for a game before. Send us a demo reel with at least one piece that builds and releases tension deliberately.",
+      payType: "Flat (USD)",
+      payRange: "$5,000",
+      roleDescription: "Compose 6 original tracks: main theme, 3 area themes, combat loop, and credits. Stems required for dynamic layering. Revisions at demo stage and final stage per track. Three-month delivery schedule."
+    }
+  ],
+  sfx: [
+    {
+      studio: "Eclipse Studios",
+      credibility: "12 shipped · 4M plays/mo",
+      roleTitle: "Combat SFX artist",
+      roleCategory: "SFX",
+      roleChip: "SX",
+      chipBg: "#ecfdf5", chipColor: "#047857",
+      whatLookingFor: "Looking for an SFX artist to design and deliver a full combat audio pack for our action RPG. Weapon swings, ability activations, hit confirms, and critical sounds. Must have shipped combat audio in a live game. Show us a reel with impact punch and clear audio-visual sync.",
+      payType: "Per pack (USD)",
+      payRange: "$800 – $1,500",
+      roleDescription: "First pack: 40 combat sounds across melee, ranged, and ability categories. WAV + OGG delivery. Manifest with naming convention included. Integration notes for the scripter. Two-month contract with ongoing packs based on game updates."
+    },
+    {
+      studio: "Orbit Interactive",
+      credibility: "6 shipped · 1.5M plays/mo",
+      roleTitle: "UI sound effects designer",
+      roleCategory: "SFX",
+      roleChip: "SX",
+      chipBg: "#ecfdf5", chipColor: "#047857",
+      whatLookingFor: "We need an SFX designer to create all UI audio for our RPG — button clicks, menu transitions, notification chimes, error sounds, and purchase confirmations. Must understand UI audio psychology. Light, satisfying, non-fatiguing. Show us UI audio from a shipped game.",
+      payType: "Flat (USD)",
+      payRange: "$2,000",
+      roleDescription: "Produce a complete UI SFX kit: 25 sounds covering navigation, feedback, notifications, and purchase flows. Consistent sonic identity throughout. WAV delivery with naming guide. One-month contract."
+    },
+    {
+      studio: "Cascade Labs",
+      credibility: "3 shipped · 400k plays/mo",
+      roleTitle: "Ability SFX pack artist",
+      roleCategory: "SFX",
+      roleChip: "SX",
+      chipBg: "#ecfdf5", chipColor: "#047857",
+      whatLookingFor: "Looking for an SFX artist to design sounds for 10 player abilities. Each ability needs cast, travel, impact, and cooldown-end sounds. Must understand ability audio readability — players need to hear what just happened. Show us ability audio from a combat game.",
+      payType: "Flat (USD)",
+      payRange: "$1,800",
+      roleDescription: "Design 40 sounds across 10 abilities (4 per ability: cast, travel, impact, cooldown). Style brief and ability descriptions provided. WAV + OGG delivery. Six-week contract with two check-in reviews during production."
     }
   ]
 };
@@ -313,13 +534,30 @@ function WeldLandingPage({
   const motionTier = motion.tier;
   const [isPending, startTransition] = useTransition();
   const [mode, setMode] = useState<Audience>(initialMode);
-  const [role, setRole] = useState<RoleKey>("scripter");
+  const [role, setRole] = useState<RoleKey>("scripting");
   const [email, setEmail] = useState("");
   const [capturePhase, setCapturePhase] = useState<CapturePhase>("idle");
   const [captureStatus, setCaptureStatus] = useState("");
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [isSwapping, setIsSwapping] = useState(false);
   const [swipeModalOpen, setSwipeModalOpen] = useState(false);
+  useEffect(() => {
+    if (!swipeModalOpen) return;
+    const scrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.overflow = "";
+      window.scrollTo(0, scrollY);
+    };
+  }, [swipeModalOpen]);
   const [hiringPanel, setHiringPanel] = useState(0);
   const [hiringAnim, setHiringAnim] = useState<HiringAnim>("idle");
   const captureRef = useRef<HTMLDivElement | null>(null);
@@ -363,6 +601,20 @@ function WeldLandingPage({
   useEffect(() => {
     setMode(initialMode);
   }, [initialMode]);
+
+  useEffect(() => {
+    const MULTIPLIER = 0.70;
+    function onWheel(e: WheelEvent) {
+      if (e.ctrlKey) return; // allow pinch-to-zoom
+      e.preventDefault();
+      const delta = e.deltaMode === 1
+        ? e.deltaY * 20 * MULTIPLIER  // line mode (mouse wheel)
+        : e.deltaY * MULTIPLIER;       // pixel mode (trackpad)
+      window.scrollBy({ top: delta, behavior: "instant" });
+    }
+    window.addEventListener("wheel", onWheel, { passive: false });
+    return () => window.removeEventListener("wheel", onWheel);
+  }, []);
 
   useEffect(() => {
     void trackEvent({
@@ -729,6 +981,14 @@ function TalentMarqueeSection() {
   const doubled = [...MARQUEE_PROFILES, ...MARQUEE_PROFILES];
   return (
     <section className="marquee-section" aria-label="Talent on Weld" aria-hidden="true">
+      <div className="marquee-header">
+        <p className="marquee-eyebrow">WHEN WE OPEN</p>
+        <h2 className="marquee-heading">This is who&apos;ll be here.</h2>
+        <p className="marquee-subtext">
+          Sample cards showing the format.{" "}
+          <strong>52 devs on the waitlist and counting</strong> — you could be the next one.
+        </p>
+      </div>
       <div className="marquee-track">
         <div className="marquee-inner">
           {doubled.map((profile, i) => (
@@ -830,6 +1090,7 @@ function RoleTalentExplorer({
         {isDev ? (
           <HiringPanelStack
             panels={panels}
+            role={role}
             activeIndex={hiringPanel}
             anim={hiringAnim}
             isSwapping={isSwapping}
@@ -877,14 +1138,30 @@ function RoleTalentExplorer({
   );
 }
 
+const ROLE_DEMAND: Record<RoleKey, number> = {
+  scripting:   28,
+  graphics:    26,
+  building:    24,
+  ui:          22,
+  art2d:       17,
+  modeling3d:  15,
+  vfx:         14,
+  animation:   13,
+  gamedesign:   9,
+  sounddesign:  7,
+  sfx:          6,
+};
+
 function HiringPanelStack({
   panels,
+  role,
   activeIndex,
   anim,
   isSwapping,
   onAction
 }: {
   panels: (typeof HIRING_PANELS)[RoleKey];
+  role: RoleKey;
   activeIndex: number;
   anim: HiringAnim;
   isSwapping: boolean;
@@ -904,95 +1181,73 @@ function HiringPanelStack({
           <span className="hiring-panel-stub-label">{behind1.studio}</span>
         </div>
         <article className="glass-card hiring-panel-active">
-          <div className="hiring-panel-header">
-            <div className="hiring-studio-logo">
-              {active.studio.charAt(0)}
-            </div>
-            <div className="hiring-studio-meta">
-              <strong>
-                {active.studio}
-                <span className="verified-dot is-active" aria-hidden="true">
-                  <CheckIcon />
-                </span>
-              </strong>
-              <em>{active.credibility}</em>
+
+          <div className="hp-title-row">
+            <span className="hp-role-chip" style={{ background: active.chipBg, color: active.chipColor }}>
+              {active.roleChip}
+            </span>
+            <div>
+              <h3 className="hp-title">{active.roleTitle}</h3>
+              <span className="hp-category">{active.roleCategory}</span>
             </div>
           </div>
-          <h3 className="hiring-panel-role">{active.role}</h3>
-          <div className="hiring-panel-rate">{active.rate}</div>
-          <p className="hiring-panel-scope">{active.scope}</p>
-          <div className="hiring-panel-chips">
-            {active.chips.map((chip) => (
-              <span key={chip} className="hiring-chip">{chip}</span>
-            ))}
+
+          <p className="hp-section-label">WHAT THEY&rsquo;RE LOOKING FOR</p>
+          <p className="hp-body-text">{active.whatLookingFor}</p>
+
+          <div className="hp-pay-box">
+            <span className="hp-pay-label">PAY</span>
+            <span className="hp-pay-divider" />
+            <span className="hp-pay-value">{active.payType} · {active.payRange}</span>
           </div>
-          <div className="hiring-panel-social">{active.social}</div>
+
+          <p className="hp-section-label">ROLE DESCRIPTION</p>
+          <p className="hp-body-text">{active.roleDescription}</p>
+
+          <div className="hp-cta-box">
+            <p className="hp-cta-title">Interested in this role?</p>
+            <p className="hp-cta-body">
+              Like {active.studio}&rsquo;s profile to connect and discuss.
+            </p>
+          </div>
+
           <div className="hiring-panel-actions">
-            <button
-              type="button"
-              className="hiring-action-skip"
-              onClick={() => onAction("skip")}
-            >
-              Skip
-            </button>
-            <button
-              type="button"
-              className="hiring-action-spark"
-              onClick={() => onAction("spark")}
-            >
-              <SparkIcon /> Spark to apply →
+            <button type="button" className="hiring-action-next" onClick={() => onAction("skip")}>
+              Next job →
             </button>
           </div>
+
         </article>
       </div>
-      <p className="hiring-stack-counter">+ {panels.length - 1} more roles like this</p>
+      <p className="hiring-stack-counter">+ {ROLE_DEMAND[role]} more roles like this</p>
     </div>
   );
 }
 
 function OtherSideSection({ mode }: { mode: Audience }) {
   const isDev = mode === "developer";
+  const doubled = [...MARQUEE_STUDIOS, ...MARQUEE_STUDIOS];
   return (
-    <section data-reveal="pending" className="glass-section other-side-section">
-      <div className="section-copy other-side-copy">
-        <h2>And here&rsquo;s who&rsquo;s looking.</h2>
-        <p>
+    <section data-reveal="pending" className="other-side-section">
+      <div className="marquee-header">
+        <p className="marquee-eyebrow">WE&rsquo;RE OPENING SOON</p>
+        <h2 className="marquee-heading">And here&rsquo;s who&rsquo;s looking.</h2>
+        <p className="marquee-subtext">
           {isDev
-            ? "Studios put themselves on cards too. Verified studio. Active projects. What they pay."
+            ? "Over 30 studios waitlisted already. Sign up today and get exposed to them immediately on launch."
             : "Dev cards are just as scannable as studio cards. Role, rate, and proof — same format."}
         </p>
       </div>
-      <div className="other-side-strip">
-        {isDev
-          ? STUDIO_STRIP.map((studio) => (
-              <div key={studio.name} className="glass-card studio-strip-card">
-                <div className="studio-strip-logo" style={{ background: studio.accent }}>
-                  {studio.name.charAt(0)}
-                </div>
-                <div className="studio-strip-body">
-                  <strong>
-                    {studio.name}
-                    {studio.verified && (
-                      <span className="verified-dot is-active" aria-hidden="true">
-                        <CheckIcon />
-                      </span>
-                    )}
-                  </strong>
-                  <span>Hiring {studio.hiring} · {studio.plays}</span>
-                </div>
+      <div className="marquee-track">
+        <div className="marquee-inner">
+          {doubled.map((studio, i) => (
+            <div key={`studio-${studio.id}-${i}`} className="marquee-card-wrap marquee-card-wrap--studio">
+              <div className="npc-hero-preview-card">
+                <StudioCard studio={studio} />
               </div>
-            ))
-          : MARQUEE_CARDS.slice(0, 7).map((card) => (
-              <div key={card.name} className="glass-card studio-strip-card">
-                <div className="studio-strip-logo" style={{ background: card.accent }}>
-                  {card.name.charAt(0)}
-                </div>
-                <div className="studio-strip-body">
-                  <strong>{card.name}</strong>
-                  <span>{card.role} · {card.rate}</span>
-                </div>
-              </div>
-            ))}
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -1035,6 +1290,7 @@ function ChatPreviewSection({
   ];
 
   return (
+    <div className="chat-section-shell-outer">
     <section data-reveal="pending" className="glass-section chat-section" id="chat">
       <div className="section-copy chat-section-copy">
         <span className="section-kicker">{copy.chatPreview.kicker}</span>
@@ -1050,14 +1306,9 @@ function ChatPreviewSection({
               <span>Back</span>
             </button>
             <div className="chat-window-identity">
-              <div className="profile-avatar-shell chat-topbar-avatar" aria-hidden="true">
-                <div className="profile-avatar">
-                  <span className="avatar-hair" />
-                  <span className="avatar-face">
-                    <span className="avatar-mouth" />
-                  </span>
-                  <span className="avatar-hoodie" />
-                </div>
+              <div className="chat-topbar-avatar chat-roblox-avatar" aria-hidden="true">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E3EC434BF92DD2F46E81D91592065FD9-Png/150/150/AvatarHeadshot/Png/noFilter" alt="" />
                 <span className="avatar-status-dot" />
               </div>
               <div>
@@ -1081,14 +1332,9 @@ function ChatPreviewSection({
 
         <aside className="chat-profile-panel" aria-label="Chat profile summary">
           <div className="chat-profile-top">
-            <div className="profile-avatar-shell chat-profile-avatar">
-              <div className="profile-avatar">
-                <span className="avatar-hair" />
-                <span className="avatar-face">
-                  <span className="avatar-mouth" />
-                </span>
-                <span className="avatar-hoodie" />
-              </div>
+            <div className="chat-profile-avatar chat-roblox-avatar">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E3EC434BF92DD2F46E81D91592065FD9-Png/150/150/AvatarHeadshot/Png/noFilter" alt="" />
               <span className="avatar-status-dot" />
             </div>
             <div>
@@ -1099,11 +1345,6 @@ function ChatPreviewSection({
               <p className="hero-card-role">{isDev ? "Roblox studio" : profile.label}</p>
               <p className="hero-card-availability"><span />{isDev ? "Hiring now" : profile.availability}</p>
             </div>
-          </div>
-
-          <div className="chat-match-bar">
-            <span><ShieldIcon /> 98% Match</span>
-            <i aria-hidden="true" style={{ ["--match-fill" as never]: "62%" }} />
           </div>
 
           <div className="chat-stat-grid">
@@ -1128,13 +1369,6 @@ function ChatPreviewSection({
             ))}
           </div>
 
-          <div className="chat-professional-note">
-            <span className="chat-professional-icon" aria-hidden="true"><HandRaisedIcon /></span>
-            <span>
-              <strong>{copy.chatPreview.professionalNote[0]}</strong>
-              <em>Be respectful and clear about your project needs.</em>
-            </span>
-          </div>
         </aside>
 
         <div className="chat-thread-panel">
@@ -1175,6 +1409,7 @@ function ChatPreviewSection({
         </div>
       </div>
     </section>
+    </div>
   );
 }
 

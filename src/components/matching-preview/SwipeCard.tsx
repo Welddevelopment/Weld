@@ -261,7 +261,7 @@ export default function SwipeCard({ profile }: { profile?: MarqueeProfile }) {
   const [sparks, setSparks] = useState(0)
   const [toast, setToast] = useState(false)
   const [avatarUrl, setAvatarUrl] = useState(
-    "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E3EC434BF92DD2F46E81D91592065FD9-Png/150/150/AvatarHeadshot/Png/noFilter"
+    profile?.avatarUrl ?? "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E3EC434BF92DD2F46E81D91592065FD9-Png/150/150/AvatarHeadshot/Png/noFilter"
   )
 
   const p = profile
@@ -284,9 +284,10 @@ export default function SwipeCard({ profile }: { profile?: MarqueeProfile }) {
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    if (profile) return
+    if (profile?.avatarUrl) return
+    const userId = profile ? profile.robloxUserId : 2837719
     fetch(
-      "/api/roblox-proxy?path=v1/users/avatar-headshot?userIds=2837719&size=150x150&format=Png&isCircular=false"
+      `/api/roblox-proxy?path=v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=false`
     )
       .then((r) => r.json())
       .then((d: { data?: Array<{ imageUrl: string }> }) => {
@@ -410,17 +411,15 @@ export default function SwipeCard({ profile }: { profile?: MarqueeProfile }) {
                     style={{ background: avatarColor }}
                   />
                   <div className="npc-avatar-initials">{initial}</div>
-                  {!profile && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      className="npc-avatar-img"
-                      src={avatarUrl}
-                      alt={displayName}
-                      onError={(e) => {
-                        ;(e.target as HTMLImageElement).style.display = "none"
-                      }}
-                    />
-                  )}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    className="npc-avatar-img"
+                    src={avatarUrl}
+                    alt={displayName}
+                    onError={(e) => {
+                      ;(e.target as HTMLImageElement).style.display = "none"
+                    }}
+                  />
                   {online && <div className="npc-online-dot" />}
                 </div>
 

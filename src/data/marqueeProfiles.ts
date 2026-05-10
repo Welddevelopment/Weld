@@ -18,6 +18,8 @@ export interface MarqueeProfile {
   rateMode: "Hourly or milestone" | "Hourly only" | "Milestone only" | "Project rate";
   skills: string[];
   primaryRole: string;
+  robloxUserId: number;
+  avatarUrl: string;
 }
 
 export const MARQUEE_PROFILES: MarqueeProfile[] = [
@@ -42,6 +44,8 @@ export const MARQUEE_PROFILES: MarqueeProfile[] = [
     rateMode: "Hourly only",
     skills: ["UI Design", "HUD", "UX"],
     primaryRole: "UI Designer",
+    robloxUserId: 339310190,
+    avatarUrl: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-5DCBE376EB33E6C60ADCBE563C85B474-Png/150/150/AvatarHeadshot/Png/noFilter",
   },
   {
     id: "lexocraft",
@@ -64,6 +68,8 @@ export const MARQUEE_PROFILES: MarqueeProfile[] = [
     rateMode: "Hourly or milestone",
     skills: ["Scripting", "OOP", "Networking"],
     primaryRole: "Scripter",
+    robloxUserId: 140258990,
+    avatarUrl: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-93AE29D7B9A260DD3975F3B0276B29E5-Png/150/150/AvatarHeadshot/Png/noFilter",
   },
   {
     id: "ash-fx",
@@ -86,6 +92,8 @@ export const MARQUEE_PROFILES: MarqueeProfile[] = [
     rateMode: "Hourly only",
     skills: ["VFX", "Particles", "Beam effects"],
     primaryRole: "VFX",
+    robloxUserId: 2207291,
+    avatarUrl: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-89A5211C79181E57B2B08FB4A94B89BC-Png/150/150/AvatarHeadshot/Png/noFilter",
   },
   {
     id: "kobb-builds",
@@ -108,6 +116,8 @@ export const MARQUEE_PROFILES: MarqueeProfile[] = [
     rateMode: "Hourly or milestone",
     skills: ["Building", "Set dressing", "Lighting"],
     primaryRole: "Builder",
+    robloxUserId: 121823922,
+    avatarUrl: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-748EFE282142A3DEBF619158296F603B-Png/150/150/AvatarHeadshot/Png/noFilter",
   },
   {
     id: "cael-fps",
@@ -130,6 +140,8 @@ export const MARQUEE_PROFILES: MarqueeProfile[] = [
     rateMode: "Hourly or milestone",
     skills: ["Scripting", "Combat", "Networking", "OOP"],
     primaryRole: "Scripter",
+    robloxUserId: 3359213,
+    avatarUrl: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-042D21DC6846D327A6730C44C23DB7D5-Png/150/150/AvatarHeadshot/Png/noFilter",
   },
   {
     id: "terra-shift",
@@ -152,6 +164,8 @@ export const MARQUEE_PROFILES: MarqueeProfile[] = [
     rateMode: "Project rate",
     skills: ["Building", "Terrain", "Lighting", "Optimization"],
     primaryRole: "Builder",
+    robloxUserId: 284583184,
+    avatarUrl: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-BA94A988DD1365E3F521F502C821594F-Png/150/150/AvatarHeadshot/Png/noFilter",
   },
   {
     id: "marini-ux",
@@ -175,6 +189,8 @@ export const MARQUEE_PROFILES: MarqueeProfile[] = [
     rateMode: "Hourly or milestone",
     skills: ["UI Design", "UX", "Figma", "Onboarding flows", "HUD"],
     primaryRole: "UI Designer",
+    robloxUserId: 63700903,
+    avatarUrl: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A8AEBFC716DF530549CA37763C66EA90-Png/150/150/AvatarHeadshot/Png/noFilter",
   },
   {
     id: "flip-rig",
@@ -197,6 +213,8 @@ export const MARQUEE_PROFILES: MarqueeProfile[] = [
     rateMode: "Hourly or milestone",
     skills: ["Animation", "Rigging", "Cinematics"],
     primaryRole: "Animator",
+    robloxUserId: 290190914,
+    avatarUrl: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-F16457B032AECBC0C1C0FC111DA0644F-Png/150/150/AvatarHeadshot/Png/noFilter",
   },
   {
     id: "vex-store",
@@ -219,6 +237,8 @@ export const MARQUEE_PROFILES: MarqueeProfile[] = [
     rateMode: "Hourly only",
     skills: ["DataStore", "Backend", "Economy", "Telemetry"],
     primaryRole: "Systems",
+    robloxUserId: 3991272,
+    avatarUrl: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-74DA731790702E1D8164775C5E1CCE09-Png/150/150/AvatarHeadshot/Png/noFilter",
   },
   {
     id: "null-byte",
@@ -241,6 +261,8 @@ export const MARQUEE_PROFILES: MarqueeProfile[] = [
     rateMode: "Hourly only",
     skills: ["Scripting", "Anti-cheat", "Networking", "OOP"],
     primaryRole: "Scripter",
+    robloxUserId: 84743203,
+    avatarUrl: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-64C2F41A2938927CF14BD9ECC2AB219D-Png/150/150/AvatarHeadshot/Png/noFilter",
   },
   {
     id: "loop-dev",
@@ -263,6 +285,8 @@ export const MARQUEE_PROFILES: MarqueeProfile[] = [
     rateMode: "Milestone only",
     skills: ["Game design", "Systems design", "Balance", "Pacing"],
     primaryRole: "Game Designer",
+    robloxUserId: 123247,
+    avatarUrl: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-95EA65A2D58C437EC32B61FF10752E9E-Png/150/150/AvatarHeadshot/Png/noFilter",
   },
   {
     id: "particle-x",
@@ -286,6 +310,8 @@ export const MARQUEE_PROFILES: MarqueeProfile[] = [
     rateMode: "Hourly or milestone",
     skills: ["VFX", "Particles", "Combat FX", "Shaders"],
     primaryRole: "VFX",
+    robloxUserId: 166392761,
+    avatarUrl: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-3EFEBA2AF8C92B67E10847A629E3B559-Png/150/150/AvatarHeadshot/Png/noFilter",
   },
   {
     id: "arch-script",
@@ -309,6 +335,8 @@ export const MARQUEE_PROFILES: MarqueeProfile[] = [
     rateMode: "Hourly or milestone",
     skills: ["Scripting", "Combat", "OOP", "Networking", "Pathfinding"],
     primaryRole: "Scripter",
+    robloxUserId: 156,
+    avatarUrl: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-882C70E071E5997E51F8CB373002AFC3-Png/150/150/AvatarHeadshot/Png/noFilter",
   },
   {
     id: "data-vex",
@@ -331,6 +359,8 @@ export const MARQUEE_PROFILES: MarqueeProfile[] = [
     rateMode: "Hourly only",
     skills: ["DataStore", "Backend", "Economy", "MemoryStore", "Live ops"],
     primaryRole: "Systems",
+    robloxUserId: 82471,
+    avatarUrl: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-5639CE53764A5903FA9B31BBE65C5CF6-Png/150/150/AvatarHeadshot/Png/noFilter",
   },
   {
     id: "world-maker",
@@ -353,6 +383,8 @@ export const MARQUEE_PROFILES: MarqueeProfile[] = [
     rateMode: "Project rate",
     skills: ["Building", "Terrain", "Lighting", "Optimization", "Modeling"],
     primaryRole: "Builder",
+    robloxUserId: 155361651,
+    avatarUrl: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-12A0CC2920FEB1D9AACD02F7A1A2ACF6-Png/150/150/AvatarHeadshot/Png/noFilter",
   },
   {
     id: "anim-core",
@@ -376,5 +408,7 @@ export const MARQUEE_PROFILES: MarqueeProfile[] = [
     rateMode: "Milestone only",
     skills: ["Animation", "Rigging", "Cinematics", "Procedural", "Mocap cleanup"],
     primaryRole: "Animator",
+    robloxUserId: 1214936835,
+    avatarUrl: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-B9F4915B2C0A599E125327934861656E-Png/150/150/AvatarHeadshot/Png/noFilter",
   },
 ];
