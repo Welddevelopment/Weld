@@ -97,7 +97,7 @@ function saveStateLabel(s: SaveState) {
 
 function ProfileAccountStatus({ accountEmail, saveState }: { accountEmail: string | null; saveState: SaveState }) {
   if (!accountEmail) {
-    return <Link href="/signup" className="pb-account-link">Sign in to save</Link>
+    return <Link href="/accountsignup" className="pb-account-link">Sign in to save</Link>
   }
   return (
     <Link href="/account" className="pb-account-status">

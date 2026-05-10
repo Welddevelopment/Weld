@@ -42,7 +42,7 @@ export default function AuthForm({ mode }: Props) {
       body: 'Pick up your profile draft and keep your matching setup attached to your account.',
       button: 'Log in',
       switchText: 'Need an account?',
-      switchHref: '/signup',
+      switchHref: '/accountsignup',
       switchLabel: 'Create one',
     }
   }, [mode])
