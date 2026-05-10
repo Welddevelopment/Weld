@@ -802,7 +802,7 @@ function WeldLandingPage({
         <HowItWorksStrip copy={modeCopy} />
 
         {/* 3. Live talent marquee */}
-        <TalentMarqueeSection />
+        {mode === "studio" ? <OtherSideSection mode={mode} /> : <TalentMarqueeSection />}
 
         {/* 4. Role switching — POV-flips per audience */}
         <RoleTalentExplorer
@@ -818,7 +818,7 @@ function WeldLandingPage({
         />
 
         {/* 5. And here's who's looking */}
-        <OtherSideSection mode={mode} />
+        {mode === "studio" ? <TalentMarqueeSection /> : <OtherSideSection mode={mode} />}
 
         {/* 6. Chat — POV-flips per audience */}
         <ChatPreviewSection copy={modeCopy} profile={activeProfile} mode={mode} />
