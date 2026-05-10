@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { saveProfileDraft } from "@/dynamic landing page/lib/service";
+import { saveProfileDraft } from "@/dynamic-landing-page/lib/service";
+
+export const maxDuration = 10
 
 export async function POST(request: NextRequest) {
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;

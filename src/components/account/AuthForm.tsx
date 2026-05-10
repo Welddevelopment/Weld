@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/browser'
@@ -14,6 +14,9 @@ type Props = {
 
 export default function AuthForm({ mode }: Props) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const inviteCode = searchParams.get('invite')
+  const postAuthPath = inviteCode ? `/invite/${inviteCode}` : '/home'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -105,7 +108,7 @@ export default function AuthForm({ mode }: Props) {
         if (signUpError) throw signUpError
 
         if (data.session) {
-          router.push('/home')
+          router.push(postAuthPath)
           router.refresh()
           return
         }
@@ -121,7 +124,7 @@ export default function AuthForm({ mode }: Props) {
 
       if (signInError) throw signInError
 
-      router.push('/home')
+      router.push(postAuthPath)
       router.refresh()
     } catch (authError) {
       setError(authError instanceof Error ? authError.message : 'Authentication failed.')

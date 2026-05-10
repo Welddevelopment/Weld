@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { captureWaitlistSignup } from "@/dynamic landing page/lib/service";
-import { normalizeAudience } from "@/dynamic landing page/lib/utils";
+import { captureWaitlistSignup } from "@/dynamic-landing-page/lib/service";
+import { normalizeAudience } from "@/dynamic-landing-page/lib/utils";
+
+export const maxDuration = 10
 
 export async function POST(request: NextRequest) {
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
@@ -29,7 +31,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       inviteCode: snapshot.lead.inviteCode,
-      inviteUrl: `${request.nextUrl.origin}/invite/${snapshot.lead.inviteCode}`,
+      inviteUrl: `/invite/${snapshot.lead.inviteCode}`,
       shareUrl: snapshot.lead.shareUrl,
       rewardTier: snapshot.rewardTier.slug,
       waveLabel: snapshot.waveLabel

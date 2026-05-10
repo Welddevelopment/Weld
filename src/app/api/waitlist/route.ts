@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { handleLegacyWaitlistRequest } from "@/dynamic landing page/lib/service";
+import { handleLegacyWaitlistRequest } from "@/dynamic-landing-page/lib/service";
+
+export const maxDuration = 10
 
 export async function OPTIONS() {
   return new NextResponse(null, {
