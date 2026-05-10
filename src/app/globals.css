@@ -6094,6 +6094,272 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .comp-badge-high, .comp-badge-advanced, .comp-badge-easy, .comp-badge-fast, .comp-badge-built-in { color: #10b981; }
 .comp-badge-rare { color: #6b7280; }
 
+.weld-glass-page .comparison-table-section {
+  width: min(1220px, calc(100% - 32px));
+}
+
+.weld-glass-page .comparison-table-section .section-copy {
+  max-width: 780px;
+}
+
+.weld-glass-page .comparison-visual-wrapper {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 32px;
+  padding: clamp(18px, 2.4vw, 28px);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 95% 4%, rgba(113, 100, 255, 0.16), transparent 28%),
+    radial-gradient(circle at 4% 96%, rgba(255, 255, 255, 0.92), transparent 34%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.68), rgba(241, 246, 255, 0.46));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 24px 64px rgba(63, 76, 132, 0.1);
+  overflow: hidden;
+}
+
+.weld-glass-page .comparison-visual-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0 1px, transparent 1px 24px);
+  pointer-events: none;
+}
+
+.weld-glass-page .comparison-lane {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  min-height: 390px;
+  padding: clamp(20px, 2.3vw, 28px);
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  border-radius: 26px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(247, 250, 255, 0.44)),
+    rgba(255, 255, 255, 0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 18px 44px rgba(63, 76, 132, 0.08);
+}
+
+.weld-glass-page .comparison-lane.is-weld {
+  background:
+    radial-gradient(circle at 80% 4%, rgba(35, 217, 141, 0.18), transparent 32%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(242, 255, 250, 0.48));
+  border-color: rgba(35, 217, 141, 0.24);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 22px 54px rgba(16, 185, 129, 0.12);
+}
+
+.weld-glass-page .comparison-lane.is-servers {
+  background:
+    radial-gradient(circle at 86% 8%, rgba(255, 123, 92, 0.16), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 247, 244, 0.48));
+}
+
+.weld-glass-page .comparison-lane.is-channels {
+  background:
+    radial-gradient(circle at 86% 8%, rgba(106, 120, 255, 0.18), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(244, 246, 255, 0.5));
+}
+
+.weld-glass-page .comparison-lane-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.weld-glass-page .comparison-lane-label {
+  width: max-content;
+  max-width: 100%;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(108, 92, 255, 0.08);
+  color: var(--wg-accent, #6b5cff);
+  font-size: 11px;
+  font-weight: 820;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.weld-glass-page .comparison-lane-icon {
+  position: relative;
+  display: grid;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.9), transparent 42%),
+    rgba(255, 255, 255, 0.54);
+  color: var(--wg-accent, #6b5cff);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 12px 24px rgba(72, 82, 132, 0.1);
+}
+
+.weld-glass-page .comparison-lane-icon::after {
+  content: "";
+  position: absolute;
+  right: 7px;
+  bottom: 7px;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.68;
+  box-shadow: 0 0 18px currentColor;
+}
+
+.weld-glass-page .comparison-lane-icon svg {
+  width: 23px;
+  height: 23px;
+}
+
+.weld-glass-page .comparison-lane.is-servers .comparison-lane-label,
+.weld-glass-page .comparison-lane.is-servers .comparison-lane-icon {
+  color: #ef6b4a;
+}
+
+.weld-glass-page .comparison-lane.is-servers .comparison-lane-label {
+  background: rgba(255, 123, 92, 0.13);
+}
+
+.weld-glass-page .comparison-lane.is-channels .comparison-lane-label,
+.weld-glass-page .comparison-lane.is-channels .comparison-lane-icon {
+  color: #5f61ff;
+}
+
+.weld-glass-page .comparison-lane.is-weld .comparison-lane-label {
+  background: rgba(35, 217, 141, 0.12);
+  color: #09865d;
+}
+
+.weld-glass-page .comparison-lane.is-weld .comparison-lane-icon {
+  color: #12a774;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.92), transparent 42%),
+    rgba(232, 255, 246, 0.7);
+}
+
+.weld-glass-page .comparison-lane h3 {
+  margin: 0;
+  color: #07133d;
+  font-size: clamp(24px, 2.4vw, 34px);
+  line-height: 1;
+  font-weight: 840;
+  letter-spacing: -0.03em;
+}
+
+.weld-glass-page .comparison-lane p {
+  margin: 0;
+  color: #50639d;
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 610;
+}
+
+.weld-glass-page .comparison-signal {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px 14px;
+  align-items: center;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid rgba(255, 255, 255, 0.74);
+}
+
+.weld-glass-page .comparison-signal span {
+  color: #07133d;
+  font-weight: 760;
+}
+
+.weld-glass-page .comparison-signal strong {
+  color: var(--wg-accent, #6b5cff);
+  font-size: 14px;
+}
+
+.weld-glass-page .comparison-signal i {
+  grid-column: 1 / -1;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(108, 92, 255, 0.12);
+}
+
+.weld-glass-page .comparison-signal i::before {
+  content: "";
+  display: block;
+  width: var(--signal-fill);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #6b5cff, #8b7cff);
+}
+
+.weld-glass-page .comparison-lane.is-weld .comparison-signal strong {
+  color: #09865d;
+}
+
+.weld-glass-page .comparison-lane.is-weld .comparison-signal i {
+  background: rgba(35, 217, 141, 0.14);
+}
+
+.weld-glass-page .comparison-lane.is-weld .comparison-signal i::before {
+  background: linear-gradient(90deg, #19b97f, #23d98d);
+}
+
+.weld-glass-page .comparison-chip-list {
+  display: grid;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.weld-glass-page .comparison-chip-list span {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.52);
+  color: #24376f;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.weld-glass-page .comparison-chip-list svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  color: var(--wg-accent, #6b5cff);
+}
+
+.weld-glass-page .comparison-lane.is-weld .comparison-chip-list svg {
+  color: #19a873;
+}
+
+@media (max-width: 860px) {
+  .weld-glass-page .comparison-visual-wrapper {
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+
+  .weld-glass-page .comparison-lane {
+    min-height: 0;
+  }
+}
+
 .weld-glass-page .faq-section {
   width: min(1080px, calc(100% - 32px));
   display: grid;
@@ -8636,18 +8902,18 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 
 .weld-glass-page .waitlist-section {
-  width: min(1120px, calc(100% - 32px));
+  width: min(1380px, calc(100% - 24px));
 }
 
 .weld-glass-page .waitlist-shell {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 0.58fr) minmax(340px, 0.42fr);
-  gap: clamp(24px, 4vw, 52px);
+  grid-template-columns: minmax(0, 1.08fr) minmax(400px, 0.74fr);
+  gap: clamp(34px, 5vw, 76px);
   align-items: center;
-  padding: clamp(28px, 5vw, 50px);
+  padding: clamp(42px, 6vw, 76px);
   border: 1px solid rgba(255, 255, 255, 0.94);
-  border-radius: var(--wg-radius-shell, 36px);
+  border-radius: clamp(36px, 4vw, 56px);
   background:
     radial-gradient(circle at 96% 18%, rgba(127, 112, 255, 0.22), transparent 31%),
     radial-gradient(circle at 2% 104%, rgba(255, 255, 255, 0.9), transparent 34%),
@@ -8660,34 +8926,35 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 
 .weld-glass-page .waitlist-copy h2 {
-  max-width: 11ch;
+  max-width: 12ch;
   color: #05070d;
-  font-size: clamp(42px, 5vw, 68px);
+  font-size: clamp(56px, 5.8vw, 88px);
   line-height: 0.98;
   letter-spacing: 0;
 }
 
 .weld-glass-page .waitlist-copy p {
-  max-width: 32rem;
+  max-width: 44rem;
   color: #5e6f9f;
-  font-size: clamp(16px, 1.35vw, 19px);
+  font-size: clamp(17px, 1.45vw, 21px);
   line-height: 1.62;
 }
 
 .weld-glass-page .waitlist-benefits {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 24px;
+  gap: 12px;
+  margin-top: 30px;
 }
 
 .weld-glass-page .waitlist-benefits span {
   display: flex;
-  min-width: min(100%, 210px);
-  flex: 1 1 190px;
+  min-width: min(100%, 250px);
+  flex: 1 1 240px;
   align-items: flex-start;
-  gap: 10px;
-  padding: 12px 13px;
+  gap: 12px;
+  min-height: 86px;
+  padding: 16px;
   border: 1px solid rgba(255, 255, 255, 0.84);
   border-radius: 18px;
   background:
@@ -8722,8 +8989,10 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .weld-glass-page .waitlist-form-card {
   position: relative;
   z-index: 1;
-  padding: clamp(20px, 3vw, 28px);
-  border-radius: 28px;
+  max-width: 540px;
+  justify-self: end;
+  padding: clamp(28px, 3.4vw, 42px);
+  border-radius: 32px;
 }
 
 .weld-glass-page .waitlist-form-card::before {
@@ -8735,14 +9004,14 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 
 .weld-glass-page .waitlist-form-heading {
-  margin-bottom: 18px;
+  margin-bottom: 24px;
   text-align: left;
 }
 
 .weld-glass-page .waitlist-form-heading h3 {
   margin: 0;
   color: #05070d;
-  font-size: clamp(25px, 2.4vw, 34px);
+  font-size: clamp(30px, 2.8vw, 42px);
   font-weight: 780;
   line-height: 1.08;
 }
@@ -8751,7 +9020,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   margin: 8px 0 0;
   max-width: 25rem;
   color: #5e6f9f;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 620;
   line-height: 1.58;
 }
@@ -8776,7 +9045,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 
 .weld-glass-page .waitlist-field input {
-  min-height: 56px;
+  min-height: 62px;
   border: 1px solid rgba(255, 255, 255, 0.9);
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.62);
@@ -8787,7 +9056,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 .weld-glass-page .waitlist-submit {
   width: 100%;
-  min-height: 56px;
+  min-height: 62px;
   margin-top: 0;
   border-radius: 16px;
   background: linear-gradient(180deg, #8b72ff, #4f43f0);
@@ -8855,6 +9124,12 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   .weld-glass-page .step-rail,
   .weld-glass-page .comparison-grid {
     grid-template-columns: 1fr;
+  }
+
+  .weld-glass-page .waitlist-form-card {
+    width: 100%;
+    max-width: none;
+    justify-self: stretch;
   }
 
   .weld-glass-page .step-arrow {
@@ -11947,10 +12222,11 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 
 .weld-glass-page .hero-copy-panel-split h1 {
-  font-size: clamp(52px, 5.8vw, 78px);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.02;
+  font-family: var(--font-body), "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+  font-size: clamp(54px, 5.8vw, 80px);
+  font-weight: 860;
+  letter-spacing: -0.045em;
+  line-height: 0.96;
   color: #1c1a3d;
   margin: 0;
 }
@@ -13159,6 +13435,87 @@ body {
   zoom: 0.88;
 }
 
+.weld-glass-page .marquee-section {
+  width: min(1680px, calc(100% - 24px));
+  margin: clamp(54px, 7vw, 96px) auto 0;
+  padding: clamp(28px, 4vw, 54px) 0 clamp(42px, 5vw, 72px);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  border-radius: clamp(32px, 4vw, 54px);
+  background:
+    radial-gradient(circle at 12% 4%, rgba(255, 255, 255, 0.92), transparent 30%),
+    radial-gradient(circle at 90% 20%, rgba(132, 202, 255, 0.2), transparent 30%),
+    radial-gradient(circle at 50% 112%, rgba(139, 122, 255, 0.16), transparent 34%),
+    linear-gradient(135deg, rgba(246, 252, 255, 0.78), rgba(229, 242, 255, 0.54));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.94),
+    inset 0 -22px 64px rgba(76, 109, 158, 0.06),
+    0 28px 74px rgba(63, 84, 132, 0.1);
+}
+
+.weld-glass-page .marquee-section::before,
+.weld-glass-page .marquee-section::after {
+  top: auto;
+  bottom: clamp(42px, 5vw, 72px);
+  height: clamp(440px, 39vw, 600px);
+  width: clamp(90px, 12vw, 190px);
+}
+
+.weld-glass-page .marquee-section::before {
+  background: linear-gradient(90deg, rgba(234, 248, 255, 0.98), transparent);
+}
+
+.weld-glass-page .marquee-section::after {
+  background: linear-gradient(270deg, rgba(234, 248, 255, 0.98), transparent);
+}
+
+.weld-glass-page .marquee-section .marquee-header {
+  position: relative;
+  z-index: 3;
+  padding: clamp(14px, 2.5vw, 26px) 24px clamp(18px, 3vw, 30px);
+}
+
+.weld-glass-page .marquee-section .marquee-track {
+  position: relative;
+  z-index: 1;
+  min-height: clamp(460px, 40vw, 610px);
+  margin-top: 8px;
+  padding: clamp(24px, 3vw, 40px) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.78);
+  border-bottom: 1px solid rgba(91, 126, 177, 0.09);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.62), rgba(200, 228, 255, 0.42) 20%, rgba(198, 228, 255, 0.5) 50%, rgba(200, 228, 255, 0.42) 80%, rgba(255, 255, 255, 0.62)),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0 1px, transparent 1px 24px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.84),
+    inset 0 -22px 54px rgba(55, 98, 150, 0.07);
+}
+
+.weld-glass-page .marquee-section .marquee-inner {
+  gap: 32px;
+  animation-duration: 44s;
+}
+
+.weld-glass-page .marquee-section .marquee-card-wrap {
+  zoom: 0.84;
+  animation: carousel-card-lift 6.4s ease-in-out infinite;
+}
+
+.weld-glass-page .marquee-section .marquee-card-wrap:nth-child(3n + 2),
+.weld-glass-page .other-side-section .marquee-card-wrap:nth-child(3n + 2) {
+  animation-delay: -1.2s;
+}
+
+.weld-glass-page .marquee-section .marquee-card-wrap:nth-child(3n),
+.weld-glass-page .other-side-section .marquee-card-wrap:nth-child(3n) {
+  animation-delay: -2.4s;
+}
+
+@keyframes carousel-card-lift {
+  0%,
+  100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -9px, 0); }
+}
+
 /* ═══════════════════════════════════════════════
    Studio Card
    ─────────────────────────────────────────────── */
@@ -13486,6 +13843,84 @@ body {
   overflow: hidden;
   position: relative;
 }
+
+.weld-glass-page .other-side-section {
+  width: min(1680px, calc(100% - 24px));
+  padding: clamp(28px, 4vw, 50px) 0 clamp(34px, 4vw, 58px);
+  border-radius: clamp(32px, 4vw, 52px);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(255, 255, 255, 0.82), transparent 28%),
+    radial-gradient(circle at 92% 32%, rgba(113, 168, 255, 0.2), transparent 30%),
+    linear-gradient(135deg, rgba(245, 251, 255, 0.72), rgba(227, 241, 255, 0.48));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 28px 74px rgba(58, 84, 132, 0.1);
+}
+
+.weld-glass-page .other-side-section .marquee-header {
+  position: relative;
+  z-index: 2;
+  width: min(860px, calc(100% - 32px));
+  margin-inline: auto;
+}
+
+.weld-glass-page .other-side-section .marquee-track {
+  position: relative;
+  margin-top: clamp(22px, 3vw, 34px);
+  padding: clamp(22px, 3vw, 34px) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.78);
+  border-bottom: 1px solid rgba(80, 111, 170, 0.08);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.82), rgba(215, 235, 255, 0.42) 18%, rgba(207, 230, 255, 0.5) 50%, rgba(215, 235, 255, 0.42) 82%, rgba(255, 255, 255, 0.82)),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0 1px, transparent 1px 24px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    inset 0 -18px 46px rgba(54, 95, 150, 0.06);
+}
+
+.weld-glass-page .other-side-section .marquee-track::before,
+.weld-glass-page .other-side-section .marquee-track::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(64px, 10vw, 160px);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.weld-glass-page .other-side-section .marquee-track::before {
+  left: 0;
+  background: linear-gradient(90deg, rgba(235, 246, 255, 0.96), transparent);
+}
+
+.weld-glass-page .other-side-section .marquee-track::after {
+  right: 0;
+  background: linear-gradient(270deg, rgba(235, 246, 255, 0.96), transparent);
+}
+
+.weld-glass-page .other-side-section .marquee-inner {
+  position: relative;
+  z-index: 1;
+  gap: 28px;
+  animation-duration: 46s;
+}
+
+.weld-glass-page .other-side-section .marquee-card-wrap {
+  animation: carousel-card-lift 6.8s ease-in-out infinite;
+}
+
+.weld-glass-page .other-side-section .marquee-card-wrap--studio {
+  zoom: 0.96;
+}
+
+@media (max-width: 720px) {
+  .weld-glass-page .other-side-section {
+    width: min(100% - 20px, 680px);
+    border-radius: 28px;
+  }
+}
+
 .other-side-copy {
   margin-bottom: 32px;
 }

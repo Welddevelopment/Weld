@@ -810,9 +810,7 @@ function WeldLandingPage({
         {/* 4. Role switching — POV-flips per audience */}
         <RoleTalentExplorer
           mode={mode}
-          copy={modeCopy}
           role={role}
-          profile={activeProfile}
           isSwapping={isSwapping}
           hiringPanel={hiringPanel}
           hiringAnim={hiringAnim}
@@ -1016,9 +1014,7 @@ function TalentMarqueeSection() {
 
 function RoleTalentExplorer({
   mode,
-  copy,
   role,
-  profile,
   isSwapping,
   hiringPanel,
   hiringAnim,
@@ -1026,9 +1022,7 @@ function RoleTalentExplorer({
   onHiringAction
 }: {
   mode: Audience;
-  copy: LandingCopy;
   role: RoleKey;
-  profile: TalentProfile;
   isSwapping: boolean;
   hiringPanel: number;
   hiringAnim: HiringAnim;
@@ -1065,19 +1059,18 @@ function RoleTalentExplorer({
   }
 
   const isDev = mode === "developer";
-  const headline = isDev ? "Pick what you do. See who's hiring." : copy.howItWorks.title;
+  const headline = "Pick what you do. See who's hiring.";
   const lead = isDev
     ? "Real open roles. Real rates. Spark to apply."
-    : copy.howItWorks.lead;
+    : "Preview role demand, rates, and scope the same way talent sees hiring cards.";
 
   return (
     <section data-reveal="pending" className="glass-section how-story-section" id="roles">
       <div className="how-story-grid">
         <div className="section-copy how-story-copy">
-          <span className="section-kicker">{isDev ? "FOR DEVELOPERS" : copy.howItWorks.kicker}</span>
+          <span className="section-kicker">{isDev ? "FOR DEVELOPERS" : "FOR STUDIOS"}</span>
           <h2>{headline}</h2>
           <p>{lead}</p>
-          {!isDev && <p>{copy.howItWorks.support}</p>}
 
           <div className="role-explorer-tabs" role="radiogroup" aria-label="Choose a Roblox talent role">
             {ROLE_ORDER.map((entry) => (
@@ -1097,52 +1090,14 @@ function RoleTalentExplorer({
           </div>
         </div>
 
-        {isDev ? (
-          <HiringPanelStack
-            panels={panels}
-            role={role}
-            activeIndex={hiringPanel}
-            anim={hiringAnim}
-            isSwapping={isSwapping}
-            onAction={onHiringAction}
-          />
-        ) : (
-          <article
-            className="glass-card how-profile-card"
-            data-swapping={isSwapping ? "true" : "false"}
-          >
-            <div className="how-profile-top">
-              <div className="profile-avatar-shell">
-                <div className="profile-avatar">
-                  <span className="avatar-hair" />
-                  <span className="avatar-face">
-                    <span className="avatar-mouth" />
-                  </span>
-                  <span className="avatar-hoodie" />
-                </div>
-                <span className="avatar-status-dot" />
-              </div>
-              <div>
-                <div className="hero-card-name-row">
-                  <h3>{profile.name}</h3>
-                  <span className="verified-dot"><CheckIcon /></span>
-                </div>
-                <p>{profile.label}</p>
-                <p className="hero-card-availability"><span />{profile.availability}</p>
-              </div>
-            </div>
-            <span className="demo-caption">{copy.demo.latestProjectCaption}</span>
-            <p>{profile.latestProject.summary}</p>
-            <div className="how-proof-list">
-              {profile.latestProject.bullets.map((bullet) => (
-                <span key={bullet}><SparkIcon />{bullet}</span>
-              ))}
-            </div>
-            <p className="demo-caption" style={{ marginTop: "12px" }}>
-              {copy.demo.feedbackCaption}
-            </p>
-          </article>
-        )}
+        <HiringPanelStack
+          panels={panels}
+          role={role}
+          activeIndex={hiringPanel}
+          anim={hiringAnim}
+          isSwapping={isSwapping}
+          onAction={onHiringAction}
+        />
       </div>
     </section>
   );
@@ -1453,17 +1408,37 @@ function DotScale({ level }: { level: 1 | 2 | 3 }) {
 }
 
 function ComparisonTableSection() {
-  const features: Array<{ name: string; s: 1 | 2 | 3; c: 1 | 2 | 3; w: 1 | 2 | 3 }> = [
-    { name: "Role clarity",     s: 1, c: 2, w: 3 },
-    { name: "Verified identity", s: 1, c: 1, w: 3 },
-    { name: "Trust signal",     s: 1, c: 2, w: 3 },
-    { name: "Scannability",     s: 1, c: 2, w: 3 },
-    { name: "Search & filters", s: 1, c: 2, w: 3 },
-    { name: "Noise level",      s: 3, c: 2, w: 1 },
-    { name: "Direct outreach",  s: 1, c: 1, w: 3 },
-    { name: "Hiring control",   s: 1, c: 1, w: 3 },
-    { name: "Client proof",     s: 1, c: 1, w: 3 },
-    { name: "Time to hire",     s: 1, c: 2, w: 3 }
+  const channels = [
+    {
+      title: "Discord servers",
+      label: "Scattered reach",
+      tone: "servers",
+      score: "Low signal",
+      scoreValue: "34%",
+      icon: <DiscordIcon />,
+      body: "Big rooms create reach, but role, proof, rate, and availability get buried quickly.",
+      points: ["Role clarity buried", "Identity varies", "High noise"]
+    },
+    {
+      title: "Discord channels",
+      label: "Partial structure",
+      tone: "channels",
+      score: "Mixed signal",
+      scoreValue: "58%",
+      icon: <FolderIcon />,
+      body: "Dedicated channels help sorting, but hiring context still depends on links and manual scanning.",
+      points: ["Some role sorting", "Proof link-hopping", "Threads drift"]
+    },
+    {
+      title: "Weld",
+      label: "Proof-first cards",
+      tone: "weld",
+      score: "Strong signal",
+      scoreValue: "92%",
+      icon: <ShieldIcon />,
+      body: "Cards package role, proof, rate, availability, and first-message context in one scannable surface.",
+      points: ["Role-first cards", "Proof upfront", "Focused outreach"]
+    }
   ];
 
   return (
@@ -1474,27 +1449,32 @@ function ComparisonTableSection() {
         <p>Discord servers, Discord channels, and Weld — side by side.</p>
       </div>
 
-      <div className="comparison-table-wrapper">
-        <div className="comparison-table">
-          <div className="comp-table-header">
-            <div className="comp-col-feature">FEATURE</div>
-            <div className="comp-col-discord">DISCORD SERVERS</div>
-            <div className="comp-col-discord">DISCORD CHANNELS</div>
-            <div className="comp-col-weld">
-              <Image src="/Assets/weld-logo-official.svg" alt="Weld" width={72} height={20} />
+      <div className="comparison-visual-wrapper" aria-label="Hiring channel comparison">
+        {channels.map((channel) => (
+          <article key={channel.title} className={`comparison-lane is-${channel.tone}`}>
+            <div className="comparison-lane-top">
+              <span className="comparison-lane-label">{channel.label}</span>
+              <span className="comparison-lane-icon" aria-hidden="true">
+                {channel.icon}
+              </span>
             </div>
-          </div>
-          <div className="comp-table-body">
-            {features.map((f, i) => (
-              <div key={i} className="comp-table-row">
-                <div className="comp-col-feature">{f.name}</div>
-                <div className="comp-col-discord"><DotScale level={f.s} /></div>
-                <div className="comp-col-discord"><DotScale level={f.c} /></div>
-                <div className="comp-col-weld"><DotScale level={f.w} /></div>
-              </div>
-            ))}
-          </div>
-        </div>
+            <h3>{channel.title}</h3>
+            <p>{channel.body}</p>
+            <div className="comparison-signal">
+              <span>{channel.score}</span>
+              <strong>{channel.scoreValue}</strong>
+              <i aria-hidden="true" style={{ "--signal-fill": channel.scoreValue } as CSSProperties} />
+            </div>
+            <div className="comparison-chip-list">
+              {channel.points.map((point) => (
+                <span key={point}>
+                  <CheckIcon />
+                  {point}
+                </span>
+              ))}
+            </div>
+          </article>
+        ))}
       </div>
     </section>
   );
@@ -1558,10 +1538,6 @@ function EarlyAccessSection({
             ))}
           </div>
 
-          <p className="waitlist-privacy">
-            <CheckIcon />
-            <span>{copy.waitlist.privacy}</span>
-          </p>
         </div>
 
         <div
