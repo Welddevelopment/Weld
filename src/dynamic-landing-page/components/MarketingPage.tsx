@@ -802,7 +802,7 @@ function WeldLandingPage({
         <HowItWorksStrip copy={modeCopy} />
 
         {/* 3. Live talent marquee */}
-        {mode === "studio" ? <OtherSideSection mode={mode} /> : <TalentMarqueeSection />}
+        {mode === "studio" ? <OtherSideSection mode={mode} primary /> : <TalentMarqueeSection mode={mode} primary />}
 
         {/* 4. Role switching — POV-flips per audience */}
         <RoleTalentExplorer
@@ -818,7 +818,7 @@ function WeldLandingPage({
         />
 
         {/* 5. And here's who's looking */}
-        {mode === "studio" ? <TalentMarqueeSection /> : <OtherSideSection mode={mode} />}
+        {mode === "studio" ? <TalentMarqueeSection mode={mode} /> : <OtherSideSection mode={mode} />}
 
         {/* 6. Chat — POV-flips per audience */}
         <ChatPreviewSection copy={modeCopy} profile={activeProfile} mode={mode} />
@@ -977,17 +977,30 @@ function HowItWorksStrip({ copy }: { copy: LandingCopy }) {
   );
 }
 
-function TalentMarqueeSection() {
+function TalentMarqueeSection({ mode, primary }: { mode?: Audience; primary?: boolean }) {
+  const isStudio = mode === "studio";
   const doubled = [...MARQUEE_PROFILES, ...MARQUEE_PROFILES];
   return (
     <section className="marquee-section" aria-label="Talent on Weld" aria-hidden="true">
       <div className="marquee-header">
-        <p className="marquee-eyebrow">WHEN WE OPEN</p>
-        <h2 className="marquee-heading">This is who&apos;ll be here.</h2>
-        <p className="marquee-subtext">
-          Sample cards showing the format.{" "}
-          <strong>52 devs on the waitlist and counting</strong> — you could be the next one.
-        </p>
+        {isStudio && !primary ? (
+          <>
+            <p className="marquee-eyebrow">WE&rsquo;RE OPENING SOON</p>
+            <h2 className="marquee-heading">And here&rsquo;s who&rsquo;s looking.</h2>
+            <p className="marquee-subtext">
+              Dev cards are just as scannable. Role, rate, and proof — same format.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="marquee-eyebrow">WHEN WE OPEN</p>
+            <h2 className="marquee-heading">This is who&apos;ll be here.</h2>
+            <p className="marquee-subtext">
+              Sample cards showing the format.{" "}
+              <strong>52 devs on the waitlist and counting</strong> — you could be the next one.
+            </p>
+          </>
+        )}
       </div>
       <div className="marquee-track">
         <div className="marquee-inner">
@@ -1224,19 +1237,31 @@ function HiringPanelStack({
   );
 }
 
-function OtherSideSection({ mode }: { mode: Audience }) {
+function OtherSideSection({ mode, primary }: { mode: Audience; primary?: boolean }) {
   const isDev = mode === "developer";
   const doubled = [...MARQUEE_STUDIOS, ...MARQUEE_STUDIOS];
   return (
     <section data-reveal="pending" className="other-side-section">
       <div className="marquee-header">
-        <p className="marquee-eyebrow">WE&rsquo;RE OPENING SOON</p>
-        <h2 className="marquee-heading">And here&rsquo;s who&rsquo;s looking.</h2>
-        <p className="marquee-subtext">
-          {isDev
-            ? "Over 30 studios waitlisted already. Sign up today and get exposed to them immediately on launch."
-            : "Dev cards are just as scannable as studio cards. Role, rate, and proof — same format."}
-        </p>
+        {!isDev && primary ? (
+          <>
+            <p className="marquee-eyebrow">WHEN WE OPEN</p>
+            <h2 className="marquee-heading">This is who&apos;ll be here.</h2>
+            <p className="marquee-subtext">
+              Over 30 studios waitlisted already. Browse and spark the ones that match your stack.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="marquee-eyebrow">WE&rsquo;RE OPENING SOON</p>
+            <h2 className="marquee-heading">And here&rsquo;s who&rsquo;s looking.</h2>
+            <p className="marquee-subtext">
+              {isDev
+                ? "Over 30 studios waitlisted already. Sign up today and get exposed to them immediately on launch."
+                : "Dev cards are just as scannable as studio cards. Role, rate, and proof — same format."}
+            </p>
+          </>
+        )}
       </div>
       <div className="marquee-track">
         <div className="marquee-inner">
