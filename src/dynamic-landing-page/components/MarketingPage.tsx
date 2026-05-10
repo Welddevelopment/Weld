@@ -2,12 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   useEffect,
   useRef,
   useState,
-  useTransition,
   type CSSProperties,
   type KeyboardEvent,
   type ReactNode
@@ -508,9 +507,10 @@ const STUDIO_STRIP = [
   { name: "Cascade Labs", hiring: 3, plays: "400k plays/mo", verified: false, accent: "#F97316" }
 ];
 
-function joinHref(mode: Audience, search: string) {
+function joinHref(mode: Audience, search: string, hash = "") {
   const base = mode === "studio" ? "/studios" : "/";
-  return search ? `${base}?${search}` : base;
+  const query = search ? `?${search}` : "";
+  return `${base}${query}${hash}`;
 }
 
 function scrollToId(id: string) {
@@ -528,17 +528,16 @@ function WeldLandingPage({
   page
 }: MarketingPageProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const searchString = searchParams.toString();
   const motion = useMotionPolicy();
   const motionTier = motion.tier;
-  const [isPending, startTransition] = useTransition();
   const [mode, setMode] = useState<Audience>(initialMode);
   const [role, setRole] = useState<RoleKey>("scripting");
   const [email, setEmail] = useState("");
   const [capturePhase, setCapturePhase] = useState<CapturePhase>("idle");
   const [captureStatus, setCaptureStatus] = useState("");
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [isSwapping, setIsSwapping] = useState(false);
   const [swipeModalOpen, setSwipeModalOpen] = useState(false);
   useEffect(() => {
@@ -603,6 +602,13 @@ function WeldLandingPage({
   }, [initialMode]);
 
   useEffect(() => {
+    const expectedPath = mode === "studio" ? "/studios" : "/";
+    if (pathname === expectedPath) return;
+
+    router.replace(joinHref(mode, searchString, window.location.hash), { scroll: false });
+  }, [mode, pathname, router, searchString]);
+
+  useEffect(() => {
     const MULTIPLIER = 0.70;
     function onWheel(e: WheelEvent) {
       if (e.ctrlKey) return; // allow pinch-to-zoom
@@ -639,9 +645,7 @@ function WeldLandingPage({
       payload: { from: mode, to: nextMode }
     });
 
-    startTransition(() => {
-      router.push(joinHref(nextMode, searchString));
-    });
+    router.push(joinHref(nextMode, searchString, window.location.hash), { scroll: false });
   }
 
   function handleRoleChange(nextRoleKey: RoleKey) {
@@ -748,7 +752,6 @@ function WeldLandingPage({
         mode={mode}
         copy={modeCopy}
         searchString={searchString}
-        pending={isPending}
         onModeChange={handleModeChange}
         onJoinClick={() => handleJoinIntent("nav")}
       />
@@ -802,7 +805,7 @@ function WeldLandingPage({
         <HowItWorksStrip copy={modeCopy} />
 
         {/* 3. Live talent marquee */}
-        {mode === "studio" ? <OtherSideSection mode={mode} /> : <TalentMarqueeSection />}
+        <TalentMarqueeSection />
 
         {/* 4. Role switching — POV-flips per audience */}
         <RoleTalentExplorer
@@ -818,7 +821,7 @@ function WeldLandingPage({
         />
 
         {/* 5. And here's who's looking */}
-        {mode === "studio" ? <TalentMarqueeSection /> : <OtherSideSection mode={mode} />}
+        <OtherSideSection mode={mode} />
 
         {/* 6. Chat — POV-flips per audience */}
         <ChatPreviewSection copy={modeCopy} profile={activeProfile} mode={mode} />
@@ -838,7 +841,7 @@ function WeldLandingPage({
           onSubmit={openSignupForm}
         />
 
-        <FriendlyFAQ copy={modeCopy} openFaq={openFaq} onToggle={setOpenFaq} />
+        <FriendlyFAQ copy={modeCopy} />
       </main>
 
       <FooterCTA copy={modeCopy} />
@@ -850,14 +853,12 @@ function GlassNav({
   mode,
   copy,
   searchString,
-  pending,
   onModeChange,
   onJoinClick
 }: {
   mode: Audience;
   copy: LandingCopy;
   searchString: string;
-  pending?: boolean;
   onModeChange: (mode: Audience) => void;
   onJoinClick: () => void;
 }) {
@@ -870,7 +871,7 @@ function GlassNav({
         <span>weld.</span>
       </Link>
 
-      <ModeToggle mode={mode} disabled={pending} onChange={onModeChange} />
+      <ModeToggle mode={mode} onChange={onModeChange} />
 
       <nav className="glass-nav-links" aria-label="Primary">
         {copy.nav.links.map((item) => (
@@ -1508,12 +1509,18 @@ function EarlyAccessSection({
   };
 
   return (
-    <section data-reveal="pending" className="glass-section waitlist-section" id="join">
+    <section
+      data-reveal="pending"
+      className="glass-section waitlist-section"
+      id="join"
+      data-mode={mode}
+    >
       <div className="waitlist-shell">
         <div className="section-copy waitlist-copy">
           <span className="section-kicker">{copy.waitlist.kicker}</span>
-          <h2>{mode === "developer" ? "Join the developer beta." : "Get studio access."}</h2>
+          <h2>{copy.waitlist.headline}</h2>
           <p>{copy.waitlist.subhead}</p>
+
           <div className="waitlist-benefits">
             {copy.waitlist.benefits.map(([title, body, iconKey]) => (
               <span key={title}>
@@ -1525,7 +1532,11 @@ function EarlyAccessSection({
               </span>
             ))}
           </div>
-          <p className="waitlist-privacy">{copy.waitlist.privacy}</p>
+
+          <p className="waitlist-privacy">
+            <CheckIcon />
+            <span>{copy.waitlist.privacy}</span>
+          </p>
         </div>
 
         <div
@@ -1537,25 +1548,27 @@ function EarlyAccessSection({
             <p>{copy.waitlist.body}</p>
           </div>
 
-          <label className="waitlist-field">
-            <span>{copy.waitlist.fieldLabel}</span>
-            <input
-              type="email"
-              value={email}
-              placeholder={copy.waitlist.placeholder}
-              onChange={(event) => onEmailChange(event.target.value)}
-              aria-describedby={status ? `waitlist-status-${mode}` : undefined}
-            />
-          </label>
+          <div className="waitlist-capture-row">
+            <label className="waitlist-field">
+              <span>{copy.waitlist.fieldLabel}</span>
+              <input
+                type="email"
+                value={email}
+                placeholder={copy.waitlist.placeholder}
+                onChange={(event) => onEmailChange(event.target.value)}
+                aria-describedby={status ? `waitlist-status-${mode}` : undefined}
+              />
+            </label>
 
-          <button
-            type="button"
-            className="button-primary waitlist-submit"
-            onClick={onSubmit}
-            disabled={phase === "submitting"}
-          >
-            {buttonLabel}
-          </button>
+            <button
+              type="button"
+              className="button-primary waitlist-submit"
+              onClick={onSubmit}
+              disabled={phase === "submitting"}
+            >
+              {buttonLabel}
+            </button>
+          </div>
 
           {phase === "success" ? (
             <Sticker
@@ -1577,15 +1590,9 @@ function EarlyAccessSection({
   );
 }
 
-function FriendlyFAQ({
-  copy,
-  openFaq,
-  onToggle
-}: {
-  copy: LandingCopy;
-  openFaq: number | null;
-  onToggle: (index: number | null) => void;
-}) {
+function FriendlyFAQ({ copy }: { copy: LandingCopy }) {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
   return (
     <section data-reveal="pending" className="glass-section faq-section" id="faq">
       <div className="section-copy">
@@ -1603,12 +1610,19 @@ function FriendlyFAQ({
                 type="button"
                 className="faq-trigger"
                 aria-expanded={isOpen}
-                onClick={() => onToggle(isOpen ? null : index)}
+                aria-controls={`faq-answer-${index}`}
+                onClick={() => setOpenFaq(isOpen ? null : index)}
               >
                 <span>{faq.question}</span>
-                <ChevronDownIcon className={isOpen ? "is-open" : ""} />
+                <span className={`faq-icon${isOpen ? " is-open" : ""}`} aria-hidden="true">
+                  <ChevronDownIcon />
+                </span>
               </button>
-              {isOpen ? <p>{faq.answer}</p> : null}
+              {isOpen ? (
+                <p id={`faq-answer-${index}`} className="faq-response">
+                  {faq.answer}
+                </p>
+              ) : null}
             </article>
           );
         })}
@@ -1635,11 +1649,9 @@ function FooterCTA({ copy }: { copy: LandingCopy }) {
 
 function ModeToggle({
   mode,
-  disabled,
   onChange
 }: {
   mode: Audience;
-  disabled?: boolean;
   onChange: (mode: Audience) => void;
 }) {
   return (
@@ -1649,7 +1661,6 @@ function ModeToggle({
         type="button"
         role="radio"
         aria-checked={mode === "developer"}
-        disabled={disabled}
         onClick={() => onChange("developer")}
       >
         I'm a developer
@@ -1658,7 +1669,6 @@ function ModeToggle({
         type="button"
         role="radio"
         aria-checked={mode === "studio"}
-        disabled={disabled}
         onClick={() => onChange("studio")}
       >
         I'm a studio
