@@ -67,7 +67,7 @@ export type PreviewProfile = {
   rateMax?: number
   rateType?: string
   rateNote?: string
-  openRoles?: Array<{ skill: string; title: string; description?: string }>
+  openRoles?: Array<{ skill: string; title: string; description?: string; payType?: string; payMin?: number | null; payMax?: number | null }>
   about?: string
   studioStats?: { yearsBuilding?: string; projectsShipped?: string; totalVisits?: string; onTimeDelivery?: string }
 }

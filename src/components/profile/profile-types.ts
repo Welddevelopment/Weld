@@ -34,7 +34,7 @@ export type ProfileDraft = {
   rateMin: number | null
   rateMax: number | null
   rateNote: string
-  openRoles: Array<{ skill: string; title: string; description: string }>
+  openRoles: Array<{ skill: string; title: string; description: string; payType?: string; payMin?: number | null; payMax?: number | null }>
   about: string
   studioStats: { yearsBuilding: string; projectsShipped: string; totalVisits: string; onTimeDelivery: string }
   skillDescriptions: Record<string, string>
@@ -153,7 +153,7 @@ export function profileToDraft(profile: PreviewProfile): ProfileDraft {
     rateMin: profile.rateMin ?? null,
     rateMax: profile.rateMax ?? null,
     rateNote: profile.rateNote ?? '',
-    openRoles: (profile.openRoles ?? []).map(r => ({ skill: r.skill ?? (r as any).icon ?? '', title: r.title, description: r.description ?? '' })),
+    openRoles: (profile.openRoles ?? []).map(r => ({ skill: r.skill ?? (r as any).icon ?? '', title: r.title, description: r.description ?? '', payType: r.payType ?? '', payMin: r.payMin ?? null, payMax: r.payMax ?? null })),
     about: profile.about ?? '',
     studioStats: profile.studioStats
       ? { yearsBuilding: profile.studioStats.yearsBuilding ?? '', projectsShipped: profile.studioStats.projectsShipped ?? '', totalVisits: profile.studioStats.totalVisits ?? '', onTimeDelivery: profile.studioStats.onTimeDelivery ?? '' }

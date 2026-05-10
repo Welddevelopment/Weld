@@ -9,12 +9,13 @@ interface Props {
   onClose: () => void
 }
 
-type RoleEntry = { skill: string; title: string; description: string }
+type RoleEntry = { skill: string; title: string; description: string; payType: string; payMin: number | null; payMax: number | null }
 
 const ALL_SKILLS = Object.keys(DEV_SKILL_DESCS)
+const RATE_TYPES = ['Hourly (USD)', 'Hourly (Robux)', 'Per Project', 'Revenue Share', 'Negotiable']
 
 function emptyRole(): RoleEntry {
-  return { skill: '', title: '', description: '' }
+  return { skill: '', title: '', description: '', payType: '', payMin: null, payMax: null }
 }
 
 export default function StudioRolesEditPanel({ draft, update, onClose }: Props) {
@@ -86,6 +87,43 @@ export default function StudioRolesEditPanel({ draft, update, onClose }: Props) 
               value={role.title}
               onChange={e => change(i, { title: e.target.value })}
             />
+
+            <div style={{ marginTop: 8 }}>
+              <div style={{ fontSize: 11, color: '#666', marginBottom: 5 }}>Pay rate <span style={{ color: '#999' }}>(optional)</span></div>
+              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 6 }}>
+                {RATE_TYPES.map(r => (
+                  <button
+                    key={r}
+                    type="button"
+                    className={`pb-emoji-btn${role.payType === r ? ' pb-emoji-btn--on' : ''}`}
+                    style={{ fontSize: 11 }}
+                    onClick={() => change(i, { payType: role.payType === r ? '' : r })}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+              {role.payType && role.payType !== 'Negotiable' && (
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <input
+                    className="pb-panel-input"
+                    type="number"
+                    placeholder="Min"
+                    value={role.payMin ?? ''}
+                    onChange={e => change(i, { payMin: e.target.value ? Number(e.target.value) : null })}
+                  />
+                  <span style={{ color: '#888', flexShrink: 0, fontSize: 13 }}>–</span>
+                  <input
+                    className="pb-panel-input"
+                    type="number"
+                    placeholder="Max"
+                    value={role.payMax ?? ''}
+                    onChange={e => change(i, { payMax: e.target.value ? Number(e.target.value) : null })}
+                  />
+                </div>
+              )}
+            </div>
+
             {role.skill && (
               <textarea
                 className="pb-panel-textarea"

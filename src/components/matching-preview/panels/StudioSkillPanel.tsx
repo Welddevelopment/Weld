@@ -19,6 +19,21 @@ function colorForSkill(name: string) {
   return ICON_COLORS[h % ICON_COLORS.length]
 }
 
+function formatPayDisplay(payType: string, payMin: number | null, payMax: number | null): string {
+  if (payType === 'Negotiable') return 'Negotiable'
+  const isRobux = payType.includes('Robux')
+  const isRevShare = payType === 'Revenue Share'
+  const prefix = isRevShare || isRobux ? '' : '$'
+  const suffix = isRevShare ? '%' : (isRobux ? ' R$' : '')
+  const fmt = (n: number) => `${prefix}${n.toLocaleString()}${suffix}`
+  const range = payMin != null && payMax != null
+    ? ` · ${fmt(payMin)} – ${fmt(payMax)}`
+    : payMin != null ? ` · from ${fmt(payMin)}`
+    : payMax != null ? ` · up to ${fmt(payMax)}`
+    : ''
+  return `${payType}${range}`
+}
+
 export default function StudioSkillPanel({ profile, skillName, initialRole, onBack }: Props) {
   const color = colorForSkill(skillName)
   const roles = (profile.openRoles ?? []).filter(r => r.skill === skillName)
@@ -93,6 +108,11 @@ export default function StudioSkillPanel({ profile, skillName, initialRole, onBa
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: '#111' }}>{role.title || 'Untitled role'}</div>
+                    {role.payType && (
+                      <div style={{ fontSize: 10, color: '#3DC77A', fontWeight: 600, marginTop: 2 }}>
+                        {formatPayDisplay(role.payType, role.payMin ?? null, role.payMax ?? null)}
+                      </div>
+                    )}
                     {role.description && (
                       <div style={{ fontSize: 11, color: '#888', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {role.description}
@@ -139,6 +159,16 @@ export default function StudioSkillPanel({ profile, skillName, initialRole, onBa
                 <div style={{ fontSize: 11, color, fontWeight: 600, marginTop: 2 }}>{popupRole.skill}</div>
               </div>
             </div>
+
+            {popupRole.payType && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 14, padding: '7px 11px', background: 'rgba(61,199,122,0.07)', borderRadius: 8, border: '1px solid rgba(61,199,122,0.18)' }}>
+                <div style={{ fontSize: 9, fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#3DC77A' }}>Pay</div>
+                <div style={{ width: 1, height: 10, background: 'rgba(61,199,122,0.3)', flexShrink: 0 }} />
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#1a7a4a' }}>
+                  {formatPayDisplay(popupRole.payType, popupRole.payMin ?? null, popupRole.payMax ?? null)}
+                </div>
+              </div>
+            )}
 
             <div style={{ fontSize: 10, fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#999', marginBottom: 8 }}>
               Role description
