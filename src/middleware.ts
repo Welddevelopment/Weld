@@ -11,7 +11,6 @@ const ALLOWLIST = [
 const BLOCKED_PREFIXES = [
   "/home",
   "/swipe",
-  "/profile",
   "/account",
   "/messages",
   "/preview",
