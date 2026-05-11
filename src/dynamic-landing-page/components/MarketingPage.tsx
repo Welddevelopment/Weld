@@ -567,8 +567,13 @@ function WeldLandingPage({
   const activeProfile = PROFILES[role];
   const modeCopy = getLandingCopy(mode);
 
+  const [savedInviteUrl, setSavedInviteUrl] = useState<string | null>(null);
+
   useEffect(() => {
     captureAttributionFromLocation();
+    try {
+      setSavedInviteUrl(localStorage.getItem("weld_last_invite_url"));
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -807,6 +812,7 @@ function WeldLandingPage({
             onEmailChange={setEmail}
             onSubmit={openSignupForm}
             inputRef={heroInputRef}
+            savedInviteUrl={savedInviteUrl}
           />
           <div className="hero-card-column hero-card-column-split">
             <div className="npc-hero-preview-container">
@@ -930,7 +936,8 @@ function HeroCopyPanel({
   capturePhase,
   onEmailChange,
   onSubmit,
-  inputRef
+  inputRef,
+  savedInviteUrl
 }: {
   copy: LandingCopy;
   email: string;
@@ -938,6 +945,7 @@ function HeroCopyPanel({
   onEmailChange: (v: string) => void;
   onSubmit: () => void;
   inputRef?: React.MutableRefObject<HTMLInputElement | null>;
+  savedInviteUrl?: string | null;
 }) {
   const isSubmitting = capturePhase === "submitting";
   const isSuccess = capturePhase === "success";
@@ -977,6 +985,14 @@ function HeroCopyPanel({
         <div aria-hidden="true" style={{width:7,height:7,borderRadius:"50%",background:"#22c55e",flexShrink:0,boxShadow:"0 0 0 2px rgba(34,197,94,0.22)"}} />
         over <strong>30</strong> studio signups
       </div>
+      {savedInviteUrl && (
+        <Link
+          href={savedInviteUrl}
+          className="hero-invite-return"
+        >
+          ← Back to my invite page
+        </Link>
+      )}
       <span className="hero-copy-eyebrow-hidden" aria-hidden="true">
         {copy.hero.eyebrow}
       </span>

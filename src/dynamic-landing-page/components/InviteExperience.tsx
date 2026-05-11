@@ -47,6 +47,12 @@ export default function InviteExperience({
 
   const shareRef = useRef<HTMLElement | null>(null);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem("weld_last_invite_url", `/invite/${inviteCode}`);
+    } catch {}
+  }, [inviteCode]);
+
   async function handleSignOut() {
     if (!hasBrowserSupabaseConfig()) return;
     await getBrowserSupabase().auth.signOut();

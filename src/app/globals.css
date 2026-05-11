@@ -5664,6 +5664,22 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   margin-top: 26px;
 }
 
+.hero-invite-return {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #5b6cff;
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+}
+
+.hero-invite-return:hover {
+  opacity: 1;
+}
+
 .hero-proof-line span {
   min-height: 36px;
   display: inline-flex;
