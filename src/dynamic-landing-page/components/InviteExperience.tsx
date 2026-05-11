@@ -252,15 +252,17 @@ export default function InviteExperience({
                 )}
               </section>
 
-              {/* Referrals placeholder */}
+              {/* Referrals */}
               <section className="rounded-[34px] border border-white/80 bg-white/70 p-5 shadow-[0_28px_90px_rgba(33,41,65,0.10)] backdrop-blur-2xl md:p-7">
-                <StatusPill>Referrals — coming soon</StatusPill>
-                <h2 className="mt-4 text-2xl font-bold tracking-[-0.03em]">
-                  Track your referrals here.
-                </h2>
-                <p className="mt-3 text-sm leading-7 text-[#6f7c95]">
-                  Referral count and reward tiers will appear here once the feature ships.
-                </p>
+                <StatusPill>Referrals</StatusPill>
+                <div className="mt-4 flex items-end gap-3">
+                  <span className="text-[clamp(48px,8vw,80px)] font-bold leading-none tracking-[-0.06em]">
+                    {snapshot.referralCount}
+                  </span>
+                  <span className="mb-2 text-base text-[#53607a]">
+                    {snapshot.referralCount === 1 ? "person joined" : "people joined"} using your invite
+                  </span>
+                </div>
               </section>
             </>
           ) : (
