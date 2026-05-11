@@ -14,8 +14,6 @@ const BLOCKED_PREFIXES = [
   "/account",
   "/messages",
   "/preview",
-  "/login",
-  "/accountsignup",
 ];
 
 function isBlockedRoute(pathname: string): boolean {
