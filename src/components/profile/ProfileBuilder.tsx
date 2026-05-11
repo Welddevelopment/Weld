@@ -341,7 +341,7 @@ export default function ProfileBuilder({
   const publishedOverlay = phase === 'published' ? (
     <PublishedOverlay
       onStartMatching={() => router.push('/swipe')}
-      onDismiss={() => onPublished?.(profile)}
+      onDismiss={() => { onPublished?.(profile); setPhase('editor') }}
     />
   ) : null
 
