@@ -143,13 +143,18 @@ export default function InviteExperience({
               <StatusPill>{inviteCode}</StatusPill>
               {!sessionLoading && (
                 session ? (
-                  <button
-                    type="button"
-                    onClick={() => void handleSignOut()}
-                    className="inline-flex min-h-[32px] items-center rounded-full border border-white/90 bg-white/60 px-3 text-xs font-bold text-[#53607a] transition hover:bg-white/80"
-                  >
-                    Sign out
-                  </button>
+                  <>
+                    <span className="text-xs text-[#6f7c95]">
+                      Logged in as <strong className="text-[#0d1220]">{session.user.email}</strong>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => void handleSignOut()}
+                      className="inline-flex min-h-[32px] items-center rounded-full border border-white/90 bg-white/60 px-3 text-xs font-bold text-[#53607a] transition hover:bg-white/80"
+                    >
+                      Sign out
+                    </button>
+                  </>
                 ) : (
                   <Link
                     href={`/login?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
