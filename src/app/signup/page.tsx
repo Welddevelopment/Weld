@@ -426,7 +426,6 @@ function buildDeveloperPayload(form: FormData, email: string, selected: string[]
 
 function ReturningOverlay({ inviteUrl, onOverride }: { inviteUrl: string; onOverride: () => void }) {
   const router = useRouter();
-
   return (
     <div className="returning-modal-overlay">
       <div className="returning-modal-card">
