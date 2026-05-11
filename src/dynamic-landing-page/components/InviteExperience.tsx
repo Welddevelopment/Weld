@@ -141,6 +141,12 @@ export default function InviteExperience({
             <div className="flex flex-wrap items-center gap-2">
               <StatusPill>{copy.audiencePill}</StatusPill>
               <StatusPill>{inviteCode}</StatusPill>
+              <Link
+                href={isStudio ? "/studios" : "/"}
+                className="inline-flex min-h-[32px] items-center rounded-full border border-white/90 bg-white/60 px-3 text-xs font-bold text-[#53607a] transition hover:bg-white/80"
+              >
+                ← Landing page
+              </Link>
               {!sessionLoading && (
                 session ? (
                   <>
