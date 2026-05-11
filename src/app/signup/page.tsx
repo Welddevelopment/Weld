@@ -76,6 +76,7 @@ function SignupContent() {
   const [message, setMessage] = useState("");
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [returningInviteUrl, setReturningInviteUrl] = useState<string | null>(null);
+  const [allowOverride, setAllowOverride] = useState(false);
 
   useEffect(() => {
     if (submitState === "success" && inviteUrl) {
@@ -158,16 +159,18 @@ function SignupContent() {
     setSubmitState("submitting");
     setMessage("");
 
-    try {
-      const checkRes = await fetch(`/api/waitlist/check?email=${encodeURIComponent(normalizedEmail)}`);
-      const checkData = await checkRes.json() as { exists: boolean; inviteUrl?: string };
-      if (checkData.exists && checkData.inviteUrl) {
-        setReturningInviteUrl(checkData.inviteUrl);
-        setSubmitState("idle");
-        return;
+    if (!allowOverride) {
+      try {
+        const checkRes = await fetch(`/api/waitlist/check?email=${encodeURIComponent(normalizedEmail)}`);
+        const checkData = await checkRes.json() as { exists: boolean; inviteUrl?: string };
+        if (checkData.exists && checkData.inviteUrl) {
+          setReturningInviteUrl(checkData.inviteUrl);
+          setSubmitState("idle");
+          return;
+        }
+      } catch {
+        // proceed with submission if check fails
       }
-    } catch {
-      // proceed with submission if check fails
     }
 
     try {
@@ -204,7 +207,15 @@ function SignupContent() {
   }
 
   if (returningInviteUrl) {
-    return <ReturningOverlay inviteUrl={returningInviteUrl} />;
+    return (
+      <ReturningOverlay
+        inviteUrl={returningInviteUrl}
+        onOverride={() => {
+          setReturningInviteUrl(null);
+          setAllowOverride(true);
+        }}
+      />
+    );
   }
 
   if (submitState === "success") {
@@ -413,13 +424,8 @@ function buildDeveloperPayload(form: FormData, email: string, selected: string[]
   };
 }
 
-function ReturningOverlay({ inviteUrl }: { inviteUrl: string }) {
+function ReturningOverlay({ inviteUrl, onOverride }: { inviteUrl: string; onOverride: () => void }) {
   const router = useRouter();
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => router.push(inviteUrl), 2500);
-    return () => window.clearTimeout(timer);
-  }, [inviteUrl, router]);
 
   return (
     <div className="returning-modal-overlay">
@@ -427,7 +433,22 @@ function ReturningOverlay({ inviteUrl }: { inviteUrl: string }) {
         <div className="returning-modal-icon">✓</div>
         <h2 className="returning-modal-title">You&rsquo;re already on the list.</h2>
         <p className="returning-modal-body">Your Weld invite is waiting for you.</p>
-        <p className="returning-modal-hint">Taking you there now&hellip;</p>
+        <div className="returning-modal-actions">
+          <button
+            type="button"
+            className="returning-modal-primary"
+            onClick={() => router.push(inviteUrl)}
+          >
+            Go to my invite page
+          </button>
+          <button
+            type="button"
+            className="returning-modal-secondary"
+            onClick={onOverride}
+          >
+            Update my submission
+          </button>
+        </div>
       </div>
     </div>
   );

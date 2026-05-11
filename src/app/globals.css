@@ -14071,6 +14071,49 @@ body {
   margin: 6px 0 0;
 }
 
+.returning-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.returning-modal-primary {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 100px;
+  background: #17143f;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.returning-modal-primary:hover {
+  opacity: 0.88;
+}
+
+.returning-modal-secondary {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 100px;
+  background: transparent;
+  color: #5c5c7a;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1.5px solid rgba(116, 105, 228, 0.25);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.returning-modal-secondary:hover {
+  border-color: rgba(116, 105, 228, 0.5);
+  color: #17143f;
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    App-specific styles — migrated from app branch globals.css
    DO NOT duplicate @tailwind directives (already present above)
