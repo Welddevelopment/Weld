@@ -18,7 +18,7 @@ export default function AccountPage() {
       return
     }
     const supabase = getBrowserSupabase()
-    supabase.auth.getSession().then(({ data }) => {
+    void supabase.auth.getSession().then(({ data }) => {
       setEmail(data.session?.user.email ?? null)
       setLoaded(true)
     })

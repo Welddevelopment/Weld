@@ -1,6 +1,7 @@
 import { createBrowserClient } from '@supabase/ssr'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
-let browserClient: ReturnType<typeof createBrowserClient> | null = null
+let browserClient: SupabaseClient | null = null
 
 export function hasBrowserSupabaseConfig() {
   return Boolean(
@@ -9,7 +10,7 @@ export function hasBrowserSupabaseConfig() {
   )
 }
 
-export function getBrowserSupabase() {
+export function getBrowserSupabase(): SupabaseClient {
   if (!hasBrowserSupabaseConfig()) {
     throw new Error('Supabase public environment variables are missing.')
   }
@@ -18,7 +19,7 @@ export function getBrowserSupabase() {
     browserClient = createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    ) as SupabaseClient
   }
 
   return browserClient
