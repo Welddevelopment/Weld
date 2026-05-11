@@ -54,19 +54,19 @@ function mergeDraft(value: unknown): ProfileDraft {
   return migrateRoles({ ...createDraft(), ...(value as Partial<ProfileDraft>) })
 }
 
-async function loadAccountDraft(accessToken: string) {
+async function loadAccountDraft(accessToken: string): Promise<{ draft: ProfileDraft | null; hasPublished: boolean }> {
   const response = await fetch('/api/account/profile', {
     headers: { Authorization: `Bearer ${accessToken}` },
     cache: 'no-store',
   })
   if (!response.ok) throw new Error('Could not load account profile.')
   const result = (await response.json()) as { profile?: { draft?: unknown; publishedProfile?: unknown } | null }
-  if (result.profile?.draft) return mergeDraft(result.profile.draft)
-  // No draft saved — reconstruct from the published profile if one exists
+  const hasPublished = Boolean(result.profile?.publishedProfile)
+  if (result.profile?.draft) return { draft: mergeDraft(result.profile.draft), hasPublished }
   if (result.profile?.publishedProfile && typeof result.profile.publishedProfile === 'object') {
-    return profileToDraft(result.profile.publishedProfile as PreviewProfile)
+    return { draft: profileToDraft(result.profile.publishedProfile as PreviewProfile), hasPublished }
   }
-  return null
+  return { draft: null, hasPublished: false }
 }
 
 async function saveAccountProfile(
@@ -228,9 +228,12 @@ export default function ProfileBuilder({
       if (!loadRemote) { setAccountLoaded(true); return }
       setSaveState('loading')
       try {
-        const remoteDraft = await loadAccountDraft(session.access_token)
+        const { draft: remoteDraft, hasPublished } = await loadAccountDraft(session.access_token)
         if (!alive) return
-        if (remoteDraft) setDraft(remoteDraft)
+        if (remoteDraft) {
+          setDraft(remoteDraft)
+          if (hasPublished) setPhase('editor')
+        }
         setSaveState('saved')
       } catch {
         if (!alive) return
