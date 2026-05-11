@@ -216,7 +216,7 @@ export default function InviteExperience({
                   Complete your Weld profile so studios can find and match with you.
                 </p>
                 <div className="mt-6">
-                  <ProfileBuilder initialPhase="identity" />
+                  <ProfileBuilder initialPhase="identity" embedded />
                 </div>
               </section>
 

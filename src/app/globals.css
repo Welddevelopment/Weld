@@ -16015,3 +16015,5 @@ body {
   color: #FF8A5C;
 }
 
+
+.pb-form-shell--embedded { min-height: unset; background: transparent; color: inherit; border-radius: 20px; overflow: hidden; }

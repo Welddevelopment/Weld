@@ -183,11 +183,13 @@ export default function ProfileBuilder({
   onDelete,
   initialPhase = 'identity',
   onCancel,
+  embedded = false,
 }: {
   onPublished?: (profile: PreviewProfile) => void
   onDelete?: () => Promise<void>
   initialPhase?: Phase
   onCancel?: () => void
+  embedded?: boolean
 } = {}) {
   const router = useRouter()
   const [draft, setDraft] = useState<ProfileDraft>(createDraft)
@@ -430,7 +432,7 @@ export default function ProfileBuilder({
     }
 
     return (
-      <div className="pb-form-shell">
+      <div className={embedded ? 'pb-form-shell pb-form-shell--embedded' : 'pb-form-shell'}>
         {header}
         <div className="pb-form-body pb-form-body--editor" ref={bodyRef}>
           <div className="npc-stack-row" style={{ alignItems: 'flex-start' }}>
@@ -523,7 +525,7 @@ export default function ProfileBuilder({
 
   // Quick setup steps
   return (
-    <div className="pb-form-shell">
+    <div className={embedded ? 'pb-form-shell pb-form-shell--embedded' : 'pb-form-shell'}>
       {header}
       <div className="pb-form-body">
         {phase === 'type' && (
