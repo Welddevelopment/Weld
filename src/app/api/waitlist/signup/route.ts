@@ -32,18 +32,14 @@ export async function POST(request: NextRequest) {
       ok: true,
       inviteCode: snapshot.lead.inviteCode,
       inviteUrl: `/invite/${snapshot.lead.inviteCode}`,
-      shareUrl: snapshot.lead.shareUrl,
-      rewardTier: snapshot.rewardTier.slug,
-      waveLabel: snapshot.waveLabel
+      shareUrl: snapshot.lead.shareUrl
     });
   } catch (error) {
-    return NextResponse.json(
-      {
-        ok: false,
-        message:
-          error instanceof Error ? error.message : "Could not save your invite right now."
-      },
-      { status: 400 }
-    );
+    console.error("[waitlist/signup] error:", JSON.stringify(error, null, 2), error)
+    const message =
+      error instanceof Error
+        ? error.message
+        : (error as { message?: string })?.message ?? "Could not save your invite right now."
+    return NextResponse.json({ ok: false, message }, { status: 400 });
   }
 }

@@ -4,7 +4,6 @@ import {
   DEVELOPER_REQUIRED_FIELDS,
   EMPTY_UTM_FIELDS,
   PROFILE_STEP_ORDER,
-  REWARD_TIERS,
   SITE_URL,
   STUDIO_REQUIRED_FIELDS
 } from "@/dynamic-landing-page/lib/constants";
@@ -12,7 +11,6 @@ import type {
   Audience,
   DraftFieldValue,
   ProfileDraftShape,
-  RewardTierDefinition,
   ShareChannel,
   UTMFields
 } from "@/dynamic-landing-page/lib/types";
@@ -37,16 +35,6 @@ export function buildInviteCode(email: string) {
 
 export function buildShareUrl(inviteCode: string, origin = SITE_URL) {
   return `${origin.replace(/\/$/, "")}/?ref=${encodeURIComponent(inviteCode)}`;
-}
-
-export function getRewardTier(referralCount: number): RewardTierDefinition {
-  return REWARD_TIERS.reduce((active, current) =>
-    referralCount >= current.threshold ? current : active
-  );
-}
-
-export function getNextReward(referralCount: number) {
-  return REWARD_TIERS.find((tier) => referralCount < tier.threshold) ?? null;
 }
 
 export function mergeUtmFields(utm?: Partial<UTMFields>): UTMFields {
@@ -110,28 +98,6 @@ export function getCurrentStep(audience: Audience, draft: ProfileDraftShape) {
       requiredFields[step].some((fieldName) => !isFilledDraftValue(draft[step][fieldName]))
     ) ?? "fit"
   );
-}
-
-export function buildWaveLabel(
-  rewardTier: RewardTierDefinition,
-  completionPercent: number,
-  audience: Audience
-) {
-  if (rewardTier.slug === "founder-lane") {
-    return "Founder lane unlocked.";
-  }
-
-  if (completionPercent >= 100) {
-    return audience === "studio"
-      ? "Hiring lane profile is complete."
-      : "Discovery profile is complete.";
-  }
-
-  if (completionPercent >= 60) {
-    return "Profile signal is warming up.";
-  }
-
-  return "Invite is active.";
 }
 
 export function buildShareCopy(input: {

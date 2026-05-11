@@ -22,12 +22,9 @@ import {
   buildInviteCode,
   buildShareCopy,
   buildShareUrl,
-  buildWaveLabel,
   calculateCompletionPercent,
   createEmptyDraft,
   getCurrentStep,
-  getNextReward,
-  getRewardTier,
   isValidEmail,
   mergeUtmFields,
   normalizeAudience,
@@ -434,36 +431,19 @@ export async function buildInviteProgressSnapshot(inviteCode: string): Promise<I
   const existingDraft = await getProfileDraftByLeadId(lead.id);
   const draft = ensureDraftRecord(lead, existingDraft);
   const referralCount = await countReferredSignups(lead.id);
-  const rewardTier = getRewardTier(referralCount);
-  const nextReward = getNextReward(referralCount);
   const completionPercent = draft.completionPercent;
-  const waveLabel = buildWaveLabel(rewardTier, completionPercent, lead.audience);
 
   if (!existingDraft) {
     await upsertProfileDraftRecord(draft);
   }
 
-  if (lead.rewardTier !== rewardTier.slug) {
-    await upsertLeadRecord({
-      ...lead,
-      rewardTier: rewardTier.slug,
-      updatedAt: new Date().toISOString()
-    });
-  }
-
   return {
-    lead: {
-      ...lead,
-      rewardTier: rewardTier.slug
-    },
+    lead,
     draft: {
       ...draft,
       completionPercent
     },
     referralCount,
-    rewardTier,
-    nextReward,
-    waveLabel,
     sharePresets: {
       discord: buildShareCopy({
         audience: lead.audience,

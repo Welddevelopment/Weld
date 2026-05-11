@@ -25,10 +25,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       draft: snapshot.draft,
-      referralCount: snapshot.referralCount,
-      rewardTier: snapshot.rewardTier,
-      nextReward: snapshot.nextReward,
-      waveLabel: snapshot.waveLabel
+      referralCount: snapshot.referralCount
     });
   } catch (error) {
     return NextResponse.json(

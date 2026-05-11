@@ -16,9 +16,6 @@ export async function GET(
       lead: snapshot.lead,
       draft: snapshot.draft,
       referralCount: snapshot.referralCount,
-      rewardTier: snapshot.rewardTier,
-      nextReward: snapshot.nextReward,
-      waveLabel: snapshot.waveLabel,
       sharePresets: snapshot.sharePresets
     });
   } catch (error) {

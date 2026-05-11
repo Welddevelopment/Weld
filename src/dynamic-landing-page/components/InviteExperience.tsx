@@ -207,8 +207,6 @@ export default function InviteExperience({
             <div className="mt-5 flex flex-wrap gap-2 text-sm text-[#6f7c95]">
               <span>Invite for</span>
               <strong className="text-[#0d1220]">{snapshot.lead.email}</strong>
-              <span>·</span>
-              <span>{snapshot.rewardTier.label}</span>
             </div>
           </section>
 
@@ -372,7 +370,6 @@ export default function InviteExperience({
           {/* Footer */}
           <footer className="rounded-[28px] border border-white/80 bg-white/60 p-5 text-sm leading-7 text-[#53607a] shadow-[0_18px_60px_rgba(33,41,65,0.08)]">
             Invite active for <strong className="text-[#0d1220]">{snapshot.lead.email}</strong>.
-            Status: <strong className="text-[#0d1220]">{snapshot.rewardTier.label}</strong>.
             Return here any time to update your profile or copy your invite.
           </footer>
 
