@@ -16,8 +16,9 @@ export default function AuthForm({ mode }: Props) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const inviteCode = searchParams.get('invite')
+  const lockedEmail = searchParams.get('email') ?? ''
   const postAuthPath = inviteCode ? `/invite/${inviteCode}` : '/home'
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState(lockedEmail)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [currentEmail, setCurrentEmail] = useState<string | null>(null)
@@ -172,8 +173,9 @@ export default function AuthForm({ mode }: Props) {
               <input
                 type="email"
                 value={email}
-                onChange={event => setEmail(event.target.value)}
+                onChange={event => { if (!lockedEmail) setEmail(event.target.value) }}
                 autoComplete="email"
+                readOnly={!!lockedEmail}
                 required
               />
             </label>

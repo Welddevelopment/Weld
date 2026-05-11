@@ -200,13 +200,13 @@ export default function InviteExperience({
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link
-                  href={`/accountsignup?invite=${inviteCode}`}
+                  href={`/accountsignup?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
                   className="inline-flex min-h-[52px] items-center rounded-full bg-[#0b0f18] px-7 text-sm font-bold text-white shadow-[0_16px_34px_rgba(10,14,26,0.24)] transition-transform hover:-translate-y-0.5"
                 >
                   Create your account
                 </Link>
                 <Link
-                  href={`/login?invite=${inviteCode}`}
+                  href={`/login?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
                   className="inline-flex min-h-[52px] items-center rounded-full border border-white/90 bg-white/60 px-7 text-sm font-bold text-[#0d1220] shadow-inner transition-transform hover:-translate-y-0.5"
                 >
                   Already have an account? Log in
