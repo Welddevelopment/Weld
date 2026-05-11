@@ -41,6 +41,7 @@ export default function InviteExperience({
   const [snapshot, setSnapshot] = useState(initialSnapshot);
   const [session, setSession] = useState<Session | null>(null);
   const [sessionLoading, setSessionLoading] = useState(true);
+  const [profilePublished, setProfilePublished] = useState(false);
   const [shareChannel, setShareChannel] = useState<ShareChannel>("discord");
   const [shareStatus, setShareStatus] = useState("");
   const [shareError, setShareError] = useState(false);
@@ -67,8 +68,20 @@ export default function InviteExperience({
       return;
     }
     const supabase = getBrowserSupabase();
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
       setSession(data.session);
+      if (data.session?.access_token) {
+        try {
+          const res = await fetch('/api/account/profile', {
+            headers: { Authorization: `Bearer ${data.session.access_token}` },
+            cache: 'no-store',
+          });
+          if (res.ok) {
+            const json = await res.json() as { profile?: { publishedProfile?: unknown } | null };
+            setProfilePublished(Boolean(json.profile?.publishedProfile));
+          }
+        } catch {}
+      }
       setSessionLoading(false);
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
@@ -206,18 +219,39 @@ export default function InviteExperience({
             </section>
           ) : session ? (
             <>
-              {/* Logged in — show real ProfileBuilder */}
+              {/* Logged in — profile setup */}
               <section className="rounded-[34px] border border-white/80 bg-white/70 p-5 shadow-[0_28px_90px_rgba(33,41,65,0.10)] backdrop-blur-2xl md:p-7">
                 <StatusPill>Profile setup</StatusPill>
-                <h2 className="mt-4 text-[clamp(30px,4vw,48px)] font-bold leading-none tracking-[-0.05em]">
-                  Build your profile.
-                </h2>
-                <p className="mt-3 max-w-[54ch] text-base leading-8 text-[#53607a]">
-                  Complete your Weld profile so studios can find and match with you.
-                </p>
-                <div className="mt-6">
-                  <ProfileBuilder initialPhase="identity" embedded />
-                </div>
+                {profilePublished ? (
+                  <>
+                    <h2 className="mt-4 text-[clamp(30px,4vw,48px)] font-bold leading-none tracking-[-0.05em]">
+                      Your profile is live.
+                    </h2>
+                    <p className="mt-3 max-w-[54ch] text-base leading-8 text-[#53607a]">
+                      Studios can already find and match with you. Head to your profile to view or edit it.
+                    </p>
+                    <div className="mt-6 flex flex-col gap-3">
+                      <Link
+                        href="/profile"
+                        className="inline-flex w-fit min-h-[52px] items-center rounded-full bg-[#0b0f18] px-7 text-sm font-bold text-white shadow-[0_16px_34px_rgba(10,14,26,0.24)] transition-transform hover:-translate-y-0.5"
+                      >
+                        View / edit profile
+                      </Link>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h2 className="mt-4 text-[clamp(30px,4vw,48px)] font-bold leading-none tracking-[-0.05em]">
+                      Build your profile.
+                    </h2>
+                    <p className="mt-3 max-w-[54ch] text-base leading-8 text-[#53607a]">
+                      Complete your Weld profile so studios can find and match with you.
+                    </p>
+                    <div className="mt-6">
+                      <ProfileBuilder initialPhase="identity" embedded />
+                    </div>
+                  </>
+                )}
               </section>
 
               {/* Referrals placeholder */}
