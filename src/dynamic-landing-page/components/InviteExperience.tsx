@@ -241,19 +241,22 @@ export default function InviteExperience({
               <p className="mt-4 max-w-[54ch] text-base leading-8 text-[#53607a]">
                 Sign up or log in to complete your Weld profile. Your invite code will carry over automatically.
               </p>
-              <div className="mt-6 flex flex-wrap gap-3">
+              <div className="mt-6 flex flex-col gap-3">
                 <Link
                   href={`/accountsignup?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
-                  className="inline-flex min-h-[52px] items-center rounded-full bg-[#0b0f18] px-7 text-sm font-bold text-white shadow-[0_16px_34px_rgba(10,14,26,0.24)] transition-transform hover:-translate-y-0.5"
+                  className="inline-flex min-h-[52px] w-fit items-center rounded-full bg-[#0b0f18] px-7 text-sm font-bold text-white shadow-[0_16px_34px_rgba(10,14,26,0.24)] transition-transform hover:-translate-y-0.5"
                 >
                   Create your account
                 </Link>
-                <Link
-                  href={`/login?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
-                  className="inline-flex min-h-[52px] items-center rounded-full border border-white/90 bg-white/60 px-7 text-sm font-bold text-[#0d1220] shadow-inner transition-transform hover:-translate-y-0.5"
-                >
-                  Already have an account? Log in
-                </Link>
+                <p className="text-sm text-[#6f7c95]">
+                  Already have an account?{" "}
+                  <Link
+                    href={`/login?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
+                    className="font-semibold text-[#0d1220] underline underline-offset-2 hover:opacity-70"
+                  >
+                    Log in
+                  </Link>
+                </p>
               </div>
             </section>
           )}
