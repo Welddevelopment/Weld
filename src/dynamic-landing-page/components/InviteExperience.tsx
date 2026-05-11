@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 
@@ -33,6 +34,7 @@ export default function InviteExperience({
   initialSnapshot,
   sourceVariant
 }: InviteExperienceProps) {
+  const router = useRouter();
   const audience = initialSnapshot.lead.audience;
   const copy = TYPE_COPY[audience];
   const inviteCode = initialSnapshot.lead.inviteCode;
@@ -44,6 +46,12 @@ export default function InviteExperience({
   const [shareError, setShareError] = useState(false);
 
   const shareRef = useRef<HTMLElement | null>(null);
+
+  async function handleSignOut() {
+    if (!hasBrowserSupabaseConfig()) return;
+    await getBrowserSupabase().auth.signOut();
+    router.refresh();
+  }
   const inviteUrl = snapshot.lead.shareUrl || `${SITE_URL}/invite/${inviteCode}`;
   const sourceLine = SOURCE_LINES[sourceVariant][audience];
 
@@ -133,6 +141,24 @@ export default function InviteExperience({
             <div className="flex flex-wrap items-center gap-2">
               <StatusPill>{copy.audiencePill}</StatusPill>
               <StatusPill>{inviteCode}</StatusPill>
+              {!sessionLoading && (
+                session ? (
+                  <button
+                    type="button"
+                    onClick={() => void handleSignOut()}
+                    className="inline-flex min-h-[32px] items-center rounded-full border border-white/90 bg-white/60 px-3 text-xs font-bold text-[#53607a] transition hover:bg-white/80"
+                  >
+                    Sign out
+                  </button>
+                ) : (
+                  <Link
+                    href={`/login?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
+                    className="inline-flex min-h-[32px] items-center rounded-full border border-white/90 bg-white/60 px-3 text-xs font-bold text-[#53607a] transition hover:bg-white/80"
+                  >
+                    Log in
+                  </Link>
+                )
+              )}
             </div>
           </header>
 
