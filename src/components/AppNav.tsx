@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/browser'
@@ -17,6 +17,7 @@ const NAV_LINKS = [
 
 export default function AppNav() {
   const pathname = usePathname()
+  const router = useRouter()
   const [email, setEmail] = useState<string | null>(null)
 
   useEffect(() => {
@@ -30,6 +31,13 @@ export default function AppNav() {
     })
     return () => data.subscription.unsubscribe()
   }, [])
+
+  async function handleSignOut() {
+    if (!hasBrowserSupabaseConfig()) return
+    await getBrowserSupabase().auth.signOut()
+    router.push('/')
+    router.refresh()
+  }
 
   return (
     <>
@@ -63,6 +71,25 @@ export default function AppNav() {
             </Link>
           )
         })}
+
+        <div className="ml-2 h-4 w-px bg-white/10" />
+
+        {email ? (
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.13em] text-white/70 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white/90"
+          >
+            Sign out
+          </button>
+        ) : (
+          <Link
+            href="/login"
+            className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.13em] text-white/70 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white/90"
+          >
+            Log in
+          </Link>
+        )}
       </div>
     </nav>
     <div aria-hidden="true" className="h-[65px] shrink-0" />
