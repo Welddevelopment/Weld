@@ -16491,6 +16491,20 @@ body {
   margin-top: 50px;
 }
 
+.weld-glass-page[data-mode] .marquee-section .marquee-header {
+  text-align: center;
+  margin-inline: auto;
+}
+
+.weld-glass-page[data-mode] .marquee-section .marquee-heading {
+  font-size: clamp(28px, 3vw, 44px);
+}
+
+.weld-glass-page[data-mode] .marquee-section .marquee-subtext {
+  max-width: 52ch;
+  margin-inline: auto;
+}
+
 .weld-glass-page[data-mode] .other-side-section {
   margin-top: 50px;
 }
