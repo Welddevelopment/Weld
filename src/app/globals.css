@@ -17463,7 +17463,8 @@ button.invite-secondary-button {
 .weld-glass-page[data-mode] .hero-preview-card-frame .npc-hero-preview-container {
   transform: none !important;
   margin-bottom: 0 !important;
-  width: min(100%, 260px) !important;
+  width: 380px !important;
+  zoom: 0.6;
 }
 
 .weld-glass-page[data-mode] :where(.glass-section, .marquee-section, .other-side-section, .how-strip-section) {
