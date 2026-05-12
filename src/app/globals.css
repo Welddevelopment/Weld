@@ -17451,12 +17451,17 @@ button.invite-secondary-button {
 }
 
 .weld-glass-page[data-mode] .hero-preview-card-frame {
-  transition: none;
+  transition: none !important;
 }
 
 .weld-glass-page[data-mode] .hero-preview-shell:hover .hero-preview-card-frame {
-  transform: none;
-  box-shadow: none;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.weld-glass-page[data-mode] .hero-preview-card-frame .npc-hero-preview-container {
+  transform: none !important;
+  margin-bottom: 0;
 }
 
 .weld-glass-page[data-mode] :where(.glass-section, .marquee-section, .other-side-section, .how-strip-section) {
