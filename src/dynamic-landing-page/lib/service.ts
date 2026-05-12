@@ -432,39 +432,24 @@ export async function buildInviteProgressSnapshot(inviteCode: string): Promise<I
   const draft = ensureDraftRecord(lead, existingDraft);
   const referralCount = await countReferredSignups(lead.id);
   const completionPercent = draft.completionPercent;
+  const shareUrl = buildShareUrl(lead.inviteCode);
 
   if (!existingDraft) {
     await upsertProfileDraftRecord(draft);
   }
 
   return {
-    lead,
+    lead: { ...lead, shareUrl },
     draft: {
       ...draft,
       completionPercent
     },
     referralCount,
     sharePresets: {
-      discord: buildShareCopy({
-        audience: lead.audience,
-        channel: "discord",
-        shareUrl: lead.shareUrl
-      }),
-      x: buildShareCopy({
-        audience: lead.audience,
-        channel: "x",
-        shareUrl: lead.shareUrl
-      }),
-      linkedin: buildShareCopy({
-        audience: lead.audience,
-        channel: "linkedin",
-        shareUrl: lead.shareUrl
-      }),
-      copy: buildShareCopy({
-        audience: lead.audience,
-        channel: "copy",
-        shareUrl: lead.shareUrl
-      })
+      discord: buildShareCopy({ audience: lead.audience, channel: "discord", shareUrl }),
+      x: buildShareCopy({ audience: lead.audience, channel: "x", shareUrl }),
+      linkedin: buildShareCopy({ audience: lead.audience, channel: "linkedin", shareUrl }),
+      copy: buildShareCopy({ audience: lead.audience, channel: "copy", shareUrl })
     }
   };
 }
