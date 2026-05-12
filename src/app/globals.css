@@ -17438,6 +17438,14 @@ button.invite-secondary-button {
   outline-color: var(--wg-accent);
 }
 
+.weld-glass-page[data-mode] .npc-hero-preview-trigger:focus-visible {
+  outline: none;
+}
+
+.weld-glass-page[data-mode] .npc-hero-preview-trigger:hover {
+  background: transparent;
+}
+
 .weld-glass-page[data-mode] :where(.glass-section, .marquee-section, .other-side-section, .how-strip-section) {
   scroll-margin-top: 118px;
 }
