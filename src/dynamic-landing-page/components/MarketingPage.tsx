@@ -906,6 +906,9 @@ function GlassNav({
             {item.label}
           </a>
         ))}
+        <a href="/find-invite" className="glass-nav-subtle">
+          Already signed up?
+        </a>
         <a
           href="#join"
           className="button-primary button-nav"

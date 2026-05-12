@@ -4943,6 +4943,15 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   color: var(--wg-ink);
 }
 
+.glass-nav-subtle {
+  opacity: 0.65;
+  font-style: italic;
+}
+
+.glass-nav-subtle:hover {
+  opacity: 1;
+}
+
 .mode-toggle {
   position: relative;
   display: grid;

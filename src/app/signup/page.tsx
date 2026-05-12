@@ -406,6 +406,13 @@ function SignupContent() {
               {message}
             </p>
           ) : null}
+
+          <p className="signup-secondary-link" style={{ textAlign: "center", marginTop: "8px" }}>
+            Already signed up?{" "}
+            <Link href="/find-invite" className="underline underline-offset-2">
+              Find your invite
+            </Link>
+          </p>
         </form>
       </section>
     </main>
