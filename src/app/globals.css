@@ -17468,7 +17468,7 @@ button.invite-secondary-button {
   transform: none !important;
   margin-bottom: 0 !important;
   width: 380px !important;
-  zoom: 0.6;
+  zoom: 1;
 }
 
 .weld-glass-page[data-mode] :where(.glass-section, .marquee-section, .other-side-section, .how-strip-section) {
