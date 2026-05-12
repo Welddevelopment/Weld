@@ -16457,6 +16457,16 @@ body {
   margin-top: 20px;
 }
 
+.weld-glass-page[data-mode] .glass-section::before {
+  content: none;
+}
+
+.weld-glass-page[data-mode] .how-story-section::after,
+.weld-glass-page[data-mode] .waitlist-shell::after,
+.weld-glass-page[data-mode] .chat-preview-shell::after {
+  content: none;
+}
+
 .weld-glass-page[data-mode] .how-strip-section {
   margin-top: 20px;
 }
