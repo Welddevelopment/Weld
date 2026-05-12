@@ -392,7 +392,7 @@ export async function captureWaitlistSignup(input: CaptureSignupInput) {
   const draft = ensureDraftRecord(lead, existingDraft);
   await upsertProfileDraftRecord(draft);
 
-  if (referrerLead && referrerLead.id !== lead.id) {
+  if (!existingLead && referrerLead && referrerLead.id !== lead.id) {
     await insertReferralEvent({
       referrerLeadId: referrerLead.id,
       refereeLeadId: lead.id,
