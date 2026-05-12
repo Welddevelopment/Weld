@@ -16458,6 +16458,11 @@ body {
   margin-top: 50px;
 }
 
+.weld-glass-page[data-mode] .glass-section.waitlist-section,
+.weld-glass-page[data-mode] .glass-section.faq-section {
+  margin-top: 30px;
+}
+
 .weld-glass-page[data-mode] .glass-section::before {
   content: none;
 }
