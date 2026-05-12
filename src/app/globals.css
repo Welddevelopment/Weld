@@ -16469,6 +16469,10 @@ body {
   padding: clamp(18px, 2.5vw, 32px);
 }
 
+.weld-glass-page[data-mode] .glass-section.comparison-table-section {
+  padding: clamp(20px, 2.6vw, 36px);
+}
+
 .weld-glass-page[data-mode] .glass-section::before {
   content: none;
 }
