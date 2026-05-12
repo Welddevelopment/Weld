@@ -77,6 +77,7 @@ function SignupContent() {
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [returningInviteUrl, setReturningInviteUrl] = useState<string | null>(null);
   const [allowOverride, setAllowOverride] = useState(false);
+  const [referralCode, setReferralCode] = useState(searchParams.get("ref") ?? "");
 
   useEffect(() => {
     if (submitState === "success" && inviteUrl) {
@@ -84,6 +85,15 @@ function SignupContent() {
       return () => window.clearTimeout(timer);
     }
   }, [submitState, inviteUrl, router]);
+
+  useEffect(() => {
+    if (!referralCode) {
+      try {
+        const stored = localStorage.getItem("weld_referral_code");
+        if (stored) setReferralCode(stored);
+      } catch {}
+    }
+  }, [referralCode]);
 
   const copy = useMemo(() => {
     if (signupType === "studio") {
@@ -188,7 +198,7 @@ function SignupContent() {
         const res = await fetch("/api/waitlist/signup", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: normalizedEmail, audience: signupType, source: "signup-form" })
+          body: JSON.stringify({ email: normalizedEmail, audience: signupType, source: "signup-form", referredByInviteCode: referralCode.trim().toUpperCase() || undefined })
         });
         const data = (await res.json()) as { ok: boolean; inviteUrl?: string };
         if (data.ok && data.inviteUrl) {
@@ -370,6 +380,18 @@ function SignupContent() {
               </label>
             </>
           )}
+
+          <label className="signup-field">
+            <span>Referral code <em>optional</em></span>
+            <input
+              type="text"
+              value={referralCode}
+              onChange={(e) => setReferralCode(e.target.value)}
+              placeholder="e.g. WLDA9F02A"
+              autoComplete="off"
+              spellCheck={false}
+            />
+          </label>
 
           <button
             type="submit"
