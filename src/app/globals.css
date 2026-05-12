@@ -17450,6 +17450,10 @@ button.invite-secondary-button {
   display: none;
 }
 
+.weld-glass-page[data-mode] .hero-preview-card-frame {
+  transition: none;
+}
+
 .weld-glass-page[data-mode] .hero-preview-shell:hover .hero-preview-card-frame {
   transform: none;
   box-shadow: none;
