@@ -17446,6 +17446,7 @@ button.invite-secondary-button {
   background: transparent;
 }
 
+.weld-glass-page[data-mode] .hero-signal-panel,
 .weld-glass-page[data-mode] .hero-signal-meter {
   display: none;
 }
