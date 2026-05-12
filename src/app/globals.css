@@ -16510,10 +16510,17 @@ body {
 }
 
 .weld-glass-page[data-mode] .other-side-section .marquee-header {
-  margin-inline: 0;
-  margin-left: clamp(24px, 3vw, 42px);
-  width: auto;
-  max-width: 860px;
+  text-align: center;
+  margin-inline: auto;
+}
+
+.weld-glass-page[data-mode] .other-side-section .marquee-heading {
+  font-size: clamp(28px, 3vw, 44px);
+}
+
+.weld-glass-page[data-mode] .other-side-section .marquee-subtext {
+  max-width: 52ch;
+  margin-inline: auto;
 }
 
 .weld-glass-page[data-mode] .chat-section-shell-outer {
