@@ -220,10 +220,12 @@ export default function InviteExperience({
                 <span>Current status</span>
                 <strong>{activeTier.label}</strong>
               </div>
-              <div>
-                <span>Referral count</span>
-                <strong>{referralCount}</strong>
-              </div>
+              {session && (
+                <div>
+                  <span>Referral count</span>
+                  <strong>{referralCount}</strong>
+                </div>
+              )}
             </aside>
           </section>
 
@@ -236,22 +238,33 @@ export default function InviteExperience({
                   Referral counts update when people join through your invite link. No fake counters, no changed attribution.
                 </p>
               </div>
-              <div className="invite-referral-number">
-                <strong>{referralCount}</strong>
-                <span>{referralCount === 1 ? "person joined" : "people joined"} using your invite</span>
-              </div>
-              <div className="invite-progress-block">
-                <div className="invite-progress-label">
-                  <span>{activeTier.label}</span>
-                  <strong>
-                    {nextTier ? `${referralsRemaining} to ${nextTier.label}` : "Top visible tier"}
-                  </strong>
-                </div>
-                <div className="invite-progress-track" aria-hidden="true">
-                  <span style={{ width: `${progressPercent}%` }} />
-                </div>
-                <p>{activeTier.description}</p>
-              </div>
+              {session ? (
+                <>
+                  <div className="invite-referral-number">
+                    <strong>{referralCount}</strong>
+                    <span>{referralCount === 1 ? "person joined" : "people joined"} using your invite</span>
+                  </div>
+                  <div className="invite-progress-block">
+                    <div className="invite-progress-label">
+                      <span>{activeTier.label}</span>
+                      <strong>
+                        {nextTier ? `${referralsRemaining} to ${nextTier.label}` : "Top visible tier"}
+                      </strong>
+                    </div>
+                    <div className="invite-progress-track" aria-hidden="true">
+                      <span style={{ width: `${progressPercent}%` }} />
+                    </div>
+                    <p>{activeTier.description}</p>
+                  </div>
+                </>
+              ) : (
+                <Link
+                  href={`/login?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
+                  className="invite-primary-button"
+                >
+                  Log in to see your referrals
+                </Link>
+              )}
             </article>
 
             {sessionLoading ? (
