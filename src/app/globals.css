@@ -16492,7 +16492,10 @@ body {
 }
 
 .weld-glass-page[data-mode] .other-side-section .marquee-header {
-  padding-left: clamp(24px, 3vw, 42px);
+  margin-inline: 0;
+  margin-left: clamp(24px, 3vw, 42px);
+  width: auto;
+  max-width: 860px;
 }
 
 .weld-glass-page[data-mode] .chat-section-shell-outer {
