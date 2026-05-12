@@ -16340,7 +16340,7 @@ body {
 
 .weld-glass-page[data-mode] .waitlist-section {
   width: min(1180px, calc(100% - 28px));
-  margin-top: 50px;
+  margin-top: 30px;
 }
 
 .weld-glass-page[data-mode] .waitlist-shell {
@@ -16411,6 +16411,7 @@ body {
 
 .weld-glass-page[data-mode] .faq-section {
   width: min(1180px, calc(100% - 28px));
+  margin-top: 30px;
   gap: clamp(16px, 2.5vw, 32px);
   padding: clamp(20px, 2.8vw, 36px);
   border-radius: clamp(20px, 2.5vw, 32px);
