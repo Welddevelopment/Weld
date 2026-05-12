@@ -16174,8 +16174,8 @@ body {
 }
 
 .weld-glass-page[data-mode] .how-story-section {
-  width: min(1240px, calc(100% - 28px));
-  padding: clamp(28px, 3.8vw, 58px);
+  width: min(1180px, calc(100% - 28px));
+  padding: clamp(20px, 2.6vw, 38px);
   background:
     radial-gradient(circle at 83% 14%, var(--wg-mode-soft), transparent 32%),
     radial-gradient(circle at 12% 86%, rgba(255, 255, 255, 0.92), transparent 32%),
@@ -16192,41 +16192,41 @@ body {
 }
 
 .weld-glass-page[data-mode] .how-story-grid {
-  grid-template-columns: minmax(0, 1.08fr) minmax(390px, 0.74fr);
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.68fr);
   align-items: center;
 }
 
 .weld-glass-page[data-mode] .how-story-copy h2 {
   max-width: 10.5ch;
   color: var(--wg-mode-ink);
-  font-size: clamp(48px, 5vw, 78px);
+  font-size: clamp(32px, 3.2vw, 48px);
 }
 
 .weld-glass-page[data-mode] .role-explorer-tabs {
-  gap: 14px;
-  max-width: 650px;
+  gap: 10px;
+  max-width: 560px;
 }
 
 .weld-glass-page[data-mode] .role-explorer-tabs button {
-  min-height: 58px;
-  padding: 0 26px;
+  min-height: 44px;
+  padding: 0 20px;
   border-color: rgba(255, 255, 255, 0.92);
 }
 
 .weld-glass-page[data-mode] .role-explorer-tabs button.is-active {
   color: #fff;
   background: linear-gradient(180deg, var(--wg-accent), var(--wg-accent-deep));
-  box-shadow: 0 16px 30px var(--wg-mode-glow);
+  box-shadow: 0 12px 22px var(--wg-mode-glow);
 }
 
 .weld-glass-page[data-mode] .hiring-panel-stack {
-  max-width: 430px;
+  max-width: 360px;
 }
 
 .weld-glass-page[data-mode] .hiring-panel-active {
-  min-height: 560px;
-  padding: 26px !important;
-  border-radius: 30px;
+  min-height: 0;
+  padding: 20px !important;
+  border-radius: 24px;
 }
 
 .weld-glass-page[data-mode] .hp-title-row {
@@ -16234,13 +16234,13 @@ body {
 }
 
 .weld-glass-page[data-mode] .hp-role-chip {
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
 }
 
 .weld-glass-page[data-mode] .hp-title {
-  font-size: 24px;
+  font-size: 18px;
   letter-spacing: -0.02em;
 }
 
