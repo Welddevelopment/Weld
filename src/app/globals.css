@@ -17450,6 +17450,11 @@ button.invite-secondary-button {
   display: none;
 }
 
+.weld-glass-page[data-mode] .hero-preview-shell:hover .hero-preview-card-frame {
+  transform: none;
+  box-shadow: none;
+}
+
 .weld-glass-page[data-mode] :where(.glass-section, .marquee-section, .other-side-section, .how-strip-section) {
   scroll-margin-top: 118px;
 }
