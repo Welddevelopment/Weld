@@ -17451,6 +17451,10 @@ button.invite-secondary-button {
   display: none;
 }
 
+.weld-glass-page[data-mode] .swipe-modal-inner {
+  zoom: 0.6;
+}
+
 .weld-glass-page[data-mode] .hero-preview-card-frame {
   transition: none !important;
 }
