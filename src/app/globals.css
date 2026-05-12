@@ -17446,6 +17446,10 @@ button.invite-secondary-button {
   background: transparent;
 }
 
+.weld-glass-page[data-mode] .hero-signal-meter {
+  display: none;
+}
+
 .weld-glass-page[data-mode] :where(.glass-section, .marquee-section, .other-side-section, .how-strip-section) {
   scroll-margin-top: 118px;
 }
