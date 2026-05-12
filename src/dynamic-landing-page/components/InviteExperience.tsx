@@ -8,7 +8,7 @@ import type { Session } from "@supabase/supabase-js";
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from "@/lib/supabase/browser";
 import ProfileBuilder from "@/components/profile/ProfileBuilder";
 import { shareInvite, trackEvent } from "@/dynamic-landing-page/lib/browser";
-import { SITE_URL } from "@/dynamic-landing-page/lib/constants";
+import { REWARD_TIERS, SITE_URL } from "@/dynamic-landing-page/lib/constants";
 import { TYPE_COPY, SOURCE_LINES } from "@/dynamic-landing-page/lib/sample-data";
 import type { SourceVariant } from "@/dynamic-landing-page/lib/source-variant";
 import type {
@@ -18,13 +18,13 @@ import type {
 
 type ShareResponse = { ok: boolean; copy: string; shareUrl: string };
 
-const SHARE_CHANNELS: Array<{ key: ShareChannel; label: string }> = [
-  { key: "discord", label: "Discord" },
-  { key: "x", label: "X" },
-  { key: "linkedin", label: "LinkedIn" },
-  { key: "instagram", label: "Instagram" },
-  { key: "snapchat", label: "Snapchat" },
-  { key: "copy", label: "Copy link" }
+const SHARE_CHANNELS: Array<{ key: ShareChannel; label: string; helper: string }> = [
+  { key: "discord", label: "Discord", helper: "Drop into a server or hiring chat." },
+  { key: "x", label: "X", helper: "Short public post copy." },
+  { key: "linkedin", label: "LinkedIn", helper: "More polished professional share." },
+  { key: "instagram", label: "Instagram", helper: "Story or DM-friendly copy." },
+  { key: "snapchat", label: "Snapchat", helper: "Fast friend-share copy." },
+  { key: "copy", label: "Copy link", helper: "Direct invite URL only." }
 ];
 
 interface InviteExperienceProps {
@@ -61,8 +61,21 @@ export default function InviteExperience({
     await getBrowserSupabase().auth.signOut();
     router.refresh();
   }
+
   const inviteUrl = snapshot.lead.shareUrl || `${SITE_URL}/invite/${inviteCode}`;
   const sourceLine = SOURCE_LINES[sourceVariant][audience];
+  const activeShare = SHARE_CHANNELS.find((channel) => channel.key === shareChannel) ?? SHARE_CHANNELS[0];
+  const selectedShareText = shareChannel === "copy"
+    ? inviteUrl
+    : snapshot.sharePresets[shareChannel] || inviteUrl;
+  const referralCount = snapshot.referralCount;
+  const activeTier =
+    [...REWARD_TIERS].reverse().find((tier) => referralCount >= tier.threshold) ?? REWARD_TIERS[0];
+  const nextTier = REWARD_TIERS.find((tier) => tier.threshold > referralCount);
+  const progressPercent = nextTier
+    ? Math.min(100, Math.round((referralCount / nextTier.threshold) * 100))
+    : 100;
+  const referralsRemaining = nextTier ? Math.max(nextTier.threshold - referralCount, 0) : 0;
 
   useEffect(() => {
     if (!hasBrowserSupabaseConfig()) {
@@ -74,9 +87,9 @@ export default function InviteExperience({
       setSession(data.session);
       if (data.session?.access_token) {
         try {
-          const res = await fetch('/api/account/profile', {
+          const res = await fetch("/api/account/profile", {
             headers: { Authorization: `Bearer ${data.session.access_token}` },
-            cache: 'no-store',
+            cache: "no-store"
           });
           if (res.ok) {
             const json = await res.json() as { profile?: { publishedProfile?: unknown } | null };
@@ -139,45 +152,36 @@ export default function InviteExperience({
 
   return (
     <div className="min-h-screen bg-[#f6f8fc] text-[#0d1220]">
-      <main className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_12%,rgba(91,108,255,0.16),transparent_28rem),radial-gradient(circle_at_88%_18%,rgba(190,205,255,0.42),transparent_26rem),linear-gradient(180deg,#fbfcff_0%,#f3f6fb_100%)]" />
+      <main className="invite-dashboard relative overflow-hidden">
+        <div className="invite-dashboard-bg" aria-hidden="true" />
         <div className="relative mx-auto flex w-full max-w-[1180px] flex-col gap-5 px-4 py-5 md:px-6 md:py-8">
-
-          {/* Header */}
-          <header className="flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-white/80 bg-white/70 px-4 py-3 shadow-[0_18px_60px_rgba(33,41,65,0.10)] backdrop-blur-xl">
-            <Link href={isStudio ? "/studios" : "/"} className="flex items-center gap-3">
-              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-white/70 shadow-inner">
-                <img src="/Assets/weld-logo-official.svg" alt="" className="h-7 w-7" />
+          <header className="invite-topbar">
+            <Link href={isStudio ? "/studios" : "/"} className="invite-brand">
+              <span>
+                <img src="/Assets/weld-logo-official.svg" alt="" />
               </span>
-              <span className="text-3xl font-bold tracking-[-0.04em]">weld.</span>
+              <strong>weld.</strong>
             </Link>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="invite-topbar-actions">
               <StatusPill>{copy.audiencePill}</StatusPill>
               <StatusPill>{inviteCode}</StatusPill>
-              <Link
-                href={isStudio ? "/studios" : "/"}
-                className="inline-flex min-h-[32px] items-center rounded-full border border-white/90 bg-white/60 px-3 text-xs font-bold text-[#53607a] transition hover:bg-white/80"
-              >
-                ← Landing page
+              <Link href={isStudio ? "/studios" : "/"} className="invite-soft-button">
+                Landing page
               </Link>
               {!sessionLoading && (
                 session ? (
                   <>
-                    <span className="text-xs text-[#6f7c95]">
-                      Logged in as <strong className="text-[#0d1220]">{session.user.email}</strong>
+                    <span className="invite-session">
+                      Signed in as <strong>{session.user.email}</strong>
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => void handleSignOut()}
-                      className="inline-flex min-h-[32px] items-center rounded-full border border-white/90 bg-white/60 px-3 text-xs font-bold text-[#53607a] transition hover:bg-white/80"
-                    >
+                    <button type="button" onClick={() => void handleSignOut()} className="invite-soft-button">
                       Sign out
                     </button>
                   </>
                 ) : (
                   <Link
                     href={`/login?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
-                    className="inline-flex min-h-[32px] items-center rounded-full border border-white/90 bg-white/60 px-3 text-xs font-bold text-[#53607a] transition hover:bg-white/80"
+                    className="invite-soft-button"
                   >
                     Log in
                   </Link>
@@ -186,231 +190,201 @@ export default function InviteExperience({
             </div>
           </header>
 
-          {/* Invite confirmation hero */}
-          <section className="rounded-[34px] border border-white/80 bg-white/70 p-5 shadow-[0_28px_90px_rgba(33,41,65,0.12)] backdrop-blur-2xl md:p-7">
-            <StatusPill>Invite active</StatusPill>
-            <h1 className="mt-5 max-w-[780px] text-[clamp(44px,7vw,76px)] font-bold leading-[0.94] tracking-[-0.06em]">
-              You&rsquo;re on the Weld beta list.
-            </h1>
-            <p className="mt-5 max-w-[58ch] text-lg leading-8 text-[#53607a]">
-              {copy.winCopy} Share your invite to move up the list, then come back here to set up your profile once your account is ready.
-            </p>
-            <p className="mt-3 max-w-[58ch] text-sm leading-7 text-[#6f7c95]">
-              {sourceLine}
-            </p>
-            <div className="mt-5 flex flex-wrap gap-2 text-sm text-[#6f7c95]">
-              <span>Invite for</span>
-              <strong className="text-[#0d1220]">{snapshot.lead.email}</strong>
+          <section className="invite-hero-card">
+            <div className="invite-hero-copy">
+              <StatusPill>Invite active</StatusPill>
+              <h1>You're on the Weld beta list.</h1>
+              <p>
+                {copy.winCopy} Your invite is live, your link is ready, and this page is your beta dashboard.
+              </p>
+              <p className="invite-source-line">{sourceLine}</p>
+              <div className="invite-hero-actions">
+                <button type="button" onClick={() => void handleShare("copy")} className="invite-primary-button">
+                  Copy invite link
+                </button>
+                <button
+                  type="button"
+                  onClick={() => shareRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                  className="invite-secondary-button"
+                >
+                  Share options
+                </button>
+              </div>
             </div>
+            <aside className="invite-status-panel">
+              <div>
+                <span>Invite for</span>
+                <strong>{snapshot.lead.email}</strong>
+              </div>
+              <div>
+                <span>Current status</span>
+                <strong>{activeTier.label}</strong>
+              </div>
+              <div>
+                <span>Referral count</span>
+                <strong>{referralCount}</strong>
+              </div>
+            </aside>
           </section>
 
-          {/* Profile section — auth-gated */}
-          {sessionLoading ? (
-            <section className="rounded-[34px] border border-white/80 bg-white/70 p-5 shadow-[0_28px_90px_rgba(33,41,65,0.10)] backdrop-blur-2xl md:p-7">
-              <p className="text-sm text-[#6f7c95]">Checking session…</p>
-            </section>
-          ) : session ? (
-            <>
-              {/* Logged in — profile setup */}
-              <section className="rounded-[34px] border border-white/80 bg-white/70 p-5 shadow-[0_28px_90px_rgba(33,41,65,0.10)] backdrop-blur-2xl md:p-7">
+          <section className="invite-dashboard-grid">
+            <article className="invite-card invite-referral-card">
+              <div className="invite-card-heading">
+                <StatusPill>Referrals</StatusPill>
+                <h2>{referralCount === 0 ? "Start with one strong share." : "Your invite is moving."}</h2>
+                <p>
+                  Referral counts update when people join through your invite link. No fake counters, no changed attribution.
+                </p>
+              </div>
+              <div className="invite-referral-number">
+                <strong>{referralCount}</strong>
+                <span>{referralCount === 1 ? "person joined" : "people joined"} using your invite</span>
+              </div>
+              <div className="invite-progress-block">
+                <div className="invite-progress-label">
+                  <span>{activeTier.label}</span>
+                  <strong>
+                    {nextTier ? `${referralsRemaining} to ${nextTier.label}` : "Top visible tier"}
+                  </strong>
+                </div>
+                <div className="invite-progress-track" aria-hidden="true">
+                  <span style={{ width: `${progressPercent}%` }} />
+                </div>
+                <p>{activeTier.description}</p>
+              </div>
+            </article>
+
+            {sessionLoading ? (
+              <article className="invite-card">
+                <StatusPill>Profile setup</StatusPill>
+                <h2>Checking session...</h2>
+                <p>Loading account state for this invite.</p>
+              </article>
+            ) : session ? (
+              <article className="invite-card invite-profile-card">
                 <StatusPill>Profile setup</StatusPill>
                 {profilePublished ? (
                   <>
-                    <h2 className="mt-4 text-[clamp(30px,4vw,48px)] font-bold leading-none tracking-[-0.05em]">
-                      Your profile is live.
-                    </h2>
-                    <p className="mt-3 max-w-[54ch] text-base leading-8 text-[#53607a]">
-                      Studios can already find and match with you. Head to your profile to view or edit it.
+                    <h2>Your profile is live.</h2>
+                    <p>
+                      Studios can already find and match with you. Head to your profile to view or tune the details.
                     </p>
-                    <div className="mt-6 flex flex-col gap-3">
-                      <Link
-                        href="/profile"
-                        className="inline-flex w-fit min-h-[52px] items-center rounded-full bg-[#0b0f18] px-7 text-sm font-bold text-white shadow-[0_16px_34px_rgba(10,14,26,0.24)] transition-transform hover:-translate-y-0.5"
-                      >
-                        View / edit profile
-                      </Link>
-                    </div>
+                    <Link href="/profile" className="invite-primary-button">
+                      View / edit profile
+                    </Link>
                   </>
                 ) : (
                   <>
-                    <h2 className="mt-4 text-[clamp(30px,4vw,48px)] font-bold leading-none tracking-[-0.05em]">
-                      Build your profile.
-                    </h2>
-                    <p className="mt-3 max-w-[54ch] text-base leading-8 text-[#53607a]">
-                      Complete your Weld profile so studios can find and match with you.
+                    <h2>Build your proof profile.</h2>
+                    <p>
+                      Complete your Weld profile so studios can evaluate role, proof, rate, and fit before outreach.
                     </p>
-                    <div className="mt-6">
+                    <div className="invite-profile-builder">
                       <ProfileBuilder initialPhase="identity" embedded />
                     </div>
                   </>
                 )}
-              </section>
-
-              {/* Referrals */}
-              <section className="rounded-[34px] border border-white/80 bg-white/70 p-5 shadow-[0_28px_90px_rgba(33,41,65,0.10)] backdrop-blur-2xl md:p-7">
-                <StatusPill>Referrals</StatusPill>
-                <div className="mt-4 flex items-end gap-3">
-                  <span className="text-[clamp(48px,8vw,80px)] font-bold leading-none tracking-[-0.06em]">
-                    {snapshot.referralCount}
-                  </span>
-                  <span className="mb-2 text-base text-[#53607a]">
-                    {snapshot.referralCount === 1 ? "person joined" : "people joined"} using your invite
-                  </span>
-                </div>
-              </section>
-            </>
-          ) : (
-            /* Not logged in — auth prompt + referral teaser */
-            <>
-              <section className="rounded-[34px] border border-white/80 bg-white/70 p-5 shadow-[0_28px_90px_rgba(33,41,65,0.10)] backdrop-blur-2xl md:p-7">
-                <StatusPill>Profile setup</StatusPill>
-                <h2 className="mt-4 text-[clamp(30px,4vw,48px)] font-bold leading-none tracking-[-0.05em]">
-                  Create your account to build your profile.
-                </h2>
-                <p className="mt-4 max-w-[54ch] text-base leading-8 text-[#53607a]">
-                  Sign up or log in to complete your Weld profile. Your invite code will carry over automatically.
+              </article>
+            ) : (
+              <article className="invite-card invite-profile-card">
+                <StatusPill>Account</StatusPill>
+                <h2>Create your account when ready.</h2>
+                <p>
+                  Your invite code carries into account signup. You can still copy and share this invite without signing in.
                 </p>
-                <div className="mt-6 flex flex-col gap-3">
+                <div className="invite-card-actions">
                   <Link
                     href={`/accountsignup?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
-                    className="inline-flex min-h-[52px] w-fit items-center rounded-full bg-[#0b0f18] px-7 text-sm font-bold text-white shadow-[0_16px_34px_rgba(10,14,26,0.24)] transition-transform hover:-translate-y-0.5"
+                    className="invite-primary-button"
                   >
-                    Create your account
+                    Create account
                   </Link>
-                  <p className="text-sm text-[#6f7c95]">
-                    Already have an account?{" "}
-                    <Link
-                      href={`/login?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
-                      className="font-semibold text-[#0d1220] underline underline-offset-2 hover:opacity-70"
-                    >
-                      Log in
-                    </Link>
-                  </p>
-                </div>
-              </section>
-
-              <section className="rounded-[34px] border border-white/80 bg-white/70 p-5 shadow-[0_28px_90px_rgba(33,41,65,0.10)] backdrop-blur-2xl md:p-7">
-                <StatusPill>Referrals</StatusPill>
-                <h2 className="mt-4 text-[clamp(24px,3.5vw,36px)] font-bold leading-none tracking-[-0.05em]">
-                  See how many people joined using your invite.
-                </h2>
-                <p className="mt-3 max-w-[54ch] text-base leading-8 text-[#53607a]">
-                  Create an account or log in to track your referrals.
-                </p>
-                <div className="mt-5 flex flex-col gap-3">
                   <Link
-                    href={`/accountsignup?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
-                    className="inline-flex min-h-[44px] w-fit items-center rounded-full bg-[#0b0f18] px-6 text-sm font-bold text-white shadow-[0_16px_34px_rgba(10,14,26,0.24)] transition-transform hover:-translate-y-0.5"
+                    href={`/login?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
+                    className="invite-secondary-button"
                   >
-                    Create an account
+                    Log in
                   </Link>
-                  <p className="text-sm text-[#6f7c95]">
-                    Already have an account?{" "}
-                    <Link
-                      href={`/login?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
-                      className="font-semibold text-[#0d1220] underline underline-offset-2 hover:opacity-70"
-                    >
-                      Log in
-                    </Link>
-                  </p>
                 </div>
-              </section>
-            </>
-          )}
+              </article>
+            )}
+          </section>
 
-          {/* Share / referral section — always visible */}
-          <section
-            ref={shareRef}
-            className="grid gap-5 rounded-[34px] border border-white/80 bg-white/70 p-5 shadow-[0_28px_90px_rgba(33,41,65,0.10)] backdrop-blur-2xl lg:grid-cols-[minmax(0,1fr)_360px] md:p-7"
-          >
-            <div>
+          <section ref={shareRef} className="invite-share-card">
+            <div className="invite-share-main">
               <StatusPill>Share invite</StatusPill>
-              <h2 className="mt-4 text-[clamp(34px,5vw,54px)] font-bold leading-none tracking-[-0.05em]">
-                One link. Clear copy. No guessing.
-              </h2>
-              <p className="mt-4 max-w-[58ch] text-base leading-8 text-[#53607a]">
-                {copy.shareCopy}
-              </p>
+              <h2>Choose the channel. Copy the right thing.</h2>
+              <p>{copy.shareCopy}</p>
 
-              <div className="mt-6 flex flex-wrap gap-2">
+              <div className="invite-share-tabs" role="tablist" aria-label="Share channels">
                 {SHARE_CHANNELS.map((channel) => (
                   <button
                     key={channel.key}
                     type="button"
                     onClick={() => void handleShare(channel.key)}
-                    className={`min-h-[44px] rounded-full border px-4 text-sm font-bold ${
-                      shareChannel === channel.key
-                        ? "border-[#0b0f18] bg-[#0b0f18] text-white"
-                        : "border-white/90 bg-white/60 text-[#53607a]"
-                    }`}
+                    className={shareChannel === channel.key ? "is-active" : ""}
+                    aria-selected={shareChannel === channel.key}
+                    role="tab"
                   >
-                    {channel.label}
+                    <span>{channel.label}</span>
                   </button>
                 ))}
               </div>
 
-              <textarea
-                readOnly
-                value={
-                  shareChannel === "copy"
-                    ? inviteUrl
-                    : snapshot.sharePresets[shareChannel] || inviteUrl
-                }
-                className="mt-5 min-h-[150px] w-full resize-y rounded-[24px] border border-white/90 bg-white/70 p-4 text-sm leading-7 text-[#0d1220] outline-none"
-              />
-              {shareChannel === "x" && snapshot.sharePresets.x && (
+              <div className="invite-share-preview">
+                <div>
+                  <span>{activeShare.label}</span>
+                  <strong>{activeShare.helper}</strong>
+                </div>
+                <textarea readOnly value={selectedShareText} />
+              </div>
+
+              <div className="invite-share-actions">
                 <button
                   type="button"
-                  onClick={() => {
-                    const intent = new URL("https://twitter.com/intent/tweet");
-                    intent.searchParams.set("text", snapshot.sharePresets.x);
-                    window.open(intent.toString(), "_blank", "noopener,noreferrer");
-                  }}
-                  className="mt-3 inline-flex min-h-[44px] items-center rounded-full bg-[#0b0f18] px-5 text-sm font-bold text-white transition-transform hover:-translate-y-0.5"
+                  onClick={() => void handleShare(shareChannel)}
+                  className="invite-primary-button"
                 >
-                  Post on X →
+                  {shareChannel === "copy" ? "Copy invite link" : `Copy ${activeShare.label} copy`}
                 </button>
-              )}
+                {shareChannel === "x" && snapshot.sharePresets.x && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const intent = new URL("https://twitter.com/intent/tweet");
+                      intent.searchParams.set("text", snapshot.sharePresets.x);
+                      window.open(intent.toString(), "_blank", "noopener,noreferrer");
+                    }}
+                    className="invite-secondary-button"
+                  >
+                    Post on X
+                  </button>
+                )}
+              </div>
+
               {shareStatus ? (
-                <p
-                  className={`mt-3 text-sm font-bold ${
-                    shareError ? "text-[#b12a42]" : "text-[#3150c9]"
-                  }`}
-                  aria-live="polite"
-                >
+                <p className={`invite-share-status ${shareError ? "is-error" : ""}`} aria-live="polite">
                   {shareStatus}
                 </p>
               ) : null}
             </div>
 
-            <aside className="rounded-[28px] border border-white/90 bg-white/75 p-5 shadow-[0_18px_50px_rgba(33,41,65,0.10)]">
-              <div className="text-xs font-bold uppercase tracking-[0.14em] text-[#5b6cff]">
-                Direct invite
-              </div>
-              <input
-                readOnly
-                value={inviteUrl}
-                className="mt-4 min-h-[52px] w-full rounded-2xl border border-white/90 bg-white/70 px-4 text-sm text-[#0d1220] outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => void handleShare("copy")}
-                className="mt-4 min-h-[48px] w-full rounded-full bg-[#0b0f18] px-5 text-sm font-bold text-white"
-              >
-                Copy invite link
+            <aside className="invite-direct-panel">
+              <span>Direct invite</span>
+              <strong>{inviteCode}</strong>
+              <input readOnly value={inviteUrl} aria-label="Direct invite link" />
+              <button type="button" onClick={() => void handleShare("copy")} className="invite-primary-button">
+                Copy link
               </button>
-              <p className="mt-5 text-sm leading-7 text-[#53607a]">
-                Referral count updates when people use your invite. No fake counters, no hidden checklist.
+              <p>
+                People must use this invite for the referral count to update. Sharing copy does not create new tracking.
               </p>
             </aside>
           </section>
 
-          {/* Footer */}
-          <footer className="rounded-[28px] border border-white/80 bg-white/60 p-5 text-sm leading-7 text-[#53607a] shadow-[0_18px_60px_rgba(33,41,65,0.08)]">
-            Invite active for <strong className="text-[#0d1220]">{snapshot.lead.email}</strong>.
-            Return here any time to update your profile or copy your invite.
+          <footer className="invite-footer">
+            Invite active for <strong>{snapshot.lead.email}</strong>. Return here any time to copy your link, share again, or finish your profile.
           </footer>
-
         </div>
       </main>
     </div>
@@ -419,7 +393,7 @@ export default function InviteExperience({
 
 function StatusPill({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex min-h-[32px] items-center rounded-full border border-white/90 bg-white/60 px-3 text-xs font-bold uppercase tracking-[0.12em] text-[#5b6cff] shadow-inner">
+    <span className="invite-status-pill">
       {children}
     </span>
   );

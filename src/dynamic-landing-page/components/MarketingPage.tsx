@@ -42,6 +42,7 @@ interface MarketingPageProps {
 
 type CapturePhase = "idle" | "submitting" | "success" | "error";
 type HiringAnim = "idle" | "spark" | "skip";
+type HeroSignal = "proof" | "match" | "studio";
 
 const WAITLIST_URL = "https://weldroblox.com";
 
@@ -540,6 +541,7 @@ function WeldLandingPage({
   const [captureStatus, setCaptureStatus] = useState("");
   const [isSwapping, setIsSwapping] = useState(false);
   const [swipeModalOpen, setSwipeModalOpen] = useState(false);
+  const [heroSignal, setHeroSignal] = useState<HeroSignal>("proof");
   useEffect(() => {
     if (!swipeModalOpen) return;
     const scrollY = window.scrollY;
@@ -804,7 +806,7 @@ function WeldLandingPage({
 
       <main className="weld-glass-main">
 
-        {/* 1. Hero — untouched */}
+        {/* 1. Hero */}
         <HeroShell>
           <HeroCopyPanel
             copy={modeCopy}
@@ -815,20 +817,14 @@ function WeldLandingPage({
             inputRef={heroInputRef}
             savedInviteUrl={savedInviteUrl}
           />
-          <div className="hero-card-column hero-card-column-split">
-            <div className="npc-hero-preview-container">
-              <div className="npc-hero-preview-card" aria-hidden="true">
-                <SwipeCard />
-              </div>
-              <button
-                className="npc-hero-preview-trigger"
-                onClick={() => setSwipeModalOpen(true)}
-                aria-label="Open interactive profile card"
-              >
-                <span className="npc-hero-preview-hint">Tap to interact →</span>
-              </button>
-            </div>
-          </div>
+          <HeroProductPreview
+            mode={mode}
+            profile={activeProfile}
+            signal={heroSignal}
+            onSignalChange={setHeroSignal}
+            onOpenCard={() => setSwipeModalOpen(true)}
+            onJoin={() => handleJoinIntent("hero")}
+          />
         </HeroShell>
 
         {/* 2. How it works — 3-step row */}
@@ -1011,6 +1007,116 @@ function HeroCopyPanel({
       <span className="hero-copy-eyebrow-hidden" aria-hidden="true">
         {copy.hero.eyebrow}
       </span>
+    </div>
+  );
+}
+
+function HeroProductPreview({
+  mode,
+  profile,
+  signal,
+  onSignalChange,
+  onOpenCard,
+  onJoin
+}: {
+  mode: Audience;
+  profile: TalentProfile;
+  signal: HeroSignal;
+  onSignalChange: (signal: HeroSignal) => void;
+  onOpenCard: () => void;
+  onJoin: () => void;
+}) {
+  const isStudioMode = mode === "studio";
+  const signals: Array<{
+    key: HeroSignal;
+    label: string;
+    value: string;
+    body: string;
+  }> = [
+    {
+      key: "proof",
+      label: "Proof signal",
+      value: profile.projects,
+      body: profile.latestProject.summary
+    },
+    {
+      key: "match",
+      label: "Match quality",
+      value: `${profile.matchScore}%`,
+      body: `${profile.services.slice(0, 3).join(", ")} fit the brief.`
+    },
+    {
+      key: "studio",
+      label: isStudioMode ? "Talent view" : "Studio view",
+      value: isStudioMode ? "Shortlist" : "Discovery",
+      body: isStudioMode
+        ? "Review role, proof, rate, and availability before outreach."
+        : "Studios see proof-first context before the first message."
+    }
+  ];
+  const activeSignal = signals.find((entry) => entry.key === signal) ?? signals[0];
+
+  return (
+    <div className="hero-card-column hero-card-column-split hero-product-preview">
+      <div className="hero-preview-shell">
+        <div className="hero-preview-topline">
+          <span>Live product preview</span>
+          <strong>{isStudioMode ? "Studio scouting" : "Developer proof card"}</strong>
+        </div>
+
+        <div className="hero-preview-stage">
+          <div className="hero-preview-card-frame">
+            <div className="npc-hero-preview-container">
+              <div className="npc-hero-preview-card" aria-hidden="true">
+                <SwipeCard />
+              </div>
+              <button
+                className="npc-hero-preview-trigger"
+                onClick={onOpenCard}
+                aria-label="Open interactive profile card"
+              >
+                <span className="npc-hero-preview-hint">Open interactive card</span>
+              </button>
+            </div>
+          </div>
+
+          <aside className="hero-signal-panel" aria-live="polite">
+            <div className="hero-signal-score">
+              <span>{activeSignal.label}</span>
+              <strong>{activeSignal.value}</strong>
+            </div>
+            <p>{activeSignal.body}</p>
+            <div className="hero-signal-meter" aria-hidden="true">
+              <span style={{ width: signal === "match" ? `${profile.matchScore}%` : "76%" }} />
+            </div>
+          </aside>
+        </div>
+
+        <div className="hero-preview-tabs" role="tablist" aria-label="Hero preview signals">
+          {signals.map((entry) => (
+            <button
+              key={entry.key}
+              type="button"
+              className={signal === entry.key ? "is-active" : ""}
+              onClick={() => onSignalChange(entry.key)}
+              aria-selected={signal === entry.key}
+              role="tab"
+            >
+              {entry.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="hero-preview-footer">
+          <div>
+            <span>Current card</span>
+            <strong>{profile.name} / {profile.label}</strong>
+          </div>
+          <button type="button" onClick={onJoin}>
+            Join early access
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

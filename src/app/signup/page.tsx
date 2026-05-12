@@ -81,7 +81,7 @@ function SignupContent() {
 
   useEffect(() => {
     if (submitState === "success" && inviteUrl) {
-      const timer = window.setTimeout(() => router.push(inviteUrl), 1800);
+      const timer = window.setTimeout(() => router.push(inviteUrl), 2200);
       return () => window.clearTimeout(timer);
     }
   }, [submitState, inviteUrl, router]);
@@ -99,23 +99,25 @@ function SignupContent() {
     if (signupType === "studio") {
       return {
         badge: "Studio Waitlist",
-        title: "Tell us what you need.",
+        title: "Reserve your Weld access.",
         subhead:
-          "Share a little about your studio so weld. can connect you with the right Roblox developers at launch.",
-        submit: "Complete studio signup",
-        successTitle: "Studio signup saved.",
-        successBody: "You're on the waitlist. We'll use this to shape early hiring access."
+          "Email is all we need. Studio details are optional and help us tune early hiring access.",
+        submit: "Join the studio waitlist",
+        successTitle: "You're on the Weld studio waitlist.",
+        successBody:
+          "Your invite is being prepared. Optional details, if provided, help shape early access."
       };
     }
 
     return {
       badge: "Developer Waitlist",
-      title: "Tell us what you make.",
+      title: "Join with email. Add proof when ready.",
       subhead:
-        "Share a little about your Roblox work so weld. can match you with the right studios at launch.",
-      submit: "Complete developer signup",
-      successTitle: "Developer signup saved.",
-      successBody: "You're on the waitlist. We'll use this to shape early developer access."
+        "Only your email is required. Skills, experience, portfolio, and referral details can be skipped for now.",
+      submit: "Join the developer waitlist",
+      successTitle: "You're on the Weld developer waitlist.",
+      successBody:
+        "Your invite is being prepared. Optional details, if provided, help studios understand your signal sooner."
     };
   }, [signupType]);
 
@@ -139,32 +141,10 @@ function SignupContent() {
       return;
     }
 
-    if (selected.length === 0) {
-      setSubmitState("error");
-      setMessage(
-        signupType === "studio"
-          ? "Select at least one role you're hiring for."
-          : "Select at least one primary skill."
-      );
-      return;
-    }
-
     const payload =
       signupType === "studio"
         ? buildStudioPayload(form, normalizedEmail, selected)
         : buildDeveloperPayload(form, normalizedEmail, selected);
-
-    if (payload.type === "studio" && (!payload.studioName || !payload.teamSize || !payload.budget)) {
-      setSubmitState("error");
-      setMessage("Complete the required studio fields.");
-      return;
-    }
-
-    if (payload.type === "developer" && (!payload.name || !payload.experience)) {
-      setSubmitState("error");
-      setMessage("Complete the required developer fields.");
-      return;
-    }
 
     setSubmitState("submitting");
     setMessage("");
@@ -198,7 +178,12 @@ function SignupContent() {
         const res = await fetch("/api/waitlist/signup", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: normalizedEmail, audience: signupType, source: "signup-form", referredByInviteCode: referralCode.trim().toUpperCase() || undefined })
+          body: JSON.stringify({
+            email: normalizedEmail,
+            audience: signupType,
+            source: "signup-form",
+            referredByInviteCode: referralCode.trim().toUpperCase() || undefined
+          })
         });
         const data = (await res.json()) as { ok: boolean; inviteUrl?: string };
         if (data.ok && data.inviteUrl) {
@@ -237,10 +222,35 @@ function SignupContent() {
             <span>weld.</span>
           </Link>
           <span className="signup-badge">{copy.badge}</span>
+          <div className="signup-success-mark" aria-hidden="true">
+            <span />
+          </div>
           <h1>{copy.successTitle}</h1>
           <p>{copy.successBody}</p>
+          <div className="signup-success-steps" aria-label="What happens next">
+            <div>
+              <strong>Invite page</strong>
+              <span>Your beta dashboard opens next.</span>
+            </div>
+            <div>
+              <strong>Share link</strong>
+              <span>Copy your invite or use channel-ready copy.</span>
+            </div>
+            <div>
+              <strong>Profile later</strong>
+              <span>Finish optional proof when you have time.</span>
+            </div>
+          </div>
           {inviteUrl ? (
-            <p className="signup-redirect-hint">Taking you to your invite page…</p>
+            <>
+              <div className="signup-redirect-track" aria-hidden="true">
+                <span />
+              </div>
+              <p className="signup-redirect-hint">Taking you to your invite page...</p>
+              <Link href={inviteUrl} className="signup-secondary-link">
+                Continue to invite page
+              </Link>
+            </>
           ) : (
             <Link href="/" className="signup-secondary-link">
               Back to landing page
@@ -269,8 +279,14 @@ function SignupContent() {
         <p className="signup-subhead">{copy.subhead}</p>
 
         <form className="signup-form" onSubmit={handleSubmit}>
+          <div className="signup-flow-meter" aria-hidden="true">
+            <span className="is-active">Email</span>
+            <span>Optional profile</span>
+            <span>Invite</span>
+          </div>
+
           <label className="signup-field">
-            <span>Email address</span>
+            <span>Email address <strong>required</strong></span>
             <input
               type="email"
               value={email}
@@ -283,21 +299,24 @@ function SignupContent() {
 
           {signupType === "developer" ? (
             <>
+              <div className="signup-optional-panel">
+                <div>
+                  <span>Optional profile details</span>
+                  <p>Add signal now, or skip and finish later from your invite page.</p>
+                </div>
+              </div>
               <label className="signup-field">
-                <span>Display name</span>
+                <span>Display name <em>optional</em></span>
                 <input
                   name="displayName"
                   type="text"
                   placeholder="How studios will see you"
-                  required
                 />
               </label>
               <label className="signup-field">
-                <span>Years of Roblox experience</span>
-                <select name="experience" required defaultValue="">
-                  <option value="" disabled>
-                    Select experience level
-                  </option>
+                <span>Years of Roblox experience <em>optional</em></span>
+                <select name="experience" defaultValue="">
+                  <option value="">Skip for now</option>
                   <option value="<1">Less than 1 year</option>
                   <option value="1-2">1-2 years</option>
                   <option value="3-4">3-4 years</option>
@@ -305,8 +324,8 @@ function SignupContent() {
                 </select>
               </label>
               <SignupTags
-                label="Primary skills"
-                hint="Select all that apply"
+                label="Primary skills optional"
+                hint="Select any that help describe your work, or leave blank."
                 options={developerSkills}
                 selected={selected}
                 onToggle={toggleSelection}
@@ -322,21 +341,24 @@ function SignupContent() {
             </>
           ) : (
             <>
+              <div className="signup-optional-panel">
+                <div>
+                  <span>Optional studio details</span>
+                  <p>Add context now, or skip and finish after your invite is active.</p>
+                </div>
+              </div>
               <label className="signup-field">
-                <span>Studio name</span>
+                <span>Studio name <em>optional</em></span>
                 <input
                   name="studioName"
                   type="text"
                   placeholder="Your studio or team name"
-                  required
                 />
               </label>
               <label className="signup-field">
-                <span>Team size</span>
-                <select name="teamSize" required defaultValue="">
-                  <option value="" disabled>
-                    How big is your team?
-                  </option>
+                <span>Team size <em>optional</em></span>
+                <select name="teamSize" defaultValue="">
+                  <option value="">Skip for now</option>
                   <option value="1-3">1-3 people</option>
                   <option value="4-8">4-8 people</option>
                   <option value="9-15">9-15 people</option>
@@ -345,18 +367,16 @@ function SignupContent() {
                 </select>
               </label>
               <SignupTags
-                label="Roles you're hiring for"
-                hint="Select all that apply"
+                label="Roles you're hiring for optional"
+                hint="Select any likely roles, or leave blank."
                 options={studioRoles}
                 selected={selected}
                 onToggle={toggleSelection}
               />
               <label className="signup-field">
-                <span>Budget type</span>
-                <select name="budget" required defaultValue="">
-                  <option value="" disabled>
-                    How do you pay?
-                  </option>
+                <span>Budget type <em>optional</em></span>
+                <select name="budget" defaultValue="">
+                  <option value="">Skip for now</option>
                   <option value="USD">USD</option>
                   <option value="Robux">Robux</option>
                   <option value="Revenue Share">Revenue share</option>
@@ -401,13 +421,21 @@ function SignupContent() {
             {submitState === "submitting" ? "Submitting..." : copy.submit}
           </button>
 
+          <button
+            type="submit"
+            className="signup-skip-submit"
+            disabled={submitState === "submitting"}
+          >
+            Skip optional details and join
+          </button>
+
           {message ? (
             <p className="signup-message" role="status">
               {message}
             </p>
           ) : null}
 
-          <p className="signup-secondary-link" style={{ textAlign: "center", marginTop: "8px" }}>
+          <p className="signup-secondary-link signup-find-invite">
             Already signed up?{" "}
             <Link href="/find-invite" className="underline underline-offset-2">
               Find your invite
@@ -458,8 +486,8 @@ function ReturningOverlay({ inviteUrl, onOverride }: { inviteUrl: string; onOver
   return (
     <div className="returning-modal-overlay">
       <div className="returning-modal-card">
-        <div className="returning-modal-icon">✓</div>
-        <h2 className="returning-modal-title">You&rsquo;re already on the list.</h2>
+        <div className="returning-modal-icon">OK</div>
+        <h2 className="returning-modal-title">You're already on the list.</h2>
         <p className="returning-modal-body">Your Weld invite is waiting for you.</p>
         <div className="returning-modal-actions">
           <button
