@@ -16230,7 +16230,7 @@ body {
 }
 
 .weld-glass-page[data-mode] .hp-title-row {
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .weld-glass-page[data-mode] .hp-role-chip {
@@ -16247,51 +16247,51 @@ body {
 .weld-glass-page[data-mode] .hp-studio-context {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 6px;
+  margin-bottom: 10px;
 }
 
 .weld-glass-page[data-mode] .hp-studio-context span,
 .weld-glass-page[data-mode] .hp-studio-context strong {
   display: inline-flex;
-  min-height: 34px;
+  min-height: 26px;
   align-items: center;
   border-radius: 999px;
-  padding: 0 12px;
+  padding: 0 10px;
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid rgba(103, 87, 255, 0.12);
   color: #33416f;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 760;
 }
 
 .weld-glass-page[data-mode] .hp-pay-box {
-  min-height: 56px;
+  min-height: 44px;
   border-color: color-mix(in srgb, var(--wg-accent) 22%, white);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.76), var(--wg-mode-soft));
 }
 
 .weld-glass-page[data-mode] .hp-pay-value {
   color: var(--wg-accent);
-  font-size: 15px;
+  font-size: 13px;
 }
 
 .weld-glass-page[data-mode] .hp-bullet-list {
   display: grid;
-  gap: 10px;
-  margin: 0 0 16px;
+  gap: 7px;
+  margin: 0 0 12px;
   padding: 0;
   list-style: none;
 }
 
 .weld-glass-page[data-mode] .hp-bullet-list li {
   position: relative;
-  padding: 12px 14px 12px 38px;
+  padding: 8px 12px 8px 32px;
   border: 1px solid rgba(255, 255, 255, 0.84);
-  border-radius: 16px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.58);
   color: #1d2a52;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 620;
   line-height: 1.45;
 }
@@ -16325,9 +16325,9 @@ body {
 
 .weld-glass-page[data-mode] .hiring-action-spark,
 .weld-glass-page[data-mode] .hiring-action-next {
-  min-height: 50px;
+  min-height: 40px;
   border-radius: 999px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 780;
   cursor: pointer;
 }
