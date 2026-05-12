@@ -1,6 +1,6 @@
 export type Audience = "developer" | "studio";
 export type DraftStepKey = "identity" | "proof" | "fit";
-export type ShareChannel = "discord" | "x" | "linkedin" | "copy";
+export type ShareChannel = "discord" | "x" | "linkedin" | "instagram" | "snapchat" | "copy";
 
 export interface UTMFields {
   utmSource: string;

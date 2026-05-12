@@ -7,7 +7,7 @@ import type { Session } from "@supabase/supabase-js";
 
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from "@/lib/supabase/browser";
 import ProfileBuilder from "@/components/profile/ProfileBuilder";
-import { getSessionId, shareInvite, trackEvent } from "@/dynamic-landing-page/lib/browser";
+import { shareInvite, trackEvent } from "@/dynamic-landing-page/lib/browser";
 import { SITE_URL } from "@/dynamic-landing-page/lib/constants";
 import { TYPE_COPY, SOURCE_LINES } from "@/dynamic-landing-page/lib/sample-data";
 import type { SourceVariant } from "@/dynamic-landing-page/lib/source-variant";
@@ -22,6 +22,8 @@ const SHARE_CHANNELS: Array<{ key: ShareChannel; label: string }> = [
   { key: "discord", label: "Discord" },
   { key: "x", label: "X" },
   { key: "linkedin", label: "LinkedIn" },
+  { key: "instagram", label: "Instagram" },
+  { key: "snapchat", label: "Snapchat" },
   { key: "copy", label: "Copy link" }
 ];
 
@@ -266,33 +268,62 @@ export default function InviteExperience({
               </section>
             </>
           ) : (
-            /* Not logged in — auth prompt */
-            <section className="rounded-[34px] border border-white/80 bg-white/70 p-5 shadow-[0_28px_90px_rgba(33,41,65,0.10)] backdrop-blur-2xl md:p-7">
-              <StatusPill>Profile setup</StatusPill>
-              <h2 className="mt-4 text-[clamp(30px,4vw,48px)] font-bold leading-none tracking-[-0.05em]">
-                Create your account to build your profile.
-              </h2>
-              <p className="mt-4 max-w-[54ch] text-base leading-8 text-[#53607a]">
-                Sign up or log in to complete your Weld profile. Your invite code will carry over automatically.
-              </p>
-              <div className="mt-6 flex flex-col gap-3">
-                <Link
-                  href={`/accountsignup?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
-                  className="inline-flex min-h-[52px] w-fit items-center rounded-full bg-[#0b0f18] px-7 text-sm font-bold text-white shadow-[0_16px_34px_rgba(10,14,26,0.24)] transition-transform hover:-translate-y-0.5"
-                >
-                  Create your account
-                </Link>
-                <p className="text-sm text-[#6f7c95]">
-                  Already have an account?{" "}
-                  <Link
-                    href={`/login?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
-                    className="font-semibold text-[#0d1220] underline underline-offset-2 hover:opacity-70"
-                  >
-                    Log in
-                  </Link>
+            /* Not logged in — auth prompt + referral teaser */
+            <>
+              <section className="rounded-[34px] border border-white/80 bg-white/70 p-5 shadow-[0_28px_90px_rgba(33,41,65,0.10)] backdrop-blur-2xl md:p-7">
+                <StatusPill>Profile setup</StatusPill>
+                <h2 className="mt-4 text-[clamp(30px,4vw,48px)] font-bold leading-none tracking-[-0.05em]">
+                  Create your account to build your profile.
+                </h2>
+                <p className="mt-4 max-w-[54ch] text-base leading-8 text-[#53607a]">
+                  Sign up or log in to complete your Weld profile. Your invite code will carry over automatically.
                 </p>
-              </div>
-            </section>
+                <div className="mt-6 flex flex-col gap-3">
+                  <Link
+                    href={`/accountsignup?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
+                    className="inline-flex min-h-[52px] w-fit items-center rounded-full bg-[#0b0f18] px-7 text-sm font-bold text-white shadow-[0_16px_34px_rgba(10,14,26,0.24)] transition-transform hover:-translate-y-0.5"
+                  >
+                    Create your account
+                  </Link>
+                  <p className="text-sm text-[#6f7c95]">
+                    Already have an account?{" "}
+                    <Link
+                      href={`/login?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
+                      className="font-semibold text-[#0d1220] underline underline-offset-2 hover:opacity-70"
+                    >
+                      Log in
+                    </Link>
+                  </p>
+                </div>
+              </section>
+
+              <section className="rounded-[34px] border border-white/80 bg-white/70 p-5 shadow-[0_28px_90px_rgba(33,41,65,0.10)] backdrop-blur-2xl md:p-7">
+                <StatusPill>Referrals</StatusPill>
+                <h2 className="mt-4 text-[clamp(24px,3.5vw,36px)] font-bold leading-none tracking-[-0.05em]">
+                  See how many people joined using your invite.
+                </h2>
+                <p className="mt-3 max-w-[54ch] text-base leading-8 text-[#53607a]">
+                  Create an account or log in to track your referrals.
+                </p>
+                <div className="mt-5 flex flex-col gap-3">
+                  <Link
+                    href={`/accountsignup?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
+                    className="inline-flex min-h-[44px] w-fit items-center rounded-full bg-[#0b0f18] px-6 text-sm font-bold text-white shadow-[0_16px_34px_rgba(10,14,26,0.24)] transition-transform hover:-translate-y-0.5"
+                  >
+                    Create an account
+                  </Link>
+                  <p className="text-sm text-[#6f7c95]">
+                    Already have an account?{" "}
+                    <Link
+                      href={`/login?invite=${inviteCode}&email=${encodeURIComponent(snapshot.lead.email)}`}
+                      className="font-semibold text-[#0d1220] underline underline-offset-2 hover:opacity-70"
+                    >
+                      Log in
+                    </Link>
+                  </p>
+                </div>
+              </section>
+            </>
           )}
 
           {/* Share / referral section — always visible */}
@@ -403,6 +434,8 @@ function channelLabel(channel: ShareChannel): string {
     case "discord": return "Discord";
     case "x": return "X";
     case "linkedin": return "LinkedIn";
+    case "instagram": return "Instagram";
+    case "snapchat": return "Snapchat";
     default: return "Invite link";
   }
 }

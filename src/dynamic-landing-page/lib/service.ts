@@ -449,6 +449,8 @@ export async function buildInviteProgressSnapshot(inviteCode: string): Promise<I
       discord: buildShareCopy({ audience: lead.audience, channel: "discord", shareUrl }),
       x: buildShareCopy({ audience: lead.audience, channel: "x", shareUrl }),
       linkedin: buildShareCopy({ audience: lead.audience, channel: "linkedin", shareUrl }),
+      instagram: buildShareCopy({ audience: lead.audience, channel: "instagram", shareUrl }),
+      snapchat: buildShareCopy({ audience: lead.audience, channel: "snapchat", shareUrl }),
       copy: buildShareCopy({ audience: lead.audience, channel: "copy", shareUrl })
     }
   };

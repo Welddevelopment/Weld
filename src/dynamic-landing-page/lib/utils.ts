@@ -119,6 +119,10 @@ export function buildShareCopy(input: {
       return `${base} I just claimed my invite. ${input.shareUrl}`;
     case "linkedin":
       return `${base} I joined the beta and thought this was worth sharing: ${input.shareUrl}`;
+    case "instagram":
+      return `${base} Use my invite link to join the beta: ${input.shareUrl}`;
+    case "snapchat":
+      return `${base} Join me on the Weld beta: ${input.shareUrl}`;
     case "copy":
     default:
       return input.shareUrl;
