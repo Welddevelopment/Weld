@@ -16461,6 +16461,18 @@ body {
   margin-top: 20px;
 }
 
+.weld-glass-page[data-mode] .marquee-section {
+  margin-top: 20px;
+}
+
+.weld-glass-page[data-mode] .other-side-section {
+  margin-top: 20px;
+}
+
+.weld-glass-page[data-mode] .chat-section-shell-outer {
+  margin-top: 20px;
+}
+
 @media (max-width: 1120px) {
   .weld-glass-page[data-mode] .glass-nav-shell {
     grid-template-columns: 1fr auto;
