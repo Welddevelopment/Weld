@@ -16456,6 +16456,8 @@ body {
 
 .weld-glass-page[data-mode] .glass-section {
   margin-top: 50px;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .weld-glass-page[data-mode] .glass-section.waitlist-section,
