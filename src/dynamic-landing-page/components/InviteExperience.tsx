@@ -119,14 +119,6 @@ export default function InviteExperience({
         }
       }));
 
-      if (channel === "x") {
-        const intent = new URL("https://twitter.com/intent/tweet");
-        intent.searchParams.set("text", result.copy);
-        window.open(intent.toString(), "_blank", "noopener,noreferrer");
-        setShareStatus("Opened X share window.");
-        return;
-      }
-
       const textToCopy = channel === "copy" ? result.shareUrl : result.copy;
       const copied = await copyToClipboard(textToCopy);
       setShareStatus(
@@ -366,6 +358,19 @@ export default function InviteExperience({
                 }
                 className="mt-5 min-h-[150px] w-full resize-y rounded-[24px] border border-white/90 bg-white/70 p-4 text-sm leading-7 text-[#0d1220] outline-none"
               />
+              {shareChannel === "x" && snapshot.sharePresets.x && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const intent = new URL("https://twitter.com/intent/tweet");
+                    intent.searchParams.set("text", snapshot.sharePresets.x);
+                    window.open(intent.toString(), "_blank", "noopener,noreferrer");
+                  }}
+                  className="mt-3 inline-flex min-h-[44px] items-center rounded-full bg-[#0b0f18] px-5 text-sm font-bold text-white transition-transform hover:-translate-y-0.5"
+                >
+                  Post on X →
+                </button>
+              )}
               {shareStatus ? (
                 <p
                   className={`mt-3 text-sm font-bold ${
