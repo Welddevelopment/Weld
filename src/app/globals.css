@@ -17452,7 +17452,7 @@ button.invite-secondary-button {
 }
 
 .weld-glass-page[data-mode] .swipe-modal-inner {
-  zoom: 1;
+  zoom: 1.2;
 }
 
 .weld-glass-page[data-mode] .hero-preview-card-frame {
