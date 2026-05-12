@@ -4,6 +4,7 @@ import {
   DEVELOPER_REQUIRED_FIELDS,
   EMPTY_UTM_FIELDS,
   PROFILE_STEP_ORDER,
+  REWARD_TIERS,
   SITE_URL,
   STUDIO_REQUIRED_FIELDS
 } from "@/dynamic-landing-page/lib/constants";
@@ -11,6 +12,7 @@ import type {
   Audience,
   DraftFieldValue,
   ProfileDraftShape,
+  RewardTierDefinition,
   ShareChannel,
   UTMFields
 } from "@/dynamic-landing-page/lib/types";
@@ -35,6 +37,16 @@ export function buildInviteCode(email: string) {
 
 export function buildShareUrl(inviteCode: string, origin = SITE_URL) {
   return `${origin.replace(/\/$/, "")}/?ref=${encodeURIComponent(inviteCode)}`;
+}
+
+export function getRewardTier(referralCount: number): RewardTierDefinition {
+  return REWARD_TIERS.reduce((active, current) =>
+    referralCount >= current.threshold ? current : active
+  );
+}
+
+export function getNextReward(referralCount: number) {
+  return REWARD_TIERS.find((tier) => referralCount < tier.threshold) ?? null;
 }
 
 export function mergeUtmFields(utm?: Partial<UTMFields>): UTMFields {

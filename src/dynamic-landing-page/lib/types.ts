@@ -76,6 +76,13 @@ export interface AnalyticsEventRecord extends UTMFields {
   createdAt: string;
 }
 
+export interface RewardTierDefinition {
+  threshold: number;
+  slug: string;
+  label: string;
+  description: string;
+}
+
 export interface InviteProgressSnapshot {
   lead: WaitlistLeadRecord;
   draft: ProfileDraftRecord;

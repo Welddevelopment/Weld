@@ -6,6 +6,7 @@ export interface LandingCopy {
   nav: {
     modeToggleDeveloper: string;
     modeToggleStudio: string;
+    alreadySignedUp: string;
     cta: string;
     links: ReadonlyArray<{ href: string; label: string }>;
   };
@@ -18,6 +19,28 @@ export interface LandingCopy {
     secondaryCta: string;
     cardFrame: string;
     helperLine: string;
+    proofPrefix: string;
+    proofStrong: string;
+    proofSuffix: string;
+    submittingLabel: string;
+    submittedLabel: string;
+    inviteReturn: string;
+  };
+  marquee: {
+    talentPrimary: { kicker: string; title: string; body: string; strong?: string };
+    talentSecondary: { kicker: string; title: string; body: string; strong?: string };
+    studioPrimary: { kicker: string; title: string; body: string; strong?: string };
+    studioSecondary: { kicker: string; title: string; body: string; strong?: string };
+  };
+  roleExplorer: {
+    kicker: string;
+    title: string;
+    lead: string;
+  };
+  comparison: {
+    kicker: string;
+    title: string;
+    body: string;
   };
   howItWorks: {
     kicker: string;
@@ -120,19 +143,59 @@ const COPY: Record<Audience, LandingCopy> = {
     nav: {
       modeToggleDeveloper: "I'm a developer",
       modeToggleStudio: "I'm a studio",
+      alreadySignedUp: "Already signed up?",
       cta: "Join as a developer",
       links: NAV_LINKS
     },
     hero: {
       eyebrow: "Built for Roblox devs",
-      title: "find roblox studios worth shipping for.",
-      lead: "Set your role, rate, and proof. Match with studios that ship and pay on time.",
+      title: "The talent network for Roblox.",
+      lead: "Link your games, set your rate, and match with studios that actually ship.",
       support:
-        "Weld turns shipped work, rates, availability, and links into one swipeable talent card studios can trust.",
+        "weld. turns shipped work, rates, availability, links, and proof into swipeable talent cards studios can trust.",
       primaryCta: "Build my talent card",
       secondaryCta: "See example card",
       cardFrame: "Your profile preview",
-      helperLine: "Developer mode previews the card studios will scan before they Spark."
+      helperLine: "Developer mode previews the card studios will scan before they Spark.",
+      proofPrefix: "over",
+      proofStrong: "30",
+      proofSuffix: "studio signups",
+      submittingLabel: "Joining...",
+      submittedLabel: "You're in",
+      inviteReturn: "Back to my invite page"
+    },
+    marquee: {
+      talentPrimary: {
+        kicker: "WHEN WE OPEN",
+        title: "This is who'll be here.",
+        body: "Sample cards showing the format.",
+        strong: "52 devs on the waitlist and counting"
+      },
+      talentSecondary: {
+        kicker: "MEET THE NETWORK",
+        title: "More builders, scripters, and artists are joining.",
+        body: "Every profile keeps rate, proof, links, and availability in the same scannable card shape."
+      },
+      studioPrimary: {
+        kicker: "WE'RE OPENING SOON",
+        title: "And here's who's looking.",
+        body: "Over 30 studios waitlisted already. Sign up today and get exposed to them immediately on launch."
+      },
+      studioSecondary: {
+        kicker: "HIRING SIDE",
+        title: "Studios scan fit the same way.",
+        body: "Role, rate, and proof stay visible before the first DM."
+      }
+    },
+    roleExplorer: {
+      kicker: "FOR DEVELOPERS",
+      title: "Pick what you do. See who's hiring.",
+      lead: "Real open roles, cleaner scope, and visible rates before you Spark."
+    },
+    comparison: {
+      kicker: "IMPROVED VISIBILITY",
+      title: "Where your signal gets seen.",
+      body: "Discord spreads your pitch around. Weld keeps proof, rate, role, and first-message context together."
     },
     howItWorks: {
       kicker: "How it works",
@@ -293,19 +356,59 @@ const COPY: Record<Audience, LandingCopy> = {
     nav: {
       modeToggleDeveloper: "I'm a developer",
       modeToggleStudio: "I'm a studio",
+      alreadySignedUp: "Already signed up?",
       cta: "Get hiring access",
       links: NAV_LINKS
     },
     hero: {
       eyebrow: "Built for Roblox studios",
-      title: "find roblox talent who ship.",
-      lead: "Filter by role, rate, proof, and availability before the first message.",
+      title: "Find Roblox talent with proof upfront.",
+      lead: "Scan focused cards by role, rate, proof, and availability before the first message.",
       support:
-        "Weld turns scattered Discord scouting into clear talent cards your team can scan, compare, and Spark.",
+        "weld. turns scattered Discord scouting into clear talent cards your team can scan, compare, and Spark.",
       primaryCta: "Get hiring access",
       secondaryCta: "See example card",
       cardFrame: "Candidate preview",
-      helperLine: "Studio mode previews the card your team will scan before they reach out."
+      helperLine: "Studio mode previews the card your team will scan before they reach out.",
+      proofPrefix: "over",
+      proofStrong: "30",
+      proofSuffix: "studios preparing to hire",
+      submittingLabel: "Opening...",
+      submittedLabel: "You're in",
+      inviteReturn: "Back to my invite page"
+    },
+    marquee: {
+      talentPrimary: {
+        kicker: "CANDIDATE PIPELINE",
+        title: "This is who you'll scan.",
+        body: "Developer cards are built for comparison.",
+        strong: "52 devs on the waitlist and counting"
+      },
+      talentSecondary: {
+        kicker: "TALENT SIDE",
+        title: "Dev cards are ready for fast review.",
+        body: "Role, rate, proof, and links stay in one format your team can trust."
+      },
+      studioPrimary: {
+        kicker: "WHEN WE OPEN",
+        title: "This is who's hiring.",
+        body: "Over 30 studios waitlisted already. Browse the hiring side and see how your team will appear."
+      },
+      studioSecondary: {
+        kicker: "HIRING DEMAND",
+        title: "Studios are already lining up roles.",
+        body: "Preview demand, scope, and rate clarity before opening access."
+      }
+    },
+    roleExplorer: {
+      kicker: "FOR STUDIOS",
+      title: "Pick a role. See market demand.",
+      lead: "Preview role demand, rates, and scope the same way talent sees hiring cards."
+    },
+    comparison: {
+      kicker: "HIRING CLARITY",
+      title: "Compare channels before you scout.",
+      body: "Discord can create reach, but Weld keeps candidate signal and first-message context in one place."
     },
     howItWorks: {
       kicker: "How it works",

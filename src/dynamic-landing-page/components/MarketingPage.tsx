@@ -760,6 +760,7 @@ function WeldLandingPage({
     <div
       ref={pageShellRef}
       className="weld-glass-page"
+      data-mode={mode}
       data-motion-tier={motionTier}
       style={
         {
@@ -834,11 +835,16 @@ function WeldLandingPage({
         <HowItWorksStrip copy={modeCopy} />
 
         {/* 3. Live talent marquee */}
-        {mode === "studio" ? <OtherSideSection mode={mode} primary /> : <TalentMarqueeSection mode={mode} primary />}
+        {mode === "studio" ? (
+          <OtherSideSection copy={modeCopy} mode={mode} primary />
+        ) : (
+          <TalentMarqueeSection copy={modeCopy} mode={mode} primary />
+        )}
 
         {/* 4. Role switching — POV-flips per audience */}
         <RoleTalentExplorer
           mode={mode}
+          copy={modeCopy}
           role={role}
           isSwapping={isSwapping}
           hiringPanel={hiringPanel}
@@ -848,13 +854,17 @@ function WeldLandingPage({
         />
 
         {/* 5. And here's who's looking */}
-        {mode === "studio" ? <TalentMarqueeSection /> : <OtherSideSection mode={mode} />}
+        {mode === "studio" ? (
+          <TalentMarqueeSection copy={modeCopy} mode={mode} />
+        ) : (
+          <OtherSideSection copy={modeCopy} mode={mode} />
+        )}
 
         {/* 6. Chat — POV-flips per audience */}
         <ChatPreviewSection copy={modeCopy} profile={activeProfile} mode={mode} />
 
         {/* 7. Comparison table — dot scale */}
-        <ComparisonTableSection />
+        <ComparisonTableSection copy={modeCopy} />
 
         {/* 8. Get early access — combined CTA */}
         <EarlyAccessSection
@@ -898,7 +908,14 @@ function GlassNav({
         <span>weld.</span>
       </Link>
 
-      <ModeToggle mode={mode} onChange={onModeChange} />
+      <ModeToggle
+        mode={mode}
+        labels={{
+          developer: copy.nav.modeToggleDeveloper,
+          studio: copy.nav.modeToggleStudio
+        }}
+        onChange={onModeChange}
+      />
 
       <nav className="glass-nav-links" aria-label="Primary">
         {copy.nav.links.map((item) => (
@@ -907,7 +924,7 @@ function GlassNav({
           </a>
         ))}
         <a href="/find-invite" className="glass-nav-subtle">
-          Already signed up?
+          {copy.nav.alreadySignedUp}
         </a>
         <a
           href="#join"
@@ -955,20 +972,15 @@ function HeroCopyPanel({
 
   return (
     <div className="hero-copy-panel hero-copy-panel-split">
-      <h1>The talent network for Roblox.</h1>
-      <p className="hero-lead">
-        Link your games, set your rate, and match with studios that actually ship.
-      </p>
-      <p className="hero-support">
-        weld. turns shipped work, rates, availability, links, and proof into swipeable talent
-        cards studios can trust.
-      </p>
+      <h1>{copy.hero.title}</h1>
+      <p className="hero-lead">{copy.hero.lead}</p>
+      <p className="hero-support">{copy.hero.support}</p>
       <div className="hero-capture-row">
         <input
           ref={inputRef}
           className="hero-capture-input"
           type="email"
-          placeholder="you@example.com"
+          placeholder={copy.waitlist.placeholder}
           value={email}
           onChange={(e) => onEmailChange(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && onSubmit()}
@@ -981,19 +993,19 @@ function HeroCopyPanel({
           onClick={onSubmit}
           disabled={isSubmitting || isSuccess}
         >
-          {isSuccess ? "You're in ✓" : isSubmitting ? "Joining…" : "Join the beta"}
+          {isSuccess ? copy.hero.submittedLabel : isSubmitting ? copy.hero.submittingLabel : copy.hero.primaryCta}
         </button>
       </div>
       <div className="hero-proof-line">
         <div aria-hidden="true" style={{width:7,height:7,borderRadius:"50%",background:"#22c55e",flexShrink:0,boxShadow:"0 0 0 2px rgba(34,197,94,0.22)"}} />
-        over <strong>30</strong> studio signups
+        {copy.hero.proofPrefix} <strong>{copy.hero.proofStrong}</strong> {copy.hero.proofSuffix}
       </div>
       {savedInviteUrl && (
         <Link
           href={savedInviteUrl}
           className="hero-invite-return"
         >
-          ← Back to my invite page
+          {copy.hero.inviteReturn}
         </Link>
       )}
       <span className="hero-copy-eyebrow-hidden" aria-hidden="true">
@@ -1030,30 +1042,32 @@ function HowItWorksStrip({ copy }: { copy: LandingCopy }) {
   );
 }
 
-function TalentMarqueeSection({ mode, primary }: { mode?: Audience; primary?: boolean }) {
-  const isStudio = mode === "studio";
+function TalentMarqueeSection({
+  copy,
+  mode,
+  primary
+}: {
+  copy: LandingCopy;
+  mode: Audience;
+  primary?: boolean;
+}) {
+  const teaser = primary ? copy.marquee.talentPrimary : copy.marquee.talentSecondary;
   const doubled = [...MARQUEE_PROFILES, ...MARQUEE_PROFILES];
+
   return (
-    <section className="marquee-section" aria-label="Talent on Weld" aria-hidden="true">
+    <section className="marquee-section" data-audience={mode} aria-label="Talent on Weld" aria-hidden="true">
       <div className="marquee-header">
-        {isStudio && !primary ? (
-          <>
-            <p className="marquee-eyebrow">WE&rsquo;RE OPENING SOON</p>
-            <h2 className="marquee-heading">And here&rsquo;s who&rsquo;s looking.</h2>
-            <p className="marquee-subtext">
-              Dev cards are just as scannable. Role, rate, and proof — same format.
-            </p>
-          </>
-        ) : (
-          <>
-            <p className="marquee-eyebrow">WHEN WE OPEN</p>
-            <h2 className="marquee-heading">This is who&apos;ll be here.</h2>
-            <p className="marquee-subtext">
-              Sample cards showing the format.{" "}
-              <strong>52 devs on the waitlist and counting</strong> — you could be the next one.
-            </p>
-          </>
-        )}
+        <p className="marquee-eyebrow">{teaser.kicker}</p>
+        <h2 className="marquee-heading">{teaser.title}</h2>
+        <p className="marquee-subtext">
+          {teaser.body}
+          {teaser.strong ? (
+            <>
+              {" "}
+              <strong>{teaser.strong}</strong>
+            </>
+          ) : null}
+        </p>
       </div>
       <div className="marquee-track">
         <div className="marquee-inner">
@@ -1069,9 +1083,9 @@ function TalentMarqueeSection({ mode, primary }: { mode?: Audience; primary?: bo
     </section>
   );
 }
-
 function RoleTalentExplorer({
   mode,
+  copy,
   role,
   isSwapping,
   hiringPanel,
@@ -1080,6 +1094,7 @@ function RoleTalentExplorer({
   onHiringAction
 }: {
   mode: Audience;
+  copy: LandingCopy;
   role: RoleKey;
   isSwapping: boolean;
   hiringPanel: number;
@@ -1116,19 +1131,13 @@ function RoleTalentExplorer({
     buttonRefs.current[next]?.focus();
   }
 
-  const isDev = mode === "developer";
-  const headline = "Pick what you do. See who's hiring.";
-  const lead = isDev
-    ? "Real open roles. Real rates. Spark to apply."
-    : "Preview role demand, rates, and scope the same way talent sees hiring cards.";
-
   return (
     <section data-reveal="pending" className="glass-section how-story-section" id="roles">
       <div className="how-story-grid">
         <div className="section-copy how-story-copy">
-          <span className="section-kicker">{isDev ? "FOR DEVELOPERS" : "FOR STUDIOS"}</span>
-          <h2>{headline}</h2>
-          <p>{lead}</p>
+          <span className="section-kicker">{copy.roleExplorer.kicker}</span>
+          <h2>{copy.roleExplorer.title}</h2>
+          <p>{copy.roleExplorer.lead}</p>
 
           <div className="role-explorer-tabs" role="radiogroup" aria-label="Choose a Roblox talent role">
             {ROLE_ORDER.map((entry) => (
@@ -1175,6 +1184,21 @@ const ROLE_DEMAND: Record<RoleKey, number> = {
   sfx:          6,
 };
 
+function compactSentences(text: string, limit: number) {
+  return text
+    .replace(/\s+/g, " ")
+    .split(/(?:\.|\?|!)\s+/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean)
+    .slice(0, limit);
+}
+
+function hiringPreviewBullets(panel: (typeof HIRING_PANELS)[RoleKey][number]) {
+  const requirements = compactSentences(panel.whatLookingFor, 2);
+  const scope = compactSentences(panel.roleDescription, 1);
+  return [...requirements, ...scope].slice(0, 3);
+}
+
 function HiringPanelStack({
   panels,
   role,
@@ -1193,6 +1217,7 @@ function HiringPanelStack({
   const active = panels[activeIndex];
   const behind1 = panels[(activeIndex + 1) % panels.length];
   const behind2 = panels[(activeIndex + 2) % panels.length];
+  const bullets = hiringPreviewBullets(active);
 
   return (
     <div className="hiring-stack-wrapper" data-swapping={isSwapping ? "true" : "false"}>
@@ -1204,7 +1229,6 @@ function HiringPanelStack({
           <span className="hiring-panel-stub-label">{behind1.studio}</span>
         </div>
         <article className="glass-card hiring-panel-active">
-
           <div className="hp-title-row">
             <span className="hp-role-chip" style={{ background: active.chipBg, color: active.chipColor }}>
               {active.roleChip}
@@ -1215,63 +1239,71 @@ function HiringPanelStack({
             </div>
           </div>
 
-          <p className="hp-section-label">WHAT THEY&rsquo;RE LOOKING FOR</p>
-          <p className="hp-body-text">{active.whatLookingFor}</p>
+          <div className="hp-studio-context">
+            <span>{active.studio}</span>
+            <strong>{active.credibility}</strong>
+          </div>
 
           <div className="hp-pay-box">
             <span className="hp-pay-label">PAY</span>
             <span className="hp-pay-divider" />
-            <span className="hp-pay-value">{active.payType} · {active.payRange}</span>
+            <span className="hp-pay-value">{active.payType} - {active.payRange}</span>
           </div>
 
-          <p className="hp-section-label">ROLE DESCRIPTION</p>
-          <p className="hp-body-text">{active.roleDescription}</p>
+          <p className="hp-section-label">ROLE SNAPSHOT</p>
+          <ul className="hp-bullet-list">
+            {bullets.map((bullet) => (
+              <li key={bullet}>{bullet}</li>
+            ))}
+          </ul>
 
           <div className="hp-cta-box">
-            <p className="hp-cta-title">Interested in this role?</p>
+            <p className="hp-cta-title">Good fit?</p>
             <p className="hp-cta-body">
-              Like {active.studio}&rsquo;s profile to connect and discuss.
+              Spark {active.studio} to open a focused hiring thread.
             </p>
           </div>
 
           <div className="hiring-panel-actions">
+            <button type="button" className="hiring-action-spark" onClick={() => onAction("spark")}>
+              Spark role
+            </button>
             <button type="button" className="hiring-action-next" onClick={() => onAction("skip")}>
-              Next job →
+              Next job
             </button>
           </div>
-
         </article>
       </div>
       <p className="hiring-stack-counter">+ {ROLE_DEMAND[role]} more roles like this</p>
     </div>
   );
 }
-
-function OtherSideSection({ mode, primary }: { mode: Audience; primary?: boolean }) {
-  const isDev = mode === "developer";
+function OtherSideSection({
+  copy,
+  mode,
+  primary
+}: {
+  copy: LandingCopy;
+  mode: Audience;
+  primary?: boolean;
+}) {
+  const teaser = primary ? copy.marquee.studioPrimary : copy.marquee.studioSecondary;
   const doubled = [...MARQUEE_STUDIOS, ...MARQUEE_STUDIOS];
+
   return (
-    <section data-reveal="pending" className="other-side-section">
+    <section data-reveal="pending" className="other-side-section" data-audience={mode}>
       <div className="marquee-header">
-        {!isDev && primary ? (
-          <>
-            <p className="marquee-eyebrow">WHEN WE OPEN</p>
-            <h2 className="marquee-heading">This is who&apos;ll be here.</h2>
-            <p className="marquee-subtext">
-              Over 30 studios waitlisted already. Browse and spark the ones that match your stack.
-            </p>
-          </>
-        ) : (
-          <>
-            <p className="marquee-eyebrow">WE&rsquo;RE OPENING SOON</p>
-            <h2 className="marquee-heading">And here&rsquo;s who&rsquo;s looking.</h2>
-            <p className="marquee-subtext">
-              {isDev
-                ? "Over 30 studios waitlisted already. Sign up today and get exposed to them immediately on launch."
-                : "Dev cards are just as scannable as studio cards. Role, rate, and proof — same format."}
-            </p>
-          </>
-        )}
+        <p className="marquee-eyebrow">{teaser.kicker}</p>
+        <h2 className="marquee-heading">{teaser.title}</h2>
+        <p className="marquee-subtext">
+          {teaser.body}
+          {teaser.strong ? (
+            <>
+              {" "}
+              <strong>{teaser.strong}</strong>
+            </>
+          ) : null}
+        </p>
       </div>
       <div className="marquee-track">
         <div className="marquee-inner">
@@ -1287,7 +1319,6 @@ function OtherSideSection({ mode, primary }: { mode: Audience; primary?: boolean
     </section>
   );
 }
-
 function ChatPreviewSection({
   copy,
   profile,
@@ -1477,7 +1508,7 @@ function DotScale({ level }: { level: 1 | 2 | 3 }) {
   );
 }
 
-function ComparisonTableSection() {
+function ComparisonTableSection({ copy }: { copy: LandingCopy }) {
   const channels = [
     {
       title: "Discord servers",
@@ -1514,9 +1545,9 @@ function ComparisonTableSection() {
   return (
     <section className="glass-section comparison-table-section" id="compare">
       <div className="section-copy">
-        <span className="section-kicker">IMPROVED VISIBILITY</span>
-        <h2>How hiring channels compare.</h2>
-        <p>Discord servers, Discord channels, and Weld — side by side.</p>
+        <span className="section-kicker">{copy.comparison.kicker}</span>
+        <h2>{copy.comparison.title}</h2>
+        <p>{copy.comparison.body}</p>
       </div>
 
       <div className="comparison-visual-wrapper" aria-label="Hiring channel comparison">
@@ -1720,9 +1751,11 @@ function FooterCTA({ copy }: { copy: LandingCopy }) {
 
 function ModeToggle({
   mode,
+  labels,
   onChange
 }: {
   mode: Audience;
+  labels: { developer: string; studio: string };
   onChange: (mode: Audience) => void;
 }) {
   return (
@@ -1734,7 +1767,7 @@ function ModeToggle({
         aria-checked={mode === "developer"}
         onClick={() => onChange("developer")}
       >
-        I'm a developer
+        {labels.developer}
       </button>
       <button
         type="button"
@@ -1742,7 +1775,7 @@ function ModeToggle({
         aria-checked={mode === "studio"}
         onClick={() => onChange("studio")}
       >
-        I'm a studio
+        {labels.studio}
       </button>
     </div>
   );

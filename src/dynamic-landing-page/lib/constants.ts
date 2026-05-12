@@ -1,5 +1,6 @@
 import type {
   DraftStepKey,
+  RewardTierDefinition,
   UTMFields
 } from "@/dynamic-landing-page/lib/types";
 
@@ -35,3 +36,29 @@ export const STUDIO_REQUIRED_FIELDS: Record<DraftStepKey, string[]> = {
   fit: ["budgetStyle", "shippingNote"]
 };
 
+export const REWARD_TIERS: RewardTierDefinition[] = [
+  {
+    threshold: 0,
+    slug: "invite-active",
+    label: "Invite active",
+    description: "Your invite is live. Share it or finish your profile to unlock more signal."
+  },
+  {
+    threshold: 1,
+    slug: "scout-signal",
+    label: "Scout signal",
+    description: "One referred signup boosts your invite status and keeps your link warm."
+  },
+  {
+    threshold: 3,
+    slug: "studio-scout",
+    label: "Studio scout",
+    description: "Three referred signups unlock a stronger beta review signal."
+  },
+  {
+    threshold: 5,
+    slug: "founder-lane",
+    label: "Founder lane",
+    description: "Five referred signups unlock the highest public beta reward tier."
+  }
+];

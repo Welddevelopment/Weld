@@ -5,7 +5,7 @@ import {
   calculateCompletionPercent,
   buildInviteCode,
   getRewardTier
-} from "../src/dynamic landing page/lib/utils";
+} from "../src/dynamic-landing-page/lib/utils";
 
 test("buildInviteCode is deterministic and uppercase", () => {
   const first = buildInviteCode("Creator@Example.com");
