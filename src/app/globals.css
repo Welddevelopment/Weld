@@ -16123,7 +16123,7 @@ body {
   min-height: 0;
   display: grid;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 50px;
   padding: clamp(20px, 2.6vw, 38px);
   background:
     radial-gradient(circle at 87% 18%, var(--wg-mode-soft), transparent 32%),
@@ -16340,7 +16340,7 @@ body {
 
 .weld-glass-page[data-mode] .waitlist-section {
   width: min(1180px, calc(100% - 28px));
-  margin-top: 20px;
+  margin-top: 50px;
 }
 
 .weld-glass-page[data-mode] .waitlist-shell {
@@ -16454,7 +16454,7 @@ body {
 }
 
 .weld-glass-page[data-mode] .glass-section {
-  margin-top: 20px;
+  margin-top: 50px;
 }
 
 .weld-glass-page[data-mode] .glass-section::before {
@@ -16468,19 +16468,19 @@ body {
 }
 
 .weld-glass-page[data-mode] .how-strip-section {
-  margin-top: 20px;
+  margin-top: 50px;
 }
 
 .weld-glass-page[data-mode] .marquee-section {
-  margin-top: 20px;
+  margin-top: 50px;
 }
 
 .weld-glass-page[data-mode] .other-side-section {
-  margin-top: 20px;
+  margin-top: 50px;
 }
 
 .weld-glass-page[data-mode] .chat-section-shell-outer {
-  margin-top: 20px;
+  margin-top: 50px;
 }
 
 @media (max-width: 1120px) {
