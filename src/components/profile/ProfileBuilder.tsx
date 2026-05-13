@@ -149,12 +149,12 @@ function PublishedOverlay({ onStartMatching, onDismiss }: { onStartMatching: () 
 
 function DeleteWarningModal({ isDeleting, onConfirm, onCancel }: { isDeleting: boolean; onConfirm: () => void; onCancel: () => void }) {
   return (
-    <div style={{
+    <div className="pb-delete-overlay" style={{
       position: 'fixed', inset: 0, zIndex: 500,
       background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(6px)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
     }}>
-      <div style={{
+      <div className="pb-delete-card" style={{
         background: '#141211', border: '1px solid rgba(232,70,36,0.3)',
         borderRadius: 20, padding: '36px 28px', maxWidth: 380, width: '100%', textAlign: 'center',
       }}>
@@ -166,10 +166,10 @@ function DeleteWarningModal({ isDeleting, onConfirm, onCancel }: { isDeleting: b
           Your draft will be permanently cleared. If you&apos;ve published a profile, it will be removed from the swipe pool. This cannot be undone.
         </p>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-          <button onClick={onCancel} disabled={isDeleting} style={{ padding: '10px 22px', borderRadius: 999, border: '1.5px solid rgba(255,255,255,0.14)', background: 'transparent', color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
+          <button className="pb-delete-cancel" onClick={onCancel} disabled={isDeleting} style={{ padding: '10px 22px', borderRadius: 999, border: '1.5px solid rgba(255,255,255,0.14)', background: 'transparent', color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
             Cancel
           </button>
-          <button onClick={onConfirm} disabled={isDeleting} style={{ padding: '10px 22px', borderRadius: 999, border: '1.5px solid #E84624', background: 'rgba(232,70,36,0.12)', color: '#E84624', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
+          <button className="pb-delete-confirm" onClick={onConfirm} disabled={isDeleting} style={{ padding: '10px 22px', borderRadius: 999, border: '1.5px solid #E84624', background: 'rgba(232,70,36,0.12)', color: '#E84624', fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
             {isDeleting ? 'Deleting…' : 'Delete draft'}
           </button>
         </div>
@@ -353,20 +353,21 @@ export default function ProfileBuilder({
   const studioPhases = ['identity', 'studio-info', 'studio-rate', 'studio-roles', 'studio-skills'] as Phase[]
   const isQuickStep = phase === 'type' || devPhases.includes(phase) || studioPhases.includes(phase)
   const isStudio = draft.type === 'studio'
+  const lane = isStudio ? 'studio' : 'developer'
 
   const quickStepNum = phase === 'type' ? 0
     : isStudio
-      ? (phase === 'identity' ? 2 : phase === 'studio-info' ? 3 : phase === 'studio-rate' ? 4 : phase === 'studio-roles' ? 5 : 6)
+      ? (phase === 'identity' ? 1 : phase === 'studio-info' ? 2 : phase === 'studio-rate' ? 3 : phase === 'studio-roles' ? 4 : 5)
       : (phase === 'identity' ? 1 : phase === 'availability' ? 2 : phase === 'rate' ? 3 : phase === 'work' ? 4 : phase === 'portfolio' ? 5 : 6)
   const quickStepLabel = phase === 'type' ? 'Type'
     : isStudio
       ? (phase === 'identity' ? 'Roblox' : phase === 'studio-info' ? 'Studio Info' : phase === 'studio-rate' ? 'Rate' : phase === 'studio-roles' ? 'Roles' : 'Skills')
       : (phase === 'identity' ? 'Roblox' : phase === 'availability' ? 'Availability' : phase === 'rate' ? 'Rate' : phase === 'work' ? 'Work' : phase === 'portfolio' ? 'Portfolio' : 'Skills')
-  const quickStepCount = isStudio ? 6 : 6
+  const quickStepCount = isStudio ? 5 : 6
 
   const header = (
     <div className="pb-form-top">
-      <span className="pb-brand">weld</span>
+      <span className="pb-brand">weld.</span>
       <ProfileAccountStatus accountEmail={accountEmail} saveState={saveState} />
       {isQuickStep && (
         <>
@@ -391,7 +392,7 @@ export default function ProfileBuilder({
       <button
         type="button"
         onClick={() => setShowDeleteWarning(true)}
-        style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(232,70,36,0.45)', padding: '4px 0', flexShrink: 0 }}
+        className="pb-delete-trigger"
       >
         Delete draft
       </button>
@@ -435,7 +436,11 @@ export default function ProfileBuilder({
     }
 
     return (
-      <div className={embedded ? 'pb-form-shell pb-form-shell--embedded' : 'pb-form-shell'}>
+      <div
+        className={embedded ? 'pb-form-shell pb-form-shell--embedded' : 'pb-form-shell'}
+        data-profile-lane={lane}
+        data-profile-phase={phase}
+      >
         {header}
         <div className="pb-form-body pb-form-body--editor" ref={bodyRef}>
           <div className="npc-stack-row" style={{ alignItems: 'flex-start' }}>
@@ -528,7 +533,11 @@ export default function ProfileBuilder({
 
   // Quick setup steps
   return (
-    <div className={embedded ? 'pb-form-shell pb-form-shell--embedded' : 'pb-form-shell'}>
+    <div
+      className={embedded ? 'pb-form-shell pb-form-shell--embedded' : 'pb-form-shell'}
+      data-profile-lane={lane}
+      data-profile-phase={phase}
+    >
       {header}
       <div className="pb-form-body">
         {phase === 'type' && (

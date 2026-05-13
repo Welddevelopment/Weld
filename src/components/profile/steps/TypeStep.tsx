@@ -11,7 +11,7 @@ export default function TypeStep({ draft, onSelect }: Props) {
   return (
     <div className="pb-step-content">
       <div className="pb-step-eyebrow">Step 1</div>
-      <h1 className="pb-step-title">Who are you on Weld?</h1>
+      <h1 className="pb-step-title">Who are you on weld.?</h1>
       <p className="pb-step-sub">Choose the profile type that best describes you. You can&apos;t change this later.</p>
 
       <div className="pb-type-cards">

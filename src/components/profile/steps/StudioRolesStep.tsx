@@ -62,10 +62,10 @@ export default function StudioRolesStep({ draft, update, onNext, onBack }: Props
       </aside>
 
       <section className="ob-main">
-        <div className="ob-progress"><span style={{ width: `${(5 / 6) * 100}%` }} /></div>
+        <div className="ob-progress"><span style={{ width: `${(4 / 5) * 100}%` }} /></div>
         <div className="ob-step-row">
-          <span>Step 5 of 6 — Open Roles</span>
-          <span>5/6</span>
+          <span>Step 4 of 5 - Open Roles</span>
+          <span>4/5</span>
         </div>
 
         {roles.map((role, i) => (
@@ -76,7 +76,7 @@ export default function StudioRolesStep({ draft, update, onNext, onBack }: Props
             </div>
 
             <div style={{ marginBottom: 8 }}>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginBottom: 5 }}>Skill type</div>
+              <div className="pb-inline-label">Skill type</div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 {ALL_SKILLS.map(name => (
                   <button
@@ -100,7 +100,7 @@ export default function StudioRolesStep({ draft, update, onNext, onBack }: Props
             />
 
             <div style={{ marginTop: 10 }}>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginBottom: 5 }}>Pay rate <span style={{ color: 'rgba(255,255,255,0.3)' }}>(optional)</span></div>
+              <div className="pb-inline-label">Pay rate <span>(optional)</span></div>
               <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 6 }}>
                 {RATE_TYPES.map(r => (
                   <button
@@ -163,7 +163,7 @@ export default function StudioRolesStep({ draft, update, onNext, onBack }: Props
         )}
 
         {roles.length === 0 && (
-          <p style={{ color: '#bbb', fontSize: 12, textAlign: 'center', marginTop: 4 }}>
+          <p className="pb-empty-note">
             No open roles yet — or skip this and add them later.
           </p>
         )}

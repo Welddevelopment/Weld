@@ -41,10 +41,10 @@ export default function StudioInfoStep({ draft, update, onNext, onBack }: Props)
       </aside>
 
       <section className="ob-main">
-        <div className="ob-progress"><span style={{ width: '50%' }} /></div>
+        <div className="ob-progress"><span style={{ width: `${(2 / 5) * 100}%` }} /></div>
         <div className="ob-step-row">
-          <span>Step 3 of 6 — Studio Info</span>
-          <span>3/6</span>
+          <span>Step 2 of 5 - Studio Info</span>
+          <span>2/5</span>
         </div>
 
         <div className="pb-field">

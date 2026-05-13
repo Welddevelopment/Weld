@@ -37,12 +37,12 @@ export default function StudioSkillsStep({ draft, update, onNext, onBack }: Prop
       <section className="ob-main">
         <div className="ob-progress"><span style={{ width: '100%' }} /></div>
         <div className="ob-step-row">
-          <span>Step 6 of 6 — Skill Descriptions</span>
-          <span>6/6</span>
+          <span>Step 5 of 5 - Skill Descriptions</span>
+          <span>5/5</span>
         </div>
 
         {derivedSkills.length === 0 && (
-          <p style={{ color: '#bbb', fontSize: 13, marginTop: 8 }}>
+          <p className="pb-empty-note">
             No roles added yet — go back and add roles first. Skills are derived from your open roles.
           </p>
         )}
@@ -50,9 +50,9 @@ export default function StudioSkillsStep({ draft, update, onNext, onBack }: Prop
         {derivedSkills.map(name => (
           <div key={name} style={{ marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <span style={{ fontWeight: 600, fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>{name}</span>
+              <span className="pb-skill-description-name">{name}</span>
               {!getDesc(name) && (
-                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>using default</span>
+                <span className="pb-skill-description-hint">using default</span>
               )}
             </div>
             <textarea

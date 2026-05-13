@@ -17930,3 +17930,922 @@ button.invite-secondary-button {
     width: auto;
   }
 }
+
+/* Profile creation liquid glass revamp */
+.pb-form-shell[data-profile-lane] {
+  --pb-accent: #1267d8;
+  --pb-accent-deep: #0b57bd;
+  --pb-accent-soft: rgba(85, 199, 236, 0.18);
+  --pb-accent-glow: rgba(18, 103, 216, 0.26);
+  --pb-ink: #071f4d;
+  --pb-muted: #53617c;
+  --pb-surface: rgba(255, 255, 255, 0.66);
+  --pb-surface-strong: rgba(255, 255, 255, 0.86);
+  --pb-border: rgba(255, 255, 255, 0.88);
+  --pb-border-ink: rgba(20, 27, 48, 0.08);
+  --pb-success: #149f67;
+  --pb-danger: #d84a5d;
+  --pb-shadow-shell: 0 30px 90px rgba(70, 50, 160, 0.16);
+  --pb-shadow-card: 0 22px 60px rgba(70, 50, 160, 0.14);
+  --pb-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  overflow-x: clip;
+  color: var(--pb-ink);
+  background:
+    radial-gradient(circle at 7% 8%, rgba(255, 255, 255, 0.84), transparent 0 20rem),
+    radial-gradient(circle at 88% 16%, var(--pb-accent-soft), transparent 0 26rem),
+    radial-gradient(circle at 75% 78%, rgba(185, 168, 255, 0.34), transparent 0 30rem),
+    radial-gradient(circle at 17% 92%, rgba(255, 170, 210, 0.18), transparent 0 24rem),
+    linear-gradient(180deg, #f6f1ff 0%, #ece4ff 56%, #dfeafd 100%);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+.pb-form-shell[data-profile-lane].pb-form-shell--embedded {
+  min-height: unset;
+  background: transparent;
+  color: inherit;
+}
+
+.pb-form-shell[data-profile-lane].pb-form-shell--embedded::before {
+  display: none;
+}
+
+.pb-form-shell[data-profile-lane="studio"] {
+  --pb-accent: #7257ff;
+  --pb-accent-deep: #4f3dff;
+  --pb-accent-soft: rgba(114, 87, 255, 0.2);
+  --pb-accent-glow: rgba(84, 62, 220, 0.30);
+  --pb-ink: #25145f;
+  background:
+    radial-gradient(circle at 8% 8%, rgba(255, 255, 255, 0.84), transparent 0 20rem),
+    radial-gradient(circle at 88% 14%, rgba(114, 87, 255, 0.30), transparent 0 26rem),
+    radial-gradient(circle at 78% 76%, rgba(188, 151, 255, 0.38), transparent 0 30rem),
+    radial-gradient(circle at 15% 92%, rgba(255, 122, 182, 0.18), transparent 0 24rem),
+    linear-gradient(180deg, #f5efff 0%, #eadfff 55%, #ddd4ff 100%);
+}
+
+.pb-form-shell[data-profile-lane]::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(125deg, transparent 0 42%, rgba(255, 255, 255, 0.45) 47%, transparent 58%),
+    radial-gradient(circle at 45% 32%, rgba(255, 255, 255, 0.38), transparent 0 24rem);
+  opacity: 0.78;
+}
+
+.pb-form-shell[data-profile-lane] *,
+.pb-form-shell[data-profile-lane] *::before,
+.pb-form-shell[data-profile-lane] *::after {
+  box-sizing: border-box;
+}
+
+.pb-form-shell[data-profile-lane] :where(button, input, textarea, select) {
+  font: inherit;
+}
+
+.pb-form-shell[data-profile-lane] :where(button, a, input, textarea, select):focus-visible {
+  outline: 2px solid var(--pb-accent);
+  outline-offset: 3px;
+}
+
+.pb-form-shell[data-profile-lane] .pb-form-top {
+  position: sticky;
+  top: 12px;
+  z-index: 40;
+  width: min(1160px, calc(100% - 28px));
+  min-height: 62px;
+  margin: 14px auto 0;
+  padding: 10px 12px 10px 16px;
+  border: 1px solid var(--pb-border);
+  border-radius: 31px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(247, 250, 255, 0.58)),
+    rgba(255, 255, 255, 0.58);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    inset 0 -1px 0 rgba(107, 124, 182, 0.1),
+    0 20px 48px rgba(64, 75, 118, 0.16);
+  backdrop-filter: blur(24px) saturate(1.22);
+  -webkit-backdrop-filter: blur(24px) saturate(1.22);
+  color: var(--pb-ink);
+}
+
+.pb-form-shell[data-profile-lane] .pb-brand,
+.pb-form-shell[data-profile-lane] .ob-brand {
+  color: var(--pb-ink);
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.pb-form-shell[data-profile-lane] .pb-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  font-size: 23px;
+}
+
+.pb-form-shell[data-profile-lane] .pb-brand::before {
+  content: "";
+  width: 30px;
+  height: 30px;
+  border-radius: 11px;
+  background:
+    radial-gradient(circle at 32% 25%, rgba(255, 255, 255, 0.72), transparent 34%),
+    linear-gradient(180deg, var(--pb-accent), var(--pb-accent-deep));
+  box-shadow: 0 12px 22px var(--pb-accent-glow);
+}
+
+.pb-form-shell[data-profile-lane] .pb-form-step-indicator {
+  margin: 0;
+  color: var(--pb-muted);
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.pb-form-shell[data-profile-lane] .pb-form-top > .pb-form-step-indicator:last-of-type {
+  display: none;
+}
+
+.pb-form-shell[data-profile-lane] .pb-form-progress,
+.pb-form-shell[data-profile-lane] .pb-checklist-progress,
+.pb-form-shell[data-profile-lane] .ob-progress {
+  overflow: hidden;
+  height: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.52);
+  box-shadow: inset 0 1px 2px rgba(40, 53, 91, 0.08);
+}
+
+.pb-form-shell[data-profile-lane] .pb-form-progress {
+  width: clamp(140px, 18vw, 260px);
+}
+
+.pb-form-shell[data-profile-lane] .pb-form-progress-fill,
+.pb-form-shell[data-profile-lane] .pb-checklist-progress-fill,
+.pb-form-shell[data-profile-lane] .ob-progress span {
+  background: linear-gradient(90deg, var(--pb-accent), color-mix(in srgb, var(--pb-accent) 72%, #55c7ec));
+  box-shadow: 0 0 18px var(--pb-accent-glow);
+}
+
+.pb-form-shell[data-profile-lane] .pb-account-link,
+.pb-form-shell[data-profile-lane] .pb-account-status,
+.pb-form-shell[data-profile-lane] .pb-delete-trigger {
+  min-height: 38px;
+  border: 1px solid rgba(20, 27, 48, 0.08);
+  background: rgba(255, 255, 255, 0.58);
+  color: var(--pb-muted);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 760;
+  text-decoration: none;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.pb-form-shell[data-profile-lane] .pb-delete-trigger {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pb-form-shell[data-profile-lane] .pb-form-body {
+  position: relative;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(30px, 5vw, 64px) clamp(14px, 3vw, 32px) 88px;
+  overflow-y: auto;
+}
+
+.pb-form-shell[data-profile-lane] .pb-step-content,
+.pb-form-shell[data-profile-lane] .ob-screen,
+.pb-form-shell[data-profile-lane] .npc-card,
+.pb-form-shell[data-profile-lane] .npc-panel,
+.pb-form-shell[data-profile-lane] .pb-checklist-panel {
+  border: 1px solid var(--pb-border);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.50)),
+    rgba(255, 255, 255, 0.42);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.38),
+    0 0 0 1px rgba(120, 110, 200, 0.10),
+    var(--pb-shadow-shell);
+  backdrop-filter: blur(28px) saturate(1.22);
+  -webkit-backdrop-filter: blur(28px) saturate(1.22);
+}
+
+.pb-form-shell[data-profile-lane] .pb-step-content {
+  position: relative;
+  width: min(760px, 100%);
+  max-width: 760px;
+  min-height: min(620px, calc(100vh - 190px));
+  padding: clamp(28px, 4vw, 48px);
+  border-radius: 36px;
+  overflow: hidden;
+  animation: pbGlassIn 420ms var(--pb-ease) both;
+}
+
+.pb-form-shell[data-profile-lane] .pb-step-content::before,
+.pb-form-shell[data-profile-lane] .ob-screen::before,
+.pb-form-shell[data-profile-lane] .npc-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 86% 14%, var(--pb-accent-soft), transparent 0 16rem),
+    linear-gradient(116deg, transparent 4%, rgba(255, 255, 255, 0.52) 18%, transparent 32%);
+  opacity: 0.88;
+}
+
+.pb-form-shell[data-profile-lane] .pb-step-content > *,
+.pb-form-shell[data-profile-lane] .ob-screen > *,
+.pb-form-shell[data-profile-lane] .npc-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.pb-form-shell[data-profile-lane] .pb-step-eyebrow {
+  color: var(--pb-accent);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+}
+
+.pb-form-shell[data-profile-lane] .pb-step-title,
+.pb-form-shell[data-profile-lane] .ob-title,
+.pb-form-shell[data-profile-lane] .pb-pub-heading {
+  color: var(--pb-ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-style: normal;
+  font-weight: 880;
+  letter-spacing: -0.055em;
+}
+
+.pb-form-shell[data-profile-lane] .pb-step-title {
+  max-width: 10ch;
+  font-size: clamp(42px, 7vw, 76px);
+  line-height: 0.94;
+  margin-bottom: 18px;
+}
+
+.pb-form-shell[data-profile-lane] .pb-step-sub {
+  max-width: 54ch;
+  color: var(--pb-muted);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.pb-form-shell[data-profile-lane] .pb-type-cards {
+  gap: 16px;
+}
+
+.pb-form-shell[data-profile-lane] .pb-type-card {
+  position: relative;
+  min-height: 220px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(18, 103, 216, 0.12), transparent 38%),
+    rgba(255, 255, 255, 0.58);
+  color: var(--pb-ink);
+  box-shadow: var(--pb-shadow-card);
+  transition: transform 220ms var(--pb-ease), border-color 220ms ease, box-shadow 220ms ease, background 220ms ease;
+}
+
+.pb-form-shell[data-profile-lane] .pb-type-card:nth-child(2) {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(114, 87, 255, 0.18), transparent 38%),
+    rgba(255, 255, 255, 0.58);
+}
+
+.pb-form-shell[data-profile-lane] .pb-type-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--pb-accent) 32%, white);
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.pb-form-shell[data-profile-lane] .pb-type-card--active {
+  border-color: color-mix(in srgb, var(--pb-accent) 52%, white);
+  background:
+    radial-gradient(circle at 100% 0%, var(--pb-accent-soft), transparent 42%),
+    rgba(255, 255, 255, 0.78);
+  box-shadow: 0 24px 58px var(--pb-accent-glow);
+}
+
+.pb-form-shell[data-profile-lane] .pb-type-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, var(--pb-accent), var(--pb-accent-deep));
+  color: #fff;
+  box-shadow: 0 18px 34px var(--pb-accent-glow);
+}
+
+.pb-form-shell[data-profile-lane] .pb-type-card:nth-child(2) .pb-type-icon {
+  background: linear-gradient(180deg, #7257ff, #4f3dff);
+}
+
+.pb-form-shell[data-profile-lane] .pb-type-label {
+  color: var(--pb-ink);
+  font-size: 20px;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+
+.pb-form-shell[data-profile-lane] .pb-type-desc {
+  color: var(--pb-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.pb-form-shell[data-profile-lane] .ob-screen {
+  position: relative;
+  width: min(1120px, 100%);
+  min-height: min(660px, calc(100vh - 190px));
+  grid-template-columns: minmax(260px, 0.42fr) minmax(0, 0.9fr);
+  border-radius: 36px;
+  overflow: hidden;
+  color: var(--pb-ink);
+  animation: pbGlassIn 420ms var(--pb-ease) both;
+}
+
+.pb-form-shell[data-profile-lane] .ob-side {
+  position: relative;
+  z-index: 1;
+  padding: clamp(24px, 3vw, 38px);
+  border-right: 1px solid rgba(255, 255, 255, 0.70);
+  background:
+    radial-gradient(circle at 12% 12%, rgba(255, 255, 255, 0.84), transparent 0 12rem),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.66), rgba(255, 255, 255, 0.28));
+}
+
+.pb-form-shell[data-profile-lane] .ob-side--dark {
+  color: #fff;
+  background:
+    radial-gradient(circle at 86% 18%, color-mix(in srgb, var(--pb-accent) 62%, white), transparent 0 12rem),
+    linear-gradient(145deg, color-mix(in srgb, var(--pb-accent-deep) 82%, #101827), color-mix(in srgb, var(--pb-ink) 78%, #090b16));
+}
+
+.pb-form-shell[data-profile-lane] .ob-brand--light,
+.pb-form-shell[data-profile-lane] .ob-title--light {
+  color: #fff;
+}
+
+.pb-form-shell[data-profile-lane] .ob-mark {
+  border-radius: 11px;
+  background: linear-gradient(180deg, var(--pb-accent), var(--pb-accent-deep));
+  box-shadow: 0 12px 22px var(--pb-accent-glow);
+}
+
+.pb-form-shell[data-profile-lane] .ob-title {
+  max-width: 8ch;
+  font-size: clamp(42px, 5vw, 64px);
+  line-height: 0.95;
+}
+
+.pb-form-shell[data-profile-lane] .ob-copy,
+.pb-form-shell[data-profile-lane] .ob-copy--light {
+  max-width: 30ch;
+  color: color-mix(in srgb, var(--pb-muted) 78%, white);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.pb-form-shell[data-profile-lane] .ob-copy--light {
+  color: rgba(255, 255, 255, 0.70);
+}
+
+.pb-form-shell[data-profile-lane] .ob-note-card,
+.pb-form-shell[data-profile-lane] .ob-status-badge,
+.pb-form-shell[data-profile-lane] .ob-linked-status,
+.pb-form-shell[data-profile-lane] .ob-linked-preview,
+.pb-form-shell[data-profile-lane] .ob-social-item,
+.pb-form-shell[data-profile-lane] .ob-work-entry,
+.pb-form-shell[data-profile-lane] .ob-cap-card,
+.pb-form-shell[data-profile-lane] .pb-work-entry,
+.pb-form-shell[data-profile-lane] .pb-entry-card {
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.42)),
+    rgba(255, 255, 255, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 12px 32px rgba(64, 75, 118, 0.08);
+}
+
+.pb-form-shell[data-profile-lane] .ob-side--dark .ob-note-card {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.pb-form-shell[data-profile-lane] .ob-main {
+  position: relative;
+  z-index: 1;
+  padding: clamp(24px, 3vw, 40px);
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.pb-form-shell[data-profile-lane] .ob-step-row {
+  color: var(--pb-muted);
+  font-size: 11px;
+  font-weight: 780;
+  letter-spacing: 0;
+}
+
+.pb-form-shell[data-profile-lane] .pb-label,
+.pb-form-shell[data-profile-lane] .ob-main .pb-label {
+  color: var(--pb-ink);
+  font-size: 12px;
+  font-weight: 820;
+  letter-spacing: 0.02em;
+}
+
+.pb-form-shell[data-profile-lane] .pb-inline-label,
+.pb-form-shell[data-profile-lane] .pb-skill-description-name {
+  margin-bottom: 5px;
+  color: var(--pb-ink);
+  font-size: 12px;
+  font-weight: 820;
+}
+
+.pb-form-shell[data-profile-lane] .pb-inline-label span,
+.pb-form-shell[data-profile-lane] .pb-skill-description-hint,
+.pb-form-shell[data-profile-lane] .pb-empty-note {
+  color: var(--pb-muted);
+  font-size: 12px;
+}
+
+.pb-form-shell[data-profile-lane] .pb-empty-note {
+  margin: 8px 0 0;
+  text-align: center;
+}
+
+.pb-form-shell[data-profile-lane] .pb-required,
+.pb-form-shell[data-profile-lane] .pb-field-error,
+.pb-form-shell[data-profile-lane] .pb-work-remove,
+.pb-form-shell[data-profile-lane] .pb-entry-card-remove,
+.pb-form-shell[data-profile-lane] .ob-work-head button {
+  color: var(--pb-danger);
+}
+
+.pb-form-shell[data-profile-lane] .pb-hint-label,
+.pb-form-shell[data-profile-lane] .ob-main .pb-hint-label {
+  color: var(--pb-muted);
+}
+
+.pb-form-shell[data-profile-lane] :where(.pb-input, .pb-textarea, .pb-select, .pb-panel-input, .pb-panel-textarea, .ob-cap-title, .ob-cap-body, .ob-cap-detail, .ob-cap-stat-input),
+.pb-form-shell[data-profile-lane] .ob-main :where(.pb-input, .pb-textarea, .pb-select) {
+  border: 1px solid rgba(20, 27, 48, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.70);
+  color: var(--pb-ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.pb-form-shell[data-profile-lane] :where(.pb-input, .pb-textarea, .pb-select, .pb-panel-input, .pb-panel-textarea):focus,
+.pb-form-shell[data-profile-lane] .ob-main :where(.pb-input, .pb-textarea, .pb-select):focus {
+  border-color: color-mix(in srgb, var(--pb-accent) 48%, white);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 0 0 4px var(--pb-accent-soft), inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+.pb-form-shell[data-profile-lane] :where(.pb-input, .pb-textarea, .pb-select)::placeholder,
+.pb-form-shell[data-profile-lane] .ob-main :where(.pb-input, .pb-textarea)::placeholder {
+  color: color-mix(in srgb, var(--pb-muted) 62%, white);
+}
+
+.pb-form-shell[data-profile-lane] :where(.pb-option-pill, .ob-pill, .pb-badge-opt, .pb-skill-btn, .ob-skill-btn, .pb-add-btn, .ob-add-dashed, .pb-edit-add-btn, .pb-emoji-btn) {
+  border: 1px solid rgba(20, 27, 48, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--pb-muted);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  transition: transform 160ms var(--pb-ease), border-color 160ms ease, color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.pb-form-shell[data-profile-lane] :where(.pb-option-pill, .ob-pill, .pb-badge-opt, .pb-skill-btn, .ob-skill-btn, .pb-add-btn, .ob-add-dashed, .pb-edit-add-btn, .pb-emoji-btn):hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--pb-accent) 30%, white);
+  color: var(--pb-accent);
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.pb-form-shell[data-profile-lane] :where(.pb-option-pill--on, .ob-pill--on, .pb-badge-opt--active, .pb-skill-btn--on, .ob-skill-btn--on, .pb-emoji-btn--on) {
+  border-color: color-mix(in srgb, var(--pb-accent) 52%, white);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.74), var(--pb-accent-soft));
+  color: var(--pb-accent);
+  font-weight: 820;
+  box-shadow: 0 12px 24px rgba(70, 50, 160, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.pb-form-shell[data-profile-lane] .pb-btn,
+.pb-form-shell[data-profile-lane] .npc-editor-publish,
+.pb-form-shell[data-profile-lane] .npc-editor-back,
+.pb-form-shell[data-profile-lane] .npc-action-seg {
+  min-height: 46px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 820;
+  letter-spacing: 0;
+  transition: transform 180ms var(--pb-ease), box-shadow 180ms ease, background 180ms ease;
+}
+
+.pb-form-shell[data-profile-lane] .pb-btn:not(:disabled):hover,
+.pb-form-shell[data-profile-lane] .npc-editor-publish:hover,
+.pb-form-shell[data-profile-lane] .npc-action-seg:hover {
+  transform: translateY(-1px);
+}
+
+.pb-form-shell[data-profile-lane] .pb-btn--primary,
+.pb-form-shell[data-profile-lane] .pb-btn--publish,
+.pb-form-shell[data-profile-lane] .npc-editor-publish,
+.pb-form-shell[data-profile-lane] .npc-action-seg:last-child {
+  border: 1px solid color-mix(in srgb, var(--pb-accent-deep) 72%, #05070d);
+  background: linear-gradient(180deg, var(--pb-accent), var(--pb-accent-deep));
+  color: #fff;
+  box-shadow: 0 18px 38px var(--pb-accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.pb-form-shell[data-profile-lane] .pb-btn--primary:not(:disabled):hover,
+.pb-form-shell[data-profile-lane] .pb-btn--publish:not(:disabled):hover {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--pb-accent) 88%, white), var(--pb-accent-deep));
+}
+
+.pb-form-shell[data-profile-lane] .pb-btn--ghost,
+.pb-form-shell[data-profile-lane] .npc-editor-back,
+.pb-form-shell[data-profile-lane] .npc-action-seg {
+  border: 1px solid rgba(20, 27, 48, 0.08);
+  background: rgba(255, 255, 255, 0.58);
+  color: var(--pb-ink);
+}
+
+.pb-form-shell[data-profile-lane] .pb-nav {
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.pb-form-shell[data-profile-lane] .pb-link-row,
+.pb-form-shell[data-profile-lane] .pb-social-row,
+.pb-form-shell[data-profile-lane] .ob-two-col,
+.pb-form-shell[data-profile-lane] .ob-three-col {
+  gap: 12px;
+}
+
+.pb-form-shell[data-profile-lane] .pb-link-row .pb-input,
+.pb-form-shell[data-profile-lane] .pb-social-row .pb-input,
+.pb-form-shell[data-profile-lane] .pb-social-row .pb-select {
+  margin-bottom: 0;
+}
+
+.pb-form-shell[data-profile-lane] .ob-social-icon--roblox {
+  background: #111827;
+}
+
+.pb-form-shell[data-profile-lane] .ob-social-item--linked,
+.pb-form-shell[data-profile-lane] .ob-linked-status,
+.pb-form-shell[data-profile-lane] .ob-status-badge,
+.pb-form-shell[data-profile-lane] .ob-social-badge {
+  border-color: color-mix(in srgb, var(--pb-success) 32%, white);
+  background: color-mix(in srgb, var(--pb-success) 10%, white);
+  color: var(--pb-success);
+}
+
+.pb-form-shell[data-profile-lane] .ob-status-badge span,
+.pb-form-shell[data-profile-lane] .ob-linked-status span {
+  background: var(--pb-success);
+}
+
+.pb-form-shell[data-profile-lane] .ob-cap-grid {
+  gap: 12px;
+}
+
+.pb-form-shell[data-profile-lane] .ob-cap-card {
+  border-radius: 20px;
+  padding: 26px 12px 12px;
+}
+
+.pb-form-shell[data-profile-lane] .ob-cap-title,
+.pb-form-shell[data-profile-lane] .ob-cap-body,
+.pb-form-shell[data-profile-lane] .ob-cap-detail,
+.pb-form-shell[data-profile-lane] .ob-cap-stat-input {
+  box-shadow: none;
+}
+
+.pb-form-shell[data-profile-lane] .npc-stack-row {
+  width: 100%;
+  justify-content: center;
+  gap: 18px;
+}
+
+.pb-form-shell[data-profile-lane] .npc-wrap {
+  width: min(100%, 430px);
+  filter: drop-shadow(0 24px 58px rgba(59, 69, 121, 0.16));
+}
+
+.pb-form-shell[data-profile-lane] .npc-card {
+  position: relative;
+  min-height: 628px;
+  border-radius: 34px;
+  color: var(--pb-ink);
+  overflow: hidden;
+}
+
+.pb-form-shell[data-profile-lane] .npc-card::after {
+  content: "";
+  position: absolute;
+  inset: auto 8% 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--pb-accent), transparent);
+  opacity: 0.52;
+}
+
+.pb-form-shell[data-profile-lane] .npc-avatar-wrap {
+  box-shadow: 0 18px 36px var(--pb-accent-glow);
+}
+
+.pb-form-shell[data-profile-lane] .npc-avatar-bg {
+  background:
+    radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.82), transparent 30%),
+    linear-gradient(135deg, var(--pb-accent), color-mix(in srgb, var(--pb-accent) 42%, #ff7ab6)) !important;
+}
+
+.pb-form-shell[data-profile-lane] .npc-stats,
+.pb-form-shell[data-profile-lane] .npc-entry-btn,
+.pb-form-shell[data-profile-lane] .npc-rate-pill,
+.pb-form-shell[data-profile-lane] .npc-skill-chip,
+.pb-form-shell[data-profile-lane] .sc-info-grid,
+.pb-form-shell[data-profile-lane] .sc-info-col,
+.pb-form-shell[data-profile-lane] .sc-role-btn {
+  border-color: rgba(20, 27, 48, 0.08);
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.pb-form-shell[data-profile-lane] .npc-editable-name,
+.pb-form-shell[data-profile-lane] .npc-stat-editable {
+  color: var(--pb-ink);
+}
+
+.pb-form-shell[data-profile-lane] .npc-role,
+.pb-form-shell[data-profile-lane] .npc-editable-bio,
+.pb-form-shell[data-profile-lane] .npc-stat-lbl,
+.pb-form-shell[data-profile-lane] .npc-entry-sub,
+.pb-form-shell[data-profile-lane] .sc-rate-note,
+.pb-form-shell[data-profile-lane] .sc-rate-type {
+  color: var(--pb-muted);
+}
+
+.pb-form-shell[data-profile-lane] .npc-entry-btn--active,
+.pb-form-shell[data-profile-lane] .sc-role-btn--active {
+  border-color: color-mix(in srgb, var(--pb-accent) 42%, white);
+  background: var(--pb-accent-soft);
+}
+
+.pb-form-shell[data-profile-lane] .npc-entry-icon,
+.pb-form-shell[data-profile-lane] .npc-entry-btn--active .npc-entry-icon,
+.pb-form-shell[data-profile-lane] .npc-entry-btn--active .npc-entry-title,
+.pb-form-shell[data-profile-lane] .npc-entry-sub,
+.pb-form-shell[data-profile-lane] .npc-rate-amount,
+.pb-form-shell[data-profile-lane] .sc-rate-range,
+.pb-form-shell[data-profile-lane] .sc-role-chevron {
+  color: var(--pb-accent);
+}
+
+.pb-form-shell[data-profile-lane] .npc-panel {
+  width: min(380px, calc(100vw - 28px));
+  border-radius: 30px;
+  color: var(--pb-ink);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.52)),
+    rgba(255, 255, 255, 0.42);
+}
+
+.pb-form-shell[data-profile-lane] .npc-panel-title,
+.pb-form-shell[data-profile-lane] .npc-section-title,
+.pb-form-shell[data-profile-lane] .npc-game-title,
+.pb-form-shell[data-profile-lane] .npc-cap-name,
+.pb-form-shell[data-profile-lane] .pb-entry-card-label {
+  color: var(--pb-ink);
+}
+
+.pb-form-shell[data-profile-lane] .npc-panel-sub,
+.pb-form-shell[data-profile-lane] .npc-panel-back,
+.pb-form-shell[data-profile-lane] .npc-game-desc,
+.pb-form-shell[data-profile-lane] .npc-cap-desc {
+  color: var(--pb-muted);
+}
+
+.pb-form-shell[data-profile-lane] .npc-game-url,
+.pb-form-shell[data-profile-lane] .npc-skill-hd-cat,
+.pb-form-shell[data-profile-lane] .npc-skill-ref-link {
+  color: var(--pb-accent);
+}
+
+.pb-form-shell[data-profile-lane] .pb-checklist-panel {
+  width: 260px;
+  border-radius: 28px;
+  padding: 16px;
+  color: var(--pb-ink);
+}
+
+.pb-form-shell[data-profile-lane] .pb-checklist-title {
+  color: var(--pb-ink);
+  font-weight: 860;
+}
+
+.pb-form-shell[data-profile-lane] .pb-checklist-meta,
+.pb-form-shell[data-profile-lane] .pb-checklist-task-label {
+  color: var(--pb-muted);
+}
+
+.pb-form-shell[data-profile-lane] .pb-checklist-toggle {
+  border: 1px solid rgba(20, 27, 48, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.58);
+  color: var(--pb-accent);
+}
+
+.pb-form-shell[data-profile-lane] .pb-checklist-bullet {
+  color: var(--pb-accent);
+}
+
+.pb-form-shell[data-profile-lane] .pb-pub-overlay {
+  background:
+    radial-gradient(circle at 50% 16%, var(--pb-accent-soft), transparent 0 28rem),
+    rgba(239, 234, 254, 0.72);
+  backdrop-filter: blur(28px) saturate(1.24);
+  -webkit-backdrop-filter: blur(28px) saturate(1.24);
+}
+
+.pb-form-shell[data-profile-lane] .pb-pub-card {
+  width: min(460px, calc(100% - 28px));
+  padding: 42px 34px;
+  border: 1px solid var(--pb-border);
+  border-radius: 36px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.54)),
+    rgba(255, 255, 255, 0.48);
+  box-shadow: var(--pb-shadow-shell);
+  backdrop-filter: blur(26px);
+  -webkit-backdrop-filter: blur(26px);
+}
+
+.pb-form-shell[data-profile-lane] .pb-pub-card > button[aria-label="Close"] {
+  background: linear-gradient(180deg, var(--pb-accent), var(--pb-accent-deep)) !important;
+  box-shadow: 0 14px 28px var(--pb-accent-glow) !important;
+}
+
+.pb-form-shell[data-profile-lane] .pb-pub-pulse,
+.pb-form-shell[data-profile-lane] .pb-pub-icon--green {
+  background: linear-gradient(180deg, var(--pb-accent), var(--pb-accent-deep));
+  box-shadow: 0 22px 44px var(--pb-accent-glow);
+}
+
+.pb-form-shell[data-profile-lane] .pb-pub-sub,
+.pb-form-shell[data-profile-lane] .pb-pub-btn-label {
+  color: var(--pb-muted);
+}
+
+.pb-form-shell[data-profile-lane] .pb-btn--danger {
+  border: 1px solid color-mix(in srgb, var(--pb-danger) 45%, white);
+  background: color-mix(in srgb, var(--pb-danger) 12%, white);
+  color: var(--pb-danger);
+}
+
+.pb-form-shell[data-profile-lane] .pb-delete-overlay {
+  background:
+    radial-gradient(circle at 50% 16%, rgba(216, 74, 93, 0.16), transparent 0 26rem),
+    rgba(239, 234, 254, 0.74) !important;
+  backdrop-filter: blur(28px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.2) !important;
+}
+
+.pb-form-shell[data-profile-lane] .pb-delete-card {
+  border: 1px solid rgba(255, 255, 255, 0.86) !important;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.54)),
+    rgba(255, 255, 255, 0.48) !important;
+  box-shadow: var(--pb-shadow-shell) !important;
+  color: var(--pb-ink) !important;
+  backdrop-filter: blur(26px) !important;
+  -webkit-backdrop-filter: blur(26px) !important;
+}
+
+.pb-form-shell[data-profile-lane] .pb-delete-card h2 {
+  color: var(--pb-ink) !important;
+}
+
+.pb-form-shell[data-profile-lane] .pb-delete-card p {
+  color: var(--pb-muted) !important;
+}
+
+.pb-form-shell[data-profile-lane] .pb-delete-cancel {
+  border-color: rgba(20, 27, 48, 0.08) !important;
+  background: rgba(255, 255, 255, 0.58) !important;
+  color: var(--pb-ink) !important;
+}
+
+.pb-form-shell[data-profile-lane] .pb-delete-confirm {
+  border-color: color-mix(in srgb, var(--pb-danger) 50%, white) !important;
+  background: color-mix(in srgb, var(--pb-danger) 12%, white) !important;
+  color: var(--pb-danger) !important;
+}
+
+@keyframes pbGlassIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 1120px) {
+  .pb-form-shell[data-profile-lane] .pb-form-top {
+    flex-wrap: wrap;
+    border-radius: 28px;
+  }
+
+  .pb-form-shell[data-profile-lane] .pb-account-link,
+  .pb-form-shell[data-profile-lane] .pb-account-status {
+    order: 4;
+    max-width: 100%;
+  }
+
+  .pb-form-shell[data-profile-lane] .npc-stack-row {
+    flex-wrap: wrap;
+  }
+
+  .pb-form-shell[data-profile-lane] .pb-checklist-panel {
+    width: min(100%, 430px);
+  }
+}
+
+@media (max-width: 820px) {
+  .pb-form-shell[data-profile-lane] .pb-form-body {
+    padding: 24px 10px 72px;
+  }
+
+  .pb-form-shell[data-profile-lane] .ob-screen {
+    grid-template-columns: 1fr;
+    border-radius: 30px;
+  }
+
+  .pb-form-shell[data-profile-lane] .ob-side {
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.70);
+  }
+
+  .pb-form-shell[data-profile-lane] .pb-type-cards,
+  .pb-form-shell[data-profile-lane] .ob-two-col,
+  .pb-form-shell[data-profile-lane] .ob-three-col,
+  .pb-form-shell[data-profile-lane] .ob-cap-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pb-form-shell[data-profile-lane] .pb-step-content {
+    min-height: 0;
+    border-radius: 30px;
+    padding: 26px 18px;
+  }
+
+  .pb-form-shell[data-profile-lane] .pb-step-title {
+    max-width: none;
+    font-size: clamp(40px, 13vw, 64px);
+  }
+
+  .pb-form-shell[data-profile-lane] .pb-link-row,
+  .pb-form-shell[data-profile-lane] .pb-social-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pb-form-shell[data-profile-lane] .pb-input--sm {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pb-form-shell[data-profile-lane] *,
+  .pb-form-shell[data-profile-lane] *::before,
+  .pb-form-shell[data-profile-lane] *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

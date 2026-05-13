@@ -18,6 +18,7 @@ function parseUserId(value: string): number | null {
 }
 
 export default function IdentityStep({ draft, update, onNext, onBack }: Props) {
+  const isStudio = draft.type === 'studio'
   const [urlInput, setUrlInput] = useState(
     draft.robloxUserId ? `https://www.roblox.com/users/${draft.robloxUserId}/profile` : ''
   )
@@ -52,7 +53,9 @@ export default function IdentityStep({ draft, update, onNext, onBack }: Props) {
         </div>
         <h1 className="ob-title ob-title--light">link your<br />roblox</h1>
         <p className="ob-copy ob-copy--light">
-          Pulls in your avatar and username. Studios trust verified Roblox accounts far more.
+          {isStudio
+            ? 'Links your studio representative or group proof so developers know the team is real.'
+            : 'Pulls in your avatar and username. Studios trust verified Roblox accounts far more.'}
         </p>
 
         <div className="ob-note-card">
@@ -62,7 +65,7 @@ export default function IdentityStep({ draft, update, onNext, onBack }: Props) {
       </aside>
 
       <section className="ob-main">
-        <div className="ob-progress"><span style={{ width: `${100 / 6}%` }} /></div>
+        <div className="ob-progress"><span style={{ width: `${100 / (isStudio ? 5 : 6)}%` }} /></div>
         <div className="ob-step-row">
           <span>Step 1 of 6 - Link Roblox</span>
           <span>1/6</span>
@@ -96,13 +99,13 @@ export default function IdentityStep({ draft, update, onNext, onBack }: Props) {
         <div className="ob-linked-preview">
           <div className="ob-linked-avatar">avatar</div>
           <div>
-            <div className="ob-linked-name">{draft.name || 'Your Roblox name'}</div>
+            <div className="ob-linked-name">{draft.name || (isStudio ? 'Your studio name' : 'Your Roblox name')}</div>
             <div className="ob-linked-sub">
-              Roblox creator{draft.robloxUserId ? ` · ID: ${draft.robloxUserId}` : ''}
+              {isStudio ? 'Roblox studio proof' : 'Roblox creator'}{draft.robloxUserId ? ` · ID: ${draft.robloxUserId}` : ''}
             </div>
             <div className="ob-linked-status">
               <span />
-              Available for work
+              {isStudio ? 'Ready to hire' : 'Available for work'}
             </div>
           </div>
         </div>
@@ -110,7 +113,7 @@ export default function IdentityStep({ draft, update, onNext, onBack }: Props) {
         <div className="pb-nav">
           <button className="pb-btn pb-btn--ghost" type="button" onClick={onBack}>Back</button>
           <button className="pb-btn pb-btn--primary" type="button" onClick={handleNext}>
-            Next: Availability
+            {isStudio ? 'Next: Studio Info' : 'Next: Availability'}
           </button>
         </div>
       </section>

@@ -30,10 +30,10 @@ export default function StudioRateStep({ draft, update, onNext, onBack }: Props)
       </aside>
 
       <section className="ob-main">
-        <div className="ob-progress"><span style={{ width: `${(4 / 6) * 100}%` }} /></div>
+        <div className="ob-progress"><span style={{ width: `${(3 / 5) * 100}%` }} /></div>
         <div className="ob-step-row">
-          <span>Step 4 of 6 — Rate & Hiring</span>
-          <span>4/6</span>
+          <span>Step 3 of 5 - Rate & Hiring</span>
+          <span>3/5</span>
         </div>
 
         <div className="pb-field">
