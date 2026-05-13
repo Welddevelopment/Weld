@@ -8,7 +8,7 @@ import type { Session } from "@supabase/supabase-js";
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from "@/lib/supabase/browser";
 import ProfileBuilder from "@/components/profile/ProfileBuilder";
 import { shareInvite, trackEvent } from "@/dynamic-landing-page/lib/browser";
-import { REWARD_TIERS, SITE_URL } from "@/dynamic-landing-page/lib/constants";
+import { SITE_URL } from "@/dynamic-landing-page/lib/constants";
 import { TYPE_COPY, SOURCE_LINES } from "@/dynamic-landing-page/lib/sample-data";
 import type { SourceVariant } from "@/dynamic-landing-page/lib/source-variant";
 import type {
@@ -69,13 +69,6 @@ export default function InviteExperience({
     ? inviteUrl
     : snapshot.sharePresets[shareChannel] || inviteUrl;
   const referralCount = snapshot.referralCount;
-  const activeTier =
-    [...REWARD_TIERS].reverse().find((tier) => referralCount >= tier.threshold) ?? REWARD_TIERS[0];
-  const nextTier = REWARD_TIERS.find((tier) => tier.threshold > referralCount);
-  const progressPercent = nextTier
-    ? Math.min(100, Math.round((referralCount / nextTier.threshold) * 100))
-    : 100;
-  const referralsRemaining = nextTier ? Math.max(nextTier.threshold - referralCount, 0) : 0;
 
   useEffect(() => {
     if (!hasBrowserSupabaseConfig()) {
@@ -216,10 +209,6 @@ export default function InviteExperience({
                 <span>Invite for</span>
                 <strong>{snapshot.lead.email}</strong>
               </div>
-              <div>
-                <span>Current status</span>
-                <strong>{activeTier.label}</strong>
-              </div>
               {session && (
                 <div>
                   <span>Referral count</span>
@@ -243,18 +232,6 @@ export default function InviteExperience({
                   <div className="invite-referral-number">
                     <strong>{referralCount}</strong>
                     <span>{referralCount === 1 ? "person joined" : "people joined"} using your invite</span>
-                  </div>
-                  <div className="invite-progress-block">
-                    <div className="invite-progress-label">
-                      <span>{activeTier.label}</span>
-                      <strong>
-                        {nextTier ? `${referralsRemaining} to ${nextTier.label}` : "Top visible tier"}
-                      </strong>
-                    </div>
-                    <div className="invite-progress-track" aria-hidden="true">
-                      <span style={{ width: `${progressPercent}%` }} />
-                    </div>
-                    <p>{activeTier.description}</p>
                   </div>
                 </>
               ) : (
