@@ -193,7 +193,7 @@ export default function PublishedProfileView({ profile, onEdit, onDelete }: Prop
     <div className="flex flex-1 flex-col items-center justify-center gap-8 py-16">
       <div className="flex items-center gap-2">
         <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
-        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/50">
+        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[rgba(8,24,39,0.5)]">
           Live — you&apos;re in the swipe pool
         </span>
       </div>
@@ -223,14 +223,14 @@ export default function PublishedProfileView({ profile, onEdit, onDelete }: Prop
         <button
           type="button"
           onClick={() => setShowEditChoice(true)}
-          className="font-mono text-[10px] uppercase tracking-[0.13em] text-white/40 transition hover:text-white/70"
+          className="font-mono text-[10px] uppercase tracking-[0.13em] text-[rgba(8,24,39,0.42)] transition hover:text-[#081827]"
         >
           Edit profile →
         </button>
         <button
           type="button"
           onClick={() => setShowDeleteWarning(true)}
-          className="font-mono text-[10px] uppercase tracking-[0.13em] text-red-500/40 transition hover:text-red-500/70"
+          className="font-mono text-[10px] uppercase tracking-[0.13em] text-red-400/60 transition hover:text-red-500"
         >
           Delete profile
         </button>

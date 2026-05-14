@@ -41,16 +41,16 @@ export default function AppNav() {
 
   return (
     <>
-    <nav className="fixed inset-x-0 top-0 z-50 flex items-center justify-between border-b border-white/10 bg-[rgba(12,14,15,0.92)] px-6 py-4 backdrop-blur-[12px]">
+    <nav className="fixed inset-x-0 top-0 z-50 flex items-center justify-between border-b border-[rgba(8,24,39,0.08)] bg-[rgba(251,252,255,0.88)] px-6 py-4 backdrop-blur-[12px]">
       <div className="flex flex-col">
         <Link
           href="/home"
-          className="font-display text-2xl italic tracking-[-0.05em] text-white/90"
+          className="font-display text-2xl italic tracking-[-0.05em] text-[#081827]"
         >
           weld.
         </Link>
         {email && (
-          <span className="font-mono text-[10px] tracking-[0.08em] text-white/40">{email}</span>
+          <span className="font-mono text-[10px] tracking-[0.08em] text-[rgba(8,24,39,0.42)]">{email}</span>
         )}
       </div>
 
@@ -63,8 +63,8 @@ export default function AppNav() {
               href={href}
               className={`rounded-full border px-4 py-2 font-mono text-[10px] uppercase tracking-[0.13em] transition ${
                 active
-                  ? 'border-white/25 bg-white/[0.10] text-white/95'
-                  : 'border-white/10 bg-white/[0.04] text-white/70 hover:border-white/20 hover:bg-white/[0.08] hover:text-white/90'
+                  ? 'border-[rgba(18,103,216,0.3)] bg-[rgba(18,103,216,0.08)] text-[#1267d8]'
+                  : 'border-[rgba(8,24,39,0.10)] bg-[rgba(8,24,39,0.03)] text-[rgba(8,24,39,0.55)] hover:border-[rgba(8,24,39,0.18)] hover:bg-[rgba(8,24,39,0.06)] hover:text-[#081827]'
               }`}
             >
               {label}
@@ -72,20 +72,20 @@ export default function AppNav() {
           )
         })}
 
-        <div className="ml-2 h-4 w-px bg-white/10" />
+        <div className="ml-2 h-4 w-px bg-[rgba(8,24,39,0.10)]" />
 
         {email ? (
           <button
             type="button"
             onClick={handleSignOut}
-            className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.13em] text-white/70 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white/90"
+            className="rounded-full border border-[rgba(8,24,39,0.10)] bg-[rgba(8,24,39,0.03)] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.13em] text-[rgba(8,24,39,0.55)] transition hover:border-[rgba(8,24,39,0.18)] hover:bg-[rgba(8,24,39,0.06)] hover:text-[#081827]"
           >
             Sign out
           </button>
         ) : (
           <Link
             href="/login"
-            className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.13em] text-white/70 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white/90"
+            className="rounded-full border border-[rgba(8,24,39,0.10)] bg-[rgba(8,24,39,0.03)] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.13em] text-[rgba(8,24,39,0.55)] transition hover:border-[rgba(8,24,39,0.18)] hover:bg-[rgba(8,24,39,0.06)] hover:text-[#081827]"
           >
             Log in
           </Link>
