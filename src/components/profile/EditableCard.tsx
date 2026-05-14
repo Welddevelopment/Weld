@@ -16,7 +16,6 @@ interface Props {
   onPublish: () => void
   showPortfolioButton?: boolean
   showExperienceEdit?: boolean
-  showScrollActions?: boolean
 }
 
 function expLabel(years: number | null): string {
@@ -38,7 +37,6 @@ export default function EditableCard({
   onPublish,
   showPortfolioButton = false,
   showExperienceEdit = false,
-  showScrollActions = false,
 }: Props) {
   const [showSkillsPicker, setShowSkillsPicker] = useState(false)
 
@@ -308,18 +306,13 @@ export default function EditableCard({
       </div>
 
       {/* Editor action bar */}
-      <div className={`npc-editor-bar${showScrollActions ? ' npc-editor-bar--hidden' : ''}`}>
+      <div className="npc-editor-bar">
         <button type="button" className="npc-editor-publish" onClick={onPublish}>
           Publish Profile
         </button>
         <button type="button" className="npc-editor-back" onClick={onBack}>
           {onBackLabel}
         </button>
-      </div>
-      <div className={`npc-editor-scroll-actions${showScrollActions ? ' npc-editor-scroll-actions--show' : ''}`}>
-        <button type="button" className="npc-action-seg" onClick={onBack}>Back</button>
-        <button type="button" className="npc-action-seg" onClick={onBack}>Save</button>
-        <button type="button" className="npc-action-seg" onClick={onPublish}>Publish</button>
       </div>
     </div>
   )

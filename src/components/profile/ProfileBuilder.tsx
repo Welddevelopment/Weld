@@ -484,7 +484,6 @@ export default function ProfileBuilder({
                 onPublish={handlePublish}
                 showPortfolioButton={true}
                 showExperienceEdit={true}
-                showScrollActions={showScrollActions}
               />
             )}
 
