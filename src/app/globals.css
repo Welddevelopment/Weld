@@ -18631,10 +18631,21 @@ button.invite-secondary-button {
 .pb-form-shell[data-profile-lane] .npc-editable-name,
 .pb-form-shell[data-profile-lane] .npc-stat-editable {
   color: var(--pb-ink);
+  background: transparent;
+}
+
+.pb-form-shell[data-profile-lane] .npc-editable-bio {
+  color: var(--pb-muted);
+  background: transparent;
+}
+
+.pb-form-shell[data-profile-lane] .npc-exp-input {
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--pb-ink);
+  border: 1px solid rgba(20, 27, 48, 0.12);
 }
 
 .pb-form-shell[data-profile-lane] .npc-role,
-.pb-form-shell[data-profile-lane] .npc-editable-bio,
 .pb-form-shell[data-profile-lane] .npc-stat-lbl,
 .pb-form-shell[data-profile-lane] .npc-entry-sub,
 .pb-form-shell[data-profile-lane] .sc-rate-note,
