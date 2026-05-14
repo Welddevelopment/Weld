@@ -6,7 +6,6 @@ import { useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from "@/lib/supabase/browser";
-import ProfileBuilder from "@/components/profile/ProfileBuilder";
 import { shareInvite, trackEvent } from "@/dynamic-landing-page/lib/browser";
 import { SITE_URL } from "@/dynamic-landing-page/lib/constants";
 import { TYPE_COPY, SOURCE_LINES } from "@/dynamic-landing-page/lib/sample-data";
@@ -267,11 +266,11 @@ export default function InviteExperience({
                   <>
                     <h2>Build your proof profile.</h2>
                     <p>
-                      Complete your Weld profile so studios can evaluate role, proof, rate, and fit before outreach.
+                      Complete your Weld profile so studios can evaluate your role, proof, rate, and fit before reaching out.
                     </p>
-                    <div className="invite-profile-builder">
-                      <ProfileBuilder initialPhase="identity" embedded />
-                    </div>
+                    <Link href="/profile" className="invite-primary-button">
+                      Build profile →
+                    </Link>
                   </>
                 )}
               </article>
