@@ -109,6 +109,7 @@ export default function AuthForm({ mode }: Props) {
         if (signUpError) throw signUpError
 
         if (data.session) {
+          try { localStorage.setItem('weld_has_account', '1') } catch {}
           router.push(postAuthPath)
           router.refresh()
           return
@@ -125,6 +126,7 @@ export default function AuthForm({ mode }: Props) {
 
       if (signInError) throw signInError
 
+      try { localStorage.setItem('weld_has_account', '1') } catch {}
       router.push(postAuthPath)
       router.refresh()
     } catch (authError) {
@@ -212,6 +214,12 @@ export default function AuthForm({ mode }: Props) {
             <button type="submit" className="auth-submit" disabled={busy}>
               {busy ? 'Working...' : copy.button}
             </button>
+
+            {mode === 'login' && (
+              <Link href="/forgot-password" className="auth-forgot">
+                Forgot password?
+              </Link>
+            )}
           </form>
         )}
 
