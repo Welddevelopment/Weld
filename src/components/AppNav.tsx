@@ -15,7 +15,12 @@ const NAV_LINKS = [
   { href: '/preview', label: 'Preview' },
 ]
 
-const TESTER_EMAILS = new Set(['joeljeon7@gmail.com'])
+const TESTER_EMAILS = new Set([
+  'qeji13@gmail.com',
+  'joeljeon7@gmail.com',
+  'joeljeon25@gmail.com',
+  '22hjeonj@gmail.com',
+])
 
 export default function AppNav() {
   const pathname = usePathname()
