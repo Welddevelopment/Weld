@@ -184,12 +184,14 @@ export default function ProfileBuilder({
   initialPhase = 'identity',
   onCancel,
   embedded = false,
+  backToInviteHref,
 }: {
   onPublished?: (profile: PreviewProfile) => void
   onDelete?: () => Promise<void>
   initialPhase?: Phase
   onCancel?: () => void
   embedded?: boolean
+  backToInviteHref?: string
 } = {}) {
   const router = useRouter()
   const [draft, setDraft] = useState<ProfileDraft>(createDraft)
@@ -388,6 +390,11 @@ export default function ProfileBuilder({
         <span className="pb-form-step-indicator">
           {quickStepLabel} · {quickStepNum} of {quickStepCount}
         </span>
+      )}
+      {backToInviteHref && (
+        <Link href={backToInviteHref} className="pb-back-invite-link">
+          ← Invite page
+        </Link>
       )}
       <button
         type="button"

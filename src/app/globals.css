@@ -18192,6 +18192,28 @@ button.invite-secondary-button {
   white-space: nowrap;
 }
 
+.pb-form-shell[data-profile-lane] .pb-back-invite-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid rgba(18, 103, 216, 0.20);
+  background: rgba(18, 103, 216, 0.06);
+  color: #1267d8;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 760;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.pb-form-shell[data-profile-lane] .pb-back-invite-link:hover {
+  background: rgba(18, 103, 216, 0.12);
+  border-color: rgba(18, 103, 216, 0.35);
+}
+
 .pb-form-shell[data-profile-lane] .pb-form-body {
   position: relative;
   align-items: flex-start;

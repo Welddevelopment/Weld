@@ -32,6 +32,13 @@ export default function ProfilePage() {
   const [builderKey, setBuilderKey] = useState(0)
   const [hasDraft, setHasDraft] = useState(false)
   const [editStart, setEditStart] = useState<EditStart>('editor')
+  const [inviteUrl, setInviteUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    try {
+      setInviteUrl(localStorage.getItem('weld_last_invite_url'))
+    } catch {}
+  }, [])
 
   useEffect(() => {
     if (!hasBrowserSupabaseConfig()) {
@@ -108,6 +115,7 @@ export default function ProfilePage() {
         onDelete={handleDelete}
         initialPhase={publishedProfile ? publishedStartPhase : 'type'}
         onCancel={publishedProfile ? () => setMode('published') : undefined}
+        backToInviteHref={inviteUrl ?? undefined}
       />
     )
   }
@@ -160,6 +168,14 @@ export default function ProfilePage() {
               >
                 {hasDraft ? 'Continue profile' : 'Make profile'}
               </button>
+              {inviteUrl && (
+                <Link
+                  href={inviteUrl}
+                  className="rounded-full border border-[rgba(8,24,39,0.10)] bg-[rgba(8,24,39,0.03)] px-5 py-3 font-mono text-[10px] uppercase tracking-[0.13em] text-[rgba(8,24,39,0.55)] transition hover:border-[rgba(8,24,39,0.18)] hover:text-[#081827]"
+                >
+                  ← Invite page
+                </Link>
+              )}
               <Link
                 href="/home"
                 className="rounded-full border border-[rgba(8,24,39,0.10)] bg-[rgba(8,24,39,0.03)] px-5 py-3 font-mono text-[10px] uppercase tracking-[0.13em] text-[rgba(8,24,39,0.55)] transition hover:border-[rgba(8,24,39,0.18)] hover:text-[#081827]"
@@ -172,11 +188,23 @@ export default function ProfilePage() {
       )}
 
       {mode === 'published' && publishedProfile && (
-        <PublishedProfileView
-          profile={publishedProfile}
-          onEdit={startPublishedEdit}
-          onDelete={handleDelete}
-        />
+        <>
+          {inviteUrl && (
+            <div className="flex justify-start px-6 pt-4">
+              <Link
+                href={inviteUrl}
+                className="rounded-full border border-[rgba(8,24,39,0.10)] bg-[rgba(8,24,39,0.03)] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.13em] text-[rgba(8,24,39,0.55)] transition hover:border-[rgba(8,24,39,0.18)] hover:text-[#081827]"
+              >
+                ← Invite page
+              </Link>
+            </div>
+          )}
+          <PublishedProfileView
+            profile={publishedProfile}
+            onEdit={startPublishedEdit}
+            onDelete={handleDelete}
+          />
+        </>
       )}
     </div>
   )
