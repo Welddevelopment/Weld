@@ -8,7 +8,7 @@ function AvatarImg({ userId, name }: { userId: number; name: string }) {
     <div className="aux-profile-icon">
       <div className="aux-profile-icon-initials">{initials}</div>
       <img
-        src={`https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=150&height=150&format=png`}
+        src={`/api/roblox/avatar?userId=${userId}`}
         alt={name}
         onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
       />

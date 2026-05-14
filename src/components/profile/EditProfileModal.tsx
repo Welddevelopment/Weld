@@ -232,7 +232,7 @@ function AvatarImg({ userId, name, bg }: { userId: number; name: string; bg: str
         </div>
         {userId > 1 && (
           <img
-            src={`https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=150&height=150&format=png`}
+            src={`/api/roblox/avatar?userId=${userId}`}
             alt={name}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
             onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}

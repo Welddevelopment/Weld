@@ -35,7 +35,7 @@ function AvatarImg({ userId, name, bg }: { userId: number; name: string; bg: str
     <div className="fc-avatar" style={{ background: bg }}>
       <div className="fc-avatar-initials">{initials}</div>
       <img
-        src={`https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=150&height=150&format=png`}
+        src={`/api/roblox/avatar?userId=${userId}`}
         alt={name}
         onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
       />

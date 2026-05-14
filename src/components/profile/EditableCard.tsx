@@ -64,7 +64,7 @@ export default function EditableCard({
             {draft.robloxUserId && (
               <img
                 className="npc-avatar-img"
-                src={`https://www.roblox.com/headshot-thumbnail/image?userId=${draft.robloxUserId}&width=150&height=150&format=png`}
+                src={`/api/roblox/avatar?userId=${draft.robloxUserId}`}
                 alt={draft.name}
                 onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
               />

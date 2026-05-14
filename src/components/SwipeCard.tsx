@@ -30,7 +30,7 @@ function Avatar({ profile }: { profile: PreviewProfile }) {
       {profile.robloxUserId !== 1 && (
         <img
           className="npc-avatar-img"
-          src={`https://www.roblox.com/headshot-thumbnail/image?userId=${profile.robloxUserId}&width=150&height=150&format=png`}
+          src={`/api/roblox/avatar?userId=${profile.robloxUserId}`}
           alt={profile.name}
           onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
         />
