@@ -30,9 +30,10 @@ import {
   type TalentProfile
 } from "@/dynamic-landing-page/lib/role-config";
 import SwipeCard from "@/components/matching-preview/SwipeCard";
-import StudioCard from "@/components/matching-preview/StudioCard";
+import RealStudioCard from "@/components/StudioCard";
 import { MARQUEE_PROFILES } from "@/data/marqueeProfiles";
 import { MARQUEE_STUDIOS } from "@/data/marqueeStudios";
+import { marqueeStudioToPreview } from "@/data/marqueeAdapters";
 
 interface MarketingPageProps {
   initialMode: Audience;
@@ -1418,7 +1419,7 @@ function OtherSideSection({
           {doubled.map((studio, i) => (
             <div key={`studio-${studio.id}-${i}`} className="marquee-card-wrap marquee-card-wrap--studio">
               <div className="npc-hero-preview-card">
-                <StudioCard studio={studio} />
+                <RealStudioCard profile={marqueeStudioToPreview(studio)} />
               </div>
             </div>
           ))}
