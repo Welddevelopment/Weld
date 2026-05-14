@@ -128,7 +128,7 @@ export default function StudioRolesEditPanel({ draft, update, onClose }: Props) 
               <textarea
                 className="pb-panel-textarea"
                 style={{ marginTop: 6 }}
-                rows={2}
+                rows={3}
                 placeholder={`What should developers know about your ${role.skill} needs?`}
                 value={getSkillDesc(role.skill)}
                 onChange={e => setSkillDesc(role.skill, e.target.value)}
@@ -137,7 +137,7 @@ export default function StudioRolesEditPanel({ draft, update, onClose }: Props) 
             <textarea
               className="pb-panel-textarea"
               style={{ marginTop: 6 }}
-              rows={2}
+              rows={4}
               placeholder="What will they work on? What experience is required?"
               value={role.description}
               onChange={e => change(i, { description: e.target.value })}

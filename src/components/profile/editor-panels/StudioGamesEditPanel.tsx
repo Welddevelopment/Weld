@@ -98,7 +98,7 @@ export default function StudioGamesEditPanel({ draft, update, onClose }: Props) 
             <textarea
               className="pb-panel-textarea"
               placeholder="What is this game about? What was your studio's role?"
-              rows={2}
+              rows={4}
               value={g.desc}
               onChange={e => change(i, { ...g, desc: e.target.value })}
             />

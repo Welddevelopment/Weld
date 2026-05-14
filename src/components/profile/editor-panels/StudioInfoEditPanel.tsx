@@ -76,7 +76,7 @@ export default function StudioInfoEditPanel({ draft, update, onClose }: Props) {
           <div className="pb-label" style={{ marginBottom: 8 }}>About</div>
           <textarea
             className="pb-panel-textarea"
-            rows={3}
+            rows={4}
             placeholder="Your studio's story, mission, or what makes you different…"
             value={draft.about}
             onChange={e => update({ about: e.target.value })}
@@ -215,7 +215,7 @@ export default function StudioInfoEditPanel({ draft, update, onClose }: Props) {
               <div style={{ fontSize: 11, fontWeight: 600, color: '#444', marginBottom: 4 }}>{name}</div>
               <textarea
                 className="pb-panel-textarea"
-                rows={2}
+                rows={3}
                 placeholder={`What should developers know about your ${name} needs?`}
                 value={getSkillDesc(name)}
                 onChange={e => setSkillDesc(name, e.target.value)}
