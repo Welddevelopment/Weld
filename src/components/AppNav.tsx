@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { getBrowserSupabase, hasBrowserSupabaseConfig } from '@/lib/supabase/browser'
 
@@ -15,10 +15,14 @@ const NAV_LINKS = [
   { href: '/preview', label: 'Preview' },
 ]
 
+const TESTER_EMAILS = new Set(['joeljeon7@gmail.com'])
+
 export default function AppNav() {
   const pathname = usePathname()
   const router = useRouter()
   const [email, setEmail] = useState<string | null>(null)
+  const [toast, setToast] = useState(false)
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     if (!hasBrowserSupabaseConfig()) return
@@ -31,6 +35,18 @@ export default function AppNav() {
     })
     return () => data.subscription.unsubscribe()
   }, [])
+
+  useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current) }, [])
+
+  function handleNavClick(href: string) {
+    if (email && TESTER_EMAILS.has(email)) {
+      router.push(href)
+      return
+    }
+    if (toastTimer.current) clearTimeout(toastTimer.current)
+    setToast(true)
+    toastTimer.current = setTimeout(() => setToast(false), 3200)
+  }
 
   async function handleSignOut() {
     if (!hasBrowserSupabaseConfig()) return
@@ -58,9 +74,10 @@ export default function AppNav() {
         {NAV_LINKS.map(({ href, label }) => {
           const active = pathname === href
           return (
-            <Link
+            <button
               key={href}
-              href={href}
+              type="button"
+              onClick={() => handleNavClick(href)}
               className={`rounded-full border px-4 py-2 font-mono text-[10px] uppercase tracking-[0.13em] transition ${
                 active
                   ? 'border-[rgba(18,103,216,0.3)] bg-[rgba(18,103,216,0.08)] text-[#1267d8]'
@@ -68,7 +85,7 @@ export default function AppNav() {
               }`}
             >
               {label}
-            </Link>
+            </button>
           )
         })}
 
@@ -93,6 +110,26 @@ export default function AppNav() {
       </div>
     </nav>
     <div aria-hidden="true" className="h-[65px] shrink-0" />
+
+    <div
+      style={{
+        position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)',
+        zIndex: 9999, pointerEvents: 'none',
+        transition: 'opacity 0.25s ease, transform 0.25s ease',
+        opacity: toast ? 1 : 0,
+        translate: toast ? '0 0' : '0 8px',
+      }}
+    >
+      <div style={{
+        background: 'rgba(8,24,39,0.88)', backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255,255,255,0.10)', borderRadius: 999,
+        padding: '10px 20px', whiteSpace: 'nowrap',
+        fontFamily: 'var(--font-mono)', fontSize: 11,
+        letterSpacing: '0.08em', color: 'rgba(255,255,255,0.82)',
+      }}>
+        Coming soon — this feature will be available at full launch.
+      </div>
+    </div>
     </>
   )
 }
