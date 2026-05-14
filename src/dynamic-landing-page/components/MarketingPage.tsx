@@ -748,9 +748,11 @@ function WeldLandingPage({
 
     setCaptureStatus("Opening your signup form...");
 
+    const refCode = searchParams.get("ref") ?? "";
     const signupParams = new URLSearchParams({
       email: email.trim(),
-      type: mode
+      type: mode,
+      ...(refCode ? { ref: refCode } : {})
     });
 
     window.setTimeout(() => {
