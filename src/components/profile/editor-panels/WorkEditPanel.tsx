@@ -123,7 +123,7 @@ export default function WorkEditPanel({ draft, update, onClose }: Props) {
             <textarea
               className="pb-panel-textarea"
               placeholder="What did you build? What was your role?"
-              rows={2}
+              rows={4}
               value={w.desc}
               onChange={e => change(i, { ...w, desc: e.target.value })}
             />

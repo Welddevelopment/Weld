@@ -143,7 +143,7 @@ export default function GamesEditPanel({ draft, update, onClose }: Props) {
             <textarea
               className="pb-panel-textarea"
               placeholder="What did you work on? What was your contribution?"
-              rows={2}
+              rows={4}
               value={g.desc}
               onChange={e => change(i, { ...g, desc: e.target.value })}
             />
