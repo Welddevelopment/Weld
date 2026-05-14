@@ -16164,6 +16164,11 @@ button.invite-secondary-button {
   color: #4444EE;
   font-weight: 600;
 }
+.npc-panel .pb-panel-input,
+.npc-panel .pb-panel-textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
 .npc-panel .pb-panel-input::placeholder,
 .npc-panel .pb-panel-textarea::placeholder {
   color: rgba(0,0,0,0.28);
