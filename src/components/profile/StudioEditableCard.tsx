@@ -1,8 +1,15 @@
 'use client'
 
+import { useState } from 'react'
 import { ProfileDraft } from './profile-types'
 import { getInitials } from '@/lib/utils'
 
+function parseRobloxUserId(value: string): number | null {
+  const match = value.match(/\/users\/(\d+)/)
+  if (match) return Number(match[1])
+  if (/^\d+$/.test(value.trim())) return Number(value.trim())
+  return null
+}
 
 interface Props {
   draft: ProfileDraft
@@ -41,6 +48,10 @@ export default function StudioEditableCard({
   onBackLabel = '← Back',
   onPublish,
 }: Props) {
+  const [showRobloxInput, setShowRobloxInput] = useState(false)
+  const [robloxInputVal, setRobloxInputVal] = useState(
+    draft.robloxUserId ? `https://www.roblox.com/users/${draft.robloxUserId}/profile` : ''
+  )
   const initials = getInitials(draft.name) || '?'
   const rate = rateDisplay(draft)
   const roles = draft.openRoles
@@ -53,7 +64,13 @@ export default function StudioEditableCard({
 
         {/* Top: logo + stats */}
         <div className="npc-top">
-          <div className="npc-avatar-wrap" style={{ borderRadius: 16 }}>
+          <button
+            type="button"
+            className="npc-avatar-wrap"
+            onClick={() => setShowRobloxInput(true)}
+            title="Tap to set Roblox avatar"
+            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', borderRadius: 16 }}
+          >
             <div className="npc-avatar-bg" style={{ background: draft.bg || '#4444EE', borderRadius: 16 }} />
             <div className="npc-avatar-initials" style={{ fontSize: 26 }}>{initials}</div>
             {draft.robloxUserId && (
@@ -65,7 +82,18 @@ export default function StudioEditableCard({
               />
             )}
             <div className="npc-online-dot" />
-          </div>
+            <div style={{
+              position: 'absolute', bottom: 0, right: 0,
+              width: 20, height: 20, borderRadius: '50%',
+              background: '#fff', border: '1.5px solid #e0e0e0',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.12)',
+            }}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="10" height="10">
+                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+              </svg>
+            </div>
+          </button>
 
           <div className="npc-top-right">
             <div className="npc-stats">
@@ -258,6 +286,47 @@ export default function StudioEditableCard({
           </button>
         </div>
 
+        {/* Roblox ID input popup */}
+        {showRobloxInput && (
+          <div
+            style={{ position: 'absolute', inset: 0, zIndex: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+            onClick={() => setShowRobloxInput(false)}
+          >
+            <div
+              style={{ background: '#fff', borderRadius: 16, padding: 20, boxShadow: '0 8px 40px rgba(0,0,0,0.18)', width: '100%' }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div style={{ fontWeight: 800, fontSize: 16, color: '#111', marginBottom: 8 }}>Set Roblox Avatar</div>
+              <p style={{ fontSize: 12, color: '#666', marginBottom: 12 }}>Paste your Roblox profile URL or numeric user ID.</p>
+              <input
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1.5px solid #e0e0e0', fontSize: 13, color: '#111', marginBottom: 12, boxSizing: 'border-box' }}
+                value={robloxInputVal}
+                onChange={e => setRobloxInputVal(e.target.value)}
+                placeholder="https://www.roblox.com/users/12345/profile"
+                autoFocus
+              />
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  type="button"
+                  style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', background: '#6c5cff', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}
+                  onClick={() => {
+                    const id = parseRobloxUserId(robloxInputVal)
+                    if (id) { update({ robloxUserId: id }); setShowRobloxInput(false) }
+                  }}
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: '1.5px solid #e0e0e0', background: 'none', fontSize: 13, color: '#666', cursor: 'pointer' }}
+                  onClick={() => setShowRobloxInput(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Action bar */}
