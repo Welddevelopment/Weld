@@ -4873,15 +4873,100 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .role-summary-card,
 .waitlist-shell,
 .glass-footer {
-  background: #0E1A2B;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(800px 500px at 90% 10%, rgba(89, 194, 240, 0.16), transparent 60%),
+    #0E1A2B;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0;
   box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  padding: 80px 32px 56px;
+}
+
+.footer-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 560px;
+}
+
+.footer-cta-headline {
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 600;
+  color: #FFFFFF;
+  margin: 0;
+  line-height: 1.15;
+}
+
+.footer-cta-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.footer-cta-input {
+  flex: 1;
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  font-size: 14px;
+  outline: none;
+}
+
+.footer-cta-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.footer-cta-input:focus {
+  border-color: rgba(89, 194, 240, 0.5);
+}
+
+.footer-cta-btn {
+  height: 48px;
+  padding: 0 24px;
+  border-radius: 999px;
+  border: none;
+  background: #59C2F0;
+  color: #0E1A2B;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.footer-cta-btn:hover {
+  background: #3fb4ea;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .glass-footer strong,
+.glass-footer .footer-links strong {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+}
+
 .glass-footer nav a,
-.glass-footer span {
-  color: rgba(255, 255, 255, 0.7);
+.glass-footer .footer-links a {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.glass-footer nav a:hover,
+.glass-footer .footer-links a:hover {
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .glass-card,

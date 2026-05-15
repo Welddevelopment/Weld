@@ -879,7 +879,7 @@ function WeldLandingPage({
         <FriendlyFAQ copy={modeCopy} />
       </main>
 
-      <FooterCTA copy={modeCopy} />
+      <FooterCTA copy={modeCopy} mode={mode} />
     </div>
   );
 }
@@ -1813,14 +1813,43 @@ function FriendlyFAQ({ copy }: { copy: LandingCopy }) {
   );
 }
 
-function FooterCTA({ copy }: { copy: LandingCopy }) {
+function FooterCTA({ copy, mode }: { copy: LandingCopy; mode: Audience }) {
+  const [footerEmail, setFooterEmail] = useState('')
+
+  async function handleFooterSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const trimmed = footerEmail.trim()
+    if (!trimmed) return
+    try {
+      const res = await fetch(`/api/waitlist/check?email=${encodeURIComponent(trimmed)}`)
+      const data = await res.json() as { exists: boolean; inviteUrl?: string }
+      if (data.exists && data.inviteUrl) {
+        window.location.href = data.inviteUrl
+        return
+      }
+    } catch { /* proceed */ }
+    const params = new URLSearchParams({ email: trimmed, type: mode })
+    window.location.href = `/signup?${params}`
+  }
+
   return (
     <footer className="glass-footer">
-      <div>
-        <strong>weld.</strong>
-        <span>{copy.footer.tagline}</span>
+      <div className="footer-cta">
+        <h2 className="footer-cta-headline">Last call — get early access.</h2>
+        <form className="footer-cta-form" onSubmit={handleFooterSubmit}>
+          <input
+            className="footer-cta-input"
+            type="email"
+            placeholder="your@email.com"
+            value={footerEmail}
+            onChange={e => setFooterEmail(e.target.value)}
+            autoComplete="email"
+          />
+          <button type="submit" className="footer-cta-btn">Get early access</button>
+        </form>
       </div>
-      <nav aria-label="Footer">
+      <nav className="footer-links" aria-label="Footer">
+        <strong>weld.</strong>
         <a href={`${WAITLIST_URL}/privacy`}>{copy.footer.privacy}</a>
         <a href={`${WAITLIST_URL}/terms`}>{copy.footer.terms}</a>
         <a href={`${WAITLIST_URL}/contact`}>{copy.footer.contact}</a>
