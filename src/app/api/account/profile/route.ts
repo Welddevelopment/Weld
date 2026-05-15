@@ -35,7 +35,7 @@ async function prefillFromWaitlist(email: string): Promise<Record<string, unknow
 
   const name = String(identity.displayName ?? identity.studioName ?? '')
   const proofLink = String(proof.proofLink ?? '')
-  const teamSize = proof.teamSize ? Number(proof.teamSize) : null
+  const teamSize = proof.teamSize ? parseInt(String(proof.teamSize), 10) || null : null
 
   return {
     type,
