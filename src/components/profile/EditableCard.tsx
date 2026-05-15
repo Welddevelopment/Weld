@@ -50,6 +50,7 @@ export default function EditableCard({
   const [robloxInputVal, setRobloxInputVal] = useState(
     draft.robloxUserId ? `https://www.roblox.com/users/${draft.robloxUserId}/profile` : ''
   )
+  const [robloxInputError, setRobloxInputError] = useState(false)
 
   const initials = getInitials(draft.name) || '?'
   const rateDisplay = draft.rateAmount
@@ -304,19 +305,23 @@ export default function EditableCard({
               <div style={{ fontWeight: 800, fontSize: 16, color: '#111', marginBottom: 8 }}>Set Roblox Avatar</div>
               <p style={{ fontSize: 12, color: '#666', marginBottom: 12 }}>Paste your Roblox profile URL or numeric user ID.</p>
               <input
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1.5px solid #e0e0e0', fontSize: 13, color: '#111', marginBottom: 12, boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${robloxInputError ? '#e84624' : '#e0e0e0'}`, fontSize: 13, color: '#111', marginBottom: robloxInputError ? 6 : 12, boxSizing: 'border-box' }}
                 value={robloxInputVal}
-                onChange={e => setRobloxInputVal(e.target.value)}
+                onChange={e => { setRobloxInputVal(e.target.value); setRobloxInputError(false) }}
                 placeholder="https://www.roblox.com/users/12345/profile"
                 autoFocus
               />
+              {robloxInputError && (
+                <p style={{ fontSize: 11, color: '#e84624', margin: '0 0 10px' }}>Paste a Roblox profile URL or numeric user ID.</p>
+              )}
               <div style={{ display: 'flex', gap: 8 }}>
                 <button
                   type="button"
                   style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', background: '#6c5cff', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}
                   onClick={() => {
                     const id = parseRobloxUserId(robloxInputVal)
-                    if (id) { update({ robloxUserId: id }); setShowRobloxInput(false) }
+                    if (id) { update({ robloxUserId: id }); setShowRobloxInput(false); setRobloxInputError(false) }
+                    else setRobloxInputError(true)
                   }}
                 >
                   Save

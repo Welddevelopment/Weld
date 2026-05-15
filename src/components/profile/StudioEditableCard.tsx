@@ -52,6 +52,7 @@ export default function StudioEditableCard({
   const [robloxInputVal, setRobloxInputVal] = useState(
     draft.robloxUserId ? `https://www.roblox.com/users/${draft.robloxUserId}/profile` : ''
   )
+  const [robloxInputError, setRobloxInputError] = useState(false)
   const initials = getInitials(draft.name) || '?'
   const rate = rateDisplay(draft)
   const roles = draft.openRoles
@@ -183,12 +184,12 @@ export default function StudioEditableCard({
         />
 
         {/* 3-col info grid — read-only display, panels handle editing */}
-        <div className="sc-info-grid">
+        <div className="sc-info-card">
           <div className="sc-info-col">
-            <div className="sc-col-heading">Hiring Rate</div>
+            <div className="sc-info-label">Hiring Rate</div>
             {rate
               ? <>
-                  <div className="sc-rate-range">{rate}</div>
+                  <div className="sc-rate">{rate}</div>
                   <div className="sc-rate-type">{draft.rateType ?? 'Hourly or milestone'}</div>
                   {draft.rateNote && <div className="sc-rate-note">{draft.rateNote}</div>}
                 </>
@@ -197,10 +198,10 @@ export default function StudioEditableCard({
           </div>
 
           <div className="sc-info-col">
-            <div className="sc-col-heading">Looking For</div>
-            <div className="sc-skill-tags">
+            <div className="sc-info-label">Looking For</div>
+            <div className="sc-chips">
               {skills.slice(0, 6).map(s => (
-                <span key={s} className="sc-skill-tag">{s}</span>
+                <span key={s} className="sc-skill-chip" style={{ background: '#f3f4f6', color: '#374151' }}>{s}</span>
               ))}
               {skills.length === 0 && (
                 <span className="sc-rate-note" style={{ cursor: 'pointer' }} onClick={() => onToggleRight('roles')}>
@@ -210,27 +211,28 @@ export default function StudioEditableCard({
             </div>
           </div>
 
-          <div className="sc-info-col" style={{ borderRight: 'none' }}>
-            <div className="sc-col-heading">Open Roles</div>
+          <div className="sc-info-col">
+            <div className="sc-info-label">Open Roles</div>
             {roles.slice(0, 4).map((role, idx) => {
               const c = skillColor(role.skill)
-              const isActive = rightPanel === 'roles'
               return (
                 <button
                   key={idx}
-                  className={`sc-role-btn${isActive ? ' sc-role-btn--active' : ''}`}
+                  type="button"
+                  className={`sc-role-row${rightPanel === 'roles' ? ' sc-role-row--active' : ''}`}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, width: '100%', textAlign: 'left' }}
                   onClick={() => onToggleRight('roles')}
                 >
-                  <span className="sc-role-icon" style={{ width: 14, height: 14, borderRadius: 3, background: `${c}22`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontSize: 7, fontWeight: 800, color: c, lineHeight: 1 }}>{(role.skill || '???').slice(0, 3)}</span>
+                  <span className="sc-role-icon" style={{ background: `${c}22`, color: c }}>
+                    {(role.skill || '???').slice(0, 2).toUpperCase()}
                   </span>
-                  <span className="sc-role-name">{role.title || 'Untitled role'}</span>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="8" height="8" className="sc-role-chevron"><polyline points="9 18 15 12 9 6"/></svg>
+                  <span className="sc-role-title">{role.title || 'Untitled role'}</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="8" height="8"><polyline points="9 18 15 12 9 6"/></svg>
                 </button>
               )
             })}
             {roles.length === 0 && (
-              <span className="sc-rate-note" style={{ cursor: 'pointer' }} onClick={() => onToggleRight('roles')}>
+              <span className="sc-no-roles" style={{ cursor: 'pointer' }} onClick={() => onToggleRight('roles')}>
                 + Add roles
               </span>
             )}
@@ -299,19 +301,23 @@ export default function StudioEditableCard({
               <div style={{ fontWeight: 800, fontSize: 16, color: '#111', marginBottom: 8 }}>Set Roblox Avatar</div>
               <p style={{ fontSize: 12, color: '#666', marginBottom: 12 }}>Paste your Roblox profile URL or numeric user ID.</p>
               <input
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1.5px solid #e0e0e0', fontSize: 13, color: '#111', marginBottom: 12, boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${robloxInputError ? '#e84624' : '#e0e0e0'}`, fontSize: 13, color: '#111', marginBottom: robloxInputError ? 6 : 12, boxSizing: 'border-box' }}
                 value={robloxInputVal}
-                onChange={e => setRobloxInputVal(e.target.value)}
+                onChange={e => { setRobloxInputVal(e.target.value); setRobloxInputError(false) }}
                 placeholder="https://www.roblox.com/users/12345/profile"
                 autoFocus
               />
+              {robloxInputError && (
+                <p style={{ fontSize: 11, color: '#e84624', margin: '0 0 10px' }}>Paste a Roblox profile URL or numeric user ID.</p>
+              )}
               <div style={{ display: 'flex', gap: 8 }}>
                 <button
                   type="button"
                   style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', background: '#6c5cff', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}
                   onClick={() => {
                     const id = parseRobloxUserId(robloxInputVal)
-                    if (id) { update({ robloxUserId: id }); setShowRobloxInput(false) }
+                    if (id) { update({ robloxUserId: id }); setShowRobloxInput(false); setRobloxInputError(false) }
+                    else setRobloxInputError(true)
                   }}
                 >
                   Save
