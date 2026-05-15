@@ -235,13 +235,20 @@ export default function StudioCard({
             {roles.slice(0, 3).map((role, idx) => {
               const rc = getSkillStyle(role.skill)
               return (
-                <div key={idx} className="sc-role-row">
+                <button
+                  key={idx}
+                  type="button"
+                  className="sc-role-row"
+                  style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center' }}
+                  onMouseDown={stopDrag}
+                  onClick={e => { e.stopPropagation(); onOpenPanel?.({ skill: role.skill, role: role.title }) }}
+                >
                   <span className="sc-role-icon" style={{ background: rc.bg, color: rc.color }}>
                     {(role.skill || '???').slice(0, 2).toUpperCase()}
                   </span>
                   <span className="sc-role-title">{role.title}</span>
                   <ChevronIcon />
-                </div>
+                </button>
               )
             })}
             {roles.length === 0 && <span className="sc-no-roles">None open</span>}
