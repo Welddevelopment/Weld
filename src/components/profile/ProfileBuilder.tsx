@@ -108,7 +108,7 @@ function ProfileAccountStatus({ accountEmail, saveState }: { accountEmail: strin
   )
 }
 
-function PublishedOverlay({ onStartMatching, onDismiss }: { onStartMatching: () => void; onDismiss: () => void }) {
+function PublishedOverlay({ onDismiss }: { onStartMatching: () => void; onDismiss: () => void }) {
   return (
     <div className="pb-pub-overlay">
       <div className="pb-pub-card" style={{ position: 'relative' }}>
@@ -119,7 +119,7 @@ function PublishedOverlay({ onStartMatching, onDismiss }: { onStartMatching: () 
           style={{
             position: 'absolute', top: -14, right: -14,
             width: 32, height: 32, borderRadius: '50%',
-            background: '#E84624', border: 'none', color: '#fff',
+            background: '#6c5cff', border: 'none', color: '#fff',
             fontSize: 15, fontWeight: 700, cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
@@ -131,16 +131,21 @@ function PublishedOverlay({ onStartMatching, onDismiss }: { onStartMatching: () 
           </svg>
         </div>
         <h2 className="pb-pub-heading">Profile is live</h2>
-        <p className="pb-pub-sub">You&apos;re live — studios and devs can now find you.</p>
-        <div className="pb-pub-actions">
-          <button type="button" className="pb-pub-btn" onClick={onStartMatching}>
-            <div className="pb-pub-icon pb-pub-icon--green">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </div>
-            <span className="pb-pub-btn-label">Start swiping</span>
-          </button>
+        <p className="pb-pub-sub">Your profile is saved and ready.</p>
+        <div style={{
+          margin: '18px 0 4px',
+          padding: '14px 16px',
+          background: 'rgba(108,92,255,0.07)',
+          border: '1px solid rgba(108,92,255,0.18)',
+          borderRadius: 12,
+          textAlign: 'left',
+        }}>
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#3a2fa0' }}>
+            Matching launches soon
+          </p>
+          <p style={{ margin: '6px 0 0', fontSize: 12, color: '#666', lineHeight: 1.6 }}>
+            When the full app goes live, your profile will be automatically pushed into the swipe pool. You&apos;ll get notified the moment matching opens.
+          </p>
         </div>
       </div>
     </div>
