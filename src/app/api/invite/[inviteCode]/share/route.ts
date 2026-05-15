@@ -19,7 +19,8 @@ export async function POST(
       inviteCode: params.inviteCode,
       channel: String(body.channel ?? "copy") as "discord" | "x" | "linkedin" | "copy",
       sessionId: String(body.sessionId ?? ""),
-      page: String(body.page ?? "invite")
+      page: String(body.page ?? "invite"),
+      origin: request.nextUrl.origin
     });
 
     return NextResponse.json(result);

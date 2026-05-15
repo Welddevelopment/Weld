@@ -594,7 +594,7 @@ export async function applyLegacyProfilePayload(
 }
 
 export async function recordInviteShare(input: ShareInviteInput) {
-  const snapshot = await buildInviteProgressSnapshot(input.inviteCode);
+  const snapshot = await buildInviteProgressSnapshot(input.inviteCode, input.origin);
   const copy = snapshot.sharePresets[input.channel];
 
   await insertReferralEvent({

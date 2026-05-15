@@ -107,6 +107,7 @@ export interface ShareInviteInput {
   channel: ShareChannel;
   sessionId?: string;
   page?: string;
+  origin?: string;
 }
 
 export interface SaveDraftInput {
