@@ -5177,6 +5177,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  margin-bottom: 12px;
 }
 
 .hero-talent-card {
