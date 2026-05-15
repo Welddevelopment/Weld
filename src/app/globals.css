@@ -4866,12 +4866,6 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   font: inherit;
 }
 
-.glass-nav-shell,
-.hero-shell,
-.glass-card,
-.proof-dialog,
-.role-summary-card,
-.waitlist-shell,
 .glass-footer {
   background:
     radial-gradient(800px 500px at 90% 10%, rgba(89, 194, 240, 0.16), transparent 60%),
