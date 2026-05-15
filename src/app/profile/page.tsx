@@ -36,7 +36,16 @@ export default function ProfilePage() {
 
   useEffect(() => {
     try {
-      setInviteUrl(localStorage.getItem('weld_last_invite_url'))
+      const stored = localStorage.getItem('weld_last_invite_url')
+      if (!stored) return
+      const match = stored.match(/^\/invite\/(.+)$/)
+      if (!match) { localStorage.removeItem('weld_last_invite_url'); return }
+      fetch(`/api/invite/${match[1]}`)
+        .then(r => {
+          if (r.ok) setInviteUrl(stored)
+          else localStorage.removeItem('weld_last_invite_url')
+        })
+        .catch(() => {})
     } catch {}
   }, [])
 
