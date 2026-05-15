@@ -163,7 +163,7 @@ export default function GamesEditPanel({ draft, update, onClose }: Props) {
             <div style={{ position: 'relative' }}>
               <input
                 className="pb-panel-input"
-                placeholder="Roblox game URL — paste to auto-fill stats"
+                placeholder="Roblox game URL (roblox.com/games/...)"
                 value={g.gameUrl ?? ''}
                 onChange={e => change(i, { ...g, gameUrl: e.target.value })}
                 onBlur={() => handleUrlBlur(i, { ...g })}
@@ -175,6 +175,11 @@ export default function GamesEditPanel({ draft, update, onClose }: Props) {
                 </span>
               )}
             </div>
+            {!g.gameUrl && (
+              <p style={{ margin: '-4px 0 6px', fontSize: 11, color: '#9b93d4' }}>
+                ✦ Paste the URL above to auto-fill name, visits, players & thumbnail
+              </p>
+            )}
             <textarea
               className="pb-panel-textarea"
               placeholder="What did you work on? What was your contribution?"
