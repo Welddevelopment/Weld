@@ -1,9 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { getSupabaseUserFromRequest } from '@/lib/supabase/server'
+import { getSupabaseAdmin } from '@/dynamic-landing-page/lib/supabase'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value))
+}
+
+async function prefillFromWaitlist(email: string): Promise<Record<string, unknown> | null> {
+  const admin = getSupabaseAdmin()
+  if (!admin) return null
+
+  const { data: lead } = await admin
+    .from('waitlist_leads')
+    .select('id, audience')
+    .eq('email', email.trim().toLowerCase())
+    .maybeSingle()
+
+  if (!lead) return null
+
+  const { data: draftRow } = await admin
+    .from('profile_drafts')
+    .select('draft')
+    .eq('lead_id', lead.id)
+    .maybeSingle()
+
+  const type = lead.audience === 'studio' ? 'studio' : 'dev'
+  const identity = isRecord(draftRow?.draft) && isRecord(draftRow.draft.identity)
+    ? draftRow.draft.identity as Record<string, unknown>
+    : {}
+  const proof = isRecord(draftRow?.draft) && isRecord(draftRow.draft.proof)
+    ? draftRow.draft.proof as Record<string, unknown>
+    : {}
+
+  const name = String(identity.displayName ?? identity.studioName ?? '')
+  const proofLink = String(proof.proofLink ?? '')
+  const teamSize = proof.teamSize ? Number(proof.teamSize) : null
+
+  return {
+    type,
+    ...(name && { name }),
+    ...(proofLink && { portfolioLinks: [{ name: 'Portfolio', url: proofLink }] }),
+    ...(teamSize && { teamSize }),
+  }
 }
 
 export async function GET(request: NextRequest) {
@@ -26,14 +65,26 @@ export async function GET(request: NextRequest) {
     )
   }
 
+  if (data) {
+    return NextResponse.json({
+      ok: true,
+      profile: {
+        draft: data.profile_draft,
+        publishedProfile: data.published_profile,
+        updatedAt: data.updated_at,
+      },
+    })
+  }
+
+  // No account profile yet — try to prefill from waitlist signup
+  const waitlistPrefill = auth.user.email
+    ? await prefillFromWaitlist(auth.user.email).catch(() => null)
+    : null
+
   return NextResponse.json({
     ok: true,
-    profile: data
-      ? {
-          draft: data.profile_draft,
-          publishedProfile: data.published_profile,
-          updatedAt: data.updated_at,
-        }
+    profile: waitlistPrefill
+      ? { draft: waitlistPrefill, publishedProfile: null }
       : null,
   })
 }
