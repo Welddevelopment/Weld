@@ -18,8 +18,15 @@ function emptyGame(): TopGame {
   return { emoji: 'Game', title: '', desc: '', plays: '', topCcu: '', currentCcu: '', imageUrl: '', gameUrl: '', skills: [] }
 }
 
+async function fetchGameData(url: string) {
+  const res = await fetch(`/api/roblox/game?url=${encodeURIComponent(url)}`)
+  if (!res.ok) return null
+  return res.json() as Promise<{ ok: boolean; title: string; plays: string; currentCcu: string; genre: string; imageUrl: string }>
+}
+
 export default function GamesEditPanel({ draft, update, onClose }: Props) {
   const games = draft.topGames
+  const [loadingIdx, setLoadingIdx] = useState<number | null>(null)
 
   const [openPicker, setOpenPicker] = useState<Set<number>>(
     () => new Set(games.length === 0 ? [] : games.map((_, i) => i).filter(i => !games[i].title))
@@ -54,6 +61,25 @@ export default function GamesEditPanel({ draft, update, onClose }: Props) {
         : current
 
     change(i, { ...g, skills: nextSkills, emoji: nextSkills[0] ?? g.emoji })
+  }
+
+  const handleUrlBlur = async (i: number, g: TopGame) => {
+    const url = g.gameUrl?.trim() ?? ''
+    if (!url || !url.includes('roblox.com/games/')) return
+    setLoadingIdx(i)
+    try {
+      const data = await fetchGameData(url)
+      if (!data?.ok) return
+      change(i, {
+        ...g,
+        title: g.title || data.title,
+        plays: g.plays || data.plays,
+        currentCcu: g.currentCcu || data.currentCcu,
+        imageUrl: g.imageUrl || data.imageUrl,
+      })
+    } finally {
+      setLoadingIdx(null)
+    }
   }
 
   const togglePicker = (i: number) => {
@@ -134,12 +160,21 @@ export default function GamesEditPanel({ draft, update, onClose }: Props) {
               value={g.title}
               onChange={e => change(i, { ...g, title: e.target.value })}
             />
-            <input
-              className="pb-panel-input"
-              placeholder="Roblox game URL (roblox.com/games/...)"
-              value={g.gameUrl ?? ''}
-              onChange={e => change(i, { ...g, gameUrl: e.target.value })}
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                className="pb-panel-input"
+                placeholder="Roblox game URL — paste to auto-fill stats"
+                value={g.gameUrl ?? ''}
+                onChange={e => change(i, { ...g, gameUrl: e.target.value })}
+                onBlur={() => handleUrlBlur(i, { ...g })}
+                style={{ paddingRight: loadingIdx === i ? 36 : undefined }}
+              />
+              {loadingIdx === i && (
+                <span style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 11, color: '#6c5cff' }}>
+                  Loading…
+                </span>
+              )}
+            </div>
             <textarea
               className="pb-panel-textarea"
               placeholder="What did you work on? What was your contribution?"
