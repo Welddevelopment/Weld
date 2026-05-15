@@ -70,14 +70,6 @@ function EyeIcon() {
   )
 }
 
-function ClockIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
-      <circle cx="12" cy="12" r="10"/>
-      <polyline points="12 6 12 12 16 14"/>
-    </svg>
-  )
-}
 
 function InfoIcon() {
   return (
@@ -163,7 +155,6 @@ export default function StudioCard({
               <div className="sc-stat"><CalendarIcon /><strong>{ss.yearsBuilding ?? '—'}</strong><em>Building</em></div>
               <div className="sc-stat"><BriefcaseIcon /><strong>{ss.projectsShipped ?? '—'}</strong><em>Projects</em></div>
               <div className="sc-stat"><EyeIcon /><strong>{ss.totalVisits ?? '—'}</strong><em>Visits</em></div>
-              <div className="sc-stat"><ClockIcon /><strong>{ss.onTimeDelivery ?? '—'}</strong><em>On-time</em></div>
             </div>
           </div>
         </div>
