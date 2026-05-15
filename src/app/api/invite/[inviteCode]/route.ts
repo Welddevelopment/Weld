@@ -5,11 +5,11 @@ import { buildInviteProgressSnapshot } from "@/dynamic-landing-page/lib/service"
 export const maxDuration = 10
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: { inviteCode: string } }
 ) {
   try {
-    const snapshot = await buildInviteProgressSnapshot(params.inviteCode);
+    const snapshot = await buildInviteProgressSnapshot(params.inviteCode, request.nextUrl.origin);
 
     return NextResponse.json({
       ok: true,

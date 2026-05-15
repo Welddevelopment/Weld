@@ -392,7 +392,7 @@ export async function captureWaitlistSignup(input: CaptureSignupInput) {
   const draft = ensureDraftRecord(lead, existingDraft);
   await upsertProfileDraftRecord(draft);
 
-  if (!existingLead && referrerLead && referrerLead.id !== lead.id) {
+  if (referrerLead && referrerLead.id !== lead.id && !existingLead?.referredByLeadId) {
     await insertReferralEvent({
       referrerLeadId: referrerLead.id,
       refereeLeadId: lead.id,
@@ -421,7 +421,7 @@ export async function captureWaitlistSignup(input: CaptureSignupInput) {
   return buildInviteProgressSnapshot(lead.inviteCode);
 }
 
-export async function buildInviteProgressSnapshot(inviteCode: string): Promise<InviteProgressSnapshot> {
+export async function buildInviteProgressSnapshot(inviteCode: string, origin?: string): Promise<InviteProgressSnapshot> {
   const lead = await findLeadByInviteCode(inviteCode);
 
   if (!lead) {
@@ -432,7 +432,7 @@ export async function buildInviteProgressSnapshot(inviteCode: string): Promise<I
   const draft = ensureDraftRecord(lead, existingDraft);
   const referralCount = await countReferredSignups(lead.id);
   const completionPercent = draft.completionPercent;
-  const shareUrl = buildShareUrl(lead.inviteCode);
+  const shareUrl = buildShareUrl(lead.inviteCode, origin);
 
   if (!existingDraft) {
     await upsertProfileDraftRecord(draft);

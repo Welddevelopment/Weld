@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
 import InviteExperience from "@/dynamic-landing-page/components/InviteExperience";
@@ -12,7 +13,11 @@ export default async function InvitePage({
   params: { inviteCode: string };
 }) {
   try {
-    const snapshot = await buildInviteProgressSnapshot(params.inviteCode);
+    const headersList = headers();
+    const host = headersList.get("host") || "localhost:3000";
+    const proto = headersList.get("x-forwarded-proto") || "https";
+    const origin = `${proto}://${host}`;
+    const snapshot = await buildInviteProgressSnapshot(params.inviteCode, origin);
 
     return (
       <InviteExperience
