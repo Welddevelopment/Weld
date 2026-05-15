@@ -9,7 +9,8 @@ export async function GET(
   { params }: { params: { inviteCode: string } }
 ) {
   try {
-    const snapshot = await buildInviteProgressSnapshot(params.inviteCode, request.nextUrl.origin);
+    const origin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || request.nextUrl.origin;
+    const snapshot = await buildInviteProgressSnapshot(params.inviteCode, origin);
 
     return NextResponse.json({
       ok: true,

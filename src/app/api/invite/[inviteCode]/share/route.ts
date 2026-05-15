@@ -20,7 +20,7 @@ export async function POST(
       channel: String(body.channel ?? "copy") as "discord" | "x" | "linkedin" | "copy",
       sessionId: String(body.sessionId ?? ""),
       page: String(body.page ?? "invite"),
-      origin: request.nextUrl.origin
+      origin: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || request.nextUrl.origin
     });
 
     return NextResponse.json(result);

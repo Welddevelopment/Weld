@@ -16,7 +16,7 @@ export default async function InvitePage({
     const headersList = headers();
     const host = headersList.get("host") || "localhost:3000";
     const proto = headersList.get("x-forwarded-proto") || "https";
-    const origin = `${proto}://${host}`;
+    const origin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || `${proto}://${host}`;
     const snapshot = await buildInviteProgressSnapshot(params.inviteCode, origin);
 
     return (
