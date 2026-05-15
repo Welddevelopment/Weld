@@ -14,6 +14,7 @@ interface Props {
   onBack: () => void
   onBackLabel?: string
   onPublish: () => void
+  publishLabel?: string
   showPortfolioButton?: boolean
   showExperienceEdit?: boolean
 }
@@ -42,6 +43,7 @@ export default function EditableCard({
   onBack,
   onBackLabel = '← Back',
   onPublish,
+  publishLabel = 'Publish profile',
   showPortfolioButton = false,
   showExperienceEdit = false,
 }: Props) {
@@ -383,7 +385,7 @@ export default function EditableCard({
       {/* Editor action bar */}
       <div className="npc-editor-bar">
         <button type="button" className="npc-editor-publish" onClick={onPublish}>
-          Publish Profile
+          {publishLabel}
         </button>
         <button type="button" className="npc-editor-back" onClick={onBack}>
           {onBackLabel}

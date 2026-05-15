@@ -21,6 +21,7 @@ interface Props {
   onBack: () => void
   onBackLabel?: string
   onPublish: () => void
+  publishLabel?: string
 }
 
 function rateDisplay(draft: ProfileDraft): string | null {
@@ -47,6 +48,7 @@ export default function StudioEditableCard({
   onBack,
   onBackLabel = '← Back',
   onPublish,
+  publishLabel = 'Publish profile',
 }: Props) {
   const [showRobloxInput, setShowRobloxInput] = useState(false)
   const [robloxInputVal, setRobloxInputVal] = useState(
@@ -351,7 +353,7 @@ export default function StudioEditableCard({
           style={{ fontSize: 11, padding: '8px 18px' }}
           onClick={onPublish}
         >
-          Publish profile
+          {publishLabel}
         </button>
       </div>
     </div>

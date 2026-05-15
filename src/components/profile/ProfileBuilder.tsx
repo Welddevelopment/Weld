@@ -108,6 +108,35 @@ function ProfileAccountStatus({ accountEmail, saveState }: { accountEmail: strin
   )
 }
 
+function UpdatedOverlay({ onDismiss }: { onDismiss: () => void }) {
+  return (
+    <div className="pb-pub-overlay">
+      <div className="pb-pub-card" style={{ position: 'relative' }}>
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label="Close"
+          style={{
+            position: 'absolute', top: -14, right: -14,
+            width: 32, height: 32, borderRadius: '50%',
+            background: '#6c5cff', border: 'none', color: '#fff',
+            fontSize: 15, fontWeight: 700, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
+          }}
+        >✕</button>
+        <div className="pb-pub-pulse" style={{ background: '#3DC77A' }}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </div>
+        <h2 className="pb-pub-heading">Changes saved</h2>
+        <p className="pb-pub-sub">Your profile has been updated.</p>
+      </div>
+    </div>
+  )
+}
+
 function PublishedOverlay({ onDismiss }: { onStartMatching: () => void; onDismiss: () => void }) {
   return (
     <div className="pb-pub-overlay">
@@ -210,7 +239,7 @@ export default function ProfileBuilder({
   const [saveState, setSaveState] = useState<SaveState>('local')
   const [showDeleteWarning, setShowDeleteWarning] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [showScrollActions, setShowScrollActions] = useState(false)
+  const [hasPublishedProfile, setHasPublishedProfile] = useState(false)
   const [checklistOpen, setChecklistOpen] = useState(true)
   const bodyRef = useRef<HTMLDivElement | null>(null)
 
@@ -239,6 +268,7 @@ export default function ProfileBuilder({
         if (!alive) return
         if (remoteDraft) {
           setDraft(remoteDraft)
+          if (hasPublished) setHasPublishedProfile(true)
           if (hasPublished && !onCancel) setPhase('editor')
         }
         setSaveState('saved')
@@ -262,14 +292,6 @@ export default function ProfileBuilder({
     try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)) } catch {}
   }, [draft, hydrated])
 
-  useEffect(() => {
-    const root = bodyRef.current
-    if (!root) return
-    const onScroll = () => setShowScrollActions(root.scrollTop > 120)
-    root.addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
-    return () => root.removeEventListener('scroll', onScroll)
-  }, [])
 
   const checklistTasks = useMemo(() => {
     const hasName = !!draft.name.trim()
@@ -349,10 +371,9 @@ export default function ProfileBuilder({
 
   // Published overlay sits on top of the editor
   const publishedOverlay = phase === 'published' ? (
-    <PublishedOverlay
-      onStartMatching={() => router.push('/swipe')}
-      onDismiss={() => { onPublished?.(profile); setPhase('editor') }}
-    />
+    hasPublishedProfile
+      ? <UpdatedOverlay onDismiss={() => { onPublished?.(profile); setPhase('editor') }} />
+      : <PublishedOverlay onStartMatching={() => router.push('/swipe')} onDismiss={() => { onPublished?.(profile); setPhase('editor'); setHasPublishedProfile(true) }} />
   ) : null
 
   // Header shown in all phases
@@ -388,7 +409,7 @@ export default function ProfileBuilder({
       )}
       {!isQuickStep && (
         <span className="pb-form-step-indicator" style={{ marginLeft: 'auto' }}>
-          Edit your profile
+          {hasPublishedProfile ? 'Update profile' : 'Build your profile'}
         </span>
       )}
       {isQuickStep && (
@@ -477,6 +498,7 @@ export default function ProfileBuilder({
                 onBack={backToOnboarding}
                 onBackLabel={onCancel ? '← Cancel' : '← Back'}
                 onPublish={handlePublish}
+                publishLabel={hasPublishedProfile ? 'Save changes' : 'Publish profile'}
               />
             ) : (
               <EditableCard
@@ -494,6 +516,7 @@ export default function ProfileBuilder({
                 onBack={backToOnboarding}
                 onBackLabel={onCancel ? '← Cancel' : '← Back'}
                 onPublish={handlePublish}
+                publishLabel={hasPublishedProfile ? 'Save changes' : 'Publish profile'}
                 showPortfolioButton={true}
                 showExperienceEdit={true}
               />
