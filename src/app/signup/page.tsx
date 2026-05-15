@@ -66,6 +66,35 @@ function SignupLoading() {
   );
 }
 
+function buildStudioProfilePayload(form: FormData, email: string, selected: string[], inviteCode: string) {
+  return {
+    stage: "profile",
+    refCode: inviteCode,
+    email,
+    type: "studio",
+    studioName: String(form.get("studioName") ?? "").trim(),
+    teamSize: String(form.get("teamSize") ?? ""),
+    hiringRoles: selected,
+    budgetStyle: String(form.get("budget") ?? ""),
+    projectNote: String(form.get("projectDesc") ?? "").trim(),
+    portfolioLink: String(form.get("studioWebsite") ?? "").trim(),
+  };
+}
+
+function buildDeveloperProfilePayload(form: FormData, email: string, selected: string[], inviteCode: string) {
+  return {
+    stage: "profile",
+    refCode: inviteCode,
+    email,
+    type: "developer",
+    displayName: String(form.get("displayName") ?? "").trim(),
+    portfolioLink: String(form.get("portfolio") ?? "").trim(),
+    skills: selected,
+    primaryRole: selected[0] ?? "",
+    experience: String(form.get("experience") ?? ""),
+  };
+}
+
 function SignupContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -185,9 +214,21 @@ function SignupContent() {
             referredByInviteCode: referralCode.trim().toUpperCase() || undefined
           })
         });
-        const data = (await res.json()) as { ok: boolean; inviteUrl?: string };
+        const data = (await res.json()) as { ok: boolean; inviteUrl?: string; inviteCode?: string };
         if (data.ok && data.inviteUrl) {
           setInviteUrl(data.inviteUrl);
+
+          // Save profile fields to profile_drafts (fire-and-forget)
+          if (data.inviteCode) {
+            const profilePayload = signupType === "studio"
+              ? buildStudioProfilePayload(form, normalizedEmail, selected, data.inviteCode)
+              : buildDeveloperProfilePayload(form, normalizedEmail, selected, data.inviteCode);
+            fetch("/api/waitlist", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(profilePayload)
+            }).catch(() => { /* non-critical */ });
+          }
         }
       } catch {
         // non-critical

@@ -538,7 +538,8 @@ export async function applyLegacyProfilePayload(
     };
     proofPatch = {
       rolesHiring: Array.isArray(payload.hiringRoles) ? payload.hiringRoles : [],
-      teamSize: String(payload.teamSize ?? "")
+      teamSize: String(payload.teamSize ?? ""),
+      proofLink: String(payload.portfolioLink ?? "")
     };
     fitPatch = {
       budgetStyle: String(payload.budgetStyle ?? ""),
