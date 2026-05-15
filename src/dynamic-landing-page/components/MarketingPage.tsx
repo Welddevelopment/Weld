@@ -1089,20 +1089,6 @@ function HeroProductPreview({
           </aside>
         </div>
 
-        <div className="hero-preview-tabs" role="tablist" aria-label="Hero preview signals">
-          {signals.map((entry) => (
-            <button
-              key={entry.key}
-              type="button"
-              className={signal === entry.key ? "is-active" : ""}
-              onClick={() => onSignalChange(entry.key)}
-              aria-selected={signal === entry.key}
-              role="tab"
-            >
-              {entry.label}
-            </button>
-          ))}
-        </div>
 
       </div>
     </div>
