@@ -1061,11 +1061,6 @@ function HeroProductPreview({
   return (
     <div className="hero-card-column hero-card-column-split hero-product-preview">
       <div className="hero-preview-shell">
-        <div className="hero-preview-topline">
-          <span>Live product preview</span>
-          <strong>{isStudioMode ? "Studio scouting" : "Developer proof card"}</strong>
-        </div>
-
         <div className="hero-preview-stage">
           <div className="hero-preview-card-frame">
             <div className="npc-hero-preview-container">
@@ -1109,15 +1104,6 @@ function HeroProductPreview({
           ))}
         </div>
 
-        <div className="hero-preview-footer">
-          <div>
-            <span>Current card</span>
-            <strong>{profile.name} / {profile.label}</strong>
-          </div>
-          <button type="button" onClick={onJoin}>
-            Join early access
-          </button>
-        </div>
       </div>
     </div>
   );
