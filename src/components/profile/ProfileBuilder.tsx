@@ -234,7 +234,7 @@ export default function ProfileBuilder({
         if (!alive) return
         if (remoteDraft) {
           setDraft(remoteDraft)
-          if (hasPublished) setPhase('editor')
+          if (hasPublished && !onCancel) setPhase('editor')
         }
         setSaveState('saved')
       } catch {
