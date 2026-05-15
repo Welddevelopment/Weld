@@ -8993,7 +8993,10 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   align-items: center;
   padding: clamp(28px, 4vw, 48px);
   border-radius: 36px;
-  background: #DBE6F0;
+  background:
+    radial-gradient(800px 500px at 8% 12%, rgba(89, 194, 240, 0.18), transparent 60%),
+    radial-gradient(600px 400px at 95% 90%, rgba(14, 91, 200, 0.10), transparent 65%),
+    linear-gradient(180deg, #D2E0EC 0%, #C2D5E3 100%);
 }
 
 .weld-glass-page .comparison-grid {
@@ -9373,7 +9376,10 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 .weld-glass-page .waitlist-shell {
   position: relative;
-  background: #DBE6F0;
+  background:
+    radial-gradient(800px 500px at 8% 12%, rgba(89, 194, 240, 0.18), transparent 60%),
+    radial-gradient(600px 400px at 95% 90%, rgba(14, 91, 200, 0.10), transparent 65%),
+    linear-gradient(180deg, #DBE6F0 0%, #CEDDEA 100%);
 }
 
 .weld-glass-page .how-story-section::after,
@@ -14553,7 +14559,10 @@ button.invite-secondary-button {
   padding: clamp(28px, 4vw, 54px) 0 clamp(42px, 5vw, 72px);
   border: 1px solid rgba(255, 255, 255, 0.88);
   border-radius: clamp(32px, 4vw, 54px);
-  background: #DBE6F0;
+  background:
+    radial-gradient(800px 500px at 8% 12%, rgba(89, 194, 240, 0.18), transparent 60%),
+    radial-gradient(600px 400px at 95% 90%, rgba(14, 91, 200, 0.10), transparent 65%),
+    linear-gradient(180deg, #DBE6F0 0%, #CEDDEA 100%);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.94),
     inset 0 -22px 64px rgba(76, 109, 158, 0.06),
