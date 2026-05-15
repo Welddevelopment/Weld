@@ -8591,7 +8591,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
     radial-gradient(circle at 90% 18%, rgba(127, 112, 255, 0.16), transparent 26%),
     radial-gradient(circle at 8% 88%, rgba(255, 255, 255, 0.86), transparent 34%);
   padding: clamp(36px, 5vw, 64px) clamp(28px, 5vw, 72px);
-  zoom: 0.8;
+  zoom: 0.75;
 }
 
 .weld-glass-page .chat-section {
