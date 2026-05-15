@@ -97,7 +97,17 @@ export default function IdentityStep({ draft, update, onNext, onBack }: Props) {
         </div>
 
         <div className="ob-linked-preview">
-          <div className="ob-linked-avatar">avatar</div>
+          <div className="ob-linked-avatar" style={{ overflow: 'hidden', position: 'relative', background: '#e9e9f0' }}>
+            {draft.robloxUserId
+              ? <img
+                  src={`/api/roblox/avatar?userId=${draft.robloxUserId}`}
+                  alt="Roblox avatar"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                />
+              : <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#aaa' }}>avatar</span>
+            }
+          </div>
           <div>
             <div className="ob-linked-name">{draft.name || (isStudio ? 'Your studio name' : 'Your Roblox name')}</div>
             <div className="ob-linked-sub">
