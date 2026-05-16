@@ -19066,13 +19066,6 @@ button.invite-secondary-button {
   margin: 0 auto;
 }
 
-/* Body wrap — SVG coordinate origin */
-.cs-body-wrap {
-  position: relative;
-  width: 100%;
-  z-index: 2;
-}
-
 /* 3-col grid */
 .cs-body {
   width: min(1440px, 100%);
@@ -19096,17 +19089,6 @@ button.invite-secondary-button {
 
 .cs-col--right {
   align-items: flex-start;
-}
-
-/* SVG lines */
-.cs-lines {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  overflow: visible;
-  z-index: 1;
 }
 
 /* Card */
