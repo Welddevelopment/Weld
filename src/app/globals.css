@@ -19022,6 +19022,7 @@ button.invite-secondary-button {
   background:
     radial-gradient(900px 600px at 50% 46%, rgba(89, 194, 240, 0.30), transparent 60%),
     #DBE6F0;
+  margin-top: 36px;
   padding: 36px 0 80px;
   overflow: visible;
 }

@@ -184,7 +184,6 @@ export default function ComparisonSection() {
 
         {/* Center card */}
         <div className="cs-card-wrap">
-          <div className="cs-sample-badge">SAMPLE</div>
           <div className="npc-card cs-card-static">
 
             <div className="npc-top">
