@@ -14,7 +14,7 @@ const THREAD_TO_REGIONS: Record<ThreadKey, RegionKey[]> = {
 }
 
 function getActiveThread(h: HoveredKey): ThreadKey {
-  if (['rate','bio','socials','games','mywork'].includes(h)) return REGION_TO_THREAD[h as RegionKey]
+  if (h in REGION_TO_THREAD) return REGION_TO_THREAD[h as RegionKey]
   return h as ThreadKey
 }
 function getActiveRegions(h: HoveredKey): RegionKey[] {
@@ -55,15 +55,14 @@ interface ThreadProps {
   title: string; channel: string; messages: Message[]
   footer: string; footerKind: 'bad' | 'cold'
   highlight: boolean; dim: boolean
-  style?: React.CSSProperties
   onMouseEnter?: () => void; onMouseLeave?: () => void
   threadRef?: (el: HTMLDivElement | null) => void
 }
 
-function ChatThread({ title, channel, messages, footer, footerKind, highlight, dim, style, onMouseEnter, onMouseLeave, threadRef }: ThreadProps) {
+function ChatThread({ title, channel, messages, footer, footerKind, highlight, dim, onMouseEnter, onMouseLeave, threadRef }: ThreadProps) {
   const cls = ['cs-thread', highlight ? 'cs-thread--highlight' : '', dim ? 'cs-thread--dim' : ''].filter(Boolean).join(' ')
   return (
-    <div className={cls} style={style} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} ref={threadRef}>
+    <div className={cls} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} ref={threadRef}>
       <div className="cs-thread-header">
         <span className="cs-thread-title">{title}</span>
         <span className="cs-thread-channel">{channel}</span>
@@ -90,12 +89,9 @@ function ChatThread({ title, channel, messages, footer, footerKind, highlight, d
 
 // ── Thread data ────────────────────────────────────────────────────────────────
 
-const THREAD_WIDTH = 270
-const THREAD_MARGIN = 56
-
-const THREADS = [
+const LEFT_THREADS = [
   {
-    key: 'rate' as ThreadKey, side: 'left' as const, top: 80,
+    key: 'rate' as ThreadKey,
     title: '#for-hire · roblox-devs', channel: "a dev's pitch",
     messages: [
       { who: 'studio2' as const, text: '🚀 Roblox Scripter for hire! DM for inquiries' },
@@ -107,7 +103,22 @@ const THREADS = [
     footer: 'No rate given · still searching', footerKind: 'bad' as const,
   },
   {
-    key: 'pitch' as ThreadKey, side: 'right' as const, top: 80,
+    key: 'games' as ThreadKey,
+    title: '@scripter_x', channel: 'dm · "Games" question',
+    messages: [
+      { who: 'dev' as const, text: 'what games have you actually shipped on?' },
+      { who: 'studio2' as const, text: 'worked on a huge pet sim, mostly NDA stuff' },
+      { who: 'dev' as const, text: 'any specific names you can share?' },
+      { who: 'studio2' as const, text: "lots of sim games, you'd know them 🎮" },
+      { who: 'dev' as const, text: 'still need one game name 🙏', gap: '2 days later' },
+    ],
+    footer: 'No specific game ever named', footerKind: 'bad' as const,
+  },
+]
+
+const RIGHT_THREADS = [
+  {
+    key: 'pitch' as ThreadKey,
     title: '@scripter_x', channel: 'dm · "describe yourself"',
     messages: [
       { who: 'dev' as const, text: 'how would you describe your work style?' },
@@ -119,19 +130,7 @@ const THREADS = [
     footer: 'No links ever sent', footerKind: 'bad' as const,
   },
   {
-    key: 'games' as ThreadKey, side: 'left' as const, top: 420,
-    title: '@scripter_x', channel: 'dm · "Games" question',
-    messages: [
-      { who: 'dev' as const, text: 'what games have you actually shipped on?' },
-      { who: 'studio2' as const, text: 'worked on a huge pet sim, mostly NDA stuff' },
-      { who: 'dev' as const, text: 'any specific names you can share?' },
-      { who: 'studio2' as const, text: "lots of sim games, you'd know them 🎮" },
-      { who: 'dev' as const, text: 'still need one game name 🙏', gap: '2 days later' },
-    ],
-    footer: 'No specific game ever named', footerKind: 'bad' as const,
-  },
-  {
-    key: 'mywork' as ThreadKey, side: 'right' as const, top: 420,
+    key: 'mywork' as ThreadKey,
     title: '@buildbot_dev', channel: 'dm · "My Work" question',
     messages: [
       { who: 'dev' as const, text: 'we need a tycoon economy system, done anything similar?' },
@@ -142,83 +141,69 @@ const THREADS = [
     ],
     footer: 'No similar work to evaluate', footerKind: 'bad' as const,
   },
-] as const
-
-// Which card region connects to which thread, and which side
-const LINE_ANCHORS: Array<{ regionKey: RegionKey; threadKey: ThreadKey; threadSide: 'left' | 'right' }> = [
-  { regionKey: 'rate',    threadKey: 'rate',   threadSide: 'left' },
-  { regionKey: 'bio',     threadKey: 'pitch',  threadSide: 'right' },
-  { regionKey: 'socials', threadKey: 'pitch',  threadSide: 'right' },
-  { regionKey: 'games',   threadKey: 'games',  threadSide: 'left' },
-  { regionKey: 'mywork',  threadKey: 'mywork', threadSide: 'right' },
 ]
 
-// ── Layout measurement types ───────────────────────────────────────────────────
-
-interface ThreadRect { left: number; top: number; width: number; height: number }
-
-interface Layout {
-  sectionWidth: number
-  cardLeft: number   // section-relative
-  cardTop: number    // section-relative
-  regions: Map<RegionKey, DOMRect>          // relative to card
-  threads: Map<ThreadKey, ThreadRect>       // section-relative, accounting for zoom
-}
+const LINE_ANCHORS: Array<{ regionKey: RegionKey; threadKey: ThreadKey; side: 'left' | 'right' }> = [
+  { regionKey: 'rate',    threadKey: 'rate',   side: 'left' },
+  { regionKey: 'bio',     threadKey: 'pitch',  side: 'right' },
+  { regionKey: 'socials', threadKey: 'pitch',  side: 'right' },
+  { regionKey: 'games',   threadKey: 'games',  side: 'left' },
+  { regionKey: 'mywork',  threadKey: 'mywork', side: 'right' },
+]
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
+interface Rect { left: number; top: number; width: number; height: number }
+
 export default function ComparisonSection() {
   const [hovered, setHovered] = useState<HoveredKey>('rate')
+  // The section element is the SVG coordinate origin (SVG is absolute child of section)
   const sectionRef = useRef<HTMLElement>(null)
-  const stageRef = useRef<HTMLDivElement>(null)
   const cardRef = useRef<HTMLDivElement>(null)
   const threadEls = useRef<Map<ThreadKey, HTMLDivElement>>(new Map())
-  const [layout, setLayout] = useState<Layout | null>(null)
+  const [rects, setRects] = useState<{
+    regions: Map<RegionKey, Rect>
+    threads: Map<ThreadKey, Rect>
+  } | null>(null)
 
   const measure = useCallback(() => {
-    // Measure everything relative to the STAGE — the SVG lives inside the stage,
-    // so its coordinate (0,0) is the stage's top-left, not the section's.
-    if (!stageRef.current || !cardRef.current) return
-    const stageRect = stageRef.current.getBoundingClientRect()
+    if (!sectionRef.current || !cardRef.current) return
+    // SVG is position:absolute inside section, so section top-left = SVG (0,0)
+    const origin = sectionRef.current.getBoundingClientRect()
     const cardRect = cardRef.current.getBoundingClientRect()
 
-    const cardLeft = cardRect.left - stageRect.left
-    const cardTop = cardRect.top - stageRect.top
-
-    const regionMap = new Map<RegionKey, DOMRect>()
+    const regions = new Map<RegionKey, Rect>()
     for (const key of ['rate','bio','socials','games','mywork'] as RegionKey[]) {
       const el = cardRef.current.querySelector(`[data-region="${key}"]`) as HTMLElement | null
       if (el) {
         const r = el.getBoundingClientRect()
-        regionMap.set(key, new DOMRect(r.left - cardRect.left, r.top - cardRect.top, r.width, r.height))
+        regions.set(key, {
+          left: r.left - origin.left,
+          top: r.top - origin.top,
+          width: r.width,
+          height: r.height,
+        })
       }
     }
 
-    // Thread rects relative to STAGE (getBoundingClientRect gives zoomed/visual rects)
-    const threadMap = new Map<ThreadKey, ThreadRect>()
+    const threads = new Map<ThreadKey, Rect>()
     for (const [key, el] of threadEls.current) {
       const r = el.getBoundingClientRect()
-      threadMap.set(key, {
-        left: r.left - stageRect.left,
-        top: r.top - stageRect.top,
+      threads.set(key, {
+        left: r.left - origin.left,
+        top: r.top - origin.top,
         width: r.width,
         height: r.height,
       })
     }
 
-    setLayout({
-      sectionWidth: stageRect.width,
-      cardLeft,
-      cardTop,
-      regions: regionMap,
-      threads: threadMap,
-    })
+    setRects({ regions, threads })
   }, [])
 
   useLayoutEffect(() => {
     measure()
     const ro = new ResizeObserver(measure)
-    if (stageRef.current) ro.observe(stageRef.current)
+    if (sectionRef.current) ro.observe(sectionRef.current)
     if (cardRef.current) ro.observe(cardRef.current)
     return () => ro.disconnect()
   }, [measure])
@@ -226,42 +211,46 @@ export default function ComparisonSection() {
   const activeThread = getActiveThread(hovered)
   const activeRegions = getActiveRegions(hovered)
 
-  // Thread left/right position style
-  function threadStyleLeft(side: 'left' | 'right', sectionWidth: number): number {
-    return side === 'left'
-      ? THREAD_MARGIN
-      : sectionWidth - THREAD_MARGIN - THREAD_WIDTH
-  }
-
-  // Build SVG path for a line anchor
-  function buildPath(anchor: typeof LINE_ANCHORS[number]): { d: string; active: boolean } | null {
-    if (!layout) return null
-    const region = layout.regions.get(anchor.regionKey)
-    const thread = layout.threads.get(anchor.threadKey)
+  function buildPath(anchor: typeof LINE_ANCHORS[number]): string | null {
+    if (!rects) return null
+    const region = rects.regions.get(anchor.regionKey)
+    const thread = rects.threads.get(anchor.threadKey)
     if (!region || !thread) return null
 
-    const active = activeThread === anchor.threadKey
-
-    // Thread connection point: inside edge (right edge for left threads, left edge for right)
-    const tx = anchor.threadSide === 'left' ? thread.left + thread.width : thread.left
+    // Thread side: right edge for left threads, left edge for right threads
+    const tx = anchor.side === 'left' ? thread.left + thread.width : thread.left
     const ty = thread.top + thread.height / 2
 
-    // Card region connection point: outside edge toward the thread side
-    const rx = anchor.threadSide === 'left'
-      ? layout.cardLeft + region.left             // left edge of region → toward left thread
-      : layout.cardLeft + region.left + region.width  // right edge → toward right thread
-    const ry = layout.cardTop + region.top + region.height / 2
+    // Card region side: left edge for left-side connections, right edge for right-side
+    const rx = anchor.side === 'left' ? region.left : region.left + region.width
+    const ry = region.top + region.height / 2
 
     const mx = (tx + rx) / 2
-    const d = `M ${tx},${ty} C ${mx},${ty} ${mx},${ry} ${rx},${ry}`
-    return { d, active }
+    return `M ${tx},${ty} C ${mx},${ty} ${mx},${ry} ${rx},${ry}`
   }
 
-  // Computed thread left positions (used for initial render before measure)
-  const estSectionWidth = layout?.sectionWidth ?? 1280
+  const reset = () => setHovered('rate')
 
   return (
     <section className="cs-section" ref={sectionRef} id="compare">
+
+      {/* SVG lines — direct child of section so (0,0) = section top-left */}
+      <svg className="cs-lines" aria-hidden="true">
+        {LINE_ANCHORS.map((anchor) => {
+          const d = buildPath(anchor)
+          if (!d) return null
+          const active = activeThread === anchor.threadKey
+          return (
+            <path key={`${anchor.regionKey}`} d={d} fill="none"
+              stroke={active ? '#0E5BC8' : 'rgba(14,26,43,0.15)'}
+              strokeWidth={active ? 1.75 : 1}
+              strokeDasharray={active ? undefined : '4 4'}
+              style={{ transition: 'stroke 0.2s ease, stroke-width 0.2s ease' }}
+            />
+          )
+        })}
+      </svg>
+
       {/* Header */}
       <div className="cs-header">
         <span className="cs-eyebrow">For studios · the difference, annotated</span>
@@ -272,137 +261,67 @@ export default function ComparisonSection() {
         <p className="cs-subhead">Hover any field on the card to see the days-long search you avoided.</p>
       </div>
 
-      {/* Stage — all absolute positions and SVG coords are relative to this element */}
-      <div className="cs-stage" ref={stageRef}>
-
-        {/* SVG connection lines — rendered over everything */}
-        <svg className="cs-lines" aria-hidden="true">
-          {LINE_ANCHORS.map((anchor) => {
-            const path = buildPath(anchor)
-            if (!path || !path.d) return null
-            const active = path.active
-            return (
-              <path
-                key={`${anchor.regionKey}-${anchor.threadKey}`}
-                d={path.d}
-                fill="none"
-                stroke={active ? '#0E5BC8' : 'rgba(14,26,43,0.18)'}
-                strokeWidth={active ? 1.75 : 1}
-                strokeDasharray={active ? undefined : '4 4'}
-                style={{ transition: 'stroke 0.2s ease, stroke-width 0.2s ease' }}
-              />
-            )
-          })}
-        </svg>
-
-        {/* Thread cards */}
-        {THREADS.map((thread) => {
-          const isActive = activeThread === thread.key
-          return (
-            <ChatThread
-              key={thread.key}
-              title={thread.title}
-              channel={thread.channel}
-              messages={thread.messages as unknown as Message[]}
-              footer={thread.footer}
-              footerKind={thread.footerKind}
-              highlight={isActive}
-              dim={!isActive}
-              style={{
-                position: 'absolute',
-                left: threadStyleLeft(thread.side, estSectionWidth),
-                top: thread.top,
-                width: THREAD_WIDTH,
-              }}
-              onMouseEnter={() => setHovered(thread.key)}
-              onMouseLeave={() => setHovered('rate')}
-              threadRef={(el) => {
-                if (el) threadEls.current.set(thread.key, el)
-                else threadEls.current.delete(thread.key)
-              }}
+      {/* 3-col body: threads flow naturally, no absolute positioning */}
+      <div className="cs-body">
+        {/* Left threads */}
+        <div className="cs-col cs-col--left">
+          {LEFT_THREADS.map((t) => (
+            <ChatThread key={t.key}
+              title={t.title} channel={t.channel}
+              messages={t.messages as Message[]}
+              footer={t.footer} footerKind={t.footerKind}
+              highlight={activeThread === t.key}
+              dim={activeThread !== t.key}
+              onMouseEnter={() => setHovered(t.key)}
+              onMouseLeave={reset}
+              threadRef={(el) => { if (el) threadEls.current.set(t.key, el); else threadEls.current.delete(t.key) }}
             />
-          )
-        })}
+          ))}
+        </div>
 
-        {/* Centered card */}
+        {/* Center card */}
         <div className="cs-card-wrap" ref={cardRef}>
           <div className="cs-sample-badge">SAMPLE</div>
-
           <div className="npc-card cs-card-static">
-            {/* Top: avatar + stats */}
+
             <div className="npc-top">
               <div className="npc-avatar-wrap">
                 <div className="npc-avatar-bg" style={{ background: '#f5ede0' }} />
                 <div className="npc-avatar-initials">DD</div>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  className="npc-avatar-img"
+                <img className="npc-avatar-img"
                   src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E3EC434BF92DD2F46E81D91592065FD9-Png/150/150/AvatarHeadshot/Png/noFilter"
                   alt="DevDave"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                 />
                 <div className="npc-online-dot" />
               </div>
-
               <div className="npc-top-right">
                 <div className="npc-stats">
-                  <div className="npc-stat">
-                    <div className="npc-stat-icon">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-                      </svg>
+                  {[
+                    { val: '4+ yrs', lbl: 'Experience', icon: <><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></> },
+                    { val: '38',     lbl: 'Projects',   icon: <><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></> },
+                    { val: '12',     lbl: 'Scripts',    icon: <><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></> },
+                    { val: '9',      lbl: 'Skills',     icon: <><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></> },
+                  ].map(({ val, lbl, icon }) => (
+                    <div key={lbl} className="npc-stat">
+                      <div className="npc-stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{icon}</svg>
+                      </div>
+                      <div className="npc-stat-val">{val}</div>
+                      <div className="npc-stat-lbl">{lbl}</div>
                     </div>
-                    <div className="npc-stat-val">4+ yrs</div>
-                    <div className="npc-stat-lbl">Experience</div>
-                  </div>
-                  <div className="npc-stat">
-                    <div className="npc-stat-icon">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" />
-                      </svg>
-                    </div>
-                    <div className="npc-stat-val">38</div>
-                    <div className="npc-stat-lbl">Projects</div>
-                  </div>
-                  <div className="npc-stat">
-                    <div className="npc-stat-icon">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" />
-                      </svg>
-                    </div>
-                    <div className="npc-stat-val">12</div>
-                    <div className="npc-stat-lbl">Scripts</div>
-                  </div>
-                  <div className="npc-stat">
-                    <div className="npc-stat-icon">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><line x1="7" y1="7" x2="7.01" y2="7" />
-                      </svg>
-                    </div>
-                    <div className="npc-stat-val">9</div>
-                    <div className="npc-stat-lbl">Skills</div>
-                  </div>
+                  ))}
                 </div>
-
-                {/* Socials / links — hover region */}
-                <div
-                  className="npc-socials cs-region-socials"
-                  data-region="socials"
+                <div className="npc-socials" data-region="socials"
                   data-active={activeRegions.includes('socials') ? '' : undefined}
-                  onMouseEnter={() => setHovered('socials')}
-                  onMouseLeave={() => setHovered('rate')}
-                >
-                  <a href="#" className="npc-portfolio-top-link" onClick={(e) => e.preventDefault()}>
-                    <IconRoblox /> Roblox Profile
-                  </a>
-                  <a href="#" className="npc-portfolio-top-link" onClick={(e) => e.preventDefault()}>
-                    <IconExternal /> GitHub
-                  </a>
+                  onMouseEnter={() => setHovered('socials')} onMouseLeave={reset}>
+                  <a href="#" className="npc-portfolio-top-link" onClick={(e) => e.preventDefault()}><IconRoblox /> Roblox Profile</a>
+                  <a href="#" className="npc-portfolio-top-link" onClick={(e) => e.preventDefault()}><IconExternal /> GitHub</a>
                 </div>
               </div>
             </div>
 
-            {/* Identity */}
             <div className="npc-identity">
               <div className="npc-name-row">
                 <h2 className="npc-name">DevDave</h2>
@@ -413,25 +332,15 @@ export default function ComparisonSection() {
 
             <div className="npc-divider" />
 
-            {/* Bio — hover region */}
-            <p
-              className="npc-bio"
-              data-region="bio"
+            <p className="npc-bio" data-region="bio"
               data-active={activeRegions.includes('bio') ? '' : undefined}
-              onMouseEnter={() => setHovered('bio')}
-              onMouseLeave={() => setHovered('rate')}
-            >
+              onMouseEnter={() => setHovered('bio')} onMouseLeave={reset}>
               I&apos;ve been building Roblox games professionally for four years, shipping everything from solo indie projects to large-team live titles. My strength is owning full game systems end-to-end.
             </p>
 
-            {/* Rate + skills — hover region */}
-            <div
-              className="npc-rate-skills"
-              data-region="rate"
+            <div className="npc-rate-skills" data-region="rate"
               data-active={activeRegions.includes('rate') ? '' : undefined}
-              onMouseEnter={() => setHovered('rate')}
-              onMouseLeave={() => setHovered('rate')}
-            >
+              onMouseEnter={() => setHovered('rate')} onMouseLeave={reset}>
               <div className="npc-rate-pill">
                 <div className="npc-rate-amount">$65 / hr</div>
                 <div className="npc-rate-type">Hourly or milestone</div>
@@ -443,41 +352,49 @@ export default function ComparisonSection() {
               </div>
             </div>
 
-            {/* Entry buttons — separate hover regions */}
             <div className="npc-entries">
-              <div
-                className="npc-entry-btn"
-                data-region="games"
+              <div className="npc-entry-btn" data-region="games"
                 data-active={activeRegions.includes('games') ? '' : undefined}
-                onMouseEnter={() => setHovered('games')}
-                onMouseLeave={() => setHovered('rate')}
-              >
+                onMouseEnter={() => setHovered('games')} onMouseLeave={reset}>
                 <div className="npc-entry-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 2 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                    <polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" />
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 2 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
                   </svg>
                 </div>
                 <div className="npc-entry-title">Games</div>
                 <div className="npc-entry-sub">See games I&apos;ve worked on →</div>
               </div>
-              <div
-                className="npc-entry-btn"
-                data-region="mywork"
+              <div className="npc-entry-btn" data-region="mywork"
                 data-active={activeRegions.includes('mywork') ? '' : undefined}
-                onMouseEnter={() => setHovered('mywork')}
-                onMouseLeave={() => setHovered('rate')}
-              >
+                onMouseEnter={() => setHovered('mywork')} onMouseLeave={reset}>
                 <div className="npc-entry-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
                   </svg>
                 </div>
                 <div className="npc-entry-title">My Work</div>
                 <div className="npc-entry-sub">View projects I&apos;ve built →</div>
               </div>
             </div>
+
           </div>
+        </div>
+
+        {/* Right threads */}
+        <div className="cs-col cs-col--right">
+          {RIGHT_THREADS.map((t) => (
+            <ChatThread key={t.key}
+              title={t.title} channel={t.channel}
+              messages={t.messages as Message[]}
+              footer={t.footer} footerKind={t.footerKind}
+              highlight={activeThread === t.key}
+              dim={activeThread !== t.key}
+              onMouseEnter={() => setHovered(t.key)}
+              onMouseLeave={reset}
+              threadRef={(el) => { if (el) threadEls.current.set(t.key, el); else threadEls.current.delete(t.key) }}
+            />
+          ))}
         </div>
       </div>
     </section>

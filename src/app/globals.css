@@ -19066,16 +19066,31 @@ button.invite-secondary-button {
   margin: 0 auto;
 }
 
-/* Stage */
-.cs-stage {
+/* Body grid */
+.cs-body {
   position: relative;
-  min-height: 780px;
   width: min(1440px, 100%);
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 340px 1fr;
+  align-items: center;
+  gap: 0 52px;
+  padding: 0 48px;
+  z-index: 2;
+}
+
+.cs-col {
   display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cs-col--left {
+  align-items: flex-end;
+}
+
+.cs-col--right {
   align-items: flex-start;
-  justify-content: center;
-  padding-top: 10px;
 }
 
 /* SVG lines */
@@ -19093,7 +19108,6 @@ button.invite-secondary-button {
 .cs-card-wrap {
   position: relative;
   width: 340px;
-  flex-shrink: 0;
   z-index: 2;
 }
 
