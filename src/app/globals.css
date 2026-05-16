@@ -5600,8 +5600,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .step-index,
 .waitlist-field span,
 .waitlist-privacy,
-.waitlist-status,
-.glass-footer nav a {
+.waitlist-status {
   color: var(--wg-soft);
   font-size: 12px;
   font-weight: 600;
@@ -5664,7 +5663,6 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .scout-copy-card h2,
 .scout-rail-card strong,
 .faq-trigger span,
-.glass-footer strong,
 .proof-dialog strong {
   color: var(--wg-ink);
 }
@@ -5809,8 +5807,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   line-height: 1.6;
 }
 
-.glass-section,
-.glass-footer {
+.glass-section {
   width: min(1600px, calc(100% - 48px));
   margin: 24px auto 0;
 }
@@ -6639,32 +6636,8 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   }
 }
 
-.glass-footer {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  align-items: center;
-  margin-bottom: 24px;
-  padding: 20px 22px;
-  border-radius: 28px;
-}
-
-.glass-footer div,
-.glass-footer nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-}
-
-.glass-footer strong {
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-}
-
 .glass-footer nav a:hover {
-  color: var(--wg-ink);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .proof-dialog-backdrop {
@@ -6947,8 +6920,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .glass-card,
 .proof-dialog,
 .role-summary-card,
-.waitlist-shell,
-.glass-footer {
+.waitlist-shell {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.44)),
     rgba(255, 255, 255, 0.38);
