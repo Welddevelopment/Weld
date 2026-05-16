@@ -170,20 +170,21 @@ interface Layout {
 export default function ComparisonSection() {
   const [hovered, setHovered] = useState<HoveredKey>('rate')
   const sectionRef = useRef<HTMLElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
   const cardRef = useRef<HTMLDivElement>(null)
   const threadEls = useRef<Map<ThreadKey, HTMLDivElement>>(new Map())
   const [layout, setLayout] = useState<Layout | null>(null)
 
   const measure = useCallback(() => {
-    if (!sectionRef.current || !cardRef.current) return
-    const sectionRect = sectionRef.current.getBoundingClientRect()
+    // Measure everything relative to the STAGE — the SVG lives inside the stage,
+    // so its coordinate (0,0) is the stage's top-left, not the section's.
+    if (!stageRef.current || !cardRef.current) return
+    const stageRect = stageRef.current.getBoundingClientRect()
     const cardRect = cardRef.current.getBoundingClientRect()
 
-    // Card position relative to section
-    const cardLeft = cardRect.left - sectionRect.left
-    const cardTop = cardRect.top - sectionRect.top
+    const cardLeft = cardRect.left - stageRect.left
+    const cardTop = cardRect.top - stageRect.top
 
-    // Region rects relative to card
     const regionMap = new Map<RegionKey, DOMRect>()
     for (const key of ['rate','bio','socials','games','mywork'] as RegionKey[]) {
       const el = cardRef.current.querySelector(`[data-region="${key}"]`) as HTMLElement | null
@@ -193,23 +194,20 @@ export default function ComparisonSection() {
       }
     }
 
-    // Thread rects relative to section
-    // zoom: 0.8 on .cs-thread means getBoundingClientRect returns scaled values,
-    // but the inline style top/left are layout positions in the parent (unscaled).
-    // We read the actual rendered rects directly.
+    // Thread rects relative to STAGE (getBoundingClientRect gives zoomed/visual rects)
     const threadMap = new Map<ThreadKey, ThreadRect>()
     for (const [key, el] of threadEls.current) {
       const r = el.getBoundingClientRect()
       threadMap.set(key, {
-        left: r.left - sectionRect.left,
-        top: r.top - sectionRect.top,
+        left: r.left - stageRect.left,
+        top: r.top - stageRect.top,
         width: r.width,
         height: r.height,
       })
     }
 
     setLayout({
-      sectionWidth: sectionRect.width,
+      sectionWidth: stageRect.width,
       cardLeft,
       cardTop,
       regions: regionMap,
@@ -220,7 +218,7 @@ export default function ComparisonSection() {
   useLayoutEffect(() => {
     measure()
     const ro = new ResizeObserver(measure)
-    if (sectionRef.current) ro.observe(sectionRef.current)
+    if (stageRef.current) ro.observe(stageRef.current)
     if (cardRef.current) ro.observe(cardRef.current)
     return () => ro.disconnect()
   }, [measure])
@@ -274,8 +272,8 @@ export default function ComparisonSection() {
         <p className="cs-subhead">Hover any field on the card to see the days-long search you avoided.</p>
       </div>
 
-      {/* Stage */}
-      <div className="cs-stage">
+      {/* Stage — all absolute positions and SVG coords are relative to this element */}
+      <div className="cs-stage" ref={stageRef}>
 
         {/* SVG connection lines — rendered over everything */}
         <svg className="cs-lines" aria-hidden="true">
