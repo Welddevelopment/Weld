@@ -33,6 +33,7 @@ import SwipeCard from "@/components/matching-preview/SwipeCard";
 import StudioCard from "@/components/matching-preview/StudioCard";
 import { MARQUEE_PROFILES } from "@/data/marqueeProfiles";
 import { MARQUEE_STUDIOS } from "@/data/marqueeStudios";
+import ComparisonSection from "@/dynamic-landing-page/components/ComparisonSection";
 
 interface MarketingPageProps {
   initialMode: Audience;
@@ -861,8 +862,8 @@ function WeldLandingPage({
         {/* 6. Chat — POV-flips per audience */}
         <ChatPreviewSection copy={modeCopy} profile={activeProfile} mode={mode} />
 
-        {/* 7. Comparison table — dot scale */}
-        <ComparisonTableSection copy={modeCopy} />
+        {/* 7. Comparison — Discord hides them, Weld shows them */}
+        <ComparisonSection />
 
         {/* 8. Get early access — combined CTA */}
         <EarlyAccessSection
