@@ -19066,9 +19066,15 @@ button.invite-secondary-button {
   margin: 0 auto;
 }
 
-/* Body grid */
-.cs-body {
+/* Body wrap — SVG coordinate origin */
+.cs-body-wrap {
   position: relative;
+  width: 100%;
+  z-index: 2;
+}
+
+/* 3-col grid */
+.cs-body {
   width: min(1440px, 100%);
   margin: 0 auto;
   display: grid;
@@ -19076,7 +19082,6 @@ button.invite-secondary-button {
   align-items: center;
   gap: 0 52px;
   padding: 0 48px;
-  z-index: 2;
 }
 
 .cs-col {
