@@ -10058,8 +10058,9 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 /* HowItWorksStrip â€” 4 numbered glass cards in a row */
 .weld-glass-page .how-strip-section {
-  width: min(1320px, calc(100% - 48px));
+  width: min(1600px, calc(100% - 48px));
   margin: 36px auto 0;
+  zoom: 0.82;
 }
 
 .weld-glass-page .how-strip-section .glass-card.how-strip {
@@ -10150,8 +10151,9 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 /* HowItWorksStrip - under-hero glass rail */
 .weld-glass-page .how-strip-section {
-  width: min(1320px, calc(100% - 48px));
+  width: min(1600px, calc(100% - 48px));
   margin: clamp(18px, 2.8vw, 36px) auto 0;
+  zoom: 0.82;
 }
 
 .weld-glass-page .how-strip-section .glass-card.how-strip {
