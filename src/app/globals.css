@@ -19018,13 +19018,11 @@ button.invite-secondary-button {
 .cs-section {
   position: relative;
   width: 100%;
-  min-height: 920px;
   background:
     radial-gradient(900px 600px at 50% 46%, rgba(89, 194, 240, 0.30), transparent 60%),
     #DBE6F0;
   margin-top: 36px;
-  padding: 36px 0 80px;
-  overflow: visible;
+  padding: 36px 0 48px;
 }
 
 .cs-header {
