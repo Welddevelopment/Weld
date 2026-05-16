@@ -4876,6 +4876,8 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   box-shadow: none;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: 48px;
   padding: 80px 32px 56px;
 }
@@ -4883,6 +4885,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .footer-cta {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 20px;
   max-width: 560px;
 }
