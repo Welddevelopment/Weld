@@ -863,7 +863,7 @@ function WeldLandingPage({
         <ChatPreviewSection copy={modeCopy} profile={activeProfile} mode={mode} />
 
         {/* 7. Comparison — Discord hides them, Weld shows them */}
-        <ComparisonSection />
+        <ComparisonSection audience={mode} />
 
         {/* 8. Get early access — combined CTA */}
         <EarlyAccessSection

@@ -19282,3 +19282,51 @@ button.invite-secondary-button {
 .cs-thread-footer--bad { color: #B5360F; }
 .cs-thread-footer--cold .cs-thread-footer-dot { background: rgba(14, 26, 43, 0.40); }
 .cs-thread-footer--cold { color: rgba(14, 26, 43, 0.55); }
+
+/* Studio card social chips */
+.cs-sc-socials {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 8px 0 2px;
+}
+
+.cs-sc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(14, 26, 43, 0.60);
+  background: #F0F5FA;
+  border: 1px solid rgba(14, 26, 43, 0.08);
+  border-radius: 20px;
+  padding: 3px 8px;
+}
+
+.cs-sc-chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.cs-sc-chip-dot--marine { background: #0E5BC8; }
+.cs-sc-chip-dot--ink    { background: #0E1A2B; }
+
+/* Studio card avatar monogram */
+.cs-sc-monogram {
+  background: linear-gradient(135deg, #1E3A5F, #0E1A2B) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cs-sc-monogram span {
+  color: #fff;
+  font-family: var(--font-display, 'Plus Jakarta Sans'), system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
