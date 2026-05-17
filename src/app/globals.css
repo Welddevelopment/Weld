@@ -1,10 +1,13 @@
-﻿
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+﻿/* Tailwind v3: do not use @theme (v4-only). These tokens back compat + next/font vars on <html>. */
+:root {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --font-geist-sans: var(--font-body, ui-sans-serif, system-ui, sans-serif);
+  --font-geist-mono: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, monospace);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -2269,7 +2272,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 .acct-btn--ghost:hover { background: rgba(255,247,241,0.10); border-color: rgba(255,247,241,0.22); color: #FFF7F1; }
 
-/* Weld dynamic-landing-page stage surfaces */
+/* weld. dynamic-landing-page stage surfaces */
 .is-selected {
   background: var(--state-selected-fill);
   border-left: 2px solid var(--studio-blue);
@@ -4791,7 +4794,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   }
 }
 
-/* Weld liquid glass landing */
+/* weld. liquid glass landing */
 .weld-glass-page {
   --wg-bg: #efeafe;
   --wg-surface: rgba(255, 255, 255, 0.68);
@@ -7147,7 +7150,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   }
 }
 
-/* Weld liquid glass reference alignment */
+/* weld. liquid glass reference alignment */
 .weld-glass-page {
   --wg-bg: #efeafe;
   --wg-surface: rgba(255, 255, 255, 0.62);

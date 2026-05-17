@@ -24,7 +24,7 @@ const WATERMARK_LINES = [
  * "someone who has opened Studio" texture. Not readable at normal opacity —
  * just enough to feel code-native without distracting.
  *
- * Line index 3 (WeldProfile require) brightens subtly when the profile
+ * Line index 3 (weld.Profile require) brightens subtly when the profile
  * script tab is active, connecting the watermark to page state.
  *
  * aria-hidden + pointer-events none — purely decorative.

@@ -283,7 +283,7 @@ export default function StudioCohortSection({
           <span className="cs-eyebrow">The waitlist, so far</span>
           <h2 className="dc-headline">Add yours<br />to the wall.</h2>
           <p className="dc-subhead">
-            Every studio on this wall is on the Weld waitlist.<br />
+            Every studio on this wall is on the weld. waitlist.<br />
             We&apos;re keeping the first 50 hand-curated.
           </p>
           <div className="dc-capture">

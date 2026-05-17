@@ -118,9 +118,9 @@ export function buildShareCopy(input: {
   shareUrl: string;
 }) {
   const developerBase =
-    "Weld is building a better way for Roblox talent to get found without digging through Discord threads.";
+    "weld. is building a better way for Roblox talent to get found without digging through Discord threads.";
   const studioBase =
-    "Weld is building a better way to screen Roblox talent by proof, rate, and availability instead of Discord chaos.";
+    "weld. is building a better way to screen Roblox talent by proof, rate, and availability instead of Discord chaos.";
 
   const base = input.audience === "studio" ? studioBase : developerBase;
 
@@ -134,7 +134,7 @@ export function buildShareCopy(input: {
     case "instagram":
       return `${base} Use my invite link to join the beta: ${input.shareUrl}`;
     case "snapchat":
-      return `${base} Join me on the Weld beta: ${input.shareUrl}`;
+      return `${base} Join me on the weld. beta: ${input.shareUrl}`;
     case "copy":
     default:
       return input.shareUrl;

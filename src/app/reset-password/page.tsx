@@ -96,7 +96,7 @@ function ResetPasswordForm() {
           <span className="auth-eyebrow">Account</span>
           <h1 className="auth-title">Set a new password</h1>
           <p className="auth-body">
-            Choose a new password for your Weld account.
+            Choose a new password for your weld. account.
           </p>
         </div>
 

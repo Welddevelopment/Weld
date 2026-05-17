@@ -128,11 +128,11 @@ function SignupContent() {
     if (signupType === "studio") {
       return {
         badge: "Studio Waitlist",
-        title: "Reserve your Weld access.",
+        title: "Reserve your weld. access.",
         subhead:
           "Email is all we need. Studio details are optional and help us tune early hiring access.",
         submit: "Join the studio waitlist",
-        successTitle: "You're on the Weld studio waitlist.",
+        successTitle: "You're on the weld. studio waitlist.",
         successBody:
           "Your invite is being prepared. Optional details, if provided, help shape early access."
       };
@@ -144,7 +144,7 @@ function SignupContent() {
       subhead:
         "Only your email is required. Skills, experience, portfolio, and referral details can be skipped for now.",
       submit: "Join the developer waitlist",
-      successTitle: "You're on the Weld developer waitlist.",
+      successTitle: "You're on the weld. developer waitlist.",
       successBody:
         "Your invite is being prepared. Optional details, if provided, help studios understand your signal sooner."
     };
@@ -202,7 +202,7 @@ function SignupContent() {
         body: JSON.stringify(payload)
       });
 
-      // Get invite code from Weld backend (non-blocking if it fails)
+      // Get invite code from weld. backend (non-blocking if it fails)
       try {
         const res = await fetch("/api/waitlist/signup", {
           method: "POST",
@@ -529,7 +529,7 @@ function ReturningOverlay({ inviteUrl, onOverride }: { inviteUrl: string; onOver
       <div className="returning-modal-card">
         <div className="returning-modal-icon">OK</div>
         <h2 className="returning-modal-title">You're already on the list.</h2>
-        <p className="returning-modal-body">Your Weld invite is waiting for you.</p>
+        <p className="returning-modal-body">Your weld. invite is waiting for you.</p>
         <div className="returning-modal-actions">
           <button
             type="button"

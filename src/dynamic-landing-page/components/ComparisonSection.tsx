@@ -495,7 +495,7 @@ export default function ComparisonSection({ audience = 'studio' }: { audience?: 
         </span>
         <h2 className="cs-headline">
           Discord hides them.{' '}
-          <span className="cs-headline-accent">Weld shows them.</span>
+          <span className="cs-headline-accent">weld. shows them.</span>
         </h2>
         <p className="cs-subhead">
           {isDev

@@ -58,13 +58,13 @@ export const SOURCE_VARIANTS = {
     developer: {
       title: "Stop thread diving.\nGet found.",
       copy:
-        "Weld turns your shipped work into a profile studios can trust instantly. No more proving yourself inside thread chaos.",
+        "weld. turns your shipped work into a profile studios can trust instantly. No more proving yourself inside thread chaos.",
       sourceLine: "Discord source detected: compiling thread noise into proof-first discovery."
     },
     studio: {
       title: "Stop hiring in thread chaos.",
       copy:
-        "Weld turns Discord scavenger hunts into clean Roblox talent filters with proof and availability already attached.",
+        "weld. turns Discord scavenger hunts into clean Roblox talent filters with proof and availability already attached.",
       sourceLine: "Discord source detected: scout signal over thread noise."
     }
   },
@@ -72,7 +72,7 @@ export const SOURCE_VARIANTS = {
     developer: {
       title: "Ship work.\nGet pulled in.",
       copy:
-        "Weld packages role, rate, proof, and availability so studios can pull you in from signal instead of cold outreach.",
+        "weld. packages role, rate, proof, and availability so studios can pull you in from signal instead of cold outreach.",
       sourceLine: "X source detected: compact setup, clean proof, faster discovery."
     },
     studio: {
@@ -86,7 +86,7 @@ export const SOURCE_VARIANTS = {
     developer: {
       title: "Proof first.\nThen opportunity.",
       copy:
-        "Weld turns shipped Roblox work into a structured profile with rate clarity, availability, and proof built in for professional review.",
+        "weld. turns shipped Roblox work into a structured profile with rate clarity, availability, and proof built in for professional review.",
       sourceLine: "LinkedIn source detected: proof-first profile language enabled."
     },
     studio: {
@@ -202,7 +202,7 @@ export const ROLE_PREVIEWS = {
     ],
     tags: ["Combat FX", "Readability", "Polish", "Particles"],
     filters: ["Role: VFX", "Rate: Package", "Availability: Slots", "Proof: Reel"],
-    foot: "Weld makes VFX proof easy to scan without pretending it is a marketplace ranking."
+    foot: "weld. makes VFX proof easy to scan without pretending it is a marketplace ranking."
   },
   builder: {
     label: "weld.preview -- builder_loadout",
@@ -341,8 +341,8 @@ export const FOUNDING_FACTS = [
 
 export const FAQ_ITEMS = [
   {
-    question: "Is Weld free during beta?",
-    answer: "Yes. Weld is free during beta for both developers and studios."
+    question: "Is weld. free during beta?",
+    answer: "Yes. weld. is free during beta for both developers and studios."
   },
   {
     question: "What does beta actually include?",
@@ -357,7 +357,7 @@ export const FAQ_ITEMS = [
   {
     question: "What if I have only one strong proof link?",
     answer:
-      "That is enough to start. Weld is designed to make one clear proof signal more useful than a long thread of vague claims."
+      "That is enough to start. weld. is designed to make one clear proof signal more useful than a long thread of vague claims."
   },
   {
     question: "Is studio mode live too?",
@@ -371,7 +371,7 @@ export const TYPE_COPY = {
     entryEyebrow: "Developer invite",
     entryTitle: "Unlock your invite state.",
     entryCopy: "Enter your email to unlock your queue, referral progress, and role loadout.",
-    winCopy: "You are in. Your Weld beta invite is active.",
+    winCopy: "You are in. Your weld. beta invite is active.",
     audiencePill: "Developer lane",
     profileCopy: "Build your role loadout. Each field improves matching signal.",
     identityCopy: "Name and discipline tell studios what to scan first.",
@@ -384,7 +384,7 @@ export const TYPE_COPY = {
     entryEyebrow: "Studio invite",
     entryTitle: "Unlock studio invite state.",
     entryCopy: "Enter your email to unlock your queue, referral progress, and scout setup.",
-    winCopy: "You are in. Your Weld studio beta invite is active.",
+    winCopy: "You are in. Your weld. studio beta invite is active.",
     audiencePill: "Studio lane",
     profileCopy: "Build your scout loadout. Each field sharpens your hiring signal.",
     identityCopy: "A clear studio identity helps creators trust the inbound opportunity.",

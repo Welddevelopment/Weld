@@ -12,7 +12,7 @@ export function buildUserSummary(userId: string): UserSummary {
   return {
     userId,
     name: `Member ${shortId}`,
-    role: 'Weld member',
+    role: 'weld. member',
     bg: 'linear-gradient(135deg,#1E1B16,#0E0C09)',
     robloxUserId: 1,
   }

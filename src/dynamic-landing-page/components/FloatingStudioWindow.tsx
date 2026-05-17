@@ -87,7 +87,7 @@ export function FloatingStudioWindow({
           <span className="studio-dot studio-dot--green" />
         </span>
         <span className="studio-titlebar__title">
-          Weld Studio — Developer.rbxl
+          weld. Studio — Developer.rbxl
         </span>
       </div>
 

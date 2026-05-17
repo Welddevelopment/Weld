@@ -195,7 +195,7 @@ const COPY: Record<Audience, LandingCopy> = {
     comparison: {
       kicker: "IMPROVED VISIBILITY",
       title: "Where your signal gets seen.",
-      body: "Discord spreads your pitch around. Weld keeps proof, rate, role, and first-message context together."
+      body: "Discord spreads your pitch around. weld. keeps proof, rate, role, and first-message context together."
     },
     howItWorks: {
       kicker: "How it works",
@@ -252,10 +252,10 @@ const COPY: Record<Audience, LandingCopy> = {
     },
     antiDiscord: {
       kicker: "Less Discord chaos",
-      headline: "Weld keeps the useful context, not the noise.",
+      headline: "weld. keeps the useful context, not the noise.",
       intro: "Replace scattered self-promotion with one profile and one professional thread.",
       beforeLabel: "Scattered DMs",
-      afterLabel: "Weld workspace",
+      afterLabel: "weld. workspace",
       before: ["Rate buried in DMs", "Portfolio split across links", "Availability unclear", "Scope starts from zero"],
       after: ["Role-first profile", "Verified proof fields", "Rate and availability visible", "Focused chat context"]
     },
@@ -314,14 +314,14 @@ const COPY: Record<Audience, LandingCopy> = {
       title: "Quick answers, no fine print.",
       items: [
         {
-          question: "Is Weld official Roblox?",
+          question: "Is weld. official Roblox?",
           answer:
-            "No. Weld is independent. We speak directly to Roblox talent, but we do not use Roblox logos or official verification marks."
+            "No. weld. is independent. We speak directly to Roblox talent, but we do not use Roblox logos or official verification marks."
         },
         {
-          question: "What is Weld?",
+          question: "What is weld.?",
           answer:
-            "Weld turns your role, rate, availability, links, and proof into a clean Roblox talent card studios can scan fast."
+            "weld. turns your role, rate, availability, links, and proof into a clean Roblox talent card studios can scan fast."
         },
         {
           question: "Who can join the developer beta?",
@@ -336,7 +336,7 @@ const COPY: Record<Audience, LandingCopy> = {
         {
           question: "Are the demo stats real?",
           answer:
-            "No. The current card content is illustrative demo data showing how Weld packages proof, links, rate, and availability."
+            "No. The current card content is illustrative demo data showing how weld. packages proof, links, rate, and availability."
         },
         {
           question: "When will access open?",
@@ -408,7 +408,7 @@ const COPY: Record<Audience, LandingCopy> = {
     comparison: {
       kicker: "HIRING CLARITY",
       title: "Compare channels before you scout.",
-      body: "Discord can create reach, but Weld keeps candidate signal and first-message context in one place."
+      body: "Discord can create reach, but weld. keeps candidate signal and first-message context in one place."
     },
     howItWorks: {
       kicker: "How it works",
@@ -464,10 +464,10 @@ const COPY: Record<Audience, LandingCopy> = {
     },
     antiDiscord: {
       kicker: "Less Discord chaos",
-      headline: "Weld keeps the useful context, not the noise.",
+      headline: "weld. keeps the useful context, not the noise.",
       intro: "Replace scattered scouting with one profile, one proof layer, and one focused first-message trail.",
       beforeLabel: "Scattered DMs",
-      afterLabel: "Weld workspace",
+      afterLabel: "weld. workspace",
       before: ["Rate hidden in DMs", "Portfolio split across servers", "Availability unclear", "Scope starts from zero"],
       after: ["Role-first candidate cards", "Verified proof fields", "Rate and availability visible", "Focused thread context"]
     },
@@ -526,14 +526,14 @@ const COPY: Record<Audience, LandingCopy> = {
       title: "Quick answers, no fine print.",
       items: [
         {
-          question: "Is Weld official Roblox?",
+          question: "Is weld. official Roblox?",
           answer:
-            "No. Weld is independent. We speak directly to Roblox talent and studios, but we do not use Roblox logos or official verification marks."
+            "No. weld. is independent. We speak directly to Roblox talent and studios, but we do not use Roblox logos or official verification marks."
         },
         {
-          question: "What is Weld?",
+          question: "What is weld.?",
           answer:
-            "Weld is a Roblox talent network where studios scan role-first cards with proof, rate, availability, and shipped work in one place."
+            "weld. is a Roblox talent network where studios scan role-first cards with proof, rate, availability, and shipped work in one place."
         },
         {
           question: "Who can join the studio beta?",
@@ -548,7 +548,7 @@ const COPY: Record<Audience, LandingCopy> = {
         {
           question: "Are the demo stats real?",
           answer:
-            "No. The current card content is illustrative demo data showing how Weld packages proof, links, rate, and availability."
+            "No. The current card content is illustrative demo data showing how weld. packages proof, links, rate, and availability."
         },
         {
           question: "When will access open?",

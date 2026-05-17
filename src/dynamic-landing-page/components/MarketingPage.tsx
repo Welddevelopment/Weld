@@ -862,7 +862,7 @@ function WeldLandingPage({
         {/* 6. Chat — POV-flips per audience */}
         <ChatPreviewSection copy={modeCopy} profile={activeProfile} mode={mode} />
 
-        {/* 7. Comparison — Discord hides them, Weld shows them */}
+        {/* 7. Comparison — Discord hides them, weld. shows them */}
         <ComparisonSection audience={mode} />
 
         <FriendlyFAQ copy={modeCopy} />
@@ -897,7 +897,7 @@ function GlassNav({
 }) {
   return (
     <header className="glass-nav-shell">
-      <Link href={joinHref(mode, searchString)} className="glass-brand" aria-label="Weld home">
+      <Link href={joinHref(mode, searchString)} className="glass-brand" aria-label="weld. home">
         <span className="glass-brand-mark">
           <Image src="/Assets/weld-logo-official.svg" alt="" width={24} height={24} priority />
         </span>
@@ -1133,7 +1133,7 @@ function TalentMarqueeSection({
   const doubled = [...MARQUEE_PROFILES, ...MARQUEE_PROFILES];
 
   return (
-    <section className="marquee-section" data-audience={mode} aria-label="Talent on Weld" aria-hidden="true">
+    <section className="marquee-section" data-audience={mode} aria-label="Talent on weld." aria-hidden="true">
       <div className="marquee-header">
         <p className="marquee-eyebrow">{teaser.kicker}</p>
         <h2 className="marquee-heading">{teaser.title}</h2>
@@ -1609,7 +1609,7 @@ function ComparisonTableSection({ copy }: { copy: LandingCopy }) {
       points: ["Some role sorting", "Proof link-hopping", "Threads drift"]
     },
     {
-      title: "Weld",
+      title: "weld.",
       label: "Proof-first cards",
       tone: "weld",
       score: "Strong signal",
@@ -1920,7 +1920,7 @@ function FooterCTA({
             </div>
           </div>
         </div>
-        <p className="glass-footer-copyright">© {new Date().getFullYear()} Weld</p>
+        <p className="glass-footer-copyright">© {new Date().getFullYear()} weld.</p>
       </div>
     </footer>
   );
@@ -2272,7 +2272,7 @@ function ReturningModal({ inviteUrl, onDismiss }: { inviteUrl: string; onDismiss
       <div className="returning-modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="returning-modal-icon">✓</div>
         <h2 className="returning-modal-title">You&rsquo;re already on the list.</h2>
-        <p className="returning-modal-body">Your Weld invite is waiting for you.</p>
+        <p className="returning-modal-body">Your weld. invite is waiting for you.</p>
         <p className="returning-modal-hint">Taking you there now&hellip;</p>
       </div>
     </div>

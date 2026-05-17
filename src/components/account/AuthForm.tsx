@@ -31,7 +31,7 @@ export default function AuthForm({ mode }: Props) {
     if (mode === 'signup') {
       return {
         eyebrow: 'Create account',
-        title: 'Start your Weld account',
+        title: 'Start your weld. account',
         body: 'Use email and password for now. Your profile draft will save to this account once you log in.',
         button: 'Create account',
         switchText: 'Already have an account?',
@@ -42,7 +42,7 @@ export default function AuthForm({ mode }: Props) {
 
     return {
       eyebrow: 'Welcome back',
-      title: 'Log in to Weld',
+      title: 'Log in to weld.',
       body: 'Pick up your profile draft and keep your matching setup attached to your account.',
       button: 'Log in',
       switchText: 'Need an account?',

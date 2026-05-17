@@ -185,7 +185,7 @@ export default function InviteExperience({
           <section className="invite-hero-card">
             <div className="invite-hero-copy">
               <StatusPill>Invite active</StatusPill>
-              <h1>You're on the Weld beta list.</h1>
+              <h1>You're on the weld. beta list.</h1>
               <p>
                 {copy.winCopy} Your invite is live, your link is ready, and this page is your beta dashboard.
               </p>
@@ -266,7 +266,7 @@ export default function InviteExperience({
                   <>
                     <h2>Build your proof profile.</h2>
                     <p>
-                      Complete your Weld profile so studios can evaluate your role, proof, rate, and fit before reaching out.
+                      Complete your weld. profile so studios can evaluate your role, proof, rate, and fit before reaching out.
                     </p>
                     <Link href="/profile" className="invite-primary-button">
                       Build profile →
