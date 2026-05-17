@@ -358,8 +358,15 @@ function StudioCardStatic({ activeRegions, onRegion, onLeave }: {
       {/* Top: monogram + stats */}
       <div className="sc-top">
         <div className="sc-avatar-wrap">
-          <div className="sc-avatar cs-sc-monogram">
+          <div className="sc-avatar cs-sc-monogram" style={{ position: 'relative' }}>
             <span>NW</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-93AE29D7B9A260DD3975F3B0276B29E5-Png/150/150/AvatarHeadshot/Png/noFilter"
+              alt="Eclipse Studios"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', borderRadius: 20 }}
+            />
           </div>
           <div className="sc-online-dot" />
         </div>
