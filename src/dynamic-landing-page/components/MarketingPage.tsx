@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   useEffect,
   useRef,
@@ -536,12 +536,14 @@ function WeldLandingPage({
   sourceVariant,
   page
 }: MarketingPageProps) {
+  void initialMode;
   const router = useRouter();
+  const pathname = usePathname() ?? "";
   const searchParams = useSearchParams();
   const navSearchString = navigationSearchString(searchParams);
   const motion = useMotionPolicy();
   const motionTier = motion.tier;
-  const [mode, setMode] = useState<Audience>(initialMode);
+  const mode: Audience = pathname.startsWith("/studios") ? "studio" : "developer";
   const [role, setRole] = useState<RoleKey>("scripting");
   const [email, setEmail] = useState("");
   const [capturePhase, setCapturePhase] = useState<CapturePhase>("idle");
@@ -614,10 +616,6 @@ function WeldLandingPage({
   }, [motion.reducedMotion, motion.allowEntranceStagger]);
 
   useEffect(() => {
-    setMode(initialMode);
-  }, [initialMode]);
-
-  useEffect(() => {
     const MULTIPLIER = 0.70;
     function onWheel(e: WheelEvent) {
       if (e.ctrlKey) return; // allow pinch-to-zoom
@@ -641,8 +639,9 @@ function WeldLandingPage({
   }, [mode, page, sourceVariant]);
 
   function handleModeChange(nextMode: Audience) {
-    if (nextMode === mode) return;
-    setMode(nextMode);
+    if (nextMode === mode) {
+      return;
+    }
     persistAudiencePreference(nextMode);
     setCaptureStatus("");
     setCapturePhase("idle");
@@ -654,7 +653,8 @@ function WeldLandingPage({
       payload: { from: mode, to: nextMode }
     });
 
-    router.push(joinHref(nextMode, navSearchString, window.location.hash), { scroll: false });
+    const href = joinHref(nextMode, navSearchString, window.location.hash);
+    router.push(href, { scroll: false });
   }
 
   function handleRoleChange(nextRoleKey: RoleKey) {
@@ -1942,20 +1942,10 @@ function ModeToggle({
   return (
     <div className="mode-toggle" role="radiogroup" aria-label="Audience mode">
       <span className={mode === "studio" ? "is-studio" : ""} aria-hidden="true" />
-      <button
-        type="button"
-        role="radio"
-        aria-checked={mode === "developer"}
-        onClick={() => onChange("developer")}
-      >
+      <button type="button" role="radio" aria-checked={mode === "developer"} onClick={() => onChange("developer")}>
         {labels.developer}
       </button>
-      <button
-        type="button"
-        role="radio"
-        aria-checked={mode === "studio"}
-        onClick={() => onChange("studio")}
-      >
+      <button type="button" role="radio" aria-checked={mode === "studio"} onClick={() => onChange("studio")}>
         {labels.studio}
       </button>
     </div>
