@@ -9,7 +9,8 @@ export async function GET(request: NextRequest) {
   try {
     const result = await checkWaitlistEmail(email);
     return NextResponse.json(result);
-  } catch {
-    return NextResponse.json({ exists: false });
+  } catch (err) {
+    console.error("[waitlist/check] error:", err);
+    return NextResponse.json({ exists: false, error: "lookup_failed" });
   }
 }
