@@ -1846,26 +1846,32 @@ function FooterCTA({ copy, mode }: { copy: LandingCopy; mode: Audience }) {
 
   return (
     <footer className="glass-footer">
-      <div className="footer-cta">
-        <h2 className="footer-cta-headline">Last call — get early access.</h2>
-        <form className="footer-cta-form" onSubmit={handleFooterSubmit}>
-          <input
-            className="footer-cta-input"
-            type="email"
-            placeholder="your@email.com"
-            value={footerEmail}
-            onChange={e => setFooterEmail(e.target.value)}
-            autoComplete="email"
-          />
-          <button type="submit" className="footer-cta-btn">Get early access</button>
-        </form>
+      <div className="footer-inner">
+        <div className="footer-brand">
+          <span className="footer-wordmark">weld.</span>
+          <p className="footer-tagline">The Roblox hiring layer.</p>
+          <nav className="footer-links" aria-label="Footer">
+            <a href={`${WAITLIST_URL}/privacy`}>{copy.footer.privacy}</a>
+            <a href={`${WAITLIST_URL}/terms`}>{copy.footer.terms}</a>
+            <a href={`${WAITLIST_URL}/contact`}>{copy.footer.contact}</a>
+          </nav>
+        </div>
+        <div className="footer-cta">
+          <h2 className="footer-cta-headline">Last call — get in early.</h2>
+          <form className="footer-cta-form" onSubmit={handleFooterSubmit}>
+            <input
+              className="footer-cta-input"
+              type="email"
+              placeholder="your@email.com"
+              value={footerEmail}
+              onChange={e => setFooterEmail(e.target.value)}
+              autoComplete="email"
+            />
+            <button type="submit" className="footer-cta-btn">Join →</button>
+          </form>
+          <p className="footer-copy">© 2025 Weld</p>
+        </div>
       </div>
-      <nav className="footer-links" aria-label="Footer">
-        <strong>weld.</strong>
-        <a href={`${WAITLIST_URL}/privacy`}>{copy.footer.privacy}</a>
-        <a href={`${WAITLIST_URL}/terms`}>{copy.footer.terms}</a>
-        <a href={`${WAITLIST_URL}/contact`}>{copy.footer.contact}</a>
-      </nav>
     </footer>
   );
 }
