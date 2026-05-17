@@ -34,6 +34,7 @@ import StudioCard from "@/components/matching-preview/StudioCard";
 import { MARQUEE_PROFILES } from "@/data/marqueeProfiles";
 import { MARQUEE_STUDIOS } from "@/data/marqueeStudios";
 import ComparisonSection from "@/dynamic-landing-page/components/ComparisonSection";
+import DevCohortSection from "@/dynamic-landing-page/components/DevCohortSection";
 
 interface MarketingPageProps {
   initialMode: Audience;
@@ -865,17 +866,28 @@ function WeldLandingPage({
         {/* 7. Comparison — Discord hides them, Weld shows them */}
         <ComparisonSection audience={mode} />
 
-        {/* 8. Get early access — combined CTA */}
-        <EarlyAccessSection
-          mode={mode}
-          copy={modeCopy}
-          email={email}
-          phase={capturePhase}
-          status={captureStatus}
-          captureRef={captureRef}
-          onEmailChange={setEmail}
-          onSubmit={openSignupForm}
-        />
+        {/* 8. Get early access — audience-split CTA */}
+        {mode === 'developer' ? (
+          <DevCohortSection
+            email={email}
+            phase={capturePhase}
+            status={captureStatus}
+            captureRef={captureRef}
+            onEmailChange={setEmail}
+            onSubmit={openSignupForm}
+          />
+        ) : (
+          <EarlyAccessSection
+            mode={mode}
+            copy={modeCopy}
+            email={email}
+            phase={capturePhase}
+            status={captureStatus}
+            captureRef={captureRef}
+            onEmailChange={setEmail}
+            onSubmit={openSignupForm}
+          />
+        )}
 
         <FriendlyFAQ copy={modeCopy} />
       </main>
