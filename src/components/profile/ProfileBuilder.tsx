@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { Session } from '@supabase/supabase-js'
@@ -395,7 +396,10 @@ export default function ProfileBuilder({
 
   const header = (
     <div className="pb-form-top">
-      <span className="pb-brand">weld.</span>
+      <span className="pb-brand">
+        <Image src="/Assets/weld-logo-official.svg" width={28} height={28} alt="weld" />
+        weld.
+      </span>
       <ProfileAccountStatus accountEmail={accountEmail} saveState={saveState} />
       {isQuickStep && (
         <>

@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState } from 'react'
 import { ProfileDraft } from '../profile-types'
 
@@ -48,7 +49,7 @@ export default function IdentityStep({ draft, update, onNext, onBack }: Props) {
     <div className="ob-screen">
       <aside className="ob-side ob-side--dark">
         <div className="ob-brand ob-brand--light">
-          <span className="ob-mark">*</span>
+          <Image src="/Assets/weld-logo-official.svg" width={24} height={24} alt="weld" />
           <span>weld.</span>
         </div>
         <h1 className="ob-title ob-title--light">link your<br />roblox</h1>

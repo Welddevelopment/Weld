@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { ProfileDraft } from '../profile-types'
 
 interface Props {
@@ -19,7 +20,7 @@ export default function AvailabilityStep({ draft, update, onNext, onBack }: Prop
     <div className="ob-screen">
       <aside className="ob-side">
         <div className="ob-brand">
-          <span className="ob-mark">*</span>
+          <Image src="/Assets/weld-logo-official.svg" width={24} height={24} alt="weld" />
           <span>weld.</span>
         </div>
         <h1 className="ob-title">your<br />availability</h1>

@@ -847,37 +847,45 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 /* â”€â”€â”€ Profile Builder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .pb-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 800;
   font-size: 22px;
   letter-spacing: -0.5px;
-  color: #E84624;
+  color: #0E1A2B;
 }
 
 /* Form shell */
 .pb-form-shell {
   min-height: 100vh;
-  background: #0a0a0a;
-  color: #f0f0f0;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(89, 194, 240, 0.18), transparent 30%),
+    radial-gradient(circle at 88% 20%, rgba(111, 93, 242, 0.10), transparent 28%),
+    linear-gradient(180deg, #F4F7FA 0%, #EBF2F8 56%, #E4EEF6 100%);
+  color: #0E1A2B;
   font-family: inherit;
   display: flex;
   flex-direction: column;
 }
 
 .pb-form-top {
-  padding: 18px 32px;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
+  padding: 14px 28px;
+  border-bottom: 1px solid rgba(14, 26, 43, 0.07);
   display: flex;
   align-items: center;
   gap: 20px;
   position: sticky;
   top: 0;
   z-index: 10;
-  background: #0a0a0a;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .pb-form-step-indicator {
   font-size: 13px;
-  color: rgba(255,255,255,0.4);
+  color: rgba(14, 26, 43, 0.40);
   margin-left: auto;
   margin-right: 16px;
 }
@@ -886,14 +894,14 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   width: 120px;
   height: 3px;
   border-radius: 99px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(14, 26, 43, 0.10);
   overflow: hidden;
   flex-shrink: 0;
 }
 
 .pb-form-progress-fill {
   height: 100%;
-  background: #E84624;
+  background: #59C2F0;
   border-radius: 99px;
   transition: width 0.35s ease;
 }
@@ -15477,37 +15485,45 @@ button.invite-secondary-button {
 /* ── Profile Builder (.pb-) and Auth (.auth-) ── */
 
 .pb-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 800;
   font-size: 22px;
   letter-spacing: -0.5px;
-  color: #E84624;
+  color: #0E1A2B;
 }
 
 /* Form shell */
 .pb-form-shell {
   min-height: 100vh;
-  background: #0a0a0a;
-  color: #f0f0f0;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(89, 194, 240, 0.18), transparent 30%),
+    radial-gradient(circle at 88% 20%, rgba(111, 93, 242, 0.10), transparent 28%),
+    linear-gradient(180deg, #F4F7FA 0%, #EBF2F8 56%, #E4EEF6 100%);
+  color: #0E1A2B;
   font-family: inherit;
   display: flex;
   flex-direction: column;
 }
 
 .pb-form-top {
-  padding: 18px 32px;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
+  padding: 14px 28px;
+  border-bottom: 1px solid rgba(14, 26, 43, 0.07);
   display: flex;
   align-items: center;
   gap: 20px;
   position: sticky;
   top: 0;
   z-index: 10;
-  background: #0a0a0a;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .pb-form-step-indicator {
   font-size: 13px;
-  color: rgba(255,255,255,0.4);
+  color: rgba(14, 26, 43, 0.40);
   margin-left: auto;
   margin-right: 16px;
 }
@@ -15516,14 +15532,14 @@ button.invite-secondary-button {
   width: 120px;
   height: 3px;
   border-radius: 99px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(14, 26, 43, 0.10);
   overflow: hidden;
   flex-shrink: 0;
 }
 
 .pb-form-progress-fill {
   height: 100%;
-  background: #E84624;
+  background: #59C2F0;
   border-radius: 99px;
   transition: width 0.35s ease;
 }
@@ -16206,8 +16222,8 @@ button.invite-secondary-button {
   background: #f2efe9;
 }
 .ob-side--dark {
-  background: #1c1a17;
-  border-right-color: rgba(255,255,255,0.1);
+  background: #0E1A2B;
+  border-right-color: rgba(255,255,255,0.08);
 }
 .ob-brand {
   display: flex;
@@ -16255,7 +16271,7 @@ button.invite-secondary-button {
   display: flex;
   flex-direction: column;
   padding: 32px;
-  background: #faf9f6;
+  background: #F4F7FA;
   overflow-y: auto;
 }
 .ob-main .pb-label {
