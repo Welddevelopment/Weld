@@ -19300,7 +19300,7 @@ button.invite-secondary-button {
   position: absolute;
   inset: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, 170px); /* 340px card × zoom 0.5 */
+  grid-template-columns: repeat(auto-fill, minmax(221px, 1fr)); /* 340px card × zoom 0.65 */
   gap: 12px;
   padding: 16px;
   overflow: hidden;
@@ -19310,7 +19310,7 @@ button.invite-secondary-button {
 
 .dc-bg-card {
   width: 340px;
-  zoom: 0.5;
+  zoom: 0.65;
   border-radius: 20px !important;
   box-shadow: 0 2px 10px rgba(14, 26, 43, 0.08) !important;
 }
