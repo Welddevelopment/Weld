@@ -554,7 +554,7 @@ export default function SwipeCard({ profile }: { profile?: MarqueeProfile }) {
                   <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
               </button>
-              <button className="npc-action-seg" aria-label="Message" onClick={() => setRightPanel("work")}>
+              <button className="npc-action-seg" aria-label="Message" onClick={showToast}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
