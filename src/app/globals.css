@@ -19679,3 +19679,79 @@ button.invite-secondary-button {
     zoom: 1;
   }
 }
+
+/* ── Marquee sections ────────────────────────────────────────────────────────── */
+
+/* On phones the 380px cards are wider than the viewport — hide the scrolling
+   track entirely and let the section header carry the value-prop copy. */
+@media (max-width: 720px) {
+  .weld-glass-page .marquee-section .marquee-track,
+  .weld-glass-page .other-side-section .marquee-track {
+    display: none;
+  }
+
+  .weld-glass-page .marquee-section .marquee-header,
+  .weld-glass-page .other-side-section .marquee-header {
+    padding-bottom: 48px;
+  }
+}
+
+/* ── SwipeCard modal on mobile ───────────────────────────────────────────────── */
+
+/* swipe-modal-inner uses zoom:1.7 (or 1.2 in data-mode). On phones this makes
+   the 380px card render at 456–646px — too wide. When the right/left panel
+   opens, both columns are partially visible (centered in the overlay). Fix:
+   remove zoom and make panels overlay the card instead of pushing sideways. */
+@media (max-width: 600px) {
+  .swipe-modal-inner,
+  .weld-glass-page[data-mode] .swipe-modal-inner {
+    zoom: 1;
+    width: 100%;
+    max-width: 380px;
+    align-self: center;
+  }
+
+  .swipe-modal-overlay {
+    padding: 60px 16px 24px;
+    align-items: flex-start;
+  }
+}
+
+/* ── SwipeCard / NPC card panels ─────────────────────────────────────────────── */
+
+/* When a side panel opens, make it overlay the card rather than push sideways */
+@media (max-width: 600px) {
+  .npc-stack-row {
+    position: relative;
+    width: 100%;
+  }
+
+  .npc-panel {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    border-radius: 20px;
+  }
+
+  .npc-wrap {
+    width: 100%;
+    min-width: 0;
+    flex-shrink: 1;
+  }
+
+  .npc-root {
+    width: 100%;
+  }
+}
+
+/* ── NPC/SwipeCard base sizing on mobile ─────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .weld-glass-page .npc-hero-preview-container .npc-wrap,
+  .weld-glass-page .npc-hero-preview-container .mock-card-shell {
+    width: 100%;
+    flex-shrink: 1;
+  }
+}
