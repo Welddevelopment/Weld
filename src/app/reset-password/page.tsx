@@ -19,21 +19,45 @@ function ResetPasswordForm() {
   useEffect(() => {
     if (!hasBrowserSupabaseConfig()) return
 
-    const code = searchParams.get('code')
-    if (!code) {
+    if (!searchParams.get('code')) {
       setError('Invalid or expired reset link. Please request a new one.')
       return
     }
 
-    getBrowserSupabase()
-      .auth.exchangeCodeForSession(code)
-      .then(({ error: exchangeError }) => {
-        if (exchangeError) {
-          setError('This reset link has expired or already been used. Please request a new one.')
-        } else {
-          setReady(true)
-        }
-      })
+    const supabase = getBrowserSupabase()
+    let done = false
+
+    function markReady() {
+      if (done) return
+      done = true
+      setReady(true)
+    }
+
+    function markError() {
+      if (done) return
+      done = true
+      setError('This reset link has expired or already been used. Please request a new one.')
+    }
+
+    // @supabase/ssr auto-exchanges the code on init and fires PASSWORD_RECOVERY
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && session)) {
+        markReady()
+      }
+    })
+
+    // In case the event already fired before we subscribed
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) markReady()
+    })
+
+    // Fallback: if nothing fires within 5s the link is genuinely invalid
+    const timer = setTimeout(markError, 5000)
+
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(timer)
+    }
   }, [searchParams])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
