@@ -14543,7 +14543,6 @@ button.invite-secondary-button {
   margin: clamp(54px, 7vw, 96px) auto 0;
   padding: clamp(28px, 4vw, 54px) 0 clamp(42px, 5vw, 72px);
   border: 1px solid rgba(255, 255, 255, 0.88);
-  border-radius: clamp(32px, 4vw, 54px);
   background:
     radial-gradient(800px 500px at 8% 12%, rgba(89, 194, 240, 0.18), transparent 60%),
     radial-gradient(600px 400px at 95% 90%, rgba(14, 91, 200, 0.10), transparent 65%),
