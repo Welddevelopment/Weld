@@ -1826,51 +1826,88 @@ function FriendlyFAQ({ copy }: { copy: LandingCopy }) {
 }
 
 function FooterCTA({ copy, mode }: { copy: LandingCopy; mode: Audience }) {
-  const [footerEmail, setFooterEmail] = useState('')
+  const [footerEmail, setFooterEmail] = useState("");
+
+  const benefitIcon = (key: "shield" | "code" | "user" | "folder") => {
+    if (key === "shield") return <ShieldIcon />;
+    if (key === "code") return <CodeIcon />;
+    if (key === "user") return <UserIcon />;
+    return <FolderIcon />;
+  };
 
   async function handleFooterSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    const trimmed = footerEmail.trim()
-    if (!trimmed) return
+    e.preventDefault();
+    const trimmed = footerEmail.trim();
+    if (!trimmed) return;
     try {
-      const res = await fetch(`/api/waitlist/check?email=${encodeURIComponent(trimmed)}`)
-      const data = await res.json() as { exists: boolean; inviteUrl?: string }
+      const res = await fetch(`/api/waitlist/check?email=${encodeURIComponent(trimmed)}`);
+      const data = (await res.json()) as { exists: boolean; inviteUrl?: string };
       if (data.exists && data.inviteUrl) {
-        window.location.href = data.inviteUrl
-        return
+        window.location.href = data.inviteUrl;
+        return;
       }
-    } catch { /* proceed */ }
-    const params = new URLSearchParams({ email: trimmed, type: mode })
-    window.location.href = `/signup?${params}`
+    } catch {
+      /* proceed */
+    }
+    const params = new URLSearchParams({ email: trimmed, type: mode });
+    window.location.href = `/signup?${params}`;
   }
 
   return (
-    <footer className="glass-footer">
-      <div className="footer-inner">
-        <div className="footer-brand">
-          <span className="footer-wordmark">weld.</span>
-          <p className="footer-tagline">The Roblox hiring layer.</p>
-          <nav className="footer-links" aria-label="Footer">
-            <a href={`${WAITLIST_URL}/privacy`}>{copy.footer.privacy}</a>
-            <a href={`${WAITLIST_URL}/terms`}>{copy.footer.terms}</a>
-            <a href={`${WAITLIST_URL}/contact`}>{copy.footer.contact}</a>
-          </nav>
+    <footer className="glass-footer glass-footer-cta-band">
+      <div className="glass-footer-band-shell">
+        <div className="glass-footer-cta-grid">
+          <div className="glass-footer-copy-col">
+            <span className="glass-footer-badge">{copy.waitlist.kicker}</span>
+            <h2 className="glass-footer-headline">{copy.waitlist.headline}</h2>
+            <p className="glass-footer-sub">{copy.waitlist.subhead}</p>
+            <div className="glass-footer-benefits" aria-label="Beta benefits">
+              {copy.waitlist.benefits.map(([title, body, iconKey]) => (
+                <div key={title} className="glass-footer-benefit">
+                  <span className="glass-footer-benefit-icon" aria-hidden="true">
+                    {benefitIcon(iconKey)}
+                  </span>
+                  <div className="glass-footer-benefit-text">
+                    <strong>{title}</strong>
+                    <span>{body}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="glass-footer-brand-block">
+              <span className="glass-footer-wordmark">weld.</span>
+              <p className="glass-footer-tagline">{copy.footer.tagline}</p>
+              <nav className="glass-footer-links" aria-label="Legal">
+                <a href={`${WAITLIST_URL}/privacy`}>{copy.footer.privacy}</a>
+                <a href={`${WAITLIST_URL}/terms`}>{copy.footer.terms}</a>
+                <a href={`${WAITLIST_URL}/contact`}>{copy.footer.contact}</a>
+              </nav>
+            </div>
+          </div>
+          <div className="glass-footer-form-col">
+            <div className="glass-footer-form-card">
+              <h3 className="glass-footer-form-title">{copy.waitlist.title}</h3>
+              <p className="glass-footer-form-lead">{copy.waitlist.body}</p>
+              <form className="glass-footer-form" onSubmit={handleFooterSubmit}>
+                <label className="glass-footer-field">
+                  <span className="glass-footer-field-label">{copy.waitlist.fieldLabel}</span>
+                  <input
+                    type="email"
+                    name="email"
+                    autoComplete="email"
+                    placeholder={copy.waitlist.placeholder}
+                    value={footerEmail}
+                    onChange={(e) => setFooterEmail(e.target.value)}
+                  />
+                </label>
+                <button type="submit" className="glass-footer-submit">
+                  {copy.waitlist.button}
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
-        <div className="footer-cta">
-          <h2 className="footer-cta-headline">Last call — get in early.</h2>
-          <form className="footer-cta-form" onSubmit={handleFooterSubmit}>
-            <input
-              className="footer-cta-input"
-              type="email"
-              placeholder="your@email.com"
-              value={footerEmail}
-              onChange={e => setFooterEmail(e.target.value)}
-              autoComplete="email"
-            />
-            <button type="submit" className="footer-cta-btn">Join →</button>
-          </form>
-          <p className="footer-copy">© 2025 Weld</p>
-        </div>
+        <p className="glass-footer-copyright">© {new Date().getFullYear()} Weld</p>
       </div>
     </footer>
   );

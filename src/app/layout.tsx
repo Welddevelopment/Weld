@@ -1,13 +1,24 @@
 import type { Metadata } from "next";
-import { DM_Mono, Instrument_Serif, Space_Grotesk } from "next/font/google";
+import {
+  DM_Mono,
+  Instrument_Serif,
+  Plus_Jakarta_Sans,
+  Space_Grotesk
+} from "next/font/google";
 
 import "./globals.css";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
+  variable: "--font-display"
+});
 
 const instrumentSerif = Instrument_Serif({
   weight: "400",
   style: ["normal", "italic"],
   subsets: ["latin"],
-  variable: "--font-display"
+  variable: "--font-instrument-serif"
 });
 
 const spaceGrotesk = Space_Grotesk({
@@ -61,7 +72,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${instrumentSerif.variable} ${spaceGrotesk.variable} ${dmMono.variable}`}
+      className={`${plusJakartaSans.variable} ${instrumentSerif.variable} ${spaceGrotesk.variable} ${dmMono.variable}`}
     >
       <body>{children}</body>
     </html>
