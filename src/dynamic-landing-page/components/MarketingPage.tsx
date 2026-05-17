@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   useEffect,
   useRef,
@@ -530,7 +530,6 @@ function WeldLandingPage({
   page
 }: MarketingPageProps) {
   const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const searchString = searchParams.toString();
   const motion = useMotionPolicy();
@@ -610,13 +609,6 @@ function WeldLandingPage({
   useEffect(() => {
     setMode(initialMode);
   }, [initialMode]);
-
-  useEffect(() => {
-    const expectedPath = mode === "studio" ? "/studios" : "/";
-    if (pathname === expectedPath) return;
-
-    router.replace(joinHref(mode, searchString, window.location.hash), { scroll: false });
-  }, [mode, pathname, router, searchString]);
 
   useEffect(() => {
     const MULTIPLIER = 0.70;
