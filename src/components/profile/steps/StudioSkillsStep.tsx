@@ -50,16 +50,19 @@ export default function StudioSkillsStep({ draft, update, onNext, onBack }: Prop
 
         {derivedSkills.map(name => (
           <div key={name} style={{ marginBottom: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <span className="pb-skill-description-name">{name}</span>
               {!getDesc(name) && (
                 <span className="pb-skill-description-hint">using default</span>
               )}
             </div>
+            <p style={{ fontSize: 11, color: 'rgba(14,26,43,0.45)', margin: '0 0 6px' }}>
+              Shown to all developers with this skill — not specific to any one role.
+            </p>
             <textarea
               className="pb-textarea"
               rows={2}
-              placeholder={`What should developers know about your ${name} needs?`}
+              placeholder={`What are you generally looking for in ${name} developers?`}
               value={getDesc(name)}
               onChange={e => setDesc(name, e.target.value)}
             />
