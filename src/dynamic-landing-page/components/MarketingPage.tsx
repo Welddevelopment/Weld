@@ -34,8 +34,6 @@ import StudioCard from "@/components/matching-preview/StudioCard";
 import { MARQUEE_PROFILES } from "@/data/marqueeProfiles";
 import { MARQUEE_STUDIOS } from "@/data/marqueeStudios";
 import ComparisonSection from "@/dynamic-landing-page/components/ComparisonSection";
-import DevCohortSection from "@/dynamic-landing-page/components/DevCohortSection";
-import StudioCohortSection from "@/dynamic-landing-page/components/StudioCohortSection";
 
 interface MarketingPageProps {
   initialMode: Audience;
@@ -867,31 +865,19 @@ function WeldLandingPage({
         {/* 7. Comparison — Discord hides them, Weld shows them */}
         <ComparisonSection audience={mode} />
 
-        {/* 8. Get early access — audience-split CTA */}
-        {mode === 'developer' ? (
-          <DevCohortSection
-            email={email}
-            phase={capturePhase}
-            status={captureStatus}
-            captureRef={captureRef}
-            onEmailChange={setEmail}
-            onSubmit={openSignupForm}
-          />
-        ) : (
-          <StudioCohortSection
-            email={email}
-            phase={capturePhase}
-            status={captureStatus}
-            captureRef={captureRef}
-            onEmailChange={setEmail}
-            onSubmit={openSignupForm}
-          />
-        )}
-
         <FriendlyFAQ copy={modeCopy} />
       </main>
 
-      <FooterCTA copy={modeCopy} mode={mode} />
+      <FooterCTA
+        copy={modeCopy}
+        mode={mode}
+        email={email}
+        phase={capturePhase}
+        status={captureStatus}
+        captureRef={captureRef}
+        onEmailChange={setEmail}
+        onSubmit={() => void openSignupForm()}
+      />
     </div>
   );
 }
@@ -1825,9 +1811,25 @@ function FriendlyFAQ({ copy }: { copy: LandingCopy }) {
   );
 }
 
-function FooterCTA({ copy, mode }: { copy: LandingCopy; mode: Audience }) {
-  const [footerEmail, setFooterEmail] = useState("");
-
+function FooterCTA({
+  copy,
+  mode,
+  email,
+  phase,
+  status,
+  captureRef,
+  onEmailChange,
+  onSubmit
+}: {
+  copy: LandingCopy;
+  mode: Audience;
+  email: string;
+  phase: CapturePhase;
+  status: string;
+  captureRef: React.MutableRefObject<HTMLDivElement | null>;
+  onEmailChange: (value: string) => void;
+  onSubmit: () => void;
+}) {
   const benefitIcon = (key: "shield" | "code" | "user" | "folder") => {
     if (key === "shield") return <ShieldIcon />;
     if (key === "code") return <CodeIcon />;
@@ -1835,27 +1837,21 @@ function FooterCTA({ copy, mode }: { copy: LandingCopy; mode: Audience }) {
     return <FolderIcon />;
   };
 
-  async function handleFooterSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const trimmed = footerEmail.trim();
-    if (!trimmed) return;
-    try {
-      const res = await fetch(`/api/waitlist/check?email=${encodeURIComponent(trimmed)}`);
-      const data = (await res.json()) as { exists: boolean; inviteUrl?: string };
-      if (data.exists && data.inviteUrl) {
-        window.location.href = data.inviteUrl;
-        return;
-      }
-    } catch {
-      /* proceed */
-    }
-    const params = new URLSearchParams({ email: trimmed, type: mode });
-    window.location.href = `/signup?${params}`;
-  }
+  const buttonLabel =
+    phase === "submitting"
+      ? copy.waitlist.submittingLabel
+      : phase === "success"
+        ? copy.waitlist.submittedLabel
+        : copy.waitlist.button;
+  const disableInputs = phase === "submitting" || phase === "success";
 
   return (
-    <footer className="glass-footer glass-footer-cta-band">
-      <div className="glass-footer-band-shell">
+    <footer
+      id="join"
+      className="glass-footer glass-footer-cta-band"
+      data-mode={mode}
+    >
+      <div className="glass-footer-inner">
         <div className="glass-footer-cta-grid">
           <div className="glass-footer-copy-col">
             <span className="glass-footer-badge">{copy.waitlist.kicker}</span>
@@ -1884,11 +1880,11 @@ function FooterCTA({ copy, mode }: { copy: LandingCopy; mode: Audience }) {
               </nav>
             </div>
           </div>
-          <div className="glass-footer-form-col">
-            <div className="glass-footer-form-card">
+          <div className="glass-footer-form-col" ref={captureRef}>
+            <div className="glass-footer-form-panel">
               <h3 className="glass-footer-form-title">{copy.waitlist.title}</h3>
               <p className="glass-footer-form-lead">{copy.waitlist.body}</p>
-              <form className="glass-footer-form" onSubmit={handleFooterSubmit}>
+              <div className="glass-footer-form">
                 <label className="glass-footer-field">
                   <span className="glass-footer-field-label">{copy.waitlist.fieldLabel}</span>
                   <input
@@ -1896,14 +1892,31 @@ function FooterCTA({ copy, mode }: { copy: LandingCopy; mode: Audience }) {
                     name="email"
                     autoComplete="email"
                     placeholder={copy.waitlist.placeholder}
-                    value={footerEmail}
-                    onChange={(e) => setFooterEmail(e.target.value)}
+                    value={email}
+                    onChange={(e) => onEmailChange(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key !== "Enter") return;
+                      e.preventDefault();
+                      onSubmit();
+                    }}
+                    disabled={disableInputs}
+                    aria-describedby={status ? "footer-join-status" : undefined}
                   />
                 </label>
-                <button type="submit" className="glass-footer-submit">
-                  {copy.waitlist.button}
+                <button
+                  type="button"
+                  className="glass-footer-submit"
+                  onClick={onSubmit}
+                  disabled={disableInputs}
+                >
+                  {buttonLabel}
                 </button>
-              </form>
+                {status ? (
+                  <p id="footer-join-status" className="glass-footer-status" aria-live="polite">
+                    {status}
+                  </p>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>
