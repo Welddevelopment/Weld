@@ -19299,7 +19299,7 @@ button.invite-secondary-button {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to right, rgba(219, 230, 240, 0.79) 0%, rgba(219, 230, 240, 0.66) 30%, rgba(219, 230, 240, 0.20) 52%, transparent 66%);
+  background: linear-gradient(to right, rgba(219, 230, 240, 0.88) 0%, rgba(219, 230, 240, 0.76) 30%, rgba(219, 230, 240, 0.28) 52%, transparent 66%);
   z-index: 1;
   pointer-events: none;
 }
