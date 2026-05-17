@@ -515,6 +515,13 @@ function joinHref(mode: Audience, search: string, hash = "") {
   return `${base}${query}${hash}`;
 }
 
+/** Strip `type` — HomePage/StudiosPage use it for server redirects; keeping it fights client audience navigation. */
+function navigationSearchString(params: { toString(): string }) {
+  const next = new URLSearchParams(params.toString());
+  next.delete("type");
+  return next.toString();
+}
+
 function scrollToId(id: string) {
   if (typeof window === "undefined") return;
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -531,7 +538,7 @@ function WeldLandingPage({
 }: MarketingPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const searchString = searchParams.toString();
+  const navSearchString = navigationSearchString(searchParams);
   const motion = useMotionPolicy();
   const motionTier = motion.tier;
   const [mode, setMode] = useState<Audience>(initialMode);
@@ -647,7 +654,7 @@ function WeldLandingPage({
       payload: { from: mode, to: nextMode }
     });
 
-    router.push(joinHref(nextMode, searchString, window.location.hash), { scroll: false });
+    router.push(joinHref(nextMode, navSearchString, window.location.hash), { scroll: false });
   }
 
   function handleRoleChange(nextRoleKey: RoleKey) {
@@ -769,7 +776,7 @@ function WeldLandingPage({
       <GlassNav
         mode={mode}
         copy={modeCopy}
-        searchString={searchString}
+        searchString={navSearchString}
         onModeChange={handleModeChange}
         onJoinClick={() => handleJoinIntent("nav")}
       />
