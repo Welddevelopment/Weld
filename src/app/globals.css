@@ -19326,7 +19326,7 @@ button.invite-secondary-button {
   justify-content: space-between;
   gap: 64px;
   padding: 72px 48px;
-  min-height: 800px;
+  min-height: 760px;
 }
 
 /* Copy / form */
