@@ -35,6 +35,7 @@ import { MARQUEE_PROFILES } from "@/data/marqueeProfiles";
 import { MARQUEE_STUDIOS } from "@/data/marqueeStudios";
 import ComparisonSection from "@/dynamic-landing-page/components/ComparisonSection";
 import DevCohortSection from "@/dynamic-landing-page/components/DevCohortSection";
+import StudioCohortSection from "@/dynamic-landing-page/components/StudioCohortSection";
 
 interface MarketingPageProps {
   initialMode: Audience;
@@ -877,9 +878,7 @@ function WeldLandingPage({
             onSubmit={openSignupForm}
           />
         ) : (
-          <EarlyAccessSection
-            mode={mode}
-            copy={modeCopy}
+          <StudioCohortSection
             email={email}
             phase={capturePhase}
             status={captureStatus}
