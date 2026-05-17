@@ -19124,9 +19124,11 @@ button.invite-secondary-button {
 
 .cs-card-static {
   width: 340px;
-  border-radius: 20px 20px 20px 20px;
+  border-radius: 20px;
   cursor: default;
   user-select: none;
+  height: auto;
+  overflow: visible;
 }
 
 .cs-card-static .npc-skill-chip {
