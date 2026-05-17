@@ -19540,3 +19540,123 @@ button.invite-secondary-button {
   font-weight: 700;
   letter-spacing: -0.01em;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MOBILE RESPONSIVE
+   Sections that had no prior breakpoints: hero card, comparison, cohort CTA.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Hero card — prevent 380px container from overflowing narrow screens */
+@media (max-width: 720px) {
+  .npc-hero-preview-container {
+    width: min(380px, 100%);
+  }
+  /* Signal panel stacks below at 1080px already; hide on phone to save space */
+  .weld-glass-page .hero-signal-panel {
+    display: none;
+  }
+}
+
+/* ── Comparison section ─────────────────────────────────────────────────────── */
+
+/* Tablet portrait (≤860px): remove zoom, hide thread columns, centre card */
+@media (max-width: 860px) {
+  .cs-section {
+    zoom: 1;
+  }
+  .cs-body {
+    grid-template-columns: 1fr;
+    padding: 0 32px;
+    gap: 0;
+  }
+  .cs-col--left,
+  .cs-col--right {
+    display: none;
+  }
+  .cs-card-wrap {
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+  .cs-card-static {
+    width: 100%;
+  }
+}
+
+/* Phone (≤600px): tighten padding and shrink headline */
+@media (max-width: 600px) {
+  .cs-section {
+    padding: 24px 0 32px;
+    margin-top: 16px;
+  }
+  .cs-body {
+    padding: 0 16px;
+  }
+  .cs-headline {
+    font-size: clamp(20px, 6vw, 28px);
+  }
+  .cs-subhead {
+    font-size: 13px;
+  }
+}
+
+/* ── Dev / Studio cohort section ────────────────────────────────────────────── */
+
+/* Tablet (≤860px): remove zoom, let flex breathe at natural size */
+@media (max-width: 860px) {
+  .dc-section {
+    zoom: 1;
+  }
+  .dc-inner {
+    padding: 52px 32px;
+    gap: 40px;
+    min-height: auto;
+  }
+}
+
+/* Phone (≤700px): stack copy above, hide featured card */
+@media (max-width: 700px) {
+  .dc-section::before {
+    background: linear-gradient(
+      to bottom,
+      rgba(219, 230, 240, 0.92) 0%,
+      rgba(219, 230, 240, 0.72) 55%,
+      transparent 100%
+    );
+  }
+  .dc-mosaic {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    opacity: 0.14;
+  }
+  .dc-inner {
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 20px 56px;
+    gap: 0;
+    text-align: center;
+  }
+  .dc-copy {
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .dc-headline {
+    font-size: clamp(26px, 8vw, 38px);
+  }
+  .dc-capture {
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+  }
+  .dc-input {
+    width: 100%;
+    min-width: 0;
+  }
+  .dc-submit {
+    width: 100%;
+  }
+  .dc-featured {
+    display: none;
+  }
+}
