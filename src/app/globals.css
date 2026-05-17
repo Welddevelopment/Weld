@@ -19295,6 +19295,15 @@ button.invite-secondary-button {
   overflow: hidden;
 }
 
+.dc-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, #DBE6F0 30%, rgba(219, 230, 240, 0.88) 48%, transparent 66%);
+  z-index: 1;
+  pointer-events: none;
+}
+
 /* Background mosaic */
 .dc-mosaic {
   position: absolute;
