@@ -12504,6 +12504,20 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 .npc-avatar-bg { position: absolute; inset: 0; }
 
+@keyframes avatar-shimmer {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(200%); }
+}
+
+.npc-avatar-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: avatar-shimmer 1.8s ease-in-out infinite;
+}
+
 .npc-avatar-initials {
   position: absolute;
   inset: 0;
@@ -14621,6 +14635,17 @@ button.invite-secondary-button {
   width: 108px; height: 108px; border-radius: 20px;
   display: flex; align-items: center; justify-content: center;
   font-size: 26px; font-weight: 800; color: #fff; letter-spacing: 0.04em;
+  overflow: hidden;
+}
+
+.sc-avatar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: avatar-shimmer 1.8s ease-in-out infinite;
+  border-radius: inherit;
 }
 .sc-avatar-img {
   width: 100%;
