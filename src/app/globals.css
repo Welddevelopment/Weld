@@ -19293,6 +19293,7 @@ button.invite-secondary-button {
     #DBE6F0;
   margin-top: 36px;
   overflow: hidden;
+  zoom: 0.9;
 }
 
 .dc-section::before {
