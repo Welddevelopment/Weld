@@ -11,6 +11,18 @@ interface Props {
 
 const RATE_TYPES = ['Hourly (USD)', 'Hourly (Robux)', 'Per Project', 'Revenue Share', 'Negotiable']
 
+function rateRangeLabel(rateType: string | null | undefined): string {
+  switch (rateType) {
+    case 'Hourly (USD)':   return '(optional, USD/hr)'
+    case 'Hourly (Robux)': return '(optional, R$/hr)'
+    case 'Per Project':    return '(optional, USD/project)'
+    case 'Revenue Share':  return '(optional, %)'
+    default:               return '(optional)'
+  }
+}
+
+const NUMERIC_RANGE_TYPES = new Set(['Hourly (USD)', 'Hourly (Robux)', 'Per Project', 'Revenue Share'])
+
 export default function StudioRateStep({ draft, update, onNext, onBack }: Props) {
   return (
     <div className="ob-screen">
@@ -72,26 +84,38 @@ export default function StudioRateStep({ draft, update, onNext, onBack }: Props)
           </div>
         </div>
 
-        <div className="pb-field">
-          <label className="pb-label">Rate range <span className="pb-hint-label">(optional, USD/hr)</span></label>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <input
-              className="pb-input"
-              type="number"
-              placeholder="Min (e.g. 15)"
-              value={draft.rateMin ?? ''}
-              onChange={e => update({ rateMin: e.target.value ? Number(e.target.value) : null })}
-            />
-            <span style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0, fontSize: 14 }}>–</span>
-            <input
-              className="pb-input"
-              type="number"
-              placeholder="Max (e.g. 50)"
-              value={draft.rateMax ?? ''}
-              onChange={e => update({ rateMax: e.target.value ? Number(e.target.value) : null })}
-            />
+        {draft.rateType !== 'Negotiable' && (
+          <div className="pb-field">
+            <label className="pb-label">Rate range <span className="pb-hint-label">{rateRangeLabel(draft.rateType)}</span></label>
+            {NUMERIC_RANGE_TYPES.has(draft.rateType ?? '') ? (
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  className="pb-input"
+                  type="number"
+                  placeholder="Min (e.g. 15)"
+                  value={draft.rateMin ?? ''}
+                  onChange={e => update({ rateMin: e.target.value ? Number(e.target.value) : null })}
+                />
+                <span style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0, fontSize: 14 }}>–</span>
+                <input
+                  className="pb-input"
+                  type="number"
+                  placeholder="Max (e.g. 50)"
+                  value={draft.rateMax ?? ''}
+                  onChange={e => update({ rateMax: e.target.value ? Number(e.target.value) : null })}
+                />
+              </div>
+            ) : (
+              <input
+                className="pb-input"
+                type="text"
+                placeholder="e.g. 20–30%"
+                value={draft.rateMin != null ? String(draft.rateMin) : ''}
+                onChange={e => update({ rateMin: e.target.value ? Number(e.target.value) : null })}
+              />
+            )}
           </div>
-        </div>
+        )}
 
         <div className="pb-field">
           <label className="pb-label">Rate note <span className="pb-hint-label">(optional)</span></label>
