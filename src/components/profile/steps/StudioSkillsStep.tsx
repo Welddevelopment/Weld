@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { ProfileDraft } from '../profile-types'
 
 interface Props {
@@ -21,7 +22,8 @@ export default function StudioSkillsStep({ draft, update, onNext, onBack }: Prop
     <div className="ob-screen">
       <aside className="ob-side ob-side--dark">
         <div className="ob-brand ob-brand--light">
-                    <span>weld.</span>
+          <Image src="/Assets/weld-logo-official.svg" width={24} height={24} alt="weld" />
+          <span>weld.</span>
         </div>
         <h1 className="ob-title ob-title--light">skill<br />descriptions</h1>
         <p className="ob-copy ob-copy--light">

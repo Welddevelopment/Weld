@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { ProfileDraft, ProfileSkillDraft } from '../profile-types'
 import { DEV_SKILL_DESCS } from '../../matching-preview/preview-data'
 
@@ -83,7 +84,8 @@ export default function SkillsStep({ draft, update, onNext, onBack }: Props) {
     <div className="ob-screen">
       <aside className="ob-side">
         <div className="ob-brand">
-                    <span>weld.</span>
+          <Image src="/Assets/weld-logo-official.svg" width={24} height={24} alt="weld" />
+          <span>weld.</span>
         </div>
         <h1 className="ob-title">your<br />skills</h1>
         <p className="ob-copy">
