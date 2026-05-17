@@ -19427,6 +19427,7 @@ button.invite-secondary-button {
 }
 
 .dc-featured-card {
+  border-radius: 20px !important;
   box-shadow:
     0 0 0 1px rgba(14, 91, 200, 0.10),
     0 28px 60px rgba(14, 26, 43, 0.18),
