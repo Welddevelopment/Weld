@@ -19660,3 +19660,22 @@ button.invite-secondary-button {
     display: none;
   }
 }
+
+/* ── How-strip section ──────────────────────────────────────────────────────── */
+
+/* Remove zoom at mobile so content isn't rendered at 75% scale on phones */
+@media (max-width: 720px) {
+  .weld-glass-page .how-strip-section {
+    zoom: 1;
+  }
+}
+
+/* ── Chat section outer shell ───────────────────────────────────────────────── */
+
+/* Remove zoom at mobile so content isn't rendered at sub-80% scale on phones */
+@media (max-width: 680px) {
+  .weld-glass-page .chat-section-shell-outer,
+  .weld-glass-page .chat-preview-shell {
+    zoom: 1;
+  }
+}
