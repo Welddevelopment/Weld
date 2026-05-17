@@ -4953,16 +4953,16 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 .glass-footer-inner {
   width: 100%;
-  max-width: min(1180px, 100%);
+  max-width: min(1240px, 100%);
   margin: 0 auto;
   padding: 0;
 }
 
 .glass-footer-cta-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.72fr);
-  gap: clamp(28px, 4vw, 52px);
-  align-items: start;
+  grid-template-columns: minmax(0, 1.02fr) minmax(360px, 1fr);
+  gap: clamp(28px, 4vw, 56px);
+  align-items: stretch;
 }
 
 .glass-footer-copy-col {
@@ -5112,14 +5112,20 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 .glass-footer-form-col {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .glass-footer-form-panel {
   border-radius: 14px;
-  padding: clamp(20px, 3vw, 26px);
+  padding: clamp(22px, 3.2vw, 32px);
   background: var(--gf-form-bg);
   border: 1px solid var(--gf-form-border);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.75) inset;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 .glass-footer-form-title {
@@ -5143,12 +5149,33 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   flex-direction: column;
   gap: 14px;
   margin-top: 18px;
+  flex: 1;
 }
 
 .glass-footer-field {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.glass-footer-capture-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  align-items: stretch;
+}
+
+@media (min-width: 720px) {
+  .glass-footer-capture-row {
+    grid-template-columns: minmax(0, 1fr) minmax(200px, 280px);
+    gap: 12px;
+  }
+
+  .glass-footer-capture-row .glass-footer-submit {
+    min-height: 48px;
+    height: 100%;
+    align-self: stretch;
+  }
 }
 
 .glass-footer-field-label {
@@ -5255,7 +5282,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 .weld-glass-main {
   overflow-x: clip;
-  padding-bottom: 48px;
+  padding-bottom: clamp(16px, 3vw, 28px);
 }
 
 .glass-nav-shell {

@@ -1884,32 +1884,37 @@ function FooterCTA({
               <h3 className="glass-footer-form-title">{copy.waitlist.title}</h3>
               <p className="glass-footer-form-lead">{copy.waitlist.body}</p>
               <div className="glass-footer-form">
-                <label className="glass-footer-field">
-                  <span className="glass-footer-field-label">{copy.waitlist.fieldLabel}</span>
-                  <input
-                    type="email"
-                    name="email"
-                    autoComplete="email"
-                    placeholder={copy.waitlist.placeholder}
-                    value={email}
-                    onChange={(e) => onEmailChange(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key !== "Enter") return;
-                      e.preventDefault();
-                      onSubmit();
-                    }}
-                    disabled={disableInputs}
-                    aria-describedby={status ? "footer-join-status" : undefined}
-                  />
-                </label>
-                <button
-                  type="button"
-                  className="glass-footer-submit"
-                  onClick={onSubmit}
-                  disabled={disableInputs}
-                >
-                  {buttonLabel}
-                </button>
+                <div className="glass-footer-field">
+                  <label className="glass-footer-field-label" htmlFor={`footer-join-email-${mode}`}>
+                    {copy.waitlist.fieldLabel}
+                  </label>
+                  <div className="glass-footer-capture-row">
+                    <input
+                      id={`footer-join-email-${mode}`}
+                      type="email"
+                      name="email"
+                      autoComplete="email"
+                      placeholder={copy.waitlist.placeholder}
+                      value={email}
+                      onChange={(e) => onEmailChange(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key !== "Enter") return;
+                        e.preventDefault();
+                        onSubmit();
+                      }}
+                      disabled={disableInputs}
+                      aria-describedby={status ? "footer-join-status" : undefined}
+                    />
+                    <button
+                      type="button"
+                      className="glass-footer-submit"
+                      onClick={onSubmit}
+                      disabled={disableInputs}
+                    >
+                      {buttonLabel}
+                    </button>
+                  </div>
+                </div>
                 {status ? (
                   <p id="footer-join-status" className="glass-footer-status" aria-live="polite">
                     {status}
