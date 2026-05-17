@@ -50,16 +50,15 @@ function StatItem({ icon, value, label }: { icon: React.ReactNode; value: string
   )
 }
 
-type CardStats = { experience: string; projects: string; scriptsBuilt: string; onTime: string; rate: string }
+type CardStats = { experience: string; projects: string; games: string; rate: string }
 
 function parseDevStats(profile: PreviewProfile): CardStats {
   const rate = profile.meta.match(/Rate:\s*([^-]+)/)?.[1]?.trim() ?? '—'
-  if (profile.stats) {
-    return { ...profile.stats, rate }
-  }
   const expMatch = profile.role.match(/(\d+)yr/)
-  const experience = expMatch ? `${expMatch[1]}+ yrs` : profile.role.includes('<1yr') ? '<1 yr' : '—'
-  return { experience, rate, projects: '—', scriptsBuilt: '—', onTime: '—' }
+  const experience = expMatch ? `${expMatch[1]}+ yrs` : profile.role.includes('<1yr') ? '<1 yr' : (profile.stats?.experience ?? '—')
+  const projects = profile.bestWork?.length ? String(profile.bestWork.length) : (profile.stats?.projects ?? '—')
+  const games = profile.topGames?.length ? String(profile.topGames.length) : '—'
+  return { experience, rate, projects, games }
 }
 
 export default function SwipeCard({
@@ -116,8 +115,8 @@ export default function SwipeCard({
               />
               <StatItem
                 icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>}
-                value={devStats.scriptsBuilt}
-                label="Scripts"
+                value={devStats.games}
+                label="Games"
               />
               <StatItem
                 icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>}
