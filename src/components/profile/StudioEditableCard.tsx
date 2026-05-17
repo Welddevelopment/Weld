@@ -72,7 +72,6 @@ export default function StudioEditableCard({
             className="npc-avatar-wrap"
             onClick={() => setShowRobloxInput(true)}
             title="Tap to set Roblox avatar"
-            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', borderRadius: 16 }}
           >
             <div className="npc-avatar-bg" style={{ background: draft.bg || '#4444EE', borderRadius: 16 }} />
             <div className="npc-avatar-initials" style={{ fontSize: 26 }}>{initials}</div>
@@ -85,15 +84,10 @@ export default function StudioEditableCard({
               />
             )}
             <div className="npc-online-dot" />
-            <div style={{
-              position: 'absolute', bottom: 0, right: 0,
-              width: 20, height: 20, borderRadius: '50%',
-              background: '#fff', border: '1.5px solid #e0e0e0',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.12)',
-            }}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="10" height="10">
-                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            <div className="npc-avatar-edit-badge" aria-hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="10" height="10">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
               </svg>
             </div>
           </button>
@@ -101,6 +95,12 @@ export default function StudioEditableCard({
           <div className="npc-top-right">
             <div className="npc-stats">
               <div className="npc-stat">
+                <div className="npc-stat-icon" aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                  </svg>
+                </div>
                 <div className="npc-stat-val">
                   <input
                     className="npc-stat-editable"
@@ -112,6 +112,12 @@ export default function StudioEditableCard({
                 <div className="npc-stat-lbl">Building</div>
               </div>
               <div className="npc-stat">
+                <div className="npc-stat-icon" aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2" />
+                    <path d="M8 21h8M12 17v4" />
+                  </svg>
+                </div>
                 <div className="npc-stat-val">
                   <input
                     className="npc-stat-editable"
@@ -123,6 +129,12 @@ export default function StudioEditableCard({
                 <div className="npc-stat-lbl">Projects</div>
               </div>
               <div className="npc-stat">
+                <div className="npc-stat-icon" aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </div>
                 <div className="npc-stat-val">
                   <input
                     className="npc-stat-editable"
@@ -134,6 +146,12 @@ export default function StudioEditableCard({
                 <div className="npc-stat-lbl">Visits</div>
               </div>
               <div className="npc-stat">
+                <div className="npc-stat-icon" aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
+                </div>
                 <div className="npc-stat-val">
                   <input
                     className="npc-stat-editable"
@@ -165,7 +183,7 @@ export default function StudioEditableCard({
                 style={{ width: 12, height: 12, accentColor: '#3DC77A' }}
               />
               {draft.hiring && <span className="sc-hiring-pill"><span className="sc-hiring-dot" />Actively Hiring</span>}
-              {!draft.hiring && <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>Show hiring</span>}
+              {!draft.hiring && <span className="sc-studio-hiring-hint">Show hiring</span>}
             </label>
           </div>
           <p className="npc-role">
@@ -242,7 +260,7 @@ export default function StudioEditableCard({
         </div>
 
         {/* Entry buttons */}
-        <div className="npc-entries" style={{ gridTemplateColumns: '1fr 1fr 1fr', marginTop: 'auto' }}>
+        <div className="npc-entries npc-entries--editor-tail" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
           <button
             className={`npc-entry-btn${leftPanel === 'games' ? ' npc-entry-btn--active' : ''}`}
             onClick={onToggleLeft}
@@ -293,29 +311,27 @@ export default function StudioEditableCard({
         {/* Roblox ID input popup */}
         {showRobloxInput && (
           <div
-            style={{ position: 'absolute', inset: 0, zIndex: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+            className="pb-glass-modal"
+            role="presentation"
             onClick={() => setShowRobloxInput(false)}
           >
-            <div
-              style={{ background: '#fff', borderRadius: 16, padding: 20, boxShadow: '0 8px 40px rgba(0,0,0,0.18)', width: '100%' }}
-              onClick={e => e.stopPropagation()}
-            >
-              <div style={{ fontWeight: 800, fontSize: 16, color: '#111', marginBottom: 8 }}>Set Roblox Avatar</div>
-              <p style={{ fontSize: 12, color: '#666', marginBottom: 12 }}>Paste your Roblox profile URL or numeric user ID.</p>
+            <div className="pb-glass-modal__panel" role="dialog" aria-labelledby="pb-studio-roblox-modal-title" onClick={e => e.stopPropagation()}>
+              <div id="pb-studio-roblox-modal-title" className="pb-glass-modal__title">Set Roblox Avatar</div>
+              <p className="pb-glass-modal__desc">Paste your Roblox profile URL or numeric user ID.</p>
               <input
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${robloxInputError ? '#e84624' : '#e0e0e0'}`, fontSize: 13, color: '#111', marginBottom: robloxInputError ? 6 : 12, boxSizing: 'border-box' }}
+                className={`pb-glass-modal__input${robloxInputError ? ' pb-glass-modal__input--error' : ''}`}
                 value={robloxInputVal}
                 onChange={e => { setRobloxInputVal(e.target.value); setRobloxInputError(false) }}
                 placeholder="https://www.roblox.com/users/12345/profile"
                 autoFocus
               />
               {robloxInputError && (
-                <p style={{ fontSize: 11, color: '#e84624', margin: '0 0 10px' }}>Paste a Roblox profile URL or numeric user ID.</p>
+                <p className="pb-glass-modal__error">Paste a Roblox profile URL or numeric user ID.</p>
               )}
-              <div style={{ display: 'flex', gap: 8 }}>
+              <div className="pb-glass-modal__actions">
                 <button
                   type="button"
-                  style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', background: '#6c5cff', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}
+                  className="pb-glass-modal__btn pb-glass-modal__btn--primary"
                   onClick={() => {
                     const id = parseRobloxUserId(robloxInputVal)
                     if (id) { update({ robloxUserId: id }); setShowRobloxInput(false); setRobloxInputError(false) }
@@ -326,7 +342,7 @@ export default function StudioEditableCard({
                 </button>
                 <button
                   type="button"
-                  style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: '1.5px solid #e0e0e0', background: 'none', fontSize: 13, color: '#666', cursor: 'pointer' }}
+                  className="pb-glass-modal__btn pb-glass-modal__btn--ghost"
                   onClick={() => setShowRobloxInput(false)}
                 >
                   Cancel

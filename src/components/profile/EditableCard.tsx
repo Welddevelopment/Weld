@@ -77,7 +77,6 @@ export default function EditableCard({
             className="npc-avatar-wrap"
             onClick={() => setShowRobloxInput(true)}
             title="Tap to set Roblox avatar"
-            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
           >
             <div className="npc-avatar-bg" style={{ background: draft.bg || '#4444EE' }} />
             <div className="npc-avatar-initials">{initials}</div>
@@ -90,15 +89,10 @@ export default function EditableCard({
               />
             )}
             <div className="npc-online-dot" />
-            <div style={{
-              position: 'absolute', bottom: 0, right: 0,
-              width: 20, height: 20, borderRadius: '50%',
-              background: '#fff', border: '1.5px solid #e0e0e0',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.12)',
-            }}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="10" height="10">
-                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            <div className="npc-avatar-edit-badge" aria-hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="10" height="10">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
               </svg>
             </div>
           </button>
@@ -106,18 +100,43 @@ export default function EditableCard({
           <div className="npc-top-right">
             <div className="npc-stats">
               <div className="npc-stat">
+                <div className="npc-stat-icon" aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
                 <div className="npc-stat-val">{expLabel(draft.experienceYears)}</div>
                 <div className="npc-stat-lbl">Experience</div>
               </div>
               <div className="npc-stat">
+                <div className="npc-stat-icon" aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2" />
+                    <path d="M8 21h8M12 17v4" />
+                  </svg>
+                </div>
                 <div className="npc-stat-val">{draft.bestWork.length || '—'}</div>
                 <div className="npc-stat-lbl">Projects</div>
               </div>
               <div className="npc-stat">
+                <div className="npc-stat-icon" aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 2 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                    <line x1="12" y1="22.08" x2="12" y2="12" />
+                  </svg>
+                </div>
                 <div className="npc-stat-val">{draft.topGames.length || '—'}</div>
                 <div className="npc-stat-lbl">Games</div>
               </div>
               <div className="npc-stat">
+                <div className="npc-stat-icon" aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                    <line x1="7" y1="7" x2="7.01" y2="7" />
+                  </svg>
+                </div>
                 <div className="npc-stat-val">{skills.length > 0 ? skills.length : '—'}</div>
                 <div className="npc-stat-lbl">Skills</div>
               </div>
@@ -249,7 +268,7 @@ export default function EditableCard({
         </div>
 
         {/* Entry buttons — always 3 columns */}
-        <div className="npc-entries" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+        <div className="npc-entries npc-entries--editor-tail" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
           <button
             className={`npc-entry-btn${leftPanel === 'games' ? ' npc-entry-btn--active' : ''}`}
             onClick={onToggleLeft}
@@ -297,29 +316,27 @@ export default function EditableCard({
         {/* Roblox ID input popup */}
         {showRobloxInput && (
           <div
-            style={{ position: 'absolute', inset: 0, zIndex: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+            className="pb-glass-modal"
+            role="presentation"
             onClick={() => setShowRobloxInput(false)}
           >
-            <div
-              style={{ background: '#fff', borderRadius: 16, padding: 20, boxShadow: '0 8px 40px rgba(0,0,0,0.18)', width: '100%' }}
-              onClick={e => e.stopPropagation()}
-            >
-              <div style={{ fontWeight: 800, fontSize: 16, color: '#111', marginBottom: 8 }}>Set Roblox Avatar</div>
-              <p style={{ fontSize: 12, color: '#666', marginBottom: 12 }}>Paste your Roblox profile URL or numeric user ID.</p>
+            <div className="pb-glass-modal__panel" role="dialog" aria-labelledby="pb-roblox-modal-title" onClick={e => e.stopPropagation()}>
+              <div id="pb-roblox-modal-title" className="pb-glass-modal__title">Set Roblox Avatar</div>
+              <p className="pb-glass-modal__desc">Paste your Roblox profile URL or numeric user ID.</p>
               <input
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${robloxInputError ? '#e84624' : '#e0e0e0'}`, fontSize: 13, color: '#111', marginBottom: robloxInputError ? 6 : 12, boxSizing: 'border-box' }}
+                className={`pb-glass-modal__input${robloxInputError ? ' pb-glass-modal__input--error' : ''}`}
                 value={robloxInputVal}
                 onChange={e => { setRobloxInputVal(e.target.value); setRobloxInputError(false) }}
                 placeholder="https://www.roblox.com/users/12345/profile"
                 autoFocus
               />
               {robloxInputError && (
-                <p style={{ fontSize: 11, color: '#e84624', margin: '0 0 10px' }}>Paste a Roblox profile URL or numeric user ID.</p>
+                <p className="pb-glass-modal__error">Paste a Roblox profile URL or numeric user ID.</p>
               )}
-              <div style={{ display: 'flex', gap: 8 }}>
+              <div className="pb-glass-modal__actions">
                 <button
                   type="button"
-                  style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', background: '#6c5cff', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}
+                  className="pb-glass-modal__btn pb-glass-modal__btn--primary"
                   onClick={() => {
                     const id = parseRobloxUserId(robloxInputVal)
                     if (id) { update({ robloxUserId: id }); setShowRobloxInput(false); setRobloxInputError(false) }
@@ -330,7 +347,7 @@ export default function EditableCard({
                 </button>
                 <button
                   type="button"
-                  style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: '1.5px solid #e0e0e0', background: 'none', fontSize: 13, color: '#666', cursor: 'pointer' }}
+                  className="pb-glass-modal__btn pb-glass-modal__btn--ghost"
                   onClick={() => setShowRobloxInput(false)}
                 >
                   Cancel
@@ -343,26 +360,24 @@ export default function EditableCard({
         {/* Skills picker popup */}
         {showSkillsPicker && (
           <div
-            style={{ position: 'absolute', inset: 0, zIndex: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+            className="pb-glass-modal"
+            role="presentation"
             onClick={() => setShowSkillsPicker(false)}
           >
-            <div
-              style={{ background: '#fff', borderRadius: 16, padding: 20, boxShadow: '0 8px 40px rgba(0,0,0,0.18)', width: '100%' }}
-              onClick={e => e.stopPropagation()}
-            >
-              <div style={{ fontWeight: 800, fontSize: 16, color: '#111', marginBottom: 14 }}>Your Skills</div>
+            <div className="pb-glass-modal__panel" role="dialog" aria-labelledby="pb-skills-modal-title" onClick={e => e.stopPropagation()}>
+              <div id="pb-skills-modal-title" className="pb-glass-modal__title pb-glass-modal__title--spaced">Your Skills</div>
               {skills.map(s => (
-                <div key={s.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #f0f0f0' }}>
+                <div key={s.name} className="pb-glass-modal__list-row">
                   <button
                     type="button"
-                    style={{ fontWeight: 600, fontSize: 14, color: '#111', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                    className="pb-glass-modal__skill-name"
                     onClick={() => { setShowSkillsPicker(false); onToggleRight({ skill: s.name }) }}
                   >
                     {s.name}
                   </button>
                   <button
                     type="button"
-                    style={{ fontSize: 12, color: 'rgba(232,70,36,0.5)', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px' }}
+                    className="pb-glass-modal__remove"
                     onClick={() => removeSkill(s.name)}
                     aria-label={`Remove ${s.name}`}
                   >
@@ -372,7 +387,7 @@ export default function EditableCard({
               ))}
               <button
                 type="button"
-                style={{ marginTop: 14, width: '100%', padding: '8px 0', borderRadius: 8, border: '1.5px solid #e0e0e0', background: 'none', fontSize: 12, color: '#666', cursor: 'pointer' }}
+                className="pb-glass-modal__close"
                 onClick={() => setShowSkillsPicker(false)}
               >
                 Close
