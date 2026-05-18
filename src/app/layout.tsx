@@ -52,7 +52,14 @@ export const metadata: Metadata = {
       "A rebellious, Roblox-native talent network for creators and studios. Show shipped work, rates, and availability in one place.",
     url: "https://weldroblox.com/",
     siteName: "weld.",
-    images: [{ url: "/og-image.png" }],
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1024,
+        height: 484,
+        alt: "weld. landing preview with sample developer profile cards."
+      }
+    ],
     type: "website"
   },
   twitter: {
