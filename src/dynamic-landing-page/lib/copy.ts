@@ -1,5 +1,4 @@
 import type { Audience } from "./types";
-import { LANDING_TALLY } from "./landing-blocks";
 
 export type HowItWorksIcon = "card" | "shield" | "spark" | "hire" | "search" | "message";
 
@@ -172,7 +171,7 @@ const COPY: Record<Audience, LandingCopy> = {
       cardFrame: "Your profile preview",
       helperLine: "Developer mode previews the card studios will scan before they Spark.",
       proofPrefix: "over",
-      proofStrong: String(LANDING_TALLY.studios),
+      proofStrong: "30",
       proofSuffix: "studio signups",
       submittingLabel: "Joining...",
       submittedLabel: "You're in",
@@ -187,7 +186,7 @@ const COPY: Record<Audience, LandingCopy> = {
         kicker: "WHEN WE OPEN",
         title: "This is who'll be here.",
         body: "Sample cards showing the format.",
-        strong: `${LANDING_TALLY.developers} devs on the waitlist and counting`
+        strong: "52 devs on the waitlist and counting"
       },
       talentSecondary: {
         kicker: "MEET THE NETWORK",
@@ -197,7 +196,7 @@ const COPY: Record<Audience, LandingCopy> = {
       studioPrimary: {
         kicker: "WE'RE OPENING SOON",
         title: "And here's who's looking.",
-        body: `${LANDING_TALLY.studios} studios waitlisted already. Sign up today and get exposed to them immediately on launch.`
+        body: "Over 30 studios waitlisted already. Sign up today and get exposed to them immediately on launch."
       },
       studioSecondary: {
         kicker: "HIRING SIDE",
@@ -396,7 +395,7 @@ const COPY: Record<Audience, LandingCopy> = {
       cardFrame: "Candidate preview",
       helperLine: "Studio mode previews the card your team will scan before they reach out.",
       proofPrefix: "over",
-      proofStrong: String(LANDING_TALLY.studios),
+      proofStrong: "30",
       proofSuffix: "studios preparing to hire",
       submittingLabel: "Opening...",
       submittedLabel: "You're in",
@@ -411,7 +410,7 @@ const COPY: Record<Audience, LandingCopy> = {
         kicker: "CANDIDATE PIPELINE",
         title: "This is who you'll scan.",
         body: "Developer cards are built for comparison.",
-        strong: `${LANDING_TALLY.developers} devs on the waitlist and counting`
+        strong: "52 devs on the waitlist and counting"
       },
       talentSecondary: {
         kicker: "TALENT SIDE",
@@ -421,7 +420,7 @@ const COPY: Record<Audience, LandingCopy> = {
       studioPrimary: {
         kicker: "WHEN WE OPEN",
         title: "This is who's hiring.",
-        body: `${LANDING_TALLY.studios} studios waitlisted already. Browse the hiring side and see how your team will appear.`
+        body: "Over 30 studios waitlisted already. Browse the hiring side and see how your team will appear."
       },
       studioSecondary: {
         kicker: "HIRING DEMAND",

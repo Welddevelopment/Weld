@@ -72,37 +72,6 @@ export const ROLE_LABELS: Record<RoleKey, string> = {
   sfx:         "SFX",
 };
 
-/** Approximate open-role demand per discipline (landing preview). */
-export const ROLE_DEMAND: Record<RoleKey, number> = {
-  scripting: 28,
-  graphics: 26,
-  building: 24,
-  ui: 22,
-  art2d: 17,
-  modeling3d: 15,
-  vfx: 14,
-  animation: 13,
-  gamedesign: 9,
-  sounddesign: 7,
-  sfx: 6,
-};
-
-export type RoleCategoryId = "engineering" | "art" | "audio" | "design";
-
-export const ROLE_CATEGORY_GROUPS: Record<
-  RoleCategoryId,
-  { label: string; roles: readonly RoleKey[] }
-> = {
-  engineering: { label: "Engineering", roles: ["scripting", "ui"] },
-  art: { label: "Art", roles: ["graphics", "art2d", "modeling3d", "animation"] },
-  audio: { label: "Audio & FX", roles: ["sounddesign", "sfx", "vfx"] },
-  design: { label: "Design & world", roles: ["gamedesign", "building"] },
-};
-
-export function roleDemandSum(roles: readonly RoleKey[]): number {
-  return roles.reduce((acc, r) => acc + ROLE_DEMAND[r], 0);
-}
-
 export const PROFILES: Record<RoleKey, TalentProfile> = {
   scripting: {
     role: "scripting",

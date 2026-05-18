@@ -8,8 +8,6 @@ export type MotionPolicy = {
   tier: MotionTier;
   reducedMotion: boolean;
   allowEntranceStagger: boolean;
-  /** WebGL / ambient motion (hero shaders, infinite loops). */
-  allowAmbient: boolean;
 };
 
 export function useMotionPolicy(): MotionPolicy {
@@ -33,6 +31,5 @@ export function useMotionPolicy(): MotionPolicy {
     tier,
     reducedMotion: tier === "reduced",
     allowEntranceStagger: tier === "full",
-    allowAmbient: tier === "full",
   };
 }

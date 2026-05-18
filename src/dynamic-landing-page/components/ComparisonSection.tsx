@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import type { Audience } from '@/dynamic-landing-page/lib/types'
-
+type Audience = 'developer' | 'studio'
 type RegionKey = 'rate' | 'socials' | 'games' | 'mywork'
 type ThreadKey = 'rate' | 'pitch' | 'games' | 'mywork'
 type HoveredKey = RegionKey | ThreadKey
@@ -479,53 +478,6 @@ function StudioCardStatic({ activeRegions, onRegion }: {
   )
 }
 
-const MOBILE_COMPARE_ROWS: Record<Audience, ReadonlyArray<{ feature: string; discord: string; weld: string }>> = {
-  developer: [
-    { feature: "Rate visible upfront", discord: "Usually buried in DMs.", weld: "On the card before Spark." },
-    { feature: "Shipped work proof", discord: "Split across links and posts.", weld: "One proof-first profile." },
-    { feature: "Scope in thread one", discord: "Starts from zero each time.", weld: "Context sits beside chat." },
-    { feature: "Studio credibility", discord: "Hard to verify quickly.", weld: "Structured signals on both sides." }
-  ],
-  studio: [
-    { feature: "Talent proof", discord: "Scattered across bios and pings.", weld: "Card-first, verified fields." },
-    { feature: "Fit before DM", discord: "Guesswork from short intros.", weld: "Match + proof before outreach." },
-    { feature: "Rate alignment", discord: "Negotiation starts late.", weld: "Visible ranges early." },
-    { feature: "Thread quality", discord: "Noise and lost context.", weld: "Focused professional thread." }
-  ]
-};
-
-function ComparisonMobileAccordion({ audience }: { audience: Audience }) {
-  const [open, setOpen] = useState<number | null>(0);
-  const rows = MOBILE_COMPARE_ROWS[audience];
-  return (
-    <div className="cs-mobile-acc">
-      {rows.map((row, i) => {
-        const isOpen = open === i;
-        return (
-          <div key={row.feature} className="cs-mobile-acc-row">
-            <button type="button" className="cs-mobile-acc-trigger" onClick={() => setOpen(isOpen ? null : i)}>
-              {row.feature}
-              <span style={{ opacity: 0.45 }}>{isOpen ? "−" : "+"}</span>
-            </button>
-            {isOpen ? (
-              <div className="cs-mobile-acc-body">
-                <div>
-                  <strong style={{ color: "rgba(14,26,43,0.45)" }}>Discord</strong>
-                  <p style={{ margin: "4px 0 0" }}>{row.discord}</p>
-                </div>
-                <div>
-                  <strong style={{ color: "#0d1220" }}>weld.</strong>
-                  <p style={{ margin: "4px 0 0", fontWeight: 600 }}>{row.weld}</p>
-                </div>
-              </div>
-            ) : null}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function ComparisonSection({ audience = 'studio' }: { audience?: Audience }) {
@@ -579,7 +531,7 @@ export default function ComparisonSection({ audience = 'studio' }: { audience?: 
         </p>
       </div>
 
-      <div className="cs-body cs-desktop" onMouseLeave={scheduleBodyLeave}>
+      <div className="cs-body" onMouseLeave={scheduleBodyLeave}>
         {/* Left threads */}
         <div className="cs-col cs-col--left">
           {leftThreads.map((t) => (
@@ -618,8 +570,6 @@ export default function ComparisonSection({ audience = 'studio' }: { audience?: 
           ))}
         </div>
       </div>
-
-      <ComparisonMobileAccordion audience={audience} />
     </section>
   )
 }

@@ -1,30 +1,16 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   useEffect,
-  useMemo,
   useRef,
   useState,
   type CSSProperties,
-  type MutableRefObject,
-  type ReactNode,
-  type Ref
+  type KeyboardEvent,
+  type ReactNode
 } from "react";
-import {
-  AnimatePresence,
-  MotionConfig,
-  animate,
-  motion,
-  useInView,
-  useMotionValue,
-  useSpring,
-  useScroll,
-  useTransform
-} from "motion/react";
 
 import {
   captureAttributionFromLocation,
@@ -34,51 +20,20 @@ import {
 import type { SourceVariant } from "@/dynamic-landing-page/lib/source-variant";
 import type { Audience } from "@/dynamic-landing-page/lib/types";
 import { useMotionPolicy } from "@/dynamic-landing-page/lib/useMotionPolicy";
+import { Sticker } from "@/dynamic-landing-page/components/primitives/Sticker";
 import { getLandingCopy, type HowItWorksIcon, type LandingCopy } from "@/dynamic-landing-page/lib/copy";
 import {
   PROFILES,
-  ROLE_CATEGORY_GROUPS,
-  ROLE_DEMAND,
   ROLE_LABELS,
-  type RoleCategoryId,
+  ROLE_ORDER,
   type RoleKey,
-  roleDemandSum,
   type TalentProfile
 } from "@/dynamic-landing-page/lib/role-config";
-import {
-  LANDING_ACTIVITY_FEED,
-  LANDING_DAY_ONE_TILES,
-  LANDING_QUOTE,
-  LANDING_TALLY
-} from "@/dynamic-landing-page/lib/landing-blocks";
-import {
-  IconArrowLeft,
-  IconArrowUpRight,
-  IconCheck,
-  IconChevronDown,
-  IconClock,
-  IconCode,
-  IconDiscord,
-  IconFolder,
-  IconGithub,
-  IconLinkedIn,
-  IconPaperclip,
-  IconRoblox,
-  IconSend,
-  IconShield,
-  IconSmile,
-  IconUser
-} from "@/dynamic-landing-page/icons";
-import HeroShaderBackground from "@/dynamic-landing-page/components/HeroShaderBackground";
-import { PaperTexture } from "@paper-design/shaders-react";
-import "@/dynamic-landing-page/styles/landing.css";
+import SwipeCard from "@/components/matching-preview/SwipeCard";
+import StudioCard from "@/components/matching-preview/StudioCard";
 import { MARQUEE_PROFILES } from "@/data/marqueeProfiles";
 import { MARQUEE_STUDIOS } from "@/data/marqueeStudios";
 import ComparisonSection from "@/dynamic-landing-page/components/ComparisonSection";
-import SwipeCard from "@/components/matching-preview/SwipeCard";
-import StudioCard from "@/components/matching-preview/StudioCard";
-
-const SwipeCardModal = dynamic(() => import("@/components/matching-preview/SwipeCard"), { ssr: false });
 
 interface MarketingPageProps {
   initialMode: Audience;
@@ -88,6 +43,7 @@ interface MarketingPageProps {
 
 type CapturePhase = "idle" | "submitting" | "success" | "error";
 type HiringAnim = "idle" | "spark" | "skip";
+type HeroSignal = "proof" | "match" | "studio";
 
 const WAITLIST_URL = "https://weldroblox.com";
 
@@ -524,6 +480,35 @@ const HIRING_PANELS: Record<RoleKey, Array<{
   ]
 };
 
+const MARQUEE_CARDS = [
+  { name: "NovaDev", role: "Scripter", rate: "$65/hr", badge: "Verified", accent: "#4F6EF7" },
+  { name: "PixelBuild", role: "Builder", rate: "$45/hr", badge: "Top 5%", accent: "#10B981" },
+  { name: "FluxVFX", role: "VFX", rate: "$55/hr", badge: "Verified", accent: "#F59E0B" },
+  { name: "UIcraft", role: "UI", rate: "$60/hr", badge: "Fast replies", accent: "#8B5CF6" },
+  { name: "ArcSystems", role: "Systems", rate: "$75/hr", badge: "Verified", accent: "#EF4444" },
+  { name: "MotionMike", role: "Animator", rate: "$50/hr", badge: "New", accent: "#06B6D4" },
+  { name: "LuaKing", role: "Scripter", rate: "$80/hr", badge: "Top 5%", accent: "#F97316" },
+  { name: "TerrainCo", role: "Builder", rate: "$40/hr", badge: "Verified", accent: "#84CC16" },
+  { name: "FlareFX", role: "VFX", rate: "$65/hr", badge: "Fast replies", accent: "#EC4899" },
+  { name: "ShopUI_Dev", role: "UI", rate: "$70/hr", badge: "Verified", accent: "#6366F1" },
+  { name: "DataLord", role: "Systems", rate: "$85/hr", badge: "Top 5%", accent: "#0EA5E9" },
+  { name: "AnimStudio", role: "Animator", rate: "$55/hr", badge: "Verified", accent: "#A855F7" },
+  { name: "CombatDev", role: "Scripter", rate: "$70/hr", badge: "Fast replies", accent: "#14B8A6" },
+  { name: "MapMaker", role: "Builder", rate: "$48/hr", badge: "New", accent: "#F59E0B" },
+  { name: "NeonVFX", role: "VFX", rate: "$60/hr", badge: "Verified", accent: "#EF4444" },
+  { name: "HudPro", role: "UI", rate: "$58/hr", badge: "Top 5%", accent: "#22C55E" }
+];
+
+const STUDIO_STRIP = [
+  { name: "Eclipse Studios", hiring: 3, plays: "4M plays/mo", verified: true, accent: "#4F6EF7" },
+  { name: "NovaBuild Co.", hiring: 5, plays: "6M plays/mo", verified: true, accent: "#10B981" },
+  { name: "Zenith Games", hiring: 2, plays: "2.1M plays/mo", verified: true, accent: "#F59E0B" },
+  { name: "Phantom Works", hiring: 4, plays: "900k plays/mo", verified: true, accent: "#8B5CF6" },
+  { name: "Orbit Interactive", hiring: 2, plays: "1.5M plays/mo", verified: false, accent: "#EF4444" },
+  { name: "Solstice Studio", hiring: 1, plays: "700k plays/mo", verified: true, accent: "#06B6D4" },
+  { name: "Cascade Labs", hiring: 3, plays: "400k plays/mo", verified: false, accent: "#F97316" }
+];
+
 function joinHref(mode: Audience, search: string, hash = "") {
   const base = mode === "studio" ? "/studios" : "/";
   const query = search ? `?${search}` : "";
@@ -540,120 +525,6 @@ function navigationSearchString(params: { toString(): string }) {
 function scrollToId(id: string) {
   if (typeof window === "undefined") return;
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-function LiveTallyBand() {
-  const { developers, studios } = LANDING_TALLY;
-  return (
-    <div id="join" className="landing-tally-band" aria-live="polite">
-      <span className="landing-tally-dot" aria-hidden />
-      <span>
-        {developers} developers waitlisted · {studios} studios reviewing ·{" "}
-        <em style={{ fontStyle: "normal", fontWeight: 500, color: "var(--wg-muted)" }}>updated live</em>
-      </span>
-    </div>
-  );
-}
-
-function LiveActivityTicker() {
-  const doubled = [...LANDING_ACTIVITY_FEED, ...LANDING_ACTIVITY_FEED];
-  return (
-    <div className="landing-activity-ticker" aria-label="Recent activity">
-      <span className="landing-tally-dot" style={{ marginLeft: 14 }} aria-hidden />
-      <div className="landing-activity-inner">
-        {doubled.map((row, i) => (
-          <span key={`${row.who}-${row.action}-${i}`}>
-            <strong>{row.who}</strong> · {row.action} · <em>{row.ago}</em>
-            <span style={{ opacity: 0.35 }}> &nbsp;•&nbsp; </span>
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function HowItWorksSection({ copy }: { copy: LandingCopy }) {
-  const pinnedRef = useRef<HTMLDivElement | null>(null);
-  const { scrollYProgress } = useScroll({
-    target: pinnedRef,
-    offset: ["start start", "end end"]
-  });
-  const [seg, setSeg] = useState(0);
-  useEffect(() => {
-    const unsub = scrollYProgress.on("change", (v) => {
-      if (v < 0.34) setSeg(0);
-      else if (v < 0.68) setSeg(1);
-      else setSeg(2);
-    });
-    return () => unsub();
-  }, [scrollYProgress]);
-  const beamW = useTransform(scrollYProgress, [0.45, 0.92], ["0%", "100%"]);
-
-  const labels = ["Drop your proof", "Your card fills in", "Studios match you"];
-  const bodies = [
-    "Shipped work, links, and rate become one scannable surface.",
-    "Role, availability, and proof stay visible as studios swipe.",
-    "A Spark opens a focused thread — no cold ping."
-  ];
-
-  return (
-    <>
-      <div ref={pinnedRef} className="how-pinned-section">
-        <div className="how-pinned-sticky">
-          <motion.div className="how-pinned-card" layout>
-            <p className="how-pinned-label">{labels[seg]}</p>
-            <p className="how-pinned-body">{bodies[seg]}</p>
-            <motion.div className="how-pinned-beam" style={{ width: beamW }} />
-          </motion.div>
-        </div>
-      </div>
-      <HowItWorksStrip copy={copy} />
-    </>
-  );
-}
-
-function LandingQuoteSection({
-  accentHex,
-  allowWebGl
-}: {
-  accentHex: string;
-  allowWebGl: boolean;
-}) {
-  return (
-    <section className="landing-quote-section" aria-label="Why now">
-      {allowWebGl ? (
-        <div className="quote-shader" aria-hidden>
-          <HeroShaderBackground accentHex={accentHex} allowWebGl={allowWebGl} />
-        </div>
-      ) : (
-        <div className="hero-shader-fallback quote-shader" aria-hidden style={{ position: "absolute", inset: 0 }} />
-      )}
-      <blockquote cite="weld.">
-        {LANDING_QUOTE.text}
-        <cite>{LANDING_QUOTE.attribution}</cite>
-      </blockquote>
-    </section>
-  );
-}
-
-function LandingDayOneGrid() {
-  const iconFor = (key: (typeof LANDING_DAY_ONE_TILES)[number]["icon"]) => {
-    if (key === "shield") return <IconShield className="dayone-ic" />;
-    if (key === "spark") return <StepSparkIcon />;
-    if (key === "code") return <IconCode className="dayone-ic" />;
-    return <IconUser className="dayone-ic" />;
-  };
-  return (
-    <div className="landing-dayone-grid" aria-label="Day one on weld.">
-      {LANDING_DAY_ONE_TILES.map((t) => (
-        <div key={t.title} className="landing-dayone-tile">
-          <span style={{ display: "flex", marginBottom: 8 }}>{iconFor(t.icon)}</span>
-          <strong>{t.title}</strong>
-          <span>{t.body}</span>
-        </div>
-      ))}
-    </div>
-  );
 }
 
 export default function MarketingPage(props: MarketingPageProps) {
@@ -679,8 +550,7 @@ function WeldLandingPage({
   const [captureStatus, setCaptureStatus] = useState("");
   const [isSwapping, setIsSwapping] = useState(false);
   const [swipeModalOpen, setSwipeModalOpen] = useState(false);
-  const heroShellRef = useRef<HTMLElement | null>(null);
-  const heroInView = useInView(heroShellRef, { amount: 0.12, margin: "0px 0px -40% 0px" });
+  const [heroSignal, setHeroSignal] = useState<HeroSignal>("proof");
   useEffect(() => {
     if (!swipeModalOpen) return;
     const scrollY = window.scrollY;
@@ -700,6 +570,7 @@ function WeldLandingPage({
   }, [swipeModalOpen]);
   const [hiringPanel, setHiringPanel] = useState(0);
   const [hiringAnim, setHiringAnim] = useState<HiringAnim>("idle");
+  const captureRef = useRef<HTMLDivElement | null>(null);
   const heroInputRef = useRef<HTMLInputElement | null>(null);
   const pageShellRef = useRef<HTMLDivElement | null>(null);
   const [returningInvite, setReturningInvite] = useState<{ inviteUrl: string } | null>(null);
@@ -806,7 +677,7 @@ function WeldLandingPage({
     });
     scrollToId("join");
     window.setTimeout(
-      () => heroInputRef.current?.focus(),
+      () => captureRef.current?.querySelector("input")?.focus(),
       motionTier === "reduced" ? 0 : 450
     );
   }
@@ -886,7 +757,6 @@ function WeldLandingPage({
   }
 
   return (
-    <MotionConfig reducedMotion="user">
     <div
       ref={pageShellRef}
       className="weld-glass-page"
@@ -905,11 +775,6 @@ function WeldLandingPage({
         searchString={navSearchString}
         onModeChange={handleModeChange}
         onJoinClick={() => handleJoinIntent("nav")}
-        stickyJoin={!heroInView}
-        email={email}
-        capturePhase={capturePhase}
-        onEmailChange={setEmail}
-        onSubmit={() => void openSignupForm()}
       />
 
       {returningInvite && (
@@ -932,7 +797,7 @@ function WeldLandingPage({
             >
               ✕
             </button>
-            <SwipeCardModal />
+            <SwipeCard />
           </div>
         </div>
       )}
@@ -940,11 +805,7 @@ function WeldLandingPage({
       <main className="weld-glass-main">
 
         {/* 1. Hero */}
-        <HeroShell
-          sectionRef={heroShellRef}
-          accentHex={activeProfile.accent}
-          allowWebGl={motion.allowAmbient}
-        >
+        <HeroShell>
           <HeroCopyPanel
             copy={modeCopy}
             email={email}
@@ -954,21 +815,25 @@ function WeldLandingPage({
             onSecondaryCta={handleSecondaryCta}
             inputRef={heroInputRef}
             savedInviteUrl={savedInviteUrl}
-            showCaptureInline={heroInView}
           />
           <HeroProductPreview
             mode={mode}
             profile={activeProfile}
+            signal={heroSignal}
+            onSignalChange={setHeroSignal}
+            signalTabs={{
+              proof: modeCopy.hero.signalTabProof,
+              match: modeCopy.hero.signalTabMatch,
+              context: modeCopy.hero.signalTabContext
+            }}
             onOpenCard={() => setSwipeModalOpen(true)}
             onJoin={() => handleJoinIntent("hero")}
             joinCtaLabel={modeCopy.nav.cta}
-            allowAmbient={motion.allowAmbient}
           />
         </HeroShell>
 
-        <LiveTallyBand />
-
-        <HowItWorksSection copy={modeCopy} />
+        {/* 2. How it works — 3-step row */}
+        <HowItWorksStrip copy={modeCopy} />
 
         {/* 3. Live talent marquee */}
         {mode === "studio" ? (
@@ -976,8 +841,6 @@ function WeldLandingPage({
         ) : (
           <TalentMarqueeSection copy={modeCopy} mode={mode} primary />
         )}
-
-        <LiveActivityTicker />
 
         {/* 4. Role switching — POV-flips per audience */}
         <RoleTalentExplorer
@@ -990,8 +853,6 @@ function WeldLandingPage({
           onRoleChange={handleRoleChange}
           onHiringAction={handleHiringAction}
         />
-
-        <LandingQuoteSection accentHex={activeProfile.accent} allowWebGl={motion.allowAmbient} />
 
         {/* 5. And here's who's looking */}
         {mode === "studio" ? (
@@ -1007,13 +868,19 @@ function WeldLandingPage({
         <ComparisonSection audience={mode} />
 
         <FriendlyFAQ copy={modeCopy} />
-
-        <LandingDayOneGrid />
       </main>
 
-      <FooterCTA copy={modeCopy} mode={mode} />
+      <FooterCTA
+        copy={modeCopy}
+        mode={mode}
+        email={email}
+        phase={capturePhase}
+        status={captureStatus}
+        captureRef={captureRef}
+        onEmailChange={setEmail}
+        onSubmit={() => void openSignupForm()}
+      />
     </div>
-    </MotionConfig>
   );
 }
 
@@ -1022,27 +889,14 @@ function GlassNav({
   copy,
   searchString,
   onModeChange,
-  onJoinClick,
-  stickyJoin,
-  email,
-  capturePhase,
-  onEmailChange,
-  onSubmit
+  onJoinClick
 }: {
   mode: Audience;
   copy: LandingCopy;
   searchString: string;
   onModeChange: (mode: Audience) => void;
   onJoinClick: () => void;
-  stickyJoin: boolean;
-  email: string;
-  capturePhase: CapturePhase;
-  onEmailChange: (v: string) => void;
-  onSubmit: () => void;
 }) {
-  const isSubmitting = capturePhase === "submitting";
-  const isSuccess = capturePhase === "success";
-
   return (
     <header className="glass-nav-shell">
       <Link href={joinHref(mode, searchString)} className="glass-brand" aria-label="weld. home">
@@ -1060,32 +914,6 @@ function GlassNav({
         }}
         onChange={onModeChange}
       />
-
-      {stickyJoin ? (
-        <motion.div
-          layoutId="join-cta-bar"
-          className="glass-nav-join-slot"
-          transition={{ type: "spring", stiffness: 420, damping: 34 }}
-        >
-          <input
-            type="email"
-            placeholder={copy.waitlist.placeholder}
-            value={email}
-            onChange={(e) => onEmailChange(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && onSubmit()}
-            disabled={isSubmitting || isSuccess}
-            aria-label="Email address"
-          />
-          <button
-            type="button"
-            className="button-primary"
-            onClick={onSubmit}
-            disabled={isSubmitting || isSuccess}
-          >
-            {isSuccess ? copy.hero.submittedLabel : isSubmitting ? copy.hero.submittingLabel : copy.hero.primaryCta}
-          </button>
-        </motion.div>
-      ) : null}
 
       <nav className="glass-nav-links" aria-label="Primary">
         {copy.nav.links.map((item) => (
@@ -1111,25 +939,11 @@ function GlassNav({
   );
 }
 
-function HeroShell({
-  children,
-  sectionRef,
-  accentHex,
-  allowWebGl
-}: {
-  children: React.ReactNode;
-  sectionRef: React.RefObject<HTMLElement | null>;
-  accentHex: string;
-  allowWebGl: boolean;
-}) {
+function HeroShell({ children }: { children: React.ReactNode }) {
   return (
-    <section
-      ref={sectionRef as Ref<HTMLElement>}
-      className="hero-shell hero-shell-split" id="top" style={{ position: "relative" }}>
-      <HeroShaderBackground accentHex={accentHex} allowWebGl={allowWebGl} />
-      <div className="hero-shell-grid" style={{ position: "relative", zIndex: 1 }}>
-        {children}
-      </div>
+    <section className="hero-shell hero-shell-split" id="top">
+      <div className="hero-shell-bloom" aria-hidden="true" />
+      <div className="hero-shell-grid">{children}</div>
     </section>
   );
 }
@@ -1142,8 +956,7 @@ function HeroCopyPanel({
   onSubmit,
   onSecondaryCta,
   inputRef,
-  savedInviteUrl,
-  showCaptureInline
+  savedInviteUrl
 }: {
   copy: LandingCopy;
   email: string;
@@ -1151,53 +964,39 @@ function HeroCopyPanel({
   onEmailChange: (v: string) => void;
   onSubmit: () => void;
   onSecondaryCta: () => void;
-  inputRef?: MutableRefObject<HTMLInputElement | null>;
+  inputRef?: React.MutableRefObject<HTMLInputElement | null>;
   savedInviteUrl?: string | null;
-  showCaptureInline: boolean;
 }) {
   const isSubmitting = capturePhase === "submitting";
   const isSuccess = capturePhase === "success";
 
   return (
     <div className="hero-copy-panel hero-copy-panel-split">
-      <div className="section-index-row">
-        <span className="section-index" aria-hidden>
-          01
-        </span>
-        <p className="hero-eyebrow" style={{ margin: 0, textTransform: "none", letterSpacing: "0.02em" }}>
-          {copy.hero.eyebrow}
-        </p>
-      </div>
+      <p className="section-kicker hero-eyebrow">{copy.hero.eyebrow}</p>
       <h1>{copy.hero.title}</h1>
       <p className="hero-lead">{copy.hero.lead}</p>
       <p className="hero-support">{copy.hero.support}</p>
-      {showCaptureInline ? (
-        <motion.div
-          layoutId="join-cta-bar"
-          className="hero-capture-row"
-          transition={{ type: "spring", stiffness: 420, damping: 34 }}
+      <div className="hero-capture-row">
+        <input
+          ref={inputRef}
+          className="hero-capture-input"
+          type="email"
+          placeholder={copy.waitlist.placeholder}
+          value={email}
+          onChange={(e) => onEmailChange(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && onSubmit()}
+          disabled={isSubmitting || isSuccess}
+          aria-label="Email address"
+        />
+        <button
+          type="button"
+          className="hero-capture-btn button-primary"
+          onClick={onSubmit}
+          disabled={isSubmitting || isSuccess}
         >
-          <input
-            ref={inputRef}
-            className="hero-capture-input"
-            type="email"
-            placeholder={copy.waitlist.placeholder}
-            value={email}
-            onChange={(e) => onEmailChange(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && onSubmit()}
-            disabled={isSubmitting || isSuccess}
-            aria-label="Email address"
-          />
-          <button
-            type="button"
-            className="hero-capture-btn button-primary"
-            onClick={onSubmit}
-            disabled={isSubmitting || isSuccess}
-          >
-            {isSuccess ? copy.hero.submittedLabel : isSubmitting ? copy.hero.submittingLabel : copy.hero.primaryCta}
-          </button>
-        </motion.div>
-      ) : null}
+          {isSuccess ? copy.hero.submittedLabel : isSubmitting ? copy.hero.submittingLabel : copy.hero.primaryCta}
+        </button>
+      </div>
       <p className="hero-trust-line">{copy.hero.trustLine}</p>
       <div className="hero-secondary-row">
         <button
@@ -1210,24 +1009,17 @@ function HeroCopyPanel({
         </button>
       </div>
       <div className="hero-proof-line">
-        <div
-          aria-hidden="true"
-          style={{
-            width: 7,
-            height: 7,
-            borderRadius: "50%",
-            background: "#22c55e",
-            flexShrink: 0,
-            boxShadow: "0 0 0 2px rgba(34,197,94,0.22)"
-          }}
-        />
+        <div aria-hidden="true" style={{width:7,height:7,borderRadius:"50%",background:"#22c55e",flexShrink:0,boxShadow:"0 0 0 2px rgba(34,197,94,0.22)"}} />
         {copy.hero.proofPrefix} <strong>{copy.hero.proofStrong}</strong> {copy.hero.proofSuffix}
       </div>
-      {savedInviteUrl ? (
-        <Link href={savedInviteUrl} className="hero-invite-return">
+      {savedInviteUrl && (
+        <Link
+          href={savedInviteUrl}
+          className="hero-invite-return"
+        >
           {copy.hero.inviteReturn}
         </Link>
-      ) : null}
+      )}
     </div>
   );
 }
@@ -1235,44 +1027,67 @@ function HeroCopyPanel({
 function HeroProductPreview({
   mode,
   profile,
+  signal,
+  onSignalChange,
+  signalTabs,
   onOpenCard,
   onJoin,
-  joinCtaLabel,
-  allowAmbient
+  joinCtaLabel
 }: {
   mode: Audience;
   profile: TalentProfile;
+  signal: HeroSignal;
+  onSignalChange: (signal: HeroSignal) => void;
+  signalTabs: { proof: string; match: string; context: string };
   onOpenCard: () => void;
   onJoin: () => void;
   joinCtaLabel: string;
-  allowAmbient: boolean;
 }) {
-  const stackProfiles = useMemo(() => [MARQUEE_PROFILES[0], MARQUEE_PROFILES[1], MARQUEE_PROFILES[2]], []);
+  const isStudioMode = mode === "studio";
+  const signals: Array<{
+    key: HeroSignal;
+    label: string;
+    value: string;
+    body: string;
+  }> = [
+    {
+      key: "proof",
+      label: "Proof signal",
+      value: profile.projects,
+      body: profile.latestProject.summary
+    },
+    {
+      key: "match",
+      label: "Match quality",
+      value: `${profile.matchScore}%`,
+      body: `${profile.services.slice(0, 3).join(", ")} fit the brief.`
+    },
+    {
+      key: "studio",
+      label: isStudioMode ? "Talent view" : "Studio view",
+      value: isStudioMode ? "Shortlist" : "Discovery",
+      body: isStudioMode
+        ? "Review role, proof, rate, and availability before outreach."
+        : "Studios see proof-first context before the first message."
+    }
+  ];
+  const activeSignal = signals.find((entry) => entry.key === signal) ?? signals[0];
+  const tabDefs: Array<{ key: HeroSignal; short: string }> = [
+    { key: "proof", short: signalTabs.proof },
+    { key: "match", short: signalTabs.match },
+    { key: "studio", short: signalTabs.context }
+  ];
 
   return (
     <div className="hero-card-column hero-card-column-split hero-product-preview">
       <div className="hero-preview-shell">
         <div className="hero-preview-stage">
           <div className="hero-preview-card-frame">
-            <div className="npc-hero-preview-container" style={{ position: "relative" }}>
-              <motion.div
-                className="hero-card-stack"
-                animate={allowAmbient ? { y: [0, -4, 0] } : undefined}
-                transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
-              >
-                {stackProfiles.map((p, i) => (
-                  <div key={p.id} className="hero-card-stack-layer" data-depth={i}>
-                    <div className="npc-hero-preview-card">
-                      <SwipeCard profile={p} />
-                    </div>
-                  </div>
-                ))}
-                <div className="hero-match-chip">
-                  {profile.matchScore}% match · {profile.availability}
-                </div>
-              </motion.div>
+            <div className="npc-hero-preview-container">
+              <div className="npc-hero-preview-card" aria-hidden="true">
+                <SwipeCard />
+              </div>
               <button
-                type="button"
                 className="npc-hero-preview-trigger"
                 onClick={onOpenCard}
                 aria-label="Open interactive profile card"
@@ -1282,12 +1097,36 @@ function HeroProductPreview({
             </div>
           </div>
 
-          <div style={{ marginTop: 16, display: "flex", justifyContent: "center" }}>
+          <aside className="hero-signal-panel" aria-live="polite">
+            <div className="hero-signal-tabs" role="tablist" aria-label="Preview signal focus">
+              {tabDefs.map(({ key, short }) => (
+                <button
+                  key={key}
+                  type="button"
+                  role="tab"
+                  aria-selected={signal === key}
+                  className={signal === key ? "is-active" : ""}
+                  onClick={() => onSignalChange(key)}
+                >
+                  {short}
+                </button>
+              ))}
+            </div>
+            <div className="hero-signal-score">
+              <span>{activeSignal.label}</span>
+              <strong>{activeSignal.value}</strong>
+            </div>
+            <p>{activeSignal.body}</p>
+            <div className="hero-signal-meter" aria-hidden="true">
+              <span style={{ width: signal === "match" ? `${profile.matchScore}%` : "76%" }} />
+            </div>
             <button type="button" className="button-secondary hero-preview-join-btn" onClick={onJoin}>
               {joinCtaLabel}
             </button>
-          </div>
+          </aside>
         </div>
+
+
       </div>
     </div>
   );
@@ -1297,17 +1136,6 @@ function HowItWorksStrip({ copy }: { copy: LandingCopy }) {
   const steps = copy.howItWorks.steps;
   return (
     <section data-reveal="pending" className="how-strip-section" id="how" aria-label={copy.howItWorks.title}>
-      <div className="section-index-row" style={{ maxWidth: "min(1180px, 100% - 32px)", margin: "0 auto 16px", padding: "0 16px" }}>
-        <span className="section-index" aria-hidden>
-          02
-        </span>
-        <div>
-          <p style={{ margin: "0 0 6px", fontSize: 12, fontWeight: 700, color: "var(--wg-muted)", letterSpacing: "0.08em" }}>
-            {copy.howItWorks.kicker}
-          </p>
-          <h2 style={{ margin: 0, fontSize: "clamp(1.5rem, 3vw, 2.1rem)" }}>{copy.howItWorks.title}</h2>
-        </div>
-      </div>
       <div className="glass-card how-strip">
         {steps.map((step, index) => (
           <article key={step.title} className="step-card">
@@ -1350,14 +1178,7 @@ function TalentMarqueeSection({
       aria-label={`${teaser.kicker}: ${teaser.title}`}
     >
       <div className="marquee-header">
-        <div className="section-index-row" style={{ marginBottom: 4 }}>
-          <span className="section-index" aria-hidden>
-            {primary ? "02" : "03"}
-          </span>
-          <p className="marquee-eyebrow" style={{ margin: 0, textTransform: "none", letterSpacing: "0.06em" }}>
-            {teaser.kicker}
-          </p>
-        </div>
+        <p className="marquee-eyebrow">{teaser.kicker}</p>
         <h2 className="marquee-heading">{teaser.title}</h2>
         <p className="marquee-subtext">
           {teaser.body}
@@ -1402,61 +1223,56 @@ function RoleTalentExplorer({
   onRoleChange: (role: RoleKey) => void;
   onHiringAction: (action: "spark" | "skip") => void;
 }) {
+  const buttonRefs = useRef<Partial<Record<RoleKey, HTMLButtonElement | null>>>({});
   const panels = HIRING_PANELS[role];
-  let activeCategory: RoleCategoryId = "engineering";
-  for (const id of Object.keys(ROLE_CATEGORY_GROUPS) as RoleCategoryId[]) {
-    if (ROLE_CATEGORY_GROUPS[id].roles.includes(role)) {
-      activeCategory = id;
-      break;
+
+  function handleKeyDown(event: KeyboardEvent<HTMLButtonElement>, currentRole: RoleKey) {
+    const currentIndex = ROLE_ORDER.indexOf(currentRole);
+    let nextIndex = currentIndex;
+
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      nextIndex = (currentIndex + 1) % ROLE_ORDER.length;
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      nextIndex = (currentIndex - 1 + ROLE_ORDER.length) % ROLE_ORDER.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = ROLE_ORDER.length - 1;
+    } else if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onRoleChange(currentRole);
+      return;
+    } else {
+      return;
     }
+
+    event.preventDefault();
+    const next = ROLE_ORDER[nextIndex];
+    onRoleChange(next);
+    buttonRefs.current[next]?.focus();
   }
-  const categoryIds = Object.keys(ROLE_CATEGORY_GROUPS) as RoleCategoryId[];
 
   return (
     <section data-reveal="pending" className="glass-section how-story-section" id="roles">
       <div className="how-story-grid">
         <div className="section-copy how-story-copy">
-          <div className="section-index-row">
-          <span className="section-index" aria-hidden>
-            05
-          </span>
-            <div>
-              <p style={{ margin: "0 0 6px", fontSize: 12, fontWeight: 700, color: "var(--wg-muted)", letterSpacing: "0.08em" }}>
-                {copy.roleExplorer.kicker}
-              </p>
-              <h2 style={{ margin: 0 }}>{copy.roleExplorer.title}</h2>
-            </div>
-          </div>
+          <span className="section-kicker">{copy.roleExplorer.kicker}</span>
+          <h2>{copy.roleExplorer.title}</h2>
           <p>{copy.roleExplorer.lead}</p>
 
-          <div className="role-category-grid" role="group" aria-label="Role categories">
-            {categoryIds.map((cid) => {
-              const g = ROLE_CATEGORY_GROUPS[cid];
-              const count = roleDemandSum(g.roles);
-              return (
-                <button
-                  key={cid}
-                  type="button"
-                  className={`role-category-card${activeCategory === cid ? " is-active" : ""}`}
-                  onClick={() => onRoleChange(g.roles[0])}
-                >
-                  <p className="rc-title">{g.label}</p>
-                  <p className="rc-count">{count}+ open roles (sample)</p>
-                </button>
-              );
-            })}
-          </div>
-          <div className="role-subchips" role="radiogroup" aria-label="Choose a discipline">
-            {ROLE_CATEGORY_GROUPS[activeCategory].roles.map((rk) => (
+          <div className="role-explorer-tabs" role="radiogroup" aria-label="Choose a Roblox talent role">
+            {ROLE_ORDER.map((entry) => (
               <button
-                key={rk}
+                key={entry}
+                ref={(node) => { buttonRefs.current[entry] = node; }}
                 type="button"
                 role="radio"
-                aria-checked={role === rk}
-                className={`role-subchip${role === rk ? " is-active" : ""}`}
-                onClick={() => onRoleChange(rk)}
+                aria-checked={role === entry}
+                className={role === entry ? "is-active" : ""}
+                onClick={() => onRoleChange(entry)}
+                onKeyDown={(event) => handleKeyDown(event, entry)}
               >
-                {ROLE_LABELS[rk]}
+                {ROLE_LABELS[entry]}
               </button>
             ))}
           </div>
@@ -1476,6 +1292,20 @@ function RoleTalentExplorer({
     </section>
   );
 }
+
+const ROLE_DEMAND: Record<RoleKey, number> = {
+  scripting:   28,
+  graphics:    26,
+  building:    24,
+  ui:          22,
+  art2d:       17,
+  modeling3d:  15,
+  vfx:         14,
+  animation:   13,
+  gamedesign:   9,
+  sounddesign:  7,
+  sfx:          6,
+};
 
 function compactSentences(text: string, limit: number) {
   return text
@@ -1520,11 +1350,6 @@ function HiringPanelStack({
       ? hiringCopy.goodFitBodyDev.split("{studio}").join(active.studio)
       : hiringCopy.goodFitBodyStudio;
 
-  const tiltX = useMotionValue(0);
-  const tiltY = useMotionValue(0);
-  const springX = useSpring(tiltX, { stiffness: 260, damping: 24 });
-  const springY = useSpring(tiltY, { stiffness: 260, damping: 24 });
-
   return (
     <div className="hiring-stack-wrapper" data-swapping={isSwapping ? "true" : "false"}>
       <div className={`hiring-panel-stack is-${anim}`}>
@@ -1534,79 +1359,51 @@ function HiringPanelStack({
         <div className="hiring-panel-behind hiring-panel-behind-1">
           <span className="hiring-panel-stub-label">{behind1.studio}</span>
         </div>
-        <div className="hiring-tilt-wrap">
-          <motion.article
-            className="glass-card hiring-panel-active hiring-tilt-inner"
-            style={{
-              rotateX: springY,
-              rotateY: springX,
-              transformPerspective: 900
-            }}
-            onMouseMove={(e) => {
-              const el = e.currentTarget;
-              const r = el.getBoundingClientRect();
-              const px = (e.clientX - r.left) / r.width - 0.5;
-              const py = (e.clientY - r.top) / r.height - 0.5;
-              tiltX.set(px * 7);
-              tiltY.set(py * -6);
-            }}
-            onMouseLeave={() => {
-              tiltX.set(0);
-              tiltY.set(0);
-            }}
-          >
-            <div className="hp-title-row" style={{ alignItems: "flex-start", gap: "12px" }}>
-              <div>
-                <h3 className="hp-title">{active.roleTitle}</h3>
-                <span className="hp-category">{active.roleCategory}</span>
-              </div>
+        <article className="glass-card hiring-panel-active">
+          <div className="hp-title-row">
+            <span className="hp-role-chip" style={{ background: active.chipBg, color: active.chipColor }}>
+              {active.roleChip}
+            </span>
+            <div>
+              <h3 className="hp-title">{active.roleTitle}</h3>
+              <span className="hp-category">{active.roleCategory}</span>
             </div>
+          </div>
 
-            <div className="hp-studio-context">
-              <span>{active.studio}</span>
-              <strong>{active.credibility}</strong>
-            </div>
+          <div className="hp-studio-context">
+            <span>{active.studio}</span>
+            <strong>{active.credibility}</strong>
+          </div>
 
-            <div className="hp-pay-box" style={{ borderStyle: "solid", padding: "10px 14px" }}>
-              <span className="hp-pay-value" style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif", fontSize: 15 }}>
-                {active.payType} · {active.payRange}
-              </span>
-            </div>
+          <div className="hp-pay-box">
+            <span className="hp-pay-label">PAY</span>
+            <span className="hp-pay-divider" />
+            <span className="hp-pay-value">{active.payType} - {active.payRange}</span>
+          </div>
 
-            <p className="hp-section-label">ROLE SNAPSHOT</p>
-            <ul className="hp-bullet-list">
-              {bullets.map((bullet) => (
-                <li key={bullet}>{bullet}</li>
-              ))}
-            </ul>
+          <p className="hp-section-label">ROLE SNAPSHOT</p>
+          <ul className="hp-bullet-list">
+            {bullets.map((bullet) => (
+              <li key={bullet}>{bullet}</li>
+            ))}
+          </ul>
 
-            <div className="hp-cta-box">
-              <p className="hp-cta-title">{hiringCopy.goodFitTitle}</p>
-              <p className="hp-cta-body">{ctaBody}</p>
-            </div>
+          <div className="hp-cta-box">
+            <p className="hp-cta-title">{hiringCopy.goodFitTitle}</p>
+            <p className="hp-cta-body">{ctaBody}</p>
+          </div>
 
-            <div className="hiring-panel-actions" style={{ alignItems: "center", gap: 12 }}>
-              <button type="button" className="hiring-action-spark" onClick={() => onAction("spark")}>
-                See this fit
-              </button>
-              <button
-                type="button"
-                className="hiring-action-next"
-                onClick={() => onAction("skip")}
-                style={{ background: "transparent", border: "none", textDecoration: "underline", cursor: "pointer" }}
-              >
-                Next role →
-              </button>
-            </div>
-          </motion.article>
-        </div>
+          <div className="hiring-panel-actions">
+            <button type="button" className="hiring-action-spark" onClick={() => onAction("spark")}>
+              {hiringCopy.primaryCta}
+            </button>
+            <button type="button" className="hiring-action-next" onClick={() => onAction("skip")}>
+              {hiringCopy.secondaryCta}
+            </button>
+          </div>
+        </article>
       </div>
-      <p className="hiring-stack-counter" style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-        <span>+ {ROLE_DEMAND[role]} more roles like this</span>
-        <span style={{ opacity: 0.55, fontSize: 12 }}>
-          {activeIndex + 1} / {panels.length}
-        </span>
-      </p>
+      <p className="hiring-stack-counter">+ {ROLE_DEMAND[role]} more roles like this</p>
     </div>
   );
 }
@@ -1630,14 +1427,7 @@ function OtherSideSection({
       aria-label={`${teaser.kicker}: ${teaser.title}`}
     >
       <div className="marquee-header">
-        <div className="section-index-row" style={{ marginBottom: 4 }}>
-          <span className="section-index" aria-hidden>
-            {primary ? "02" : "03"}
-          </span>
-          <p className="marquee-eyebrow" style={{ margin: 0, textTransform: "none", letterSpacing: "0.06em" }}>
-            {teaser.kicker}
-          </p>
-        </div>
+        <p className="marquee-eyebrow">{teaser.kicker}</p>
         <h2 className="marquee-heading">{teaser.title}</h2>
         <p className="marquee-subtext">
           {teaser.body}
@@ -1695,159 +1485,160 @@ function ChatPreviewSection({
   const chatAvatarUrl =
     "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E3EC434BF92DD2F46E81D91592065FD9-Png/150/150/AvatarHeadshot/Png/noFilter";
 
+  const contacts = [
+    { icon: <RobloxIcon />, label: "Roblox", value: isDev ? "/EclipseStudios" : `/` + profile.name },
+    { icon: <DiscordIcon />, label: "Discord", value: isDev ? "eclipse.studios" : profile.name.toLowerCase() + ".dev" },
+    { icon: <GithubIcon />, label: "GitHub", value: isDev ? "eclipsestudios" : profile.name.toLowerCase() + "x" }
+  ];
+
   return (
     <div className="chat-section-shell-outer">
-      <section data-reveal="pending" className="glass-section chat-section" id="chat">
-        <div className="section-copy chat-section-copy">
-          <div className="section-index-row">
-            <span className="section-index" aria-hidden>
-              05
-            </span>
-            <div>
-              <p style={{ margin: "0 0 6px", fontSize: 12, fontWeight: 700, color: "var(--wg-muted)", letterSpacing: "0.08em" }}>
-                {copy.chatPreview.kicker}
-              </p>
-              <h2 style={{ margin: 0 }}>{copy.chatPreview.headline}</h2>
-            </div>
-          </div>
-          <p>{copy.chatPreview.body}</p>
-        </div>
+    <section data-reveal="pending" className="glass-section chat-section" id="chat">
+      <div className="section-copy chat-section-copy">
+        <span className="section-kicker">{copy.chatPreview.kicker}</span>
+        <h2>{copy.chatPreview.headline}</h2>
+        <p>{copy.chatPreview.body}</p>
+      </div>
 
-        <div className="glass-card chat-preview-shell chat-preview-shell-clean" style={{ position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", inset: 0, opacity: 0.06, pointerEvents: "none" }} aria-hidden>
-            <PaperTexture speed={0} scale={3} contrast={0.15} />
-          </div>
-          <div className="chat-window-topbar" style={{ position: "relative", zIndex: 1 }}>
-            <div className="chat-window-topbar-left">
-              <button type="button" className="chat-back-btn" aria-label="Decorative back button">
-                <IconArrowLeft />
-                <span>Back</span>
-              </button>
-              <div className="chat-window-identity">
-                <div className="chat-topbar-avatar chat-roblox-avatar" aria-hidden="true">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={chatAvatarUrl} alt="" />
-                  <span className="avatar-status-dot" />
-                </div>
-                <div>
-                  <strong>
-                    {contactName}
-                    <span className="verified-dot is-active" aria-hidden="true">
-                      <IconCheck />
-                    </span>
-                  </strong>
-                  <em>
-                    <span className="online-dot" />
-                    Online
-                  </em>
-                </div>
-              </div>
-            </div>
-            <div className="chat-window-actions">
-              <motion.button
-                type="button"
-                className="chat-view-profile-btn"
-                whileHover={{ x: 3 }}
-                transition={{ type: "spring", stiffness: 400, damping: 24 }}
-              >
-                View full profile <IconArrowUpRight />
-              </motion.button>
-              <button type="button" className="chat-more-btn" aria-label="Decorative more menu">
-                •••
-              </button>
-            </div>
-          </div>
-
-          <aside className="chat-profile-panel" aria-label="Chat profile summary" style={{ position: "relative", zIndex: 1 }}>
-            <div className="chat-profile-top">
-              <div className="chat-profile-avatar chat-roblox-avatar">
+      <div className="glass-card chat-preview-shell chat-preview-shell-clean">
+        <div className="chat-window-topbar">
+          <div className="chat-window-topbar-left">
+            <button type="button" className="chat-back-btn" aria-label="Decorative back button">
+              <ArrowLeftIcon />
+              <span>Back</span>
+            </button>
+            <div className="chat-window-identity">
+              <div className="chat-topbar-avatar chat-roblox-avatar" aria-hidden="true">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={chatAvatarUrl} alt="" />
                 <span className="avatar-status-dot" />
               </div>
               <div>
-                <div className="hero-card-name-row">
-                  <h3>{contactName}</h3>
+                <strong>
+                  {contactName}
                   <span className="verified-dot is-active" aria-hidden="true">
-                    <IconCheck />
+                    <CheckIcon />
                   </span>
-                </div>
-                <p className="hero-card-role">{isDev ? "Roblox studio" : profile.label}</p>
-                <p className="hero-card-availability">
-                  <span />
-                  {isDev ? "Hiring now" : profile.availability}
-                </p>
+                </strong>
+                <em><span className="online-dot" />Online</em>
               </div>
             </div>
-
-            <p className="chat-profile-summary" style={{ marginTop: 12 }}>
-              {isDev
-                ? "Eclipse Studios ships combat-focused games. 4M plays/mo. Rate: $60–85/hr. Scope explained upfront."
-                : profile.headline}
-            </p>
-            <p style={{ marginTop: 10, fontSize: 12, fontWeight: 700 }}>
-              <IconShield style={{ display: "inline", verticalAlign: "middle", marginRight: 6 }} />
-              98% match
-            </p>
-          </aside>
-
-          <div className="chat-thread-panel" style={{ position: "relative", zIndex: 1 }}>
-            <div className="chat-thread-top">
-              <span className="chat-day-pill">
-                <strong>{copy.chatPreview.threadLabel}</strong>
-                <em>3:17 PM</em>
-              </span>
-            </div>
-
-            <div className="chat-bubble-list">
-              {messages.map((message, index) => (
-                <div key={`${index}-${message.time}`} className={`chat-row is-${message.side}`}>
-                  {message.side === "in" ? (
-                    <div className="chat-mini-avatar" aria-hidden="true">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={chatAvatarUrl} alt="" />
-                      <span className="avatar-status-dot" />
-                    </div>
-                  ) : null}
-                  <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.4 }}
-                    transition={{ delay: index * 0.12, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                  >
-                    {message.side === "in" ? (
-                      <span className="chat-typing" aria-hidden>
-                        <span />
-                        <span />
-                        <span />
-                      </span>
-                    ) : null}
-                    {message.text}
-                    <time>
-                      {message.time}
-                      {message.side === "out" ? <ChatReadIcon /> : null}
-                    </time>
-                  </motion.p>
-                </div>
-              ))}
-            </div>
-
-            <div className="chat-composer chat-composer-clean" aria-label="Decorative message composer">
-              <span className="chat-composer-icon" aria-hidden="true">
-                <IconPaperclip />
-              </span>
-              <em>{copy.chatPreview.composerHint(contactName)}</em>
-              <span className="chat-composer-icon" aria-hidden="true">
-                <IconSmile />
-              </span>
-              <button type="button" className="chat-send-btn" aria-label="Decorative send button">
-                <IconSend />
-              </button>
-            </div>
+          </div>
+          <div className="chat-window-actions">
+            <button type="button" className="chat-view-profile-btn">
+              View full profile <ArrowUpRightIcon />
+            </button>
+            <button type="button" className="chat-more-btn" aria-label="Decorative more menu">•••</button>
           </div>
         </div>
-      </section>
+
+        <aside className="chat-profile-panel" aria-label="Chat profile summary">
+          <div className="chat-profile-top">
+            <div className="chat-profile-avatar chat-roblox-avatar">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={chatAvatarUrl} alt="" />
+              <span className="avatar-status-dot" />
+            </div>
+            <div>
+              <div className="hero-card-name-row">
+                <h3>{contactName}</h3>
+                <span className="verified-dot is-active" aria-hidden="true"><CheckIcon /></span>
+              </div>
+              <p className="hero-card-role">{isDev ? "Roblox studio" : profile.label}</p>
+              <p className="hero-card-availability"><span />{isDev ? "Hiring now" : profile.availability}</p>
+            </div>
+          </div>
+
+          <div className="chat-match-bar" aria-hidden="true">
+            <span><ShieldIcon />98% Match</span>
+            <i style={{ "--match-fill": "92%" } as CSSProperties} />
+          </div>
+
+          <div className="chat-stat-grid">
+            <span><UserIcon /><strong>{isDev ? "12 shipped" : profile.years}</strong><em>{isDev ? "Games" : "Experience"}</em></span>
+            <span><ShieldIcon /><strong>98%</strong><em>Match</em></span>
+            <span><ClockIcon /><strong>Replies</strong><em>Usually 1hr</em></span>
+          </div>
+
+          <p className="chat-profile-summary">
+            {isDev
+              ? "Eclipse Studios ships combat-focused games. 4M plays/mo. Rate: $60–85/hr. Scope explained upfront."
+              : profile.headline}
+          </p>
+
+          <div className="chat-contact-row chat-contact-row-clean">
+            {contacts.map((contact) => (
+              <span key={contact.label} className="chat-contact-chip">
+                <i aria-hidden="true">{contact.icon}</i>
+                <strong>{contact.label}</strong>
+                <em>{contact.value}</em>
+              </span>
+            ))}
+          </div>
+
+          <div className="chat-professional-note">
+            <span className="chat-professional-icon" aria-hidden="true"><HandRaisedIcon /></span>
+            <span>
+              <strong>{copy.chatPreview.professionalNote[0]}</strong>
+              <em>{copy.chatPreview.professionalNote[1]}</em>
+            </span>
+          </div>
+        </aside>
+
+        <div className="chat-thread-panel">
+          <div className="chat-thread-top">
+            <span className="chat-day-pill">
+              <strong>{copy.chatPreview.threadLabel}</strong>
+              <em>3:17 PM</em>
+            </span>
+          </div>
+
+          <div className="chat-bubble-list">
+            {messages.map((message, index) => (
+              <div key={`${index}-${message.time}`} className={`chat-row is-${message.side}`}>
+                {message.side === "in" ? (
+                  <div className="chat-mini-avatar" aria-hidden="true">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={chatAvatarUrl} alt="" />
+                    <span className="avatar-status-dot" />
+                  </div>
+                ) : null}
+                <p>
+                  {message.text}
+                  <time>
+                    {message.time}
+                    {message.side === "out" ? <ChatReadIcon /> : null}
+                  </time>
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="chat-composer chat-composer-clean" aria-label="Decorative message composer">
+            <span className="chat-composer-icon" aria-hidden="true"><PaperclipIcon /></span>
+            <em>{copy.chatPreview.composerHint(contactName)}</em>
+            <span className="chat-composer-icon" aria-hidden="true"><EmojiIcon /></span>
+            <button type="button" className="chat-send-btn" aria-label="Decorative send button">
+              <SendIcon />
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
     </div>
+  );
+}
+
+function DotScale({ level }: { level: 1 | 2 | 3 }) {
+  return (
+    <span
+      className="dot-scale"
+      aria-label={level === 1 ? "Low" : level === 2 ? "Medium" : "High"}
+    >
+      <span className={`dot${level >= 1 ? " filled" : ""}`} />
+      <span className={`dot${level >= 2 ? " filled" : ""}`} />
+      <span className={`dot${level >= 3 ? " filled" : ""}`} />
+    </span>
   );
 }
 
@@ -1857,17 +1648,8 @@ function FriendlyFAQ({ copy }: { copy: LandingCopy }) {
   return (
     <section data-reveal="pending" className="glass-section faq-section" id="faq">
       <div className="section-copy">
-        <div className="section-index-row">
-          <span className="section-index" aria-hidden>
-            06
-          </span>
-          <div>
-            <p style={{ margin: "0 0 6px", fontSize: 12, fontWeight: 700, color: "var(--wg-muted)", letterSpacing: "0.08em" }}>
-              {copy.faq.kicker}
-            </p>
-            <h2 style={{ margin: 0 }}>{copy.faq.title}</h2>
-          </div>
-        </div>
+        <span className="section-kicker">{copy.faq.kicker}</span>
+        <h2>{copy.faq.title}</h2>
       </div>
 
       <div className="faq-list">
@@ -1884,31 +1666,15 @@ function FriendlyFAQ({ copy }: { copy: LandingCopy }) {
                 onClick={() => setOpenFaq(isOpen ? null : index)}
               >
                 <span>{faq.question}</span>
-                <motion.span
-                  className={`faq-icon${isOpen ? " is-open" : ""}`}
-                  aria-hidden
-                  animate={{ rotate: isOpen ? 180 : 0 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 22 }}
-                >
-                  <IconChevronDown />
-                </motion.span>
+                <span className={`faq-icon${isOpen ? " is-open" : ""}`} aria-hidden="true">
+                  <ChevronDownIcon />
+                </span>
               </button>
-              <AnimatePresence initial={false}>
-                {isOpen ? (
-                  <motion.div
-                    key={`faq-${index}`}
-                    id={`faq-answer-${index}`}
-                    className="faq-response"
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                    style={{ overflow: "hidden" }}
-                  >
-                    <p style={{ margin: 0 }}>{faq.answer}</p>
-                  </motion.div>
-                ) : null}
-              </AnimatePresence>
+              {isOpen ? (
+                <p id={`faq-answer-${index}`} className="faq-response">
+                  {faq.answer}
+                </p>
+              ) : null}
             </article>
           );
         })}
@@ -1917,19 +1683,49 @@ function FriendlyFAQ({ copy }: { copy: LandingCopy }) {
   );
 }
 
-function FooterCTA({ copy, mode }: { copy: LandingCopy; mode: Audience }) {
+function FooterCTA({
+  copy,
+  mode,
+  email,
+  phase,
+  status,
+  captureRef,
+  onEmailChange,
+  onSubmit
+}: {
+  copy: LandingCopy;
+  mode: Audience;
+  email: string;
+  phase: CapturePhase;
+  status: string;
+  captureRef: React.MutableRefObject<HTMLDivElement | null>;
+  onEmailChange: (value: string) => void;
+  onSubmit: () => void;
+}) {
   const benefitIcon = (key: "shield" | "code" | "user" | "folder") => {
-    if (key === "shield") return <IconShield />;
-    if (key === "code") return <IconCode />;
-    if (key === "user") return <IconUser />;
-    return <IconFolder />;
+    if (key === "shield") return <ShieldIcon />;
+    if (key === "code") return <CodeIcon />;
+    if (key === "user") return <UserIcon />;
+    return <FolderIcon />;
   };
 
+  const buttonLabel =
+    phase === "submitting"
+      ? copy.waitlist.submittingLabel
+      : phase === "success"
+        ? copy.waitlist.submittedLabel
+        : copy.waitlist.button;
+  const disableInputs = phase === "submitting" || phase === "success";
+
   return (
-    <footer className="glass-footer glass-footer-cta-band" data-mode={mode}>
+    <footer
+      id="join"
+      className="glass-footer glass-footer-cta-band"
+      data-mode={mode}
+    >
       <div className="glass-footer-inner">
-        <div className="glass-footer-cta-grid" style={{ gridTemplateColumns: "1fr", maxWidth: 720, margin: "0 auto" }}>
-          <div className="glass-footer-copy-col" style={{ alignItems: "center", textAlign: "center" }}>
+        <div className="glass-footer-cta-grid">
+          <div className="glass-footer-copy-col">
             <span className="glass-footer-badge">{copy.waitlist.kicker}</span>
             <h2 className="glass-footer-headline">{copy.waitlist.headline}</h2>
             <p className="glass-footer-sub">{copy.waitlist.subhead}</p>
@@ -1946,12 +1742,7 @@ function FooterCTA({ copy, mode }: { copy: LandingCopy; mode: Audience }) {
                 </div>
               ))}
             </div>
-            <p style={{ marginTop: 16 }}>
-              <Link href="/find-invite" className="glass-nav-subtle" style={{ fontWeight: 700 }}>
-                Already have an invite? →
-              </Link>
-            </p>
-            <div className="glass-footer-brand-block" style={{ marginTop: 24 }}>
+            <div className="glass-footer-brand-block">
               <span className="glass-footer-wordmark">weld.</span>
               <p className="glass-footer-tagline">{copy.footer.tagline}</p>
               <nav className="glass-footer-links" aria-label="Legal">
@@ -1959,6 +1750,51 @@ function FooterCTA({ copy, mode }: { copy: LandingCopy; mode: Audience }) {
                 <a href={`${WAITLIST_URL}/terms`}>{copy.footer.terms}</a>
                 <a href={`${WAITLIST_URL}/contact`}>{copy.footer.contact}</a>
               </nav>
+            </div>
+          </div>
+          <div className="glass-footer-form-col" ref={captureRef}>
+            <div className="glass-footer-form-panel">
+              <h3 className="glass-footer-form-title">{copy.waitlist.title}</h3>
+              <p className="glass-footer-form-lead">{copy.waitlist.body}</p>
+              <div className="glass-footer-form">
+                <div className="glass-footer-field">
+                  <label className="glass-footer-field-label" htmlFor={`footer-join-email-${mode}`}>
+                    {copy.waitlist.fieldLabel}
+                  </label>
+                  <div className="glass-footer-capture-row">
+                    <input
+                      id={`footer-join-email-${mode}`}
+                      type="email"
+                      name="email"
+                      autoComplete="email"
+                      placeholder={copy.waitlist.placeholder}
+                      value={email}
+                      onChange={(e) => onEmailChange(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key !== "Enter") return;
+                        e.preventDefault();
+                        onSubmit();
+                      }}
+                      disabled={disableInputs}
+                      aria-describedby={status ? "footer-join-status" : undefined}
+                    />
+                    <button
+                      type="button"
+                      className="glass-footer-submit"
+                      onClick={onSubmit}
+                      disabled={disableInputs}
+                    >
+                      {buttonLabel}
+                    </button>
+                  </div>
+                </div>
+                <p className="glass-footer-privacy-note">{copy.waitlist.privacy}</p>
+                {status ? (
+                  <p id="footer-join-status" className="glass-footer-status" aria-live="polite">
+                    {status}
+                  </p>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>
