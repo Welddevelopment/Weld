@@ -4797,6 +4797,9 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 /* weld. liquid glass landing */
 .weld-glass-page {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
   --wg-bg: #efeafe;
   --wg-surface: rgba(255, 255, 255, 0.68);
   --wg-surface-strong: rgba(255, 255, 255, 0.84);
@@ -4833,7 +4836,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   --w-dur-base: 180ms;
   --w-dur-card: 280ms;
   --w-dur-swipe: 420ms;
-  min-height: 100vh;
+  min-height: 100dvh;
   background:
     radial-gradient(circle at 10% 12%, rgba(140, 120, 240, 0.32), transparent 0 28rem),
     radial-gradient(circle at 90% 16%, rgba(190, 170, 255, 0.58), transparent 0 26rem),
@@ -5270,7 +5273,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 
 .weld-glass-main {
-  overflow-x: clip;
+  overflow-x: auto;
   padding-bottom: clamp(16px, 3vw, 28px);
 }
 
@@ -8491,7 +8494,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   .weld-glass-page .hero-shell {
     width: min(1600px, calc(100% - 28px));
     margin-top: 24px;
-    padding: 52px 0 0 180px;
+    padding: clamp(28px, 4vw, 52px) clamp(20px, 5vw, 64px) clamp(36px, 5vw, 56px);
   }
 
   .weld-glass-page .hero-shell-grid {
@@ -8965,7 +8968,6 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
     radial-gradient(700px 460px at 90% 15%, rgba(14, 91, 200, 0.06), transparent 60%),
     #FFFFFF;
   padding: clamp(36px, 5vw, 64px) clamp(28px, 5vw, 72px);
-  zoom: 0.775;
 }
 
 .weld-glass-page .chat-section {
@@ -9771,7 +9773,6 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   align-items: start;
   gap: 14px;
   padding: 16px;
-  zoom: 0.84;
   border-radius: 44px;
   background:
     radial-gradient(circle at 94% 4%, rgba(255, 255, 255, 0.86), transparent 20%),
@@ -10378,94 +10379,6 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   display: none;
 }
 
-/* HowItWorksStrip â€” 4 numbered glass cards in a row */
-.weld-glass-page .how-strip-section {
-  width: min(1600px, calc(100% - 48px));
-  margin: 36px auto 0;
-  zoom: 0.75;
-}
-
-.weld-glass-page .how-strip-section .glass-card.how-strip {
-  display: grid;
-  grid-template-columns: repeat(3, 284px);
-  justify-content: center;
-  gap: clamp(16px, 2vw, 28px);
-  align-items: stretch;
-  padding: clamp(24px, 3vw, 36px);
-  border-radius: 36px;
-  position: relative;
-}
-
-.weld-glass-page .how-strip .step-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 22px 22px 24px;
-  border-radius: 24px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 240, 255, 0.72));
-  border: 1px solid rgba(255, 255, 255, 0.92);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.96), 0 14px 36px rgba(70, 50, 160, 0.10);
-}
-
-.weld-glass-page .how-strip .step-index {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  background: var(--wg-accent, #6b5cff);
-  color: #fff;
-  font-weight: 800;
-  font-size: 14px;
-  box-shadow: 0 6px 14px rgba(85, 65, 200, 0.32);
-}
-
-.weld-glass-page .how-strip .step-card h3 {
-  font-family: var(--font-display, "Plus Jakarta Sans"), system-ui, sans-serif;
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -0.015em;
-  color: var(--wg-ink);
-  margin: 0;
-}
-
-.weld-glass-page .how-strip .step-card p {
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--wg-muted);
-  margin: 0;
-}
-
-.weld-glass-page .how-strip .step-arrow {
-  position: absolute;
-  top: 50%;
-  right: -16px;
-  transform: translateY(-50%);
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  background: rgba(120, 110, 200, 0.14);
-  color: var(--wg-accent, #6b5cff);
-  font-size: 14px;
-  font-weight: 700;
-  pointer-events: none;
-}
-
-@media (max-width: 880px) {
-  .weld-glass-page .how-strip-section .glass-card.how-strip {
-    grid-template-columns: 1fr;
-  }
-
-  .weld-glass-page .how-strip .step-arrow {
-    display: none;
-  }
-}
-
 .weld-glass-page .hero-match-meter {
   display: inline-flex;
   margin: 0 0 14px;
@@ -10473,14 +10386,14 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 /* HowItWorksStrip - under-hero glass rail */
 .weld-glass-page .how-strip-section {
-  width: min(1600px, calc(100% - 48px));
+  width: min(1600px, calc(100% - clamp(20px, 4vw, 48px)));
   margin: clamp(18px, 2.8vw, 36px) auto 0;
-  zoom: 0.75;
 }
 
 .weld-glass-page .how-strip-section .glass-card.how-strip {
   position: relative;
   display: grid;
+  /* Four steps (dev + studio); one row on desktop — narrow viewports scroll horizontally */
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(18px, 2.2vw, 36px);
   align-items: stretch;
@@ -10622,7 +10535,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .weld-glass-page .how-strip .step-arrow {
   position: absolute;
   top: 50%;
-  right: calc(clamp(18px, 2.2vw, 36px) * -0.78);
+  right: -10px;
   width: 34px;
   height: 34px;
   display: inline-flex;
@@ -10642,16 +10555,6 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   height: 18px;
 }
 
-@media (max-width: 1180px) {
-  .weld-glass-page .how-strip-section .glass-card.how-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .weld-glass-page .how-strip .step-arrow {
-    display: none;
-  }
-}
-
 @media (max-width: 720px) {
   .weld-glass-page .how-strip-section {
     width: min(100% - 20px, 680px);
@@ -10659,13 +10562,19 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   }
 
   .weld-glass-page .how-strip-section .glass-card.how-strip {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(4, minmax(200px, 1fr));
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
     gap: 14px;
     padding: 16px;
     border-radius: 28px;
   }
 
   .weld-glass-page .how-strip .step-card {
+    scroll-snap-align: start;
     min-height: 0;
     grid-template-columns: minmax(0, 1fr) 58px;
     padding: 18px;
@@ -12294,10 +12203,14 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 
 .weld-glass-page .hero-card-column-split {
   position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
 }
 
 .weld-glass-page .hero-card-column-split .npc-hero-preview-container {
-  margin-inline: 0;
+  margin-inline: auto;
   zoom: 1;
 }
 
@@ -13025,7 +12938,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 .npc-entry-title { font-size: 13px; font-weight: 700; color: #111; margin-bottom: 2px; }
 .npc-entry-sub { font-size: 10px; color: #4444EE; display: flex; align-items: center; gap: 3px; }
 
-.npc-stack-row { display: flex; gap: 16px; align-items: flex-start; }
+.npc-stack-row { display: flex; gap: 16px; align-items: flex-start; justify-content: center; max-width: 100%; }
 
 .npc-panel {
   width: 380px;
@@ -13384,12 +13297,21 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 }
 
 .weld-glass-page .npc-hero-preview-container {
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   border-radius: 20px;
 }
+
+.weld-glass-page .npc-hero-preview-container .mock-card-shell,
+.weld-glass-page .npc-hero-preview-container .npc-wrap {
+  width: min(100%, 380px);
+  flex-shrink: 1;
+}
+
 .npc-hero-preview-container {
   position: relative;
-  width: 380px;
+  width: min(100%, 380px);
+  max-width: 100%;
   margin-inline: auto;
 }
 
@@ -13522,6 +13444,12 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
 html,
 body {
   background: #FAFCFE;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+body {
+  min-height: 100dvh;
 }
 
 /* Frontend UX revamp: landing hero, signup, invite dashboard */
@@ -13531,7 +13459,8 @@ body {
 
 .weld-glass-page .hero-preview-shell {
   position: relative;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: visible;
   border: 1px solid rgba(255, 255, 255, 0.78);
   border-radius: 34px;
   padding: clamp(16px, 2vw, 22px);
@@ -13587,13 +13516,22 @@ body {
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 178px;
+  grid-template-columns: 1fr;
   gap: 14px;
-  align-items: end;
+  align-items: stretch;
   margin-top: 18px;
 }
 
+@media (min-width: 901px) {
+  .weld-glass-page .hero-preview-stage {
+    grid-template-columns: minmax(0, 1fr) min(178px, 28vw);
+    align-items: end;
+  }
+}
+
 .weld-glass-page .hero-preview-card-frame {
+  display: flex;
+  justify-content: center;
   min-width: 0;
   border-radius: 28px;
   padding: 10px;
@@ -13601,6 +13539,13 @@ body {
   border: 1px solid rgba(8, 24, 39, 0.08);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88);
   transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.weld-glass-page .hero-preview-card-frame .npc-hero-preview-container {
+  width: min(100%, 380px);
+  max-width: 100%;
+  transform: none;
+  margin-bottom: 0;
 }
 
 .weld-glass-page .hero-preview-shell:hover .hero-preview-card-frame {
@@ -14908,7 +14853,6 @@ button.invite-secondary-button {
   flex-shrink: 0;
   width: 380px;
   height: 628px;
-  zoom: 0.68;
   overflow: hidden;
   border-radius: 20px;
   pointer-events: none;
@@ -14918,10 +14862,6 @@ button.invite-secondary-button {
   transform: translateZ(0);
   backface-visibility: hidden;
 }
-.marquee-card-wrap--studio {
-  zoom: 0.88;
-}
-
 .weld-glass-page .marquee-section {
   width: min(1680px, calc(100% - 24px));
   margin: clamp(54px, 7vw, 96px) auto 0;
@@ -14981,7 +14921,6 @@ button.invite-secondary-button {
 }
 
 .weld-glass-page .marquee-section .marquee-card-wrap {
-  zoom: 0.84;
   animation: carousel-card-lift 6.4s ease-in-out infinite;
 }
 
@@ -15404,10 +15343,6 @@ button.invite-secondary-button {
 
 .weld-glass-page .other-side-section .marquee-card-wrap {
   animation: carousel-card-lift 6.8s ease-in-out infinite;
-}
-
-.weld-glass-page .other-side-section .marquee-card-wrap--studio {
-  zoom: 0.96;
 }
 
 @media (max-width: 720px) {
@@ -17670,7 +17605,7 @@ button.invite-secondary-button {
 }
 
 .weld-glass-page[data-mode] .hero-shell-split .hero-shell-grid {
-  grid-template-columns: minmax(0, 0.92fr) minmax(340px, 0.68fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, min(100%, 400px));
   gap: clamp(24px, 3.2vw, 52px);
   align-items: center;
 }
@@ -18017,7 +17952,8 @@ button.invite-secondary-button {
 .weld-glass-page[data-mode] .hero-preview-card-frame .npc-hero-preview-container {
   transform: none !important;
   margin-bottom: 0 !important;
-  width: 380px !important;
+  width: min(100%, 380px) !important;
+  max-width: 100%;
   zoom: 1;
 }
 
@@ -18459,24 +18395,6 @@ button.invite-secondary-button {
     grid-template-columns: minmax(0, 1fr);
     border-radius: 24px;
   }
-}
-
-/* Final hero preview fit: preserve full card in split hero. */
-.weld-glass-page .hero-preview-stage {
-  grid-template-columns: minmax(0, 1fr);
-  align-items: start;
-}
-
-.weld-glass-page .hero-preview-card-frame {
-  display: flex;
-  justify-content: center;
-}
-
-.weld-glass-page .hero-preview-card-frame .npc-hero-preview-container {
-  width: min(100%, 380px);
-  transform: scale(0.9);
-  transform-origin: top center;
-  margin-bottom: -54px;
 }
 
 .weld-glass-page .hero-signal-panel {

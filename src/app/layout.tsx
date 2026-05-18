@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import {
   DM_Mono,
   Instrument_Serif,
@@ -32,6 +32,12 @@ const dmMono = DM_Mono({
   subsets: ["latin"],
   variable: "--font-mono"
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover"
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://weldroblox.com"),
