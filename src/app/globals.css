@@ -4842,24 +4842,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
     linear-gradient(180deg, #f4f0ff 0%, #ebe3ff 60%, #e2dafb 100%);
   color: var(--wg-ink);
   font-family: var(--font-body), system-ui, sans-serif;
-}
-
-@media (min-width: 1440px) {
-  .weld-glass-main {
-    zoom: 1.15;
-  }
-}
-
-@media (min-width: 1920px) {
-  .weld-glass-main {
-    zoom: 1.35;
-  }
-}
-
-@media (min-width: 2560px) {
-  .weld-glass-main {
-    zoom: 1.6;
-  }
+  --font-space-grotesk: var(--font-body);
 }
 
 .weld-glass-page *,
@@ -8001,6 +7984,39 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   max-width: min(14em, 92vw);
   font-size: clamp(52px, 5.4vw, 72px);
   line-height: 0.98;
+}
+
+@media (max-width: 640px) {
+  .weld-glass-page .hero-copy-panel h1 {
+    line-height: 1.06;
+  }
+}
+
+.weld-glass-page .hero-eyebrow {
+  margin-bottom: 16px;
+}
+
+.weld-glass-page .hero-trust-line {
+  max-width: 32rem;
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--wg-soft);
+}
+
+.weld-glass-page .hero-secondary-row {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.weld-glass-page .hero-secondary-cta {
+  min-height: 46px;
+  padding: 0 22px;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .weld-glass-page .hero-lead {
@@ -12597,7 +12613,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 20px;
   font-size: 16px;
   color: #374151;
 }
@@ -12648,10 +12664,6 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   line-height: 1.6;
   color: #5a567f;
   font-weight: 400;
-}
-
-.weld-glass-page .hero-copy-eyebrow-hidden {
-  display: none;
 }
 
 @media (max-width: 1080px) {
@@ -13633,6 +13645,32 @@ body {
   border-radius: inherit;
   background: linear-gradient(90deg, #55c7ec, #ffffff);
   transition: width 280ms ease;
+}
+
+.weld-glass-page .hero-preview-join-btn {
+  width: 100%;
+  margin-top: 14px;
+  min-height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    transform 160ms var(--w-ease-press, cubic-bezier(0.2, 0.8, 0.2, 1)),
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.weld-glass-page .hero-preview-join-btn:hover,
+.weld-glass-page .hero-preview-join-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.55);
+  outline: none;
 }
 
 .weld-glass-page .hero-preview-tabs {

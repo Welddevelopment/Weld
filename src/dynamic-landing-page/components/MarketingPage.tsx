@@ -616,20 +616,6 @@ function WeldLandingPage({
   }, [motion.reducedMotion, motion.allowEntranceStagger]);
 
   useEffect(() => {
-    const MULTIPLIER = 0.70;
-    function onWheel(e: WheelEvent) {
-      if (e.ctrlKey) return; // allow pinch-to-zoom
-      e.preventDefault();
-      const delta = e.deltaMode === 1
-        ? e.deltaY * 20 * MULTIPLIER  // line mode (mouse wheel)
-        : e.deltaY * MULTIPLIER;       // pixel mode (trackpad)
-      window.scrollBy({ top: delta, behavior: "instant" });
-    }
-    window.addEventListener("wheel", onWheel, { passive: false });
-    return () => window.removeEventListener("wheel", onWheel);
-  }, []);
-
-  useEffect(() => {
     void trackEvent({
       eventName: "landing_viewed",
       page,
@@ -694,6 +680,16 @@ function WeldLandingPage({
       () => captureRef.current?.querySelector("input")?.focus(),
       motionTier === "reduced" ? 0 : 450
     );
+  }
+
+  function handleSecondaryCta() {
+    void trackEvent({
+      eventName: "landing_secondary_cta_clicked",
+      page,
+      audience: mode,
+      payload: { variant: sourceVariant }
+    });
+    setSwipeModalOpen(true);
   }
 
   function handleHiringAction(action: "spark" | "skip") {
@@ -816,6 +812,7 @@ function WeldLandingPage({
             capturePhase={capturePhase}
             onEmailChange={setEmail}
             onSubmit={openSignupForm}
+            onSecondaryCta={handleSecondaryCta}
             inputRef={heroInputRef}
             savedInviteUrl={savedInviteUrl}
           />
@@ -826,6 +823,7 @@ function WeldLandingPage({
             onSignalChange={setHeroSignal}
             onOpenCard={() => setSwipeModalOpen(true)}
             onJoin={() => handleJoinIntent("hero")}
+            joinCtaLabel={modeCopy.nav.cta}
           />
         </HeroShell>
 
@@ -951,6 +949,7 @@ function HeroCopyPanel({
   capturePhase,
   onEmailChange,
   onSubmit,
+  onSecondaryCta,
   inputRef,
   savedInviteUrl
 }: {
@@ -959,6 +958,7 @@ function HeroCopyPanel({
   capturePhase: CapturePhase;
   onEmailChange: (v: string) => void;
   onSubmit: () => void;
+  onSecondaryCta: () => void;
   inputRef?: React.MutableRefObject<HTMLInputElement | null>;
   savedInviteUrl?: string | null;
 }) {
@@ -967,6 +967,7 @@ function HeroCopyPanel({
 
   return (
     <div className="hero-copy-panel hero-copy-panel-split">
+      <p className="section-kicker hero-eyebrow">{copy.hero.eyebrow}</p>
       <h1>{copy.hero.title}</h1>
       <p className="hero-lead">{copy.hero.lead}</p>
       <p className="hero-support">{copy.hero.support}</p>
@@ -991,6 +992,17 @@ function HeroCopyPanel({
           {isSuccess ? copy.hero.submittedLabel : isSubmitting ? copy.hero.submittingLabel : copy.hero.primaryCta}
         </button>
       </div>
+      <p className="hero-trust-line">{copy.waitlist.privacy}</p>
+      <div className="hero-secondary-row">
+        <button
+          type="button"
+          className="button-secondary hero-secondary-cta"
+          onClick={onSecondaryCta}
+          disabled={isSubmitting || isSuccess}
+        >
+          {copy.hero.secondaryCta}
+        </button>
+      </div>
       <div className="hero-proof-line">
         <div aria-hidden="true" style={{width:7,height:7,borderRadius:"50%",background:"#22c55e",flexShrink:0,boxShadow:"0 0 0 2px rgba(34,197,94,0.22)"}} />
         {copy.hero.proofPrefix} <strong>{copy.hero.proofStrong}</strong> {copy.hero.proofSuffix}
@@ -1003,9 +1015,6 @@ function HeroCopyPanel({
           {copy.hero.inviteReturn}
         </Link>
       )}
-      <span className="hero-copy-eyebrow-hidden" aria-hidden="true">
-        {copy.hero.eyebrow}
-      </span>
     </div>
   );
 }
@@ -1016,7 +1025,8 @@ function HeroProductPreview({
   signal,
   onSignalChange,
   onOpenCard,
-  onJoin
+  onJoin,
+  joinCtaLabel
 }: {
   mode: Audience;
   profile: TalentProfile;
@@ -1024,7 +1034,9 @@ function HeroProductPreview({
   onSignalChange: (signal: HeroSignal) => void;
   onOpenCard: () => void;
   onJoin: () => void;
+  joinCtaLabel: string;
 }) {
+  void onSignalChange;
   const isStudioMode = mode === "studio";
   const signals: Array<{
     key: HeroSignal;
@@ -1083,6 +1095,9 @@ function HeroProductPreview({
             <div className="hero-signal-meter" aria-hidden="true">
               <span style={{ width: signal === "match" ? `${profile.matchScore}%` : "76%" }} />
             </div>
+            <button type="button" className="button-secondary hero-preview-join-btn" onClick={onJoin}>
+              {joinCtaLabel}
+            </button>
           </aside>
         </div>
 
@@ -1132,7 +1147,7 @@ function TalentMarqueeSection({
   const doubled = [...MARQUEE_PROFILES, ...MARQUEE_PROFILES];
 
   return (
-    <section className="marquee-section" data-audience={mode} aria-label="Talent on weld." aria-hidden="true">
+    <section className="marquee-section" data-audience={mode} aria-label="Talent on weld.">
       <div className="marquee-header">
         <p className="marquee-eyebrow">{teaser.kicker}</p>
         <h2 className="marquee-heading">{teaser.title}</h2>
@@ -1146,7 +1161,7 @@ function TalentMarqueeSection({
           ) : null}
         </p>
       </div>
-      <div className="marquee-track">
+      <div className="marquee-track" aria-hidden="true">
         <div className="marquee-inner">
           {doubled.map((profile, i) => (
             <div key={`${profile.id}-${i}`} className="marquee-card-wrap">
@@ -1382,7 +1397,7 @@ function OtherSideSection({
           ) : null}
         </p>
       </div>
-      <div className="marquee-track">
+      <div className="marquee-track" aria-hidden="true">
         <div className="marquee-inner">
           {doubled.map((studio, i) => (
             <div key={`studio-${studio.id}-${i}`} className="marquee-card-wrap marquee-card-wrap--studio">
