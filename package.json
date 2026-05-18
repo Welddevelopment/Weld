@@ -2,11 +2,12 @@
   "name": "weld-next",
   "private": true,
   "scripts": {
-    "prebuild": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true});\"",
+    "prebuild": "node scripts/prebuild.mjs",
     "postbuild": "node scripts/dev-after-build-hint.mjs",
     "dev:clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true});\" && next dev",
     "dev": "next dev",
     "build": "next build",
+    "build:clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true});\" && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test tests/**/*.test.ts"
