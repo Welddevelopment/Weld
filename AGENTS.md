@@ -6,4 +6,4 @@ This version has breaking changes - APIs, conventions, and file structure may al
 
 We are ONLY working on the FRONTEND of the dynamic landing page and the referral system, nothing else.
 
-Add, commit, and deploy after every full edit to https://github.com/Welddevelopment/Weld/tree/app.
+After every change, commit and push to https://github.com/Welddevelopment/Weld/tree/app.
