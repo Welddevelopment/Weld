@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "prebuild": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true});\"",
+    "postbuild": "node scripts/dev-after-build-hint.mjs",
     "dev:clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true});\" && next dev",
     "dev": "next dev",
     "build": "next build",
