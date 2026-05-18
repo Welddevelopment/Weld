@@ -19889,8 +19889,7 @@ button.invite-secondary-button {
     radial-gradient(900px 600px at 50% 46%, rgba(89, 194, 240, 0.30), transparent 60%),
     #DBE6F0;
   margin-top: 36px;
-  padding: 36px 0 48px;
-  zoom: 0.9;
+  padding: 32px 0 44px;
 }
 
 .cs-header {
@@ -20008,31 +20007,73 @@ button.invite-secondary-button {
 }
 
 .cs-section [data-region][data-active] {
-  background: rgba(14, 91, 200, 0.06);
-  box-shadow: inset 0 0 0 1.75px #0E5BC8;
+  background: rgba(14, 91, 200, 0.09);
+  box-shadow:
+    inset 0 0 0 1.75px #0E5BC8,
+    0 0 0 1px rgba(14, 91, 200, 0.12),
+    0 10px 28px rgba(14, 91, 200, 0.14);
 }
 
 /* Chat threads */
 .cs-thread {
+  position: relative;
+  width: min(100%, 300px);
   background: #FFFFFF;
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba(14, 26, 43, 0.08), 0 0 0 1px rgba(14, 26, 43, 0.06);
-  padding: 12px 14px 10px;
+  padding: 11px 13px 9px;
   font-family: Inter, system-ui, sans-serif;
-  transition: box-shadow 0.18s ease, transform 0.18s ease, opacity 0.18s ease;
+  transition: box-shadow 0.18s ease, opacity 0.18s ease;
   z-index: 3;
   cursor: default;
-  zoom: 0.8;
+}
+
+.cs-thread--left::after,
+.cs-thread--right::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 2px;
+  background: #0E5BC8;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  pointer-events: none;
+}
+
+.cs-thread--left::after {
+  right: -1px;
+}
+
+.cs-thread--right::after {
+  left: -1px;
 }
 
 .cs-thread--highlight {
-  box-shadow: 0 14px 36px rgba(14, 91, 200, 0.22), 0 0 0 1.5px rgba(14, 91, 200, 0.85);
-  transform: translateY(-2px);
+  box-shadow:
+    0 14px 36px rgba(14, 91, 200, 0.22),
+    0 0 0 1.5px rgba(14, 91, 200, 0.85);
   opacity: 1 !important;
 }
 
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .cs-thread {
+    transition: box-shadow 0.18s ease, opacity 0.18s ease, transform 0.18s ease;
+  }
+
+  .cs-thread--highlight {
+    transform: translateY(-2px);
+  }
+}
+
+.cs-thread--highlight.cs-thread--left::after,
+.cs-thread--highlight.cs-thread--right::after {
+  opacity: 1;
+}
+
 .cs-thread--dim {
-  opacity: 0.5;
+  opacity: 0.42;
 }
 
 .cs-thread-header {
@@ -20058,7 +20099,7 @@ button.invite-secondary-button {
 .cs-thread-divider {
   height: 1px;
   background: rgba(14, 26, 43, 0.06);
-  margin: 0 -14px 8px;
+  margin: 0 -13px 8px;
 }
 
 .cs-thread-divider--footer {
@@ -20372,9 +20413,6 @@ button.invite-secondary-button {
 
 /* Tablet portrait (≤860px): remove zoom, hide thread columns, centre card */
 @media (max-width: 860px) {
-  .cs-section {
-    zoom: 1;
-  }
   .cs-body {
     grid-template-columns: 1fr;
     padding: 0 32px;

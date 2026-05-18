@@ -1,17 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 type Audience = 'developer' | 'studio'
-type RegionKey = 'rate' | 'bio' | 'socials' | 'games' | 'mywork'
+type RegionKey = 'rate' | 'socials' | 'games' | 'mywork'
 type ThreadKey = 'rate' | 'pitch' | 'games' | 'mywork'
 type HoveredKey = RegionKey | ThreadKey
 
+const HOVER_RESET_MS = 120
+
 const REGION_TO_THREAD: Record<RegionKey, ThreadKey> = {
-  rate: 'rate', bio: 'pitch', socials: 'pitch', games: 'games', mywork: 'mywork',
+  rate: 'rate',
+  socials: 'pitch',
+  games: 'games',
+  mywork: 'mywork',
 }
 const THREAD_TO_REGIONS: Record<ThreadKey, RegionKey[]> = {
-  rate: ['rate'], pitch: ['bio', 'socials'], games: ['games'], mywork: ['mywork'],
+  rate: ['rate'],
+  pitch: ['socials'],
+  games: ['games'],
+  mywork: ['mywork'],
 }
 
 function getActiveThread(h: HoveredKey | null): ThreadKey | null {
@@ -82,13 +90,19 @@ interface ThreadProps {
   title: string; channel: string; messages: Message[]
   footer: string; footerKind: 'bad' | 'cold'
   highlight: boolean; dim: boolean
-  onMouseEnter?: () => void; onMouseLeave?: () => void
+  side: 'left' | 'right'
+  onMouseEnter?: () => void
 }
 
-function ChatThread({ title, channel, messages, footer, footerKind, highlight, dim, onMouseEnter, onMouseLeave }: ThreadProps) {
-  const cls = ['cs-thread', highlight ? 'cs-thread--highlight' : '', dim ? 'cs-thread--dim' : ''].filter(Boolean).join(' ')
+function ChatThread({ title, channel, messages, footer, footerKind, highlight, dim, side, onMouseEnter }: ThreadProps) {
+  const cls = [
+    'cs-thread',
+    side === 'left' ? 'cs-thread--left' : 'cs-thread--right',
+    highlight ? 'cs-thread--highlight' : '',
+    dim ? 'cs-thread--dim' : '',
+  ].filter(Boolean).join(' ')
   return (
-    <div className={cls} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+    <div className={cls} onMouseEnter={onMouseEnter}>
       <div className="cs-thread-header">
         <span className="cs-thread-title">{title}</span>
         <span className="cs-thread-channel">{channel}</span>
@@ -238,10 +252,9 @@ function scSkill(s: string) {
   return SC_SKILL_COLORS[s] ?? { bg: '#f3f4f6', color: '#374151' }
 }
 
-function TalentCard({ activeRegions, onRegion, onLeave }: {
+function TalentCard({ activeRegions, onRegion }: {
   activeRegions: RegionKey[]
   onRegion: (k: RegionKey) => void
-  onLeave: () => void
 }) {
   return (
     <div className="npc-card cs-card-static">
@@ -277,7 +290,7 @@ function TalentCard({ activeRegions, onRegion, onLeave }: {
           <div className="npc-socials"
             data-region="socials"
             data-active={activeRegions.includes('socials') ? '' : undefined}
-            onMouseEnter={() => onRegion('socials')} onMouseLeave={onLeave}>
+            onMouseEnter={() => onRegion('socials')}>
             <a href="#" className="npc-portfolio-top-link" onClick={(e) => e.preventDefault()}><IconRoblox /> Roblox Profile</a>
             <a href="#" className="npc-portfolio-top-link" onClick={(e) => e.preventDefault()}><IconExternal /> GitHub</a>
           </div>
@@ -294,17 +307,14 @@ function TalentCard({ activeRegions, onRegion, onLeave }: {
 
       <div className="npc-divider" />
 
-      <p className="npc-bio"
-        data-region="bio"
-        data-active={activeRegions.includes('bio') ? '' : undefined}
-        onMouseEnter={() => onRegion('bio')} onMouseLeave={onLeave}>
+      <p className="npc-bio">
         I&apos;ve been building Roblox games professionally for four years, shipping everything from solo indie projects to large-team live titles. My strength is owning full game systems end-to-end.
       </p>
 
       <div className="npc-rate-skills"
         data-region="rate"
         data-active={activeRegions.includes('rate') ? '' : undefined}
-        onMouseEnter={() => onRegion('rate')} onMouseLeave={onLeave}>
+        onMouseEnter={() => onRegion('rate')}>
         <div className="npc-rate-pill">
           <div className="npc-rate-amount">$65 / hr</div>
           <div className="npc-rate-type">Hourly or milestone</div>
@@ -320,7 +330,7 @@ function TalentCard({ activeRegions, onRegion, onLeave }: {
         <div className="npc-entry-btn"
           data-region="games"
           data-active={activeRegions.includes('games') ? '' : undefined}
-          onMouseEnter={() => onRegion('games')} onMouseLeave={onLeave}>
+          onMouseEnter={() => onRegion('games')}>
           <div className="npc-entry-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 2 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
@@ -333,7 +343,7 @@ function TalentCard({ activeRegions, onRegion, onLeave }: {
         <div className="npc-entry-btn"
           data-region="mywork"
           data-active={activeRegions.includes('mywork') ? '' : undefined}
-          onMouseEnter={() => onRegion('mywork')} onMouseLeave={onLeave}>
+          onMouseEnter={() => onRegion('mywork')}>
           <div className="npc-entry-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
@@ -347,10 +357,9 @@ function TalentCard({ activeRegions, onRegion, onLeave }: {
   )
 }
 
-function StudioCardStatic({ activeRegions, onRegion, onLeave }: {
+function StudioCardStatic({ activeRegions, onRegion }: {
   activeRegions: RegionKey[]
   onRegion: (k: RegionKey) => void
-  onLeave: () => void
 }) {
   return (
     <div className="npc-card sc-card cs-card-static">
@@ -384,7 +393,7 @@ function StudioCardStatic({ activeRegions, onRegion, onLeave }: {
       <div className="cs-sc-socials"
         data-region="socials"
         data-active={activeRegions.includes('socials') ? '' : undefined}
-        onMouseEnter={() => onRegion('socials')} onMouseLeave={onLeave}>
+        onMouseEnter={() => onRegion('socials')}>
         <span className="cs-sc-chip"><span className="cs-sc-chip-dot cs-sc-chip-dot--marine" />Studio Profile</span>
         <span className="cs-sc-chip"><span className="cs-sc-chip-dot cs-sc-chip-dot--ink" />X / Twitter</span>
       </div>
@@ -402,11 +411,7 @@ function StudioCardStatic({ activeRegions, onRegion, onLeave }: {
         <p className="sc-type">Live game studio · 7yr</p>
       </div>
 
-      {/* Bio — data-region="bio" */}
-      <div className="sc-bio-card"
-        data-region="bio"
-        data-active={activeRegions.includes('bio') ? '' : undefined}
-        onMouseEnter={() => onRegion('bio')} onMouseLeave={onLeave}>
+      <div className="sc-bio-card">
         <p className="sc-bio">We&apos;re shipping the next update of a long-running tycoon franchise. Looking for a scripter to own the combat and progression systems end-to-end. 6 months of runway, milestone-based, scope locked from week one.</p>
       </div>
 
@@ -416,7 +421,7 @@ function StudioCardStatic({ activeRegions, onRegion, onLeave }: {
         <div className="sc-info-col"
           data-region="rate"
           data-active={activeRegions.includes('rate') ? '' : undefined}
-          onMouseEnter={() => onRegion('rate')} onMouseLeave={onLeave}>
+          onMouseEnter={() => onRegion('rate')}>
           <div className="sc-info-label">HIRING RATE</div>
           <div className="sc-rate">$50–80/hr</div>
           <div className="sc-rate-type">Locked range,</div>
@@ -435,7 +440,7 @@ function StudioCardStatic({ activeRegions, onRegion, onLeave }: {
         <div className="sc-info-col"
           data-region="mywork"
           data-active={activeRegions.includes('mywork') ? '' : undefined}
-          onMouseEnter={() => onRegion('mywork')} onMouseLeave={onLeave}>
+          onMouseEnter={() => onRegion('mywork')}>
           <div className="sc-info-label">OPEN ROLES</div>
           {[
             { label: 'Sc', bg: '#ede9fe', color: '#6d28d9', title: 'Systems sc...' },
@@ -461,7 +466,7 @@ function StudioCardStatic({ activeRegions, onRegion, onLeave }: {
       <div className="sc-games"
         data-region="games"
         data-active={activeRegions.includes('games') ? '' : undefined}
-        onMouseEnter={() => onRegion('games')} onMouseLeave={onLeave}>
+        onMouseEnter={() => onRegion('games')}>
         <div className="sc-games-icon"><BoxIcon /></div>
         <div>
           <div className="sc-games-title">Games (6)</div>
@@ -477,10 +482,32 @@ function StudioCardStatic({ activeRegions, onRegion, onLeave }: {
 
 export default function ComparisonSection({ audience = 'studio' }: { audience?: Audience }) {
   const [hovered, setHovered] = useState<HoveredKey | null>(null)
+  const hoverClearRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const clearHoverTimer = () => {
+    if (hoverClearRef.current) {
+      clearTimeout(hoverClearRef.current)
+      hoverClearRef.current = null
+    }
+  }
+
+  const beginHover = (k: HoveredKey) => {
+    clearHoverTimer()
+    setHovered(k)
+  }
+
+  const scheduleBodyLeave = () => {
+    clearHoverTimer()
+    hoverClearRef.current = setTimeout(() => {
+      setHovered(null)
+      hoverClearRef.current = null
+    }, HOVER_RESET_MS)
+  }
+
+  useEffect(() => () => clearHoverTimer(), [])
 
   const activeThread = getActiveThread(hovered)
   const activeRegions = getActiveRegions(hovered)
-  const reset = () => setHovered(null)
 
   const isDev = audience === 'developer'
   const leftThreads = isDev ? DEV_LEFT_THREADS : STUDIO_LEFT_THREADS
@@ -499,12 +526,12 @@ export default function ComparisonSection({ audience = 'studio' }: { audience?: 
         </h2>
         <p className="cs-subhead">
           {isDev
-            ? 'Hover any field on the offer to see the days-long search you avoided.'
-            : 'Hover any field on the card to see the days-long search you avoided.'}
+            ? 'Hover a Discord thread or any field on the offer to see the search you skipped.'
+            : 'Hover a Discord thread or any field on the card to see the search you skipped.'}
         </p>
       </div>
 
-      <div className="cs-body">
+      <div className="cs-body" onMouseLeave={scheduleBodyLeave}>
         {/* Left threads */}
         <div className="cs-col cs-col--left">
           {leftThreads.map((t) => (
@@ -514,8 +541,8 @@ export default function ComparisonSection({ audience = 'studio' }: { audience?: 
               footer={t.footer} footerKind={t.footerKind}
               highlight={activeThread === t.key}
               dim={activeThread !== null && activeThread !== t.key}
-              onMouseEnter={() => setHovered(t.key)}
-              onMouseLeave={reset}
+              side="left"
+              onMouseEnter={() => beginHover(t.key)}
             />
           ))}
         </div>
@@ -523,8 +550,8 @@ export default function ComparisonSection({ audience = 'studio' }: { audience?: 
         {/* Center card */}
         <div className="cs-card-wrap">
           {isDev
-            ? <StudioCardStatic activeRegions={activeRegions} onRegion={(k) => setHovered(k)} onLeave={reset} />
-            : <TalentCard activeRegions={activeRegions} onRegion={(k) => setHovered(k)} onLeave={reset} />
+            ? <StudioCardStatic activeRegions={activeRegions} onRegion={(k) => beginHover(k)} />
+            : <TalentCard activeRegions={activeRegions} onRegion={(k) => beginHover(k)} />
           }
         </div>
 
@@ -537,8 +564,8 @@ export default function ComparisonSection({ audience = 'studio' }: { audience?: 
               footer={t.footer} footerKind={t.footerKind}
               highlight={activeThread === t.key}
               dim={activeThread !== null && activeThread !== t.key}
-              onMouseEnter={() => setHovered(t.key)}
-              onMouseLeave={reset}
+              side="right"
+              onMouseEnter={() => beginHover(t.key)}
             />
           ))}
         </div>
