@@ -5097,6 +5097,7 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   min-width: 0;
   display: flex;
   flex-direction: column;
+  align-self: start;
 }
 
 .glass-footer-form-panel {
@@ -5105,10 +5106,8 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   background: var(--gf-form-bg);
   border: 1px solid var(--gf-form-border);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.75) inset;
-  flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 100%;
 }
 
 .glass-footer-form-title {
@@ -5132,7 +5131,6 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   flex-direction: column;
   gap: 14px;
   margin-top: 18px;
-  flex: 1;
 }
 
 .glass-footer-privacy-note {
