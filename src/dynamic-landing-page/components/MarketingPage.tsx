@@ -821,6 +821,11 @@ function WeldLandingPage({
             profile={activeProfile}
             signal={heroSignal}
             onSignalChange={setHeroSignal}
+            signalTabs={{
+              proof: modeCopy.hero.signalTabProof,
+              match: modeCopy.hero.signalTabMatch,
+              context: modeCopy.hero.signalTabContext
+            }}
             onOpenCard={() => setSwipeModalOpen(true)}
             onJoin={() => handleJoinIntent("hero")}
             joinCtaLabel={modeCopy.nav.cta}
@@ -992,7 +997,7 @@ function HeroCopyPanel({
           {isSuccess ? copy.hero.submittedLabel : isSubmitting ? copy.hero.submittingLabel : copy.hero.primaryCta}
         </button>
       </div>
-      <p className="hero-trust-line">{copy.waitlist.privacy}</p>
+      <p className="hero-trust-line">{copy.hero.trustLine}</p>
       <div className="hero-secondary-row">
         <button
           type="button"
@@ -1024,6 +1029,7 @@ function HeroProductPreview({
   profile,
   signal,
   onSignalChange,
+  signalTabs,
   onOpenCard,
   onJoin,
   joinCtaLabel
@@ -1032,11 +1038,11 @@ function HeroProductPreview({
   profile: TalentProfile;
   signal: HeroSignal;
   onSignalChange: (signal: HeroSignal) => void;
+  signalTabs: { proof: string; match: string; context: string };
   onOpenCard: () => void;
   onJoin: () => void;
   joinCtaLabel: string;
 }) {
-  void onSignalChange;
   const isStudioMode = mode === "studio";
   const signals: Array<{
     key: HeroSignal;
@@ -1066,6 +1072,11 @@ function HeroProductPreview({
     }
   ];
   const activeSignal = signals.find((entry) => entry.key === signal) ?? signals[0];
+  const tabDefs: Array<{ key: HeroSignal; short: string }> = [
+    { key: "proof", short: signalTabs.proof },
+    { key: "match", short: signalTabs.match },
+    { key: "studio", short: signalTabs.context }
+  ];
 
   return (
     <div className="hero-card-column hero-card-column-split hero-product-preview">
@@ -1087,6 +1098,20 @@ function HeroProductPreview({
           </div>
 
           <aside className="hero-signal-panel" aria-live="polite">
+            <div className="hero-signal-tabs" role="tablist" aria-label="Preview signal focus">
+              {tabDefs.map(({ key, short }) => (
+                <button
+                  key={key}
+                  type="button"
+                  role="tab"
+                  aria-selected={signal === key}
+                  className={signal === key ? "is-active" : ""}
+                  onClick={() => onSignalChange(key)}
+                >
+                  {short}
+                </button>
+              ))}
+            </div>
             <div className="hero-signal-score">
               <span>{activeSignal.label}</span>
               <strong>{activeSignal.value}</strong>
@@ -1147,7 +1172,11 @@ function TalentMarqueeSection({
   const doubled = [...MARQUEE_PROFILES, ...MARQUEE_PROFILES];
 
   return (
-    <section className="marquee-section" data-audience={mode} aria-label="Talent on weld.">
+    <section
+      className="marquee-section"
+      data-audience={mode}
+      aria-label={`${teaser.kicker}: ${teaser.title}`}
+    >
       <div className="marquee-header">
         <p className="marquee-eyebrow">{teaser.kicker}</p>
         <h2 className="marquee-heading">{teaser.title}</h2>
@@ -1250,6 +1279,8 @@ function RoleTalentExplorer({
         </div>
 
         <HiringPanelStack
+          mode={mode}
+          hiringCopy={copy.roleExplorer.hiring}
           panels={panels}
           role={role}
           activeIndex={hiringPanel}
@@ -1292,6 +1323,8 @@ function hiringPreviewBullets(panel: (typeof HIRING_PANELS)[RoleKey][number]) {
 }
 
 function HiringPanelStack({
+  mode,
+  hiringCopy,
   panels,
   role,
   activeIndex,
@@ -1299,6 +1332,8 @@ function HiringPanelStack({
   isSwapping,
   onAction
 }: {
+  mode: Audience;
+  hiringCopy: LandingCopy["roleExplorer"]["hiring"];
   panels: (typeof HIRING_PANELS)[RoleKey];
   role: RoleKey;
   activeIndex: number;
@@ -1310,6 +1345,10 @@ function HiringPanelStack({
   const behind1 = panels[(activeIndex + 1) % panels.length];
   const behind2 = panels[(activeIndex + 2) % panels.length];
   const bullets = hiringPreviewBullets(active);
+  const ctaBody =
+    mode === "developer"
+      ? hiringCopy.goodFitBodyDev.split("{studio}").join(active.studio)
+      : hiringCopy.goodFitBodyStudio;
 
   return (
     <div className="hiring-stack-wrapper" data-swapping={isSwapping ? "true" : "false"}>
@@ -1350,18 +1389,16 @@ function HiringPanelStack({
           </ul>
 
           <div className="hp-cta-box">
-            <p className="hp-cta-title">Good fit?</p>
-            <p className="hp-cta-body">
-              Spark {active.studio} to open a focused hiring thread.
-            </p>
+            <p className="hp-cta-title">{hiringCopy.goodFitTitle}</p>
+            <p className="hp-cta-body">{ctaBody}</p>
           </div>
 
           <div className="hiring-panel-actions">
             <button type="button" className="hiring-action-spark" onClick={() => onAction("spark")}>
-              Spark role
+              {hiringCopy.primaryCta}
             </button>
             <button type="button" className="hiring-action-next" onClick={() => onAction("skip")}>
-              Next job
+              {hiringCopy.secondaryCta}
             </button>
           </div>
         </article>
@@ -1383,7 +1420,12 @@ function OtherSideSection({
   const doubled = [...MARQUEE_STUDIOS, ...MARQUEE_STUDIOS];
 
   return (
-    <section data-reveal="pending" className="other-side-section" data-audience={mode}>
+    <section
+      data-reveal="pending"
+      className="other-side-section"
+      data-audience={mode}
+      aria-label={`${teaser.kicker}: ${teaser.title}`}
+    >
       <div className="marquee-header">
         <p className="marquee-eyebrow">{teaser.kicker}</p>
         <h2 className="marquee-heading">{teaser.title}</h2>
@@ -1600,190 +1642,6 @@ function DotScale({ level }: { level: 1 | 2 | 3 }) {
   );
 }
 
-function ComparisonTableSection({ copy }: { copy: LandingCopy }) {
-  const channels = [
-    {
-      title: "Discord servers",
-      label: "Scattered reach",
-      tone: "servers",
-      score: "Low signal",
-      scoreValue: "34%",
-      icon: <DiscordIcon />,
-      body: "Big rooms create reach, but role, proof, rate, and availability get buried quickly.",
-      points: ["Role clarity buried", "Identity varies", "High noise"]
-    },
-    {
-      title: "Discord channels",
-      label: "Partial structure",
-      tone: "channels",
-      score: "Mixed signal",
-      scoreValue: "58%",
-      icon: <FolderIcon />,
-      body: "Dedicated channels help sorting, but hiring context still depends on links and manual scanning.",
-      points: ["Some role sorting", "Proof link-hopping", "Threads drift"]
-    },
-    {
-      title: "weld.",
-      label: "Proof-first cards",
-      tone: "weld",
-      score: "Strong signal",
-      scoreValue: "92%",
-      icon: <ShieldIcon />,
-      body: "Cards package role, proof, rate, availability, and first-message context in one scannable surface.",
-      points: ["Role-first cards", "Proof upfront", "Focused outreach"]
-    }
-  ];
-
-  return (
-    <section className="glass-section comparison-table-section" id="compare">
-      <div className="section-copy">
-        <span className="section-kicker">{copy.comparison.kicker}</span>
-        <h2>{copy.comparison.title}</h2>
-        <p>{copy.comparison.body}</p>
-      </div>
-
-      <div className="comparison-visual-wrapper" aria-label="Hiring channel comparison">
-        {channels.map((channel) => (
-          <article key={channel.title} className={`comparison-lane is-${channel.tone}`}>
-            <div className="comparison-lane-top">
-              <span className="comparison-lane-label">{channel.label}</span>
-              <span className="comparison-lane-icon" aria-hidden="true">
-                {channel.icon}
-              </span>
-            </div>
-            <h3>{channel.title}</h3>
-            <p>{channel.body}</p>
-            <div className="comparison-signal">
-              <span>{channel.score}</span>
-              <strong>{channel.scoreValue}</strong>
-              <i aria-hidden="true" style={{ "--signal-fill": channel.scoreValue } as CSSProperties} />
-            </div>
-            <div className="comparison-chip-list">
-              {channel.points.map((point) => (
-                <span key={point}>
-                  <CheckIcon />
-                  {point}
-                </span>
-              ))}
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function EarlyAccessSection({
-  mode,
-  copy,
-  email,
-  phase,
-  status,
-  captureRef,
-  onEmailChange,
-  onSubmit
-}: {
-  mode: Audience;
-  copy: LandingCopy;
-  email: string;
-  phase: CapturePhase;
-  status: string;
-  captureRef: React.MutableRefObject<HTMLDivElement | null>;
-  onEmailChange: (value: string) => void;
-  onSubmit: () => void;
-}) {
-  const buttonLabel =
-    phase === "submitting"
-      ? copy.waitlist.submittingLabel
-      : phase === "success"
-        ? copy.waitlist.submittedLabel
-        : copy.waitlist.button;
-
-  const benefitIcon = (key: "shield" | "code" | "user" | "folder") => {
-    if (key === "shield") return <ShieldIcon />;
-    if (key === "code") return <CodeIcon />;
-    if (key === "user") return <UserIcon />;
-    return <FolderIcon />;
-  };
-
-  return (
-    <section
-      data-reveal="pending"
-      className="glass-section waitlist-section"
-      id="join"
-      data-mode={mode}
-    >
-      <div className="waitlist-shell">
-        <div className="section-copy waitlist-copy">
-          <span className="section-kicker">{copy.waitlist.kicker}</span>
-          <h2>{copy.waitlist.headline}</h2>
-          <p>{copy.waitlist.subhead}</p>
-
-          <div className="waitlist-benefits">
-            {copy.waitlist.benefits.map(([title, body, iconKey]) => (
-              <span key={title}>
-                {benefitIcon(iconKey)}
-                <strong>
-                  {title}
-                  <em>{body}</em>
-                </strong>
-              </span>
-            ))}
-          </div>
-
-        </div>
-
-        <div
-          ref={captureRef}
-          className={`glass-card waitlist-form-card is-${phase}`}
-        >
-          <div className="waitlist-form-heading">
-            <h3>{copy.waitlist.title}</h3>
-            <p>{copy.waitlist.body}</p>
-          </div>
-
-          <div className="waitlist-capture-row">
-            <label className="waitlist-field">
-              <span>{copy.waitlist.fieldLabel}</span>
-              <input
-                type="email"
-                value={email}
-                placeholder={copy.waitlist.placeholder}
-                onChange={(event) => onEmailChange(event.target.value)}
-                aria-describedby={status ? `waitlist-status-${mode}` : undefined}
-              />
-            </label>
-
-            <button
-              type="button"
-              className="button-primary waitlist-submit"
-              onClick={onSubmit}
-              disabled={phase === "submitting"}
-            >
-              {buttonLabel}
-            </button>
-          </div>
-
-          {phase === "success" ? (
-            <Sticker
-              tone="spark"
-              icon={<SparkIcon />}
-              label={copy.waitlist.successSticker}
-              className="waitlist-success-sticker"
-            />
-          ) : null}
-
-          {status ? (
-            <p id={`waitlist-status-${mode}`} className="waitlist-status" aria-live="polite">
-              {status}
-            </p>
-          ) : null}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function FriendlyFAQ({ copy }: { copy: LandingCopy }) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
@@ -1930,6 +1788,7 @@ function FooterCTA({
                     </button>
                   </div>
                 </div>
+                <p className="glass-footer-privacy-note">{copy.waitlist.privacy}</p>
                 {status ? (
                   <p id="footer-join-status" className="glass-footer-status" aria-live="polite">
                     {status}

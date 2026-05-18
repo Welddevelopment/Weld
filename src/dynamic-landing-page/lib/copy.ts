@@ -25,6 +25,11 @@ export interface LandingCopy {
     submittingLabel: string;
     submittedLabel: string;
     inviteReturn: string;
+    /** Short reassurance under the hero email row (footer keeps full `waitlist.privacy`). */
+    trustLine: string;
+    signalTabProof: string;
+    signalTabMatch: string;
+    signalTabContext: string;
   };
   marquee: {
     talentPrimary: { kicker: string; title: string; body: string; strong?: string };
@@ -36,6 +41,14 @@ export interface LandingCopy {
     kicker: string;
     title: string;
     lead: string;
+    hiring: {
+      goodFitTitle: string;
+      /** Use `{studio}` placeholder; only shown in developer mode. */
+      goodFitBodyDev: string;
+      goodFitBodyStudio: string;
+      primaryCta: string;
+      secondaryCta: string;
+    };
   };
   comparison: {
     kicker: string;
@@ -162,7 +175,11 @@ const COPY: Record<Audience, LandingCopy> = {
       proofSuffix: "studio signups",
       submittingLabel: "Joining...",
       submittedLabel: "You're in",
-      inviteReturn: "Back to my invite page"
+      inviteReturn: "Back to my invite page",
+      trustLine: "Invite-first beta. No fake countdowns or public waitlist numbers.",
+      signalTabProof: "Proof",
+      signalTabMatch: "Fit",
+      signalTabContext: "Studio view"
     },
     marquee: {
       talentPrimary: {
@@ -190,7 +207,14 @@ const COPY: Record<Audience, LandingCopy> = {
     roleExplorer: {
       kicker: "FOR DEVELOPERS",
       title: "Pick what you do. See who's hiring.",
-      lead: "Real open roles, cleaner scope, and visible rates before you Spark."
+      lead: "Real open roles, cleaner scope, and visible rates before you Spark.",
+      hiring: {
+        goodFitTitle: "Good fit?",
+        goodFitBodyDev: "Spark {studio} to open a focused hiring thread.",
+        goodFitBodyStudio: "",
+        primaryCta: "Spark role",
+        secondaryCta: "Next job"
+      }
     },
     comparison: {
       kicker: "IMPROVED VISIBILITY",
@@ -375,7 +399,11 @@ const COPY: Record<Audience, LandingCopy> = {
       proofSuffix: "studios preparing to hire",
       submittingLabel: "Opening...",
       submittedLabel: "You're in",
-      inviteReturn: "Back to my invite page"
+      inviteReturn: "Back to my invite page",
+      trustLine: "Invite-first beta for hiring teams. No fake countdowns or public waitlist numbers.",
+      signalTabProof: "Proof",
+      signalTabMatch: "Fit",
+      signalTabContext: "Talent view"
     },
     marquee: {
       talentPrimary: {
@@ -403,7 +431,15 @@ const COPY: Record<Audience, LandingCopy> = {
     roleExplorer: {
       kicker: "FOR STUDIOS",
       title: "Pick a role. See market demand.",
-      lead: "Preview role demand, rates, and scope the same way talent sees hiring cards."
+      lead: "Preview role demand, rates, and scope the same way talent sees hiring cards.",
+      hiring: {
+        goodFitTitle: "Posting preview",
+        goodFitBodyDev: "",
+        goodFitBodyStudio:
+          "This is how talent reads a hiring card before they reply — scope, pay band, and credibility in one scan.",
+        primaryCta: "Get hiring access",
+        secondaryCta: "Next listing"
+      }
     },
     comparison: {
       kicker: "HIRING CLARITY",
@@ -513,7 +549,7 @@ const COPY: Record<Audience, LandingCopy> = {
       privacy: "Invite-first beta for hiring teams. No fake countdowns or public waitlist numbers.",
       successMessage: "Studio spot saved. We'll send the next step soon.",
       successSticker: "Studio spot saved ✨",
-      submittingLabel: "Joining...",
+      submittingLabel: "Opening...",
       submittedLabel: "Joined"
     },
     demo: {

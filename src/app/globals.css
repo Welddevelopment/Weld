@@ -5135,6 +5135,14 @@ body.split-active > *:not(#split-entry-root):not(#__NEXT_DATA__) {
   flex: 1;
 }
 
+.glass-footer-privacy-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--gf-sub);
+  max-width: 48ch;
+}
+
 .glass-footer-field {
   display: flex;
   flex-direction: column;
@@ -13611,6 +13619,46 @@ body {
   box-shadow: 0 18px 42px rgba(8, 24, 39, 0.22);
 }
 
+.weld-glass-page .hero-signal-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 12px;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.weld-glass-page .hero-signal-tabs button {
+  flex: 1;
+  min-height: 32px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.weld-glass-page .hero-signal-tabs button:hover,
+.weld-glass-page .hero-signal-tabs button:focus-visible {
+  color: rgba(255, 255, 255, 0.92);
+  outline: none;
+}
+
+.weld-glass-page .hero-signal-tabs button.is-active {
+  color: rgba(8, 24, 39, 0.92);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+}
+
 .weld-glass-page .hero-signal-score strong {
   display: block;
   margin-top: 6px;
@@ -13625,7 +13673,7 @@ body {
 }
 
 .weld-glass-page .hero-signal-panel p {
-  min-height: 70px;
+  min-height: 56px;
   margin: 14px 0 0;
   font-size: 13px;
   line-height: 1.55;
@@ -17980,7 +18028,7 @@ button.invite-secondary-button {
 }
 
 .weld-glass-page[data-mode] .glass-section {
-  margin-top: 50px;
+  margin-top: 56px;
   padding-top: 0;
   padding-bottom: 0;
 }
@@ -18009,11 +18057,11 @@ button.invite-secondary-button {
 }
 
 .weld-glass-page[data-mode] .how-strip-section {
-  margin-top: 50px;
+  margin-top: 56px;
 }
 
 .weld-glass-page[data-mode] .marquee-section {
-  margin-top: 50px;
+  margin-top: 56px;
 }
 
 .weld-glass-page[data-mode] .marquee-section .marquee-header,
@@ -18032,7 +18080,7 @@ button.invite-secondary-button {
 }
 
 .weld-glass-page[data-mode] .other-side-section {
-  margin-top: 50px;
+  margin-top: 56px;
 }
 
 .weld-glass-page[data-mode] .other-side-section .marquee-header {
@@ -18050,7 +18098,7 @@ button.invite-secondary-button {
 }
 
 .weld-glass-page[data-mode] .chat-section-shell-outer {
-  margin-top: 50px;
+  margin-top: 56px;
 }
 
 @media (max-width: 1120px) {
@@ -18120,7 +18168,27 @@ button.invite-secondary-button {
   }
 
   .weld-glass-page[data-mode] .glass-nav-links {
-    display: none;
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    padding-bottom: 2px;
+  }
+
+  .weld-glass-page[data-mode] .glass-nav-links a {
+    font-size: 12px;
+    min-height: 36px;
+    padding: 0 11px;
+  }
+
+  .weld-glass-page[data-mode] .glass-nav-links .button-nav {
+    min-height: 38px;
+    font-size: 12px;
+    padding: 0 14px;
   }
 
   .weld-glass-page[data-mode] .hero-shell {
