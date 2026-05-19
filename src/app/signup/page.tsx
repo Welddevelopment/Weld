@@ -172,10 +172,17 @@ function SignupContent() {
       return;
     }
 
-    const payload =
-      signupType === "studio"
+    const attribution = getStoredAttribution();
+    const payload = {
+      ...(signupType === "studio"
         ? buildStudioPayload(form, normalizedEmail, selected)
-        : buildDeveloperPayload(form, normalizedEmail, selected);
+        : buildDeveloperPayload(form, normalizedEmail, selected)),
+      utm_source: attribution.utmSource,
+      utm_medium: attribution.utmMedium,
+      utm_campaign: attribution.utmCampaign,
+      utm_content: attribution.utmContent,
+      utm_term: attribution.utmTerm,
+    };
 
     setSubmitState("submitting");
     setMessage("");
