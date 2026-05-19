@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 
+import { getStoredAttribution } from "@/dynamic-landing-page/lib/browser";
+
 type SignupType = "developer" | "studio";
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
@@ -211,7 +213,8 @@ function SignupContent() {
             email: normalizedEmail,
             audience: signupType,
             source: "signup-form",
-            referredByInviteCode: referralCode.trim().toUpperCase() || undefined
+            referredByInviteCode: referralCode.trim().toUpperCase() || undefined,
+            utm: getStoredAttribution()
           })
         });
         const data = (await res.json()) as { ok: boolean; inviteUrl?: string; inviteCode?: string };
